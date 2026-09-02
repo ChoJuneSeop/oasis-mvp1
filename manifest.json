@@ -1,11 +1,11 @@
 {
-  "name": "OASIS MVP1 Living RPG Observer",
-  "short_name": "OASIS MVP1",
+  "name": "OASIS MVP2 Relational World Laboratory",
+  "short_name": "OASIS MVP2",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#07111f",
   "theme_color": "#111827",
-  "description": "OASIS 2D autonomous RPG observation MVP",
+  "description": "OASIS multi-party relational RPG comparison laboratory",
   "icons": [
     {
       "src": "icon.svg",
