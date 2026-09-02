@@ -1,61 +1,58 @@
-# OASIS MVP1
+# OASIS MVP2
 
-2D autonomous RPG observation MVP converted into a comparative validation laboratory for OASIS.
+OASIS is implemented here as a 2D autonomous RPG observation laboratory, not as a score-maximizing game bot.
 
-## Party model
+## Current validation structure
 
-The hero party now moves together by default instead of letting every member choose an independent destination.
+The world now contains 10 places, 8 NPCs, and 3 distinct hero parties. Each party moves together by default. Individual members contribute differently to one party decision according to current danger, role, health, curiosity, care, courage, accumulated experience, and — in OASIS-Full — relationship history.
 
-Each member contributes to one party decision through personality, current risk, health, experience, role, and — where enabled — relationship history. Only one party destination is realized at a time.
+Multiple possibilities can exist at once, but only one party action is realized at a time.
 
-Temporary separation is treated as a contextual possibility rather than the normal movement model. For example, the scout can temporarily leave formation to inspect an undiscovered location when conditions are suitable, then return to the party. Separation and reunion are recorded as part of the relationship/experience process.
+Temporary separation is allowed only as a contextual role action such as scouting, followed by reunion.
 
-The intended loop is:
+## Four comparison groups
 
-current world flow -> member participation -> multiple party possibilities -> one realized party action -> shared result/experience -> relationship and participation changes -> next party decision
+- OASIS-Full: relationship history + outcome feedback + present-flow context + participation state + relationship-gated structural expansion.
+- NoRelation: outcome feedback remains, but relationship formation/reactivation and relationship-gated possibilities are removed.
+- NoFeedback: outcomes do not update later decision conditions. Relationship state, experience, discovery, injury, and healing are not fed back into future judgment.
+- FixedScore: static role/place preferences with evolving OASIS structures removed.
 
-## Validation design
+The environmental danger/weather tape is deterministic and shared across groups.
 
-The app runs four worlds from the same initial conditions and the same deterministic environmental events.
+## Why the world was expanded
 
-- OASIS-Full: relationship history + outcome feedback + current-flow context + participation state + structural expansion.
-- NoRelation: relationship formation/reactivation removed.
-- NoFeedback: outcomes do not modify later decision conditions.
-- FixedScore: fixed personality/place preference scores; evolving OASIS structure is removed.
+The purpose is not to add content for its own sake. The expanded world creates conditions in which a past relationship can alter what is possible later.
 
-## What to observe
+Examples include relationship-gated places such as the Ancient Ruins, Watchtower, Star Shrine, and Red Canyon. In OASIS-Full, relationships with particular NPCs can make previously unavailable places enter the party's candidate set. NoRelation cannot open those candidates through relationship history.
 
-The MVP is not intended to prove that OASIS always achieves a higher score. It tests whether removing OASIS structures changes how the simulated world develops.
+## Cause-separated metrics
 
-Displayed validation metrics include:
+The previous single spiral count was not sufficient to explain why OASIS-Full and NoRelation could look identical. MVP2 therefore records separate causes:
 
-- active relationship edges
-- spiral-change count
-- discovered places
-- unique party/destination routes
-- temporary split count
-- reunion count
+- experience feedback changes
+- relationship changes
+- participation-leader changes
+- candidate-structure changes
+- counterfactual choice changes caused by relationship participation
+- total spiral-loop events
 - estimated possibility-space size
 
-A +100 tick control is provided for rapid comparative observation. A selected world can be inspected on the 2D map while all four worlds continue advancing together.
+A higher number is not treated as proof of superiority. The important observation is whether the structure and realized path diverge, and why.
 
-## Experimental control
+## Same-state counterfactual replay
 
-Random behavior uses deterministic hash-based noise keyed by tick, actor, and event. This keeps environmental disturbances comparable across groups and reduces differences caused only by unequal random-number call sequences.
+The `동일상황 재시험` control evaluates the selected OASIS-Full party twice without advancing the world: once with relationship participation and once with relationship participation removed. It records whether the available candidate set or selected destination changes.
 
-## OASIS concepts represented
+This is intended as an internal structural falsification aid, not as proof of real-world causality.
 
-- flow
-- relationship process
-- participation state
-- multiple possibilities with one realized action
-- shared party action and shared experience
-- contextual split and reunion
-- spiral feedback
-- structural expansion
+## Multiple party histories
 
-## Run
+Three parties begin from different locations and carry slightly different collective dispositions. They share the same world but accumulate different experiences and relationships. This makes it possible to observe whether the same NPC or place later participates differently in each party's future possibilities.
 
-Serve the repository as a static website and open `index.html`. GitHub Pages is suitable.
+## Persistence and closed-app behavior
 
-No external LLM, paid API, or dedicated game server is required.
+State is saved in localStorage. When the app is reopened, elapsed wall-clock time is converted into a bounded catch-up simulation. This is not true continuous background execution while the browser or PWA is closed; it is resume-time catch-up without a dedicated server.
+
+## PWA
+
+The app uses `manifest.json`, `icon.svg`, and `service-worker.js` and can be installed from the GitHub Pages deployment as a standalone home-screen app.
