@@ -1,0 +1,9 @@
+{
+  "name": "OASIS MVP1 Living RPG Observer",
+  "short_name": "OASIS MVP1",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#111827",
+  "description": "OASIS 2D autonomous RPG observation MVP"
+}
