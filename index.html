@@ -12,9 +12,9 @@
 </style>
 </head>
 <body><div class="app">
-<div class="top"><div><div class="title">OASIS MVP2 · Structural Relation Laboratory</div><div class="sub">비교군은 모두 현재 세계에서 계속 행동합니다. NoRelation의 경험 피드백 변화는 '경험전이'로 별도 기록하고 OASIS의 관계 나선으로 세지 않습니다. 관계 나선은 실제 결과가 관계과정에 남고 그 관계과정이 다음 판단구조를 바꾼 경우만 기록합니다.</div></div><div class="ctl"><button id="toggle">일시정지</button><button id="step">1틱</button><button id="run100">+100틱</button><button id="replay">동일상황 재시험</button><select id="speed"><option value="450">x1</option><option value="150">x3</option><option value="50">x8</option></select><button id="reset">초기화</button></div></div>
+<div class="top"><div><div class="title">OASIS MVP2 · Structural Relation Laboratory</div><div class="sub">비교군은 모두 현재 세계에서 계속 행동합니다. 관계나선은 단순히 관계가 생긴 턴의 변화가 아니라, 동일한 결과 상태에서 관계 참여만 제거했을 때 판단이 달라지는지 즉시 대조한 뒤 관계가 실제 차이를 만든 경우만 기록합니다. NoRelation의 경험 피드백 변화는 경험전이로 별도 기록됩니다.</div></div><div class="ctl"><button id="toggle">일시정지</button><button id="step">1틱</button><button id="run100">+100틱</button><button id="replay">동일상황 재시험</button><select id="speed"><option value="450">x1</option><option value="150">x3</option><option value="50">x8</option></select><button id="reset">초기화</button></div></div>
 <div class="lab"><section class="card"><h2>세계 관찰 · <select id="focus"></select> · <select id="focusParty"></select></h2><canvas id="world" width="960" height="600"></canvas><div class="hud"><div class="met"><b id="day">1일</b><span>시간</span></div><div class="met"><b id="danger">낮음</b><span>위험</span></div><div class="met"><b id="relations">0</b><span>관계이력</span></div><div class="met"><b id="candidate">0</b><span>후보변화</span></div><div class="met"><b id="decision">0</b><span>전체전이</span></div><div class="met"><b id="spiral">0</b><span>관계나선</span></div><div class="met"><b id="hidden">0</b><span>히든 후보</span></div><div class="met"><b id="stories">0</b><span>히든 발생</span></div></div></section><div class="right"><section class="card"><h2>4군 동시 비교</h2><div class="compare" id="compare"></div></section><section class="card"><h2>원인 분해 지표</h2><div style="overflow:auto"><table class="table" id="metrics"></table></div></section><section class="card"><h2>현재 판단 / 스토리 로그</h2><div class="note" id="explain"></div><div class="log" id="log"></div></section></div></div>
-<div class="foot">현재 흐름에 따른 이동·선택 변화, 경험전이, 관계나선을 분리합니다. NoFeedback과 StaticPreference도 행동은 계속하지만 결과를 다음 판단의 기억으로 사용하지 않습니다.</div></div>
+<div class="foot">현재 흐름, 경험전이, 관계기인 전이를 분리합니다. Full은 매 결과마다 '관계 포함 판단'과 '같은 경험을 유지한 관계 제거 판단'을 대조합니다. 두 판단이 다를 때만 관계기인 나선으로 인정합니다.</div></div>
 <script>
 const $=x=>document.getElementById(x),cv=$('world'),ctx=cv.getContext('2d');
 const places={village:{x:120,y:345,n:'새벽마을',pub:1,r:.05},road:{x:300,y:390,n:'갈림길',pub:1,r:.12},forest:{x:370,y:215,n:'속삭임숲',pub:1,r:.25},lake:{x:670,y:455,n:'별빛호수',pub:1,r:.12},market:{x:205,y:155,n:'바람시장',pub:1,r:.08},camp:{x:500,y:350,n:'유랑캠프',pub:1,r:.18},ruin:{x:720,y:165,n:'고대유적',r:.5,gate:'엘리'},tower:{x:845,y:315,n:'감시탑',r:.42,gate:'도른'},shrine:{x:555,y:105,n:'별의성소',r:.3,gate:'미라'},canyon:{x:825,y:505,n:'붉은협곡',r:.62,gate:'아론'}};
@@ -29,7 +29,7 @@ function hash(s){let h=2166136261;for(let c of s){h^=c.charCodeAt(0);h=Math.imul
 function noise(...x){return hash(x.join('|'))}
 function env(t){return{pulse:(noise('d',t)-.5)*.02+(noise('shock',Math.floor(t/5))<.07?(noise('dd',Math.floor(t/5))-.4)*.22:0)}}
 function mkP(d){const q=places[d[2]];return{id:d[0],name:d[1],target:'road',members:mem.map((m,i)=>({name:m[0],role:m[1],c:m[2],care:m[3],cur:m[4],hp:100,x:q.x+off[i][0],y:q.y+off[i][1]})),disc:new Set([d[2],'road']),vis:{},routes:new Set(),last:'',leader:'',hiddenCandidates:new Set(),hiddenDone:new Set(),seenNPC:new Set(),relationHistory:[],choiceHistory:[]}}
-function mkW(k){return{key:k,danger:.12,events:[],spiral:0,c:{exp:0,rel:0,part:0,cand:0,decision:0,flow:0,hidden:0,expTransition:0,relTransition:0,actions:0},parties:defs.map(mkP)}}
+function mkW(k){return{key:k,danger:.12,events:[],spiral:0,c:{exp:0,rel:0,part:0,cand:0,decision:0,flow:0,hidden:0,expTransition:0,relTransition:0,actions:0,relTests:0,relDivergence:0},parties:defs.map(mkP)}}
 function invariant(S){if(!V[S.key].rel){S.spiral=0;S.c.relTransition=0}if(!V[S.key].fb){S.c.decision=0;S.c.expTransition=0}}
 function log(S,s){S.events.unshift({t:E.tick,s});S.events=S.events.slice(0,100)}
 function center(P){return{x:P.members.reduce((a,m)=>a+m.x,0)/4,y:P.members.reduce((a,m)=>a+m.y,0)/4}}
@@ -39,14 +39,14 @@ function available(S,P,use=1){return Object.keys(places).filter(id=>places[id].p
 function actionable(S,P,use=1){const ids=available(S,P,use),here=currentPlace(P);const others=ids.filter(id=>id!==here);return others.length?others:ids}
 function hiddenReady(S,P,h){if(!V[S.key].rel)return false;if(!P.seenNPC.has(h.npc))return false;if(!h.links.every(n=>relationExists(P,n)))return false;return h.places.every(id=>P.disc.has(id)||available(S,P,1).includes(id))}
 function refreshHidden(S,P){if(!V[S.key].rel){P.hiddenCandidates.clear();return}for(const h of hiddenDefs){const ready=hiddenReady(S,P,h),was=P.hiddenCandidates.has(h.id);if(ready&&!P.hiddenDone.has(h.id)){P.hiddenCandidates.add(h.id);if(!was){S.c.hidden++;S.c.cand++;log(S,`${P.name}: 관계과정으로 히든 가능성 생성 「${h.name}」`)}}else if(!ready&&was)P.hiddenCandidates.delete(h.id)}}
-function participants(S,P){const ids=actionable(S,P,1),set=new Set();const risks=ids.map(id=>places[id].r),nearestRisk=risks.reduce((a,b)=>Math.abs(b-S.danger)<Math.abs(a-S.danger)?b:a,risks[0]??S.danger);for(const m of P.members){const roleAnchor=m.role==='전사'?m.c:m.role==='치유사'?1-m.care:m.role==='정찰자'?m.cur:(m.c+m.cur)/2;if(Math.abs(roleAnchor-S.danger)<=Math.abs(nearestRisk-S.danger)+.15)set.add(m.role)}if(V[S.key].rel&&P.relationHistory.length)set.add('마도사');if(!set.size)P.members.forEach(m=>set.add(m.role));return set}
-function memberRank(S,P,m,id){const d=places[id],unseen=!P.disc.has(id),npcKnown=npcs.some(n=>n[1]===id&&P.seenNPC.has(n[0])),flowFit=-Math.abs(d.r-S.danger),riskFit=-Math.abs(d.r-m.c),novelty=unseen?m.cur:0,careFit=-Math.abs(d.r-(1-m.care)),relationFit=V[S.key].rel&&npcKnown?1:0,revisit=-(P.vis[id]||0),distance=-Math.hypot(d.x-center(P).x,d.y-center(P).y);return m.role==='전사'?[flowFit,riskFit,relationFit,novelty,revisit,distance]:m.role==='치유사'?[flowFit,careFit,relationFit,-d.r,revisit,distance]:m.role==='정찰자'?[novelty,flowFit,riskFit,relationFit,revisit,distance]:[relationFit,flowFit,novelty,riskFit,revisit,distance]}
+function participants(S,P,useRel=1){const ids=actionable(S,P,useRel),set=new Set();const risks=ids.map(id=>places[id].r),nearestRisk=risks.reduce((a,b)=>Math.abs(b-S.danger)<Math.abs(a-S.danger)?b:a,risks[0]??S.danger);for(const m of P.members){const roleAnchor=m.role==='전사'?m.c:m.role==='치유사'?1-m.care:m.role==='정찰자'?m.cur:(m.c+m.cur)/2;if(Math.abs(roleAnchor-S.danger)<=Math.abs(nearestRisk-S.danger)+.15)set.add(m.role)}if(useRel&&V[S.key].rel&&P.relationHistory.length)set.add('마도사');if(!set.size)P.members.forEach(m=>set.add(m.role));return set}
+function memberRank(S,P,m,id,useRel=1){const d=places[id],unseen=!P.disc.has(id),npcRelated=useRel&&V[S.key].rel&&npcs.some(n=>n[1]===id&&relationExists(P,n[0])),flowFit=-Math.abs(d.r-S.danger),riskFit=-Math.abs(d.r-m.c),novelty=unseen?m.cur:0,careFit=-Math.abs(d.r-(1-m.care)),relationFit=npcRelated?1:0,revisit=-(P.vis[id]||0),distance=-Math.hypot(d.x-center(P).x,d.y-center(P).y);return m.role==='전사'?[flowFit,riskFit,relationFit,novelty,revisit,distance]:m.role==='치유사'?[flowFit,careFit,relationFit,-d.r,revisit,distance]:m.role==='정찰자'?[novelty,flowFit,riskFit,relationFit,revisit,distance]:[relationFit,flowFit,novelty,riskFit,revisit,distance]}
 function cmpTuple(a,b){for(let i=0;i<Math.max(a.length,b.length);i++){const x=a[i]??0,y=b[i]??0;if(x!==y)return y-x}return 0}
 function evalP(S,P,use=1){
   const ids=actionable(S,P,use);
   if(V[S.key].fix){const here=currentPlace(P),start=Math.max(0,staticOrder.indexOf(here));return ids.map(id=>{const ix=staticOrder.indexOf(id),cyc=ix<0?99:(ix-start+staticOrder.length)%staticOrder.length;return{id,votes:-cyc,voices:[['고정순환',1]]}}).sort((a,b)=>b.votes-a.votes)}
-  const active=participants(S,P),points=Object.fromEntries(ids.map(id=>[id,0])),voices=Object.fromEntries(ids.map(id=>[id,[]]));
-  for(const m of P.members.filter(m=>active.has(m.role))){const ranked=[...ids].sort((a,b)=>cmpTuple(memberRank(S,P,m,a),memberRank(S,P,m,b)));ranked.forEach((id,rank)=>{points[id]+=ids.length-rank;voices[id].push([m.name,ids.length-rank])})}
+  const active=participants(S,P,use),points=Object.fromEntries(ids.map(id=>[id,0])),voices=Object.fromEntries(ids.map(id=>[id,[]]));
+  for(const m of P.members.filter(m=>active.has(m.role))){const ranked=[...ids].sort((a,b)=>cmpTuple(memberRank(S,P,m,a,use),memberRank(S,P,m,b,use)));ranked.forEach((id,rank)=>{points[id]+=ids.length-rank;voices[id].push([m.name,ids.length-rank])})}
   let rows=ids.map(id=>({id,votes:points[id],voices:voices[id]}));
   if(use&&V[S.key].rel)for(const h of hiddenDefs)if(P.hiddenCandidates.has(h.id)&&!P.hiddenDone.has(h.id))rows.push({id:'hidden:'+h.id,votes:Math.max(...rows.map(r=>r.votes),0)+1,voices:[['관계과정',1]]});
   rows.sort((a,b)=>b.votes-a.votes||noise('tie',E.tick,P.id,a.id)-noise('tie',E.tick,P.id,b.id));return rows
@@ -59,28 +59,37 @@ function choose(S,P){
   P.routes.add(P.target);P.choiceHistory.push({t:E.tick,target:P.target});S.c.actions++;log(S,`${P.name} 행동 선택: ${places[P.target]?.n||P.target}`);invariant(S)
 }
 function chooseAll(){for(const S of Object.values(E.worlds))for(const P of S.parties)choose(S,P)}
+function changedSig(a,b){return a.choice!==b.choice||a.cands!==b.cands||a.leader!==b.leader}
 function outcome(S,P,id){
   if(!V[S.key].fb){invariant(S);return}
   const before=sig(evalP(S,P,1)),first=!P.disc.has(id);P.disc.add(id);P.vis[id]=(P.vis[id]||0)+1;S.c.exp++;
-  let relationAdded=false;
-  for(const [n,p] of npcs.filter(n=>n[1]===id)){P.seenNPC.add(n);if(V[S.key].rel){P.relationHistory.push({t:E.tick,npc:n,place:p,after:P.choiceHistory.at(-1)?.target||id});S.c.rel++;relationAdded=true}}
-  refreshHidden(S,P);const after=sig(evalP(S,P,1)),changed=before.choice!==after.choice||before.cands!==after.cands||before.leader!==after.leader;
-  if(changed){S.c.decision++;if(V[S.key].rel&&relationAdded){S.spiral++;S.c.relTransition++;log(S,`${P.name}: 관계과정이 다음 판단구조를 변경 → 관계나선 +1`)}else{S.c.expTransition++;log(S,`${P.name}: 경험 피드백이 다음 판단구조를 변경 → 경험전이 +1`)}}
+  for(const [n,p] of npcs.filter(n=>n[1]===id)){P.seenNPC.add(n);if(V[S.key].rel){P.relationHistory.push({t:E.tick,npc:n,place:p,after:P.choiceHistory.at(-1)?.target||id});S.c.rel++}}
+  refreshHidden(S,P);
+  const afterFull=sig(evalP(S,P,1));
+  const afterNoRel=sig(evalP(S,P,0));
+  const totalChanged=changedSig(before,afterFull);
+  const experienceChanged=changedSig(before,afterNoRel);
+  const relationChanged=V[S.key].rel&&changedSig(afterFull,afterNoRel);
+  if(V[S.key].rel){S.c.relTests++;if(relationChanged)S.c.relDivergence++}
+  if(totalChanged||experienceChanged||relationChanged){S.c.decision++}
+  if(experienceChanged){S.c.expTransition++;log(S,`${P.name}: 같은 결과에서 관계를 제거해도 판단이 달라짐 → 경험전이 +1`)}
+  if(relationChanged){S.spiral++;S.c.relTransition++;log(S,`${P.name}: 동일 경험 유지 + 관계 제거 시 판단이 달라짐 → 관계기인 나선 +1`)}
+  if(totalChanged&&!experienceChanged&&!relationChanged)log(S,`${P.name}: 전체 판단은 변했지만 경험/관계 단독 기여로 확정하지 않음`)
   if(first)log(S,`${P.name}: ${places[id].n} 첫 경험`)
 }
 function move(m,x,y,s){let dx=x-m.x,dy=y-m.y,l=Math.hypot(dx,dy)||1;m.x+=dx/l*Math.min(s,l);m.y+=dy/l*Math.min(s,l)}
 function tickW(S,e){const before=S.danger;S.danger=clamp(S.danger+e.pulse,0,1);if(before!==S.danger)S.c.flow++;for(const P of S.parties){const d=places[P.target]||places.road,c=center(P);for(let i=0;i<4;i++)move(P.members[i],d.x+off[i][0],d.y+off[i][1],1.55);if(Math.hypot(d.x-c.x,d.y-c.y)<24){outcome(S,P,P.target);choose(S,P)}}invariant(S)}
 function tick(n=1){while(n--){E.tick++;const e=env(E.tick);for(const S of Object.values(E.worlds))tickW(S,e)}render()}
-function replay(){const S=E.worlds[focus],P=S.parties.find(x=>x.id===focusParty),a=sig(evalP(S,P,1)),b=sig(evalP(S,P,0));log(S,`${P.name} 동일상황 재시험: 관계 포함=${a.choice||'없음'} / 관계 제거=${b.choice||'없음'}`);render()}
+function replay(){const S=E.worlds[focus],P=S.parties.find(x=>x.id===focusParty),a=sig(evalP(S,P,1)),b=sig(evalP(S,P,0)),d=changedSig(a,b);log(S,`${P.name} 관계 인과 재시험: 관계 포함=${a.choice||'없음'} / 같은 경험·관계 제거=${b.choice||'없음'} / ${d?'판단 차이 있음':'판단 동일'}`);render()}
 function draw(){const S=E.worlds[focus],P=S.parties.find(x=>x.id===focusParty);ctx.clearRect(0,0,960,600);ctx.fillStyle='#10271f';ctx.fillRect(0,0,960,600);for(const[id,d]of Object.entries(places)){ctx.fillStyle=available(S,P,1).includes(id)?'#8dd3c7':'#52616b';ctx.beginPath();ctx.arc(d.x,d.y,8,0,7);ctx.fill();ctx.fillStyle='#ddd';ctx.font='12px sans-serif';ctx.fillText(d.n,d.x+11,d.y+4)}const cols=['#e88b72','#77c9b8','#9d91d8'];S.parties.forEach((p,i)=>{p.members.forEach(m=>{ctx.fillStyle=cols[i];ctx.beginPath();ctx.arc(m.x,m.y,5,0,7);ctx.fill()});const c=center(p);ctx.fillStyle='#fff';ctx.fillText(p.name,c.x+8,c.y-10)})}
 function render(){
   for(const S of Object.values(E.worlds))invariant(S);const S=E.worlds[focus],P=S.parties.find(x=>x.id===focusParty);
   $('day').textContent=Math.floor(E.tick/144+1)+'일';$('danger').textContent=S.danger<.3?'낮음':S.danger<.6?'중간':'높음';$('relations').textContent=P.relationHistory.length;$('candidate').textContent=S.c.cand;$('decision').textContent=S.c.decision;$('spiral').textContent=S.spiral;$('hidden').textContent=P.hiddenCandidates.size;$('stories').textContent=P.hiddenDone.size;
-  $('compare').innerHTML=Object.entries(E.worlds).map(([k,w])=>`<div class="wc ${k===focus?'on':''}" data-k="${k}"><h3>${V[k].n}</h3><div class="mini">행동 <b>${w.c.actions}</b> · 관계나선 <b>${w.spiral}</b><br>경험전이 <b>${w.c.expTransition}</b> · 관계이력 <b>${w.c.rel}</b><br>흐름 <b>${w.c.flow}</b> · 히든 <b>${w.parties.reduce((a,p)=>a+p.hiddenDone.size,0)}</b></div></div>`).join('');
+  $('compare').innerHTML=Object.entries(E.worlds).map(([k,w])=>`<div class="wc ${k===focus?'on':''}" data-k="${k}"><h3>${V[k].n}</h3><div class="mini">행동 <b>${w.c.actions}</b> · 관계나선 <b>${w.spiral}</b><br>경험전이 <b>${w.c.expTransition}</b> · 관계이력 <b>${w.c.rel}</b><br>흐름 <b>${w.c.flow}</b> · 관계검사 <b>${w.c.relDivergence}/${w.c.relTests}</b></div></div>`).join('');
   document.querySelectorAll('.wc').forEach(x=>x.onclick=()=>{focus=x.dataset.k;render()});
-  $('metrics').innerHTML='<tr><th>군</th><th>행동</th><th>흐름</th><th>경험</th><th>관계</th><th>경험전이</th><th>관계나선</th><th>후보</th><th>참여</th></tr>'+Object.entries(E.worlds).map(([k,w])=>`<tr><td>${V[k].n}</td><td>${w.c.actions}</td><td>${w.c.flow}</td><td>${w.c.exp}</td><td>${w.c.rel}</td><td>${w.c.expTransition}</td><td>${w.spiral}</td><td>${w.c.cand}</td><td>${w.c.part}</td></tr>`).join('');
+  $('metrics').innerHTML='<tr><th>군</th><th>행동</th><th>흐름</th><th>경험</th><th>관계</th><th>경험전이</th><th>관계나선</th><th>관계검사</th><th>후보</th><th>참여</th></tr>'+Object.entries(E.worlds).map(([k,w])=>`<tr><td>${V[k].n}</td><td>${w.c.actions}</td><td>${w.c.flow}</td><td>${w.c.exp}</td><td>${w.c.rel}</td><td>${w.c.expTransition}</td><td>${w.spiral}</td><td>${w.c.relDivergence}/${w.c.relTests}</td><td>${w.c.cand}</td><td>${w.c.part}</td></tr>`).join('');
   const hs=hiddenDefs.map(h=>`${h.name}: ${P.hiddenDone.has(h.id)?'발생':P.hiddenCandidates.has(h.id)?'현재 후보':'관계과정 미완성'}`).join('<br>');
-  $('explain').innerHTML=`<b>${P.name}</b> → ${places[P.target]?.n||P.target}<br>현재 참여: ${[...participants(S,P)].join(', ')}<br>현재 위치: ${places[currentPlace(P)].n}<br><span class="hidden">히든 스토리</span><br>${hs}`;
+  $('explain').innerHTML=`<b>${P.name}</b> → ${places[P.target]?.n||P.target}<br>현재 참여: ${[...participants(S,P,1)].join(', ')}<br>현재 위치: ${places[currentPlace(P)].n}<br><span class="hidden">히든 스토리</span><br>${hs}`;
   $('log').innerHTML=S.events.slice(0,35).map(e=>`<div>[${e.t}] ${e.s}</div>`).join('');draw()
 }
 $('focus').innerHTML=Object.entries(V).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('');
