@@ -5,118 +5,35 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <meta name="theme-color" content="#111827" />
 <link rel="manifest" href="manifest.json" />
-<title>OASIS MVP1 - Living RPG Observer</title>
+<title>OASIS MVP1 - Comparative RPG Laboratory</title>
 <style>
-:root{color-scheme:dark;--bg:#07111f;--panel:#0e1b2b;--line:#23384e;--text:#e8f0f7;--muted:#91a4b7;--accent:#8dd3c7;--warn:#f4c76b;--danger:#ef7a7a}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:radial-gradient(circle at top,#122640,#07111f 55%);color:var(--text);min-height:100vh}.app{max-width:1180px;margin:auto;padding:14px}.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}.title{font-size:20px;font-weight:800}.sub{font-size:12px;color:var(--muted)}.controls{display:flex;gap:8px;flex-wrap:wrap}button,select{background:#14263a;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-weight:700}button:active{transform:translateY(1px)}.grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(290px,1fr);gap:12px}.card{background:rgba(14,27,43,.92);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.22)}.card h2{font-size:14px;margin:0;padding:11px 13px;border-bottom:1px solid var(--line)}#world{display:block;width:100%;aspect-ratio:16/10;background:#142d25;touch-action:none}.hud{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:10px}.metric{padding:9px;border-radius:11px;background:#0b1624;border:1px solid #1c3044}.metric b{display:block;font-size:15px}.metric span{font-size:11px;color:var(--muted)}.side{display:grid;gap:12px}.list{padding:10px;display:grid;gap:7px;max-height:255px;overflow:auto}.row{background:#0a1522;border:1px solid #1b3044;border-radius:10px;padding:8px;font-size:12px}.row strong{font-size:13px}.tag{display:inline-block;font-size:10px;padding:2px 6px;border:1px solid #34516d;border-radius:999px;margin-left:4px;color:#b9cbdb}.bar{height:5px;background:#1b2c3b;border-radius:99px;overflow:hidden;margin-top:5px}.bar i{display:block;height:100%;background:#8dd3c7}.log{padding:9px;max-height:265px;overflow:auto;font-size:11px;line-height:1.5}.log div{padding:5px 2px;border-bottom:1px dashed #203247}.oasis{padding:11px;font-size:12px;line-height:1.45;color:#c6d5e2}.oasis b{color:#fff}.footer{font-size:11px;color:var(--muted);padding:10px;text-align:center}@media(max-width:820px){.grid{grid-template-columns:1fr}.hud{grid-template-columns:repeat(2,1fr)}.side{grid-template-columns:1fr 1fr}.side .card:last-child{grid-column:1/-1}}@media(max-width:560px){.side{grid-template-columns:1fr}.side .card:last-child{grid-column:auto}.app{padding:8px}.title{font-size:17px}}
+:root{color-scheme:dark;--bg:#07111f;--panel:#0e1b2b;--line:#23384e;--text:#e8f0f7;--muted:#91a4b7;--accent:#8dd3c7}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:radial-gradient(circle at top,#122640,#07111f 55%);color:var(--text);min-height:100vh}.app{max-width:1280px;margin:auto;padding:12px}.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}.title{font-size:20px;font-weight:800}.sub{font-size:12px;color:var(--muted);margin-top:3px}.controls{display:flex;gap:7px;flex-wrap:wrap}button,select{background:#14263a;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-weight:700}.lab{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(320px,1fr);gap:10px}.card{background:rgba(14,27,43,.94);border:1px solid var(--line);border-radius:15px;overflow:hidden}.card h2{font-size:13px;margin:0;padding:10px 12px;border-bottom:1px solid var(--line)}#world{display:block;width:100%;aspect-ratio:16/10;background:#142d25}.hud{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:8px}.metric{padding:8px;border-radius:10px;background:#0b1624;border:1px solid #1c3044}.metric b{display:block;font-size:14px}.metric span{font-size:10px;color:var(--muted)}.right{display:grid;gap:10px}.compare{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:8px}.worldcard{background:#091522;border:1px solid #1d3348;border-radius:11px;padding:8px;cursor:pointer}.worldcard.active{outline:2px solid var(--accent)}.worldcard h3{font-size:12px;margin:0 0 6px}.mini{font-size:10px;color:var(--muted);line-height:1.45}.mini b{color:var(--text)}.bar{height:5px;background:#1b2c3b;border-radius:99px;overflow:hidden;margin-top:4px}.bar i{display:block;height:100%;background:var(--accent)}.table{width:100%;border-collapse:collapse;font-size:10px}.table th,.table td{padding:6px;border-bottom:1px solid #1c3044;text-align:right}.table th:first-child,.table td:first-child{text-align:left}.table th{color:#b8c9d8}.log{padding:8px;max-height:235px;overflow:auto;font-size:10px;line-height:1.45}.log div{padding:4px 2px;border-bottom:1px dashed #203247}.note{padding:9px;font-size:11px;color:#c6d5e2;line-height:1.5}.footer{font-size:10px;color:var(--muted);padding:9px;text-align:center}@media(max-width:900px){.lab{grid-template-columns:1fr}.hud{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.compare{grid-template-columns:1fr}.app{padding:7px}.title{font-size:17px}}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="top">
-    <div><div class="title">OASIS MVP1 · Living RPG Observer</div><div class="sub">플레이가 아니라 관찰합니다. 세계는 현재 흐름에 따라 계속 변합니다.</div></div>
-    <div class="controls"><button id="toggle">일시정지</button><button id="step">1틱 진행</button><select id="speed"><option value="450">x1</option><option value="180">x3</option><option value="70">x8</option></select><button id="reset">세계 초기화</button></div>
-  </div>
-  <div class="grid">
-    <section class="card">
-      <h2>세계 관찰 화면</h2>
-      <canvas id="world" width="960" height="600"></canvas>
-      <div class="hud">
-        <div class="metric"><b id="day">1일 06:00</b><span>세계 시간</span></div>
-        <div class="metric"><b id="danger">낮음</b><span>현재 위험</span></div>
-        <div class="metric"><b id="relations">0</b><span>활성 관계</span></div>
-        <div class="metric"><b id="spiral">0</b><span>나선 변화</span></div>
-      </div>
-    </section>
-    <div class="side">
-      <section class="card"><h2>용사 파티</h2><div class="list" id="party"></div></section>
-      <section class="card"><h2>NPC 반응</h2><div class="list" id="npcs"></div></section>
-      <section class="card"><h2>OASIS 관찰 로그</h2><div class="oasis" id="oasisState"></div><div class="log" id="log"></div></section>
-    </div>
-  </div>
-  <div class="footer">MVP1: 흐름 · 관계과정 · 참여상태 · 가능성 조합 · 나선 · 구조적 확장성의 최소 관찰 구현</div>
-</div>
+<div class="top"><div><div class="title">OASIS MVP1 · Comparative RPG Laboratory</div><div class="sub">동일 초기조건 · 동일 환경사건 · 4개 구조 비교. 차이는 구조에서만 발생하도록 설계.</div></div><div class="controls"><button id="toggle">일시정지</button><button id="step">1틱</button><button id="run100">+100틱</button><select id="speed"><option value="420">x1</option><option value="140">x3</option><option value="45">x8</option></select><button id="reset">실험 초기화</button></div></div>
+<div class="lab"><section class="card"><h2>선택 세계 관찰 화면 · <select id="focus"></select></h2><canvas id="world" width="960" height="600"></canvas><div class="hud"><div class="metric"><b id="day">1일 06:00</b><span>공통 세계 시간</span></div><div class="metric"><b id="danger">낮음</b><span>공통 위험</span></div><div class="metric"><b id="relations">0</b><span>관계 수</span></div><div class="metric"><b id="spiral">0</b><span>나선 변화</span></div><div class="metric"><b id="possibilities">0</b><span>가능성 공간</span></div></div></section><div class="right"><section class="card"><h2>4군 동시 비교</h2><div class="compare" id="compare"></div></section><section class="card"><h2>검증 지표</h2><div style="overflow:auto"><table class="table" id="metrics"></table></div></section><section class="card"><h2>선택 세계 로그</h2><div class="note" id="explain"></div><div class="log" id="log"></div></section></div></div>
+<div class="footer">검증 목표: 성능 우위가 아니라, OASIS 구조를 제거했을 때 관계적 전개와 가능성 공간의 변화가 사라지거나 달라지는지 관측</div></div>
 <script>
-const canvas=document.getElementById('world'),ctx=canvas.getContext('2d');
-const W=canvas.width,H=canvas.height;
+const canvas=document.getElementById('world'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
 const places={village:{x:155,y:350,name:'새벽마을'},forest:{x:430,y:230,name:'속삭임숲'},ruin:{x:705,y:165,name:'고대유적'},lake:{x:690,y:440,name:'별빛호수'},road:{x:410,y:410,name:'갈림길'}};
-const personalities=[
- {name:'세라',role:'전사',color:'#e88b72',courage:.78,care:.45,curiosity:.52},
- {name:'리안',role:'치유사',color:'#77c9b8',courage:.42,care:.9,curiosity:.48},
- {name:'카이',role:'정찰자',color:'#d8bf70',courage:.62,care:.52,curiosity:.88},
- {name:'노아',role:'마도사',color:'#9d91d8',courage:.48,care:.56,curiosity:.76}
-];
-let S;
-function rnd(a=1){return Math.random()*a} function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
-function reset(){
- S={tick:0,paused:false,spiral:0,danger:.12,weather:'맑음',events:[],relations:{},discovered:new Set(['village','road']),worldSeed:Math.random(),party:personalities.map((p,i)=>({...p,hp:100,trust:.5,experience:[],x:places.village.x+i*12,y:places.village.y+i*8,target:'road',action:'준비 중'})),npcs:[
- {name:'미라',type:'상인',x:125,y:325,att:.52,state:'평온'}, {name:'도른',type:'경비',x:185,y:375,att:.48,state:'경계'}, {name:'엘리',type:'약초꾼',x:405,y:265,att:.56,state:'관찰'}, {name:'???',type:'낯선 여행자',x:430,y:430,att:.35,state:'침묵'}]};
- log('새 세계가 시작되었습니다. 선택되지 않은 가능성은 가능성으로만 남습니다.');render();
-}
-function key(a,b){return [a,b].sort().join('|')}
-function addRel(a,b,delta,reason){let k=key(a,b);let before=S.relations[k]||0;let after=clamp(before+delta,0,1);S.relations[k]=after;if(Math.abs(after-before)>.06){S.spiral++;log(`${a} ↔ ${b} 관계 변화: ${reason}`)}}
-function worldEvent(){
- const r=Math.random();
- if(r<.12){S.weather=Math.random()<.5?'비':'안개';S.danger=clamp(S.danger+.09,0,1);log(`${S.weather}이 시작되어 이동 조건이 변했습니다.`)}
- else if(r<.18){S.weather='맑음';S.danger=clamp(S.danger-.07,0,1);log('날씨가 개어 주변을 더 잘 볼 수 있습니다.')}
- if(Math.random()<.08){S.danger=clamp(S.danger+(Math.random()-.35)*.25,0,1)}
-}
-function candidateScore(p,id){
- const d=places[id],dist=Math.hypot(d.x-p.x,d.y-p.y)/700;
- const novelty=S.discovered.has(id)?0:.35*p.curiosity;
- const safety=(1-S.danger)*(p.care*.35)+(p.courage*.15);
- const rel=Object.entries(S.relations).filter(([k])=>k.includes(p.name)).reduce((a,[,v])=>a+v,0)*.05;
- let context=0;if(id==='forest')context+=p.curiosity*.16;if(id==='village'&&p.hp<65)context+=p.care*.55;if(id==='ruin')context+=p.curiosity*.2-S.danger*(1-p.courage)*.35;if(id==='lake')context+=p.care*.08;
- return novelty+safety+rel+context-dist*.28+rnd(.12);
-}
-function choose(p){
- const ids=Object.keys(places),ranked=ids.map(id=>[id,candidateScore(p,id)]).sort((a,b)=>b[1]-a[1]);
- const chosen=ranked[0][0];p.target=chosen;p.action=`${places[chosen].name}(으)로 이동`;
- if(Math.random()<.12)log(`${p.name}: ${places[chosen].name} 가능성을 선택했습니다. 다른 후보는 현실화하지 않습니다.`);
-}
-function interact(p){
- for(const n of S.npcs){let d=Math.hypot(n.x-p.x,n.y-p.y);if(d<50){
-   const old=n.att;let delta=(p.care*.05+p.trust*.03)-S.danger*.025+(Math.random()-.45)*.035;n.att=clamp(n.att+delta,.05,.98);
-   n.state=n.att>.7?'호의':n.att<.3?'불신':'관찰';addRel(p.name,n.name,Math.max(.015,delta+.025),`${n.type}의 반응이 ${n.state}(으)로 이동`);
-   if(Math.abs(n.att-old)>.035)log(`${n.name}은(는) ${p.name}의 현재 행동에 ${n.state} 반응을 보였습니다.`);
- }}
- for(const q of S.party){if(q===p)continue;let d=Math.hypot(q.x-p.x,q.y-p.y);if(d<45&&Math.random()<.18)addRel(p.name,q.name,.025,`${p.action} 과정에서 함께 경험함`)}
-}
-function tick(){
- S.tick++; if(S.tick%4===0)worldEvent();
- for(const p of S.party){
-   if(!p.target||Math.hypot(places[p.target].x-p.x,places[p.target].y-p.y)<18){
-     if(p.target){S.discovered.add(p.target);p.experience.push({t:S.tick,place:p.target,danger:S.danger,weather:S.weather});if(p.experience.length>20)p.experience.shift();}
-     choose(p);
-   }
-   const t=places[p.target],dx=t.x-p.x,dy=t.y-p.y,len=Math.hypot(dx,dy)||1,speed=5+(p.role==='정찰자'?1.3:0);p.x+=dx/len*speed;p.y+=dy/len*speed;
-   if(S.danger>.58&&Math.random()<.04){let dmg=2+rnd(7);p.hp=clamp(p.hp-dmg,15,100);log(`${p.name}이(가) 위험 속에서 피해 ${Math.round(dmg)}를 입었습니다.`)}
-   if(p.role==='치유사'){let hurt=S.party.sort((a,b)=>a.hp-b.hp)[0];if(hurt.hp<72&&Math.hypot(hurt.x-p.x,hurt.y-p.y)<110){hurt.hp=clamp(hurt.hp+3,0,100);p.action=`${hurt.name} 회복 지원`;addRel(p.name,hurt.name,.018,'회복 과정에 참여')}}
-   interact(p);
- }
- for(const n of S.npcs){n.x+=Math.sin((S.tick+n.att*10)/8)*.3;n.y+=Math.cos((S.tick+n.att*7)/9)*.25}
- S.danger=clamp(S.danger+(Math.random()-.51)*.018,.03,.92);render();save();
-}
-function save(){try{localStorage.setItem('oasis-mvp1',JSON.stringify({...S,discovered:[...S.discovered]}))}catch(e){}}
-function log(msg){S.events.unshift({t:S.tick,msg});S.events=S.events.slice(0,45)}
-function drawWorld(){
- ctx.clearRect(0,0,W,H);let g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#163f30');g.addColorStop(1,'#183145');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
- ctx.strokeStyle='#6e7e6a';ctx.lineWidth=16;ctx.globalAlpha=.23;ctx.beginPath();ctx.moveTo(160,350);ctx.lineTo(410,410);ctx.lineTo(430,230);ctx.lineTo(705,165);ctx.moveTo(410,410);ctx.lineTo(690,440);ctx.stroke();ctx.globalAlpha=1;
- ctx.fillStyle='#102a25';for(let i=0;i<65;i++){let x=(i*137+S.worldSeed*800)%W,y=(i*83+80)%H;ctx.beginPath();ctx.arc(x,y,3+(i%5),0,Math.PI*2);ctx.fill()}
- for(const [id,p] of Object.entries(places)){ctx.fillStyle=id==='lake'?'#315e76':id==='ruin'?'#6d6559':'#5d6d4d';ctx.beginPath();ctx.arc(p.x,p.y,25,0,Math.PI*2);ctx.fill();ctx.fillStyle='#eef6ee';ctx.font='bold 14px system-ui';ctx.fillText(p.name,p.x-30,p.y-34);if(!S.discovered.has(id)){ctx.fillStyle='rgba(8,15,23,.58)';ctx.beginPath();ctx.arc(p.x,p.y,34,0,Math.PI*2);ctx.fill();ctx.fillStyle='#a9bac8';ctx.fillText('?',p.x-4,p.y+5)}}
- for(const n of S.npcs){ctx.fillStyle=n.att>.7?'#a9e3b3':n.att<.3?'#e59b9b':'#c7b58a';ctx.fillRect(n.x-6,n.y-6,12,12);ctx.fillStyle='#dce7ef';ctx.font='11px system-ui';ctx.fillText(n.name,n.x-18,n.y-12)}
- for(const p of S.party){ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,9,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.globalAlpha=.5;ctx.stroke();ctx.globalAlpha=1;ctx.fillStyle='#fff';ctx.font='bold 11px system-ui';ctx.fillText(p.name,p.x-14,p.y-14)}
- if(S.weather==='비'){ctx.strokeStyle='rgba(180,210,240,.32)';for(let i=0;i<70;i++){let x=(i*71+S.tick*7)%W,y=(i*47+S.tick*11)%H;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-5,y+13);ctx.stroke()}}if(S.weather==='안개'){ctx.fillStyle='rgba(220,230,230,.16)';ctx.fillRect(0,0,W,H)}
-}
-function render(){drawWorld();let mins=360+S.tick*18,day=Math.floor(mins/1440)+1,hh=String(Math.floor(mins%1440/60)).padStart(2,'0'),mm=String(mins%60).padStart(2,'0');document.getElementById('day').textContent=`${day}일 ${hh}:${mm}`;document.getElementById('danger').textContent=S.danger>.65?'높음':S.danger>.35?'중간':'낮음';document.getElementById('relations').textContent=Object.values(S.relations).filter(v=>v>.08).length;document.getElementById('spiral').textContent=S.spiral;
- document.getElementById('party').innerHTML=S.party.map(p=>`<div class="row"><strong>${p.name}</strong><span class="tag">${p.role}</span><div>${p.action}</div><div class="bar"><i style="width:${p.hp}%"></i></div><small>HP ${Math.round(p.hp)} · 경험 ${p.experience.length}</small></div>`).join('');
- document.getElementById('npcs').innerHTML=S.npcs.map(n=>`<div class="row"><strong>${n.name}</strong><span class="tag">${n.type}</span><div>${n.state} · 관계개방도 ${Math.round(n.att*100)}</div></div>`).join('');
- document.getElementById('oasisState').innerHTML=`<b>현재 흐름</b>: ${S.weather}, 위험 ${Math.round(S.danger*100)}%<br><b>참여상태</b>: 파티 ${S.party.length}명 + NPC ${S.npcs.length}명<br><b>가능성 공간</b>: 발견 장소 ${S.discovered.size}/${Object.keys(places).length}<br><b>관계과정</b>: ${Object.keys(S.relations).length}개 누적<br><b>나선</b>: 결과가 다음 판단조건에 ${S.spiral}회 반영됨`;
- document.getElementById('log').innerHTML=S.events.map(e=>`<div>[${e.t}] ${e.msg}</div>`).join('');
-}
-let timer;function restartTimer(){clearInterval(timer);timer=setInterval(()=>{if(!S.paused)tick()},+document.getElementById('speed').value)}
-document.getElementById('toggle').onclick=()=>{S.paused=!S.paused;document.getElementById('toggle').textContent=S.paused?'계속':'일시정지'};document.getElementById('step').onclick=()=>tick();document.getElementById('speed').onchange=restartTimer;document.getElementById('reset').onclick=()=>{localStorage.removeItem('oasis-mvp1');reset()};
-try{let raw=localStorage.getItem('oasis-mvp1');if(raw){let x=JSON.parse(raw);x.discovered=new Set(x.discovered||[]);S=x;log('저장된 세계를 이어서 관찰합니다.');render()}else reset()}catch(e){reset()}
-restartTimer();if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+const personalities=[{name:'세라',role:'전사',color:'#e88b72',courage:.78,care:.45,curiosity:.52},{name:'리안',role:'치유사',color:'#77c9b8',courage:.42,care:.9,curiosity:.48},{name:'카이',role:'정찰자',color:'#d8bf70',courage:.62,care:.52,curiosity:.88},{name:'노아',role:'마도사',color:'#9d91d8',courage:.48,care:.56,curiosity:.76}];
+const variants={full:{name:'OASIS-Full',desc:'관계이력 + 결과피드백 + 현재 흐름 + 구조확장',relation:true,feedback:true,fixed:false},norel:{name:'NoRelation',desc:'관계 형성/재활성화를 제거',relation:false,feedback:true,fixed:false},nofb:{name:'NoFeedback',desc:'결과가 다음 판단조건을 바꾸지 않음',relation:true,feedback:false,fixed:false},fixed:{name:'FixedScore',desc:'고정 선호점수로 선택',relation:false,feedback:false,fixed:true}};
+let E,focus='full',timer=null;
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return(h>>>0)/4294967296}function noise(...p){return hash(p.join('|'))}function sharedEnv(t){let b=Math.floor(t/4),r=noise('weather',b),weather=r<.12?(noise('weatherType',b)<.5?'비':'안개'):r<.18?'맑음':null,pulse=(noise('danger',t)-.51)*.018;if(noise('dangerShock',b)<.08)pulse+=(noise('dangerDelta',b)-.35)*.25;return{weather,pulse}}
+function makeWorld(key){return{key,tick:0,spiral:0,danger:.12,weather:'맑음',events:[],relations:{},discovered:new Set(['village','road']),decisionCount:0,routeSet:new Set(),possibilityEvents:0,party:personalities.map((p,i)=>({...p,hp:100,trust:.5,experience:[],x:places.village.x+i*12,y:places.village.y+i*8,target:'road',action:'준비 중'})),npcs:[{name:'미라',type:'상인',x:125,y:325,baseX:125,baseY:325,att:.52,state:'평온'},{name:'도른',type:'경비',x:185,y:375,baseX:185,baseY:375,att:.48,state:'경계'},{name:'엘리',type:'약초꾼',x:405,y:265,baseX:405,baseY:265,att:.56,state:'관찰'},{name:'???',type:'낯선 여행자',x:430,y:430,baseX:430,baseY:430,att:.35,state:'침묵'}]}}
+function reset(){E={tick:0,paused:false,worlds:{}};for(const k of Object.keys(variants)){E.worlds[k]=makeWorld(k);log(E.worlds[k],`실험 ${variants[k].name} 시작`)}render()}function keyRel(a,b){return[a,b].sort().join('|')}function log(S,msg){S.events.unshift({t:E.tick,msg});S.events=S.events.slice(0,50)}function addRel(S,a,b,delta,reason){if(!variants[S.key].relation)return;let k=keyRel(a,b),before=S.relations[k]||0,after=clamp(before+delta,0,1);S.relations[k]=after;if(after-before>.04){S.spiral++;log(S,`${a} ↔ ${b}: ${reason}`)}}function relationValue(S,p){if(!variants[S.key].relation)return 0;return Object.entries(S.relations).filter(([k])=>k.includes(p.name)).reduce((a,[,v])=>a+v,0)}
+function candidateScore(S,p,id){const v=variants[S.key],d=places[id],dist=Math.hypot(d.x-p.x,d.y-p.y)/700;if(v.fixed){const pref={전사:{village:.42,forest:.62,ruin:.82,lake:.45,road:.56},치유사:{village:.8,forest:.5,ruin:.3,lake:.62,road:.52},정찰자:{village:.3,forest:.84,ruin:.76,lake:.68,road:.5},마도사:{village:.38,forest:.7,ruin:.86,lake:.58,road:.48}};return pref[p.role][id]-dist*.08}const novelty=v.feedback&&!S.discovered.has(id)?.35*p.curiosity:0,safety=(1-S.danger)*(p.care*.35)+(p.courage*.15),rel=v.relation?relationValue(S,p)*.05:0;let context=0;if(id==='forest')context+=p.curiosity*.16;if(id==='village'&&p.hp<65)context+=p.care*.55;if(id==='ruin')context+=p.curiosity*.2-S.danger*(1-p.courage)*.35;if(id==='lake')context+=p.care*.08;const history=v.feedback?p.experience.slice(-5).filter(e=>e.place===id).length*.025:0;return novelty+safety+rel+context-dist*.28-history+(noise('choice',E.tick,p.name,id)-.5)*.12}
+function choose(S,p){const ranked=Object.keys(places).map(id=>[id,candidateScore(S,p,id)]).sort((a,b)=>b[1]-a[1]),chosen=ranked[0][0];p.target=chosen;p.action=`${places[chosen].name}(으)로 이동`;S.decisionCount++;S.routeSet.add(`${p.name}:${chosen}`);if(ranked[1]&&ranked[0][1]-ranked[1][1]<.06)S.possibilityEvents++;if(noise('choiceLog',E.tick,p.name)<.16)log(S,`${p.name}: ${places[chosen].name} 선택 / 차선 ${places[ranked[1][0]].name}`)}
+function interact(S,p){const v=variants[S.key];for(const n of S.npcs){let d=Math.hypot(n.x-p.x,n.y-p.y);if(d<50){const old=n.att;let delta=(p.care*.05+p.trust*.03)-S.danger*.025+(noise('npc',E.tick,p.name,n.name)-.45)*.035;n.att=clamp(n.att+delta,.05,.98);n.state=n.att>.7?'호의':n.att<.3?'불신':'관찰';addRel(S,p.name,n.name,Math.max(.015,delta+.025),`${n.type} 반응 ${n.state}`);if(v.feedback&&Math.abs(n.att-old)>.035){p.trust=clamp(p.trust+(n.att-old)*.08,.2,.9);S.spiral++}}}if(v.relation)for(const q of S.party){if(q===p)continue;let d=Math.hypot(q.x-p.x,q.y-p.y);if(d<45&&noise('partyRel',E.tick,p.name,q.name)<.18)addRel(S,p.name,q.name,.025,`${p.action} 과정 공유`)}}
+function tickWorld(S){const v=variants[S.key],env=sharedEnv(E.tick);S.tick=E.tick;if(E.tick%4===0&&env.weather){S.weather=env.weather;if(env.weather==='맑음')S.danger=clamp(S.danger-.07,0,1);else S.danger=clamp(S.danger+.09,0,1)}S.danger=clamp(S.danger+env.pulse,.03,.92);for(const p of S.party){if(!p.target||Math.hypot(places[p.target].x-p.x,places[p.target].y-p.y)<18){if(p.target&&v.feedback){const before=S.discovered.size;S.discovered.add(p.target);p.experience.push({t:E.tick,place:p.target,danger:S.danger,weather:S.weather});if(p.experience.length>20)p.experience.shift();if(S.discovered.size>before){S.spiral++;log(S,`${p.name}: 새로운 장소 ${places[p.target].name}가 이후 가능성 조건에 편입`)}}choose(S,p)}const t=places[p.target],dx=t.x-p.x,dy=t.y-p.y,len=Math.hypot(dx,dy)||1,speed=5+(p.role==='정찰자'?1.3:0);p.x+=dx/len*speed;p.y+=dy/len*speed;if(S.danger>.58&&noise('damage',E.tick,p.name)<.04){let dmg=2+noise('damageAmt',E.tick,p.name)*7;p.hp=clamp(p.hp-dmg,15,100);if(v.feedback){S.spiral++;log(S,`${p.name}: 피해 ${Math.round(dmg)} → 다음 판단조건 변화`)}}if(p.role==='치유사'){let hurt=[...S.party].sort((a,b)=>a.hp-b.hp)[0];if(hurt.hp<72&&Math.hypot(hurt.x-p.x,hurt.y-p.y)<110){hurt.hp=clamp(hurt.hp+3,0,100);p.action=`${hurt.name} 회복 지원`;addRel(S,p.name,hurt.name,.018,'회복 과정 참여')}}interact(S,p)}for(const n of S.npcs){n.x=n.baseX+Math.sin((E.tick+n.att*10)/8)*4;n.y=n.baseY+Math.cos((E.tick+n.att*7)/9)*3}}
+function tickOnce(){E.tick++;for(const S of Object.values(E.worlds))tickWorld(S);render()}function possibilitySpace(S){const relEdges=Object.values(S.relations).filter(v=>v>.05).length,discovery=S.discovered.size;return Object.keys(places).length*S.party.length+relEdges*2+discovery*S.party.length+S.possibilityEvents}function metrics(S){const atts=S.npcs.map(n=>n.att),mean=atts.reduce((a,b)=>a+b,0)/atts.length,variance=atts.reduce((a,b)=>a+(b-mean)**2,0)/atts.length;return{relations:Object.values(S.relations).filter(v=>v>.05).length,spiral:S.spiral,discovered:S.discovered.size,routes:S.routeSet.size,possibility:possibilitySpace(S),npcVar:variance}}
+function render(){const S=E.worlds[focus],m=metrics(S);drawWorld(S);let minutes=360+E.tick*10,day=Math.floor(minutes/1440)+1,hh=String(Math.floor(minutes%1440/60)).padStart(2,'0'),mm=String(minutes%60).padStart(2,'0');document.getElementById('day').textContent=`${day}일 ${hh}:${mm}`;document.getElementById('danger').textContent=S.danger>.6?'높음':S.danger>.3?'중간':'낮음';document.getElementById('relations').textContent=m.relations;document.getElementById('spiral').textContent=m.spiral;document.getElementById('possibilities').textContent=m.possibility;renderCompare();renderMetrics();document.getElementById('log').innerHTML=S.events.map(e=>`<div>[${e.t}] ${e.msg}</div>`).join('');document.getElementById('explain').innerHTML=`<b>${variants[focus].name}</b><br>${variants[focus].desc}<br>동일 환경사건을 공유하므로 장기 차이는 구조 차이로 비교합니다.`}
+function renderCompare(){const box=document.getElementById('compare');box.innerHTML=Object.entries(E.worlds).map(([k,S])=>{const m=metrics(S);return`<div class="worldcard ${k===focus?'active':''}" data-k="${k}"><h3>${variants[k].name}</h3><div class="mini">관계 <b>${m.relations}</b> · 나선 <b>${m.spiral}</b> · 발견 <b>${m.discovered}</b><br>경로 <b>${m.routes}</b> · 가능성 <b>${m.possibility}</b><div class="bar"><i style="width:${Math.min(100,m.possibility/1.4)}%"></i></div></div></div>`}).join('');box.querySelectorAll('.worldcard').forEach(el=>el.onclick=()=>{focus=el.dataset.k;document.getElementById('focus').value=focus;render()})}
+function renderMetrics(){let rows=Object.entries(E.worlds).map(([k,S])=>[variants[k].name,metrics(S)]);document.getElementById('metrics').innerHTML='<tr><th>군</th><th>관계</th><th>나선</th><th>발견</th><th>경로</th><th>가능성</th><th>NPC분산</th></tr>'+rows.map(([n,m])=>`<tr><td>${n}</td><td>${m.relations}</td><td>${m.spiral}</td><td>${m.discovered}</td><td>${m.routes}</td><td>${m.possibility}</td><td>${m.npcVar.toFixed(3)}</td></tr>`).join('')}
+function drawWorld(S){ctx.clearRect(0,0,W,H);let g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#163f30');g.addColorStop(1,'#183145');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.strokeStyle='#6e7e6a';ctx.lineWidth=16;ctx.globalAlpha=.23;ctx.beginPath();ctx.moveTo(160,350);ctx.lineTo(410,410);ctx.lineTo(430,230);ctx.lineTo(705,165);ctx.moveTo(410,410);ctx.lineTo(690,440);ctx.stroke();ctx.globalAlpha=1;for(const[id,p]of Object.entries(places)){ctx.fillStyle=id==='lake'?'#315e76':id==='ruin'?'#6d6559':'#5d6d4d';ctx.beginPath();ctx.arc(p.x,p.y,25,0,Math.PI*2);ctx.fill();ctx.fillStyle='#eef6ee';ctx.font='bold 14px system-ui';ctx.fillText(p.name,p.x-30,p.y-34);if(!S.discovered.has(id)){ctx.fillStyle='rgba(8,15,23,.58)';ctx.beginPath();ctx.arc(p.x,p.y,34,0,Math.PI*2);ctx.fill();ctx.fillStyle='#a9bac8';ctx.fillText('?',p.x-4,p.y+5)}}for(const n of S.npcs){ctx.fillStyle=n.att>.7?'#a9e3b3':n.att<.3?'#e59b9b':'#c7b58a';ctx.fillRect(n.x-6,n.y-6,12,12);ctx.fillStyle='#dce7ef';ctx.font='11px system-ui';ctx.fillText(n.name,n.x-18,n.y-12)}for(const p of S.party){ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,9,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.globalAlpha=.5;ctx.stroke();ctx.globalAlpha=1;ctx.fillStyle='#fff';ctx.font='bold 11px system-ui';ctx.fillText(p.name,p.x-14,p.y-13)}ctx.fillStyle='rgba(3,8,14,.72)';ctx.fillRect(12,12,285,48);ctx.fillStyle='#fff';ctx.font='bold 14px system-ui';ctx.fillText(variants[S.key].name,24,33);ctx.font='11px system-ui';ctx.fillStyle='#b9cbdb';ctx.fillText(`${S.weather} · 위험 ${S.danger.toFixed(2)} · 공통환경 tick ${E.tick}`,24,50)}
+function restartTimer(){if(timer)clearInterval(timer);timer=setInterval(()=>{if(!E.paused)tickOnce()},+document.getElementById('speed').value)}document.getElementById('focus').innerHTML=Object.entries(variants).map(([k,v])=>`<option value="${k}">${v.name}</option>`).join('');document.getElementById('focus').onchange=e=>{focus=e.target.value;render()};document.getElementById('toggle').onclick=()=>{E.paused=!E.paused;document.getElementById('toggle').textContent=E.paused?'계속':'일시정지'};document.getElementById('step').onclick=()=>tickOnce();document.getElementById('run100').onclick=()=>{for(let i=0;i<100;i++){E.tick++;for(const S of Object.values(E.worlds))tickWorld(S)}render()};document.getElementById('reset').onclick=reset;document.getElementById('speed').onchange=restartTimer;reset();restartTimer();if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
 </script>
 </body>
 </html>
