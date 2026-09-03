@@ -171,3 +171,5 @@ try {
   if (browser) await browser.close();
   server.kill('SIGTERM');
 }
+
+await import('./responsibility-allocation-test.mjs');
