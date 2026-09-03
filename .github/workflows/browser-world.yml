@@ -27,6 +27,8 @@ jobs:
         run: node tools/browser-world-test.mjs
       - name: Run equal-compute parallel OASIS experiment
         run: node tools/parallel-oasis-test.mjs
+      - name: Run parallel relation scaling experiment
+        run: node tools/parallel-scale-test.mjs
       - name: Upload world report
         if: always()
         uses: actions/upload-artifact@v4
@@ -35,4 +37,5 @@ jobs:
           path: |
             browser-world-report.json
             parallel-oasis-report.json
+            parallel-scale-report.json
           if-no-files-found: ignore
