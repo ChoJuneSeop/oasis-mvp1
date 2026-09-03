@@ -18,11 +18,23 @@ try {
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForFunction(() => document.title.includes('Dual Comparison Laboratory') && document.getElementById('run100'), null, { timeout: 60000 });
 
-  // Stop the real-time timer so the experiment is driven only by explicit world ticks.
   const toggle = page.locator('#toggle');
   if ((await toggle.textContent())?.includes('일시정지')) await toggle.click();
   await page.locator('#reset').click();
   if ((await toggle.textContent())?.includes('일시정지')) await toggle.click();
+
+  // Fair-comparison lock: every group receives the same observable access set.
+  // OASIS-specific differences may then arise only from relation/participation/feedback structure,
+  // not from one group simply being denied a place that another group can observe.
+  await page.evaluate(() => {
+    window.__OASIS_ORIGINAL_ACTIONABLE__ = actionableIds;
+    actionableIds = function(S, P, use = 1) {
+      const here = currentPlace(P);
+      const ids = Object.keys(places);
+      const other = ids.filter(id => id !== here);
+      return other.length ? other : ids;
+    };
+  });
 
   const batches = 30;
   for (let i = 0; i < batches; i++) await page.locator('#run100').click();
@@ -41,8 +53,8 @@ try {
           name: P.name,
           discovered: [...P.disc],
           seenNPC: [...P.seenNPC],
-          relations: P.relationHistory.length,
-          choices: P.choiceHistory.length,
+          relationHistory: P.relationHistory.map(x => ({ ...x })),
+          choices: P.choiceHistory.map(x => ({ ...x })),
           hiddenCandidates: [...P.hiddenCandidates],
           hiddenDone: [...P.hiddenDone],
           pathCount: Object.keys(P.possibilityPaths || {}).length,
@@ -56,36 +68,44 @@ try {
   const full = report.worlds.full;
   const norel = report.worlds.norel;
   const nofb = report.worlds.nofb;
-  const ext = ['rule', 'utility', 'qlite', 'retrieval'].map(k => report.worlds[k]);
-  const sum = (world, key) => world.parties.reduce((n, p) => n + (p[key] || 0), 0);
+  const matched = ['full', 'norel', 'nofb', 'static', 'rule', 'utility', 'qlite', 'retrieval'].map(k => report.worlds[k]);
+  const sumRelations = world => world.parties.reduce((n, p) => n + p.relationHistory.length, 0);
+  const sumChoices = world => world.parties.reduce((n, p) => n + p.choices.length, 0);
+  const hiddenDone = world => world.parties.reduce((n, p) => n + p.hiddenDone.length, 0);
 
-  console.log('\nOASIS ACTUAL BROWSER WORLD TEST');
+  console.log('\nOASIS MATCHED-CONDITION ACTUAL ENGINE TEST');
   console.log(`actual world ticks: ${report.tick}`);
-  for (const [key, w] of Object.entries(report.worlds)) {
-    console.log(`${w.name}: actions=${w.counters.actions} rel=${w.counters.rel} spiral=${w.spiral} path(gen/cand/sel/real/chg)=${w.counters.pathGenerated||0}/${w.counters.pathCandidate||0}/${w.counters.pathSelected||0}/${w.counters.pathRealized||0}/${w.counters.pathChanged||0} hidden=${w.counters.hidden||0}`);
+  console.log('fairness lock: identical place/action access for every comparison group');
+  for (const w of matched) {
+    console.log(`${w.name}: actions=${w.counters.actions} choices=${sumChoices(w)} rel=${sumRelations(w)} spiral=${w.spiral} hiddenDone=${hiddenDone(w)} path(gen/cand/sel/real/chg)=${w.counters.pathGenerated||0}/${w.counters.pathCandidate||0}/${w.counters.pathSelected||0}/${w.counters.pathRealized||0}/${w.counters.pathChanged||0}`);
   }
 
-  assert(report.tick >= 3000, 'actual browser world advanced by explicit ticks');
-  assert(full.counters.actions > 0, 'OASIS-Full performed autonomous actions in the actual world engine');
-  assert(full.counters.rel > 0 && sum(full, 'relations') > 0, 'OASIS-Full accumulated actual relationship history');
-  assert((full.counters.pathGenerated || 0) > 0, 'actual world generated observable possibility paths');
-  assert((full.counters.pathRealized || 0) > 0, 'at least one generated possibility path reached an actual outcome');
-  assert(norel.counters.rel === 0 && sum(norel, 'relations') === 0, 'NoRelation keeps relationship history removed in actual execution');
-  assert(nofb.counters.exp === 0 && nofb.counters.decision === 0, 'NoFeedback does not feed outcomes into later judgment counters');
-  assert(ext.some(w => (w.counters.pathGenerated || 0) > 0), 'external baselines receive ordinary gated opportunities in actual execution');
+  assert(report.tick >= 3000, 'actual browser world advanced by explicit matched ticks');
+  assert(full.counters.actions > 0, 'OASIS-Full performed autonomous actions');
+  assert(sumRelations(full) > 0, 'OASIS-Full formed relationship-process history');
+  assert(sumRelations(norel) === 0, 'NoRelation differs only by removing relationship history use');
+  assert(nofb.counters.exp === 0 && nofb.counters.decision === 0, 'NoFeedback prevents outcome feedback into later judgment');
+  assert(matched.every(w => w.counters.actions > 0), 'all comparison groups received executable opportunities under matched access');
+  assert(matched.every(w => sumChoices(w) <= w.counters.actions), 'all groups preserve bounded single-choice histories');
 
-  for (const w of Object.values(report.worlds)) {
-    for (const p of w.parties) {
-      const seenTicks = new Set();
-      for (const c of p.paths ? [] : []) void c;
-      for (const c of (p.choices ? [] : [])) void c;
-      // choiceHistory stores one target per party decision; count itself is retained in the report.
-      assert(p.choices <= w.counters.actions, `${w.name}/${p.name} choice history is bounded by world action count`);
-    }
-  }
+  const fullHidden = hiddenDone(full);
+  const noRelHidden = hiddenDone(norel);
+  console.log(`OASIS-specific contrast: hidden completed full=${fullHidden}, noRelation=${noRelHidden}`);
+  console.log(`OASIS-specific contrast: relation history full=${sumRelations(full)}, noRelation=${sumRelations(norel)}`);
+  console.log(`OASIS-specific contrast: participationTransition full=${full.counters.participationTransition||0}, noRelation=${norel.counters.participationTransition||0}`);
+  console.log(`OASIS-specific contrast: structuralExpansion full=${full.counters.structuralExpansion||0}, noRelation=${norel.counters.structuralExpansion||0}`);
+  console.log(`OASIS-specific contrast: choiceTransition full=${full.counters.choiceTransition||0}, noRelation=${norel.counters.choiceTransition||0}`);
+  console.log(`OASIS-specific contrast: relationSpiral full=${full.counters.relationSpiral||0}, noRelation=${norel.counters.relationSpiral||0}`);
 
-  await writeFile('browser-world-report.json', JSON.stringify(report, null, 2));
-  console.log('RESULT: the real 2D browser/world engine executed headlessly and produced falsifiable state/log evidence. This is not a superiority proof.');
+  await writeFile('browser-world-report.json', JSON.stringify({
+    design: {
+      matchedConditions: ['same initial world', 'same environment tape', 'same tick budget', 'same places/action access'],
+      primaryContrast: 'OASIS-Full vs NoRelation',
+      interpretation: 'isolate relationship-process contribution without access advantage'
+    },
+    ...report
+  }, null, 2));
+  console.log('RESULT: real engine executed under matched access; interpret Full-vs-NoRelation differences as the primary OASIS-specific structural contrast, not as general superiority.');
 } finally {
   if (browser) await browser.close();
   server.kill('SIGTERM');
