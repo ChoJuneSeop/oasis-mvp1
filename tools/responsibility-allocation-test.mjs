@@ -191,3 +191,5 @@ try {
   if (browser) await browser.close();
   server.kill('SIGTERM');
 }
+
+await import('./open-possibility-flow-test.mjs');
