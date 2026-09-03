@@ -15,12 +15,6 @@ try {
   await page.waitForFunction(() => document.title.includes('Dual Comparison Laboratory') && document.getElementById('relationFieldCard'), null, { timeout: 60000 });
 
   const report = await page.evaluate(() => {
-    // This test asks one narrow question:
-    // With the SAME total auxiliary world-tick budget, does keeping several independent
-    // OASIS relationship trajectories expose relation-process possibilities that merely
-    // running one OASIS trajectory longer does not?
-    // Auxiliary trajectories never write their simulated experiences into primary reality.
-
     const originalE = E;
     const originalActionable = actionableIds;
     actionableIds = function(S, P, use = 1) {
@@ -36,6 +30,7 @@ try {
     const TOTAL_AUX_PER_CHECKPOINT = 480;
     const PARALLEL_BRANCHES = 4;
     const BRANCH_TICKS = TOTAL_AUX_PER_CHECKPOINT / PARALLEL_BRANCHES;
+    const CONDITION_OFFSETS = [0, 73, 149, 251, 389, 577, 911];
 
     const episodeSig = ep => `${ep.key}|${(ep.places || []).join('>')}`;
     const fieldSigs = S => new Set(S.parties.flatMap(P => (P.relationField?.episodes || []).map(episodeSig)));
@@ -55,47 +50,45 @@ try {
       return targets;
     }
 
-    function runVirtual(seed, startTick, ticks, forcedTarget) {
+    function runVirtual(seed, startEnvTick, ticks, forcedTarget) {
       const V = structuredClone(seed);
       if (forcedTarget) for (const P of V.parties) P.target = forcedTarget;
       for (let j = 1; j <= ticks; j++) {
-        E.tick = startTick + j;
+        E.tick = startEnvTick + j;
         tickW(V, env(E.tick));
       }
       return V;
     }
 
-    function runScenario(mode) {
-      E = { tick: 0, worlds: {}, paused: true };
+    function runScenario(mode, offset) {
+      E = { tick: offset, worlds: {}, paused: true };
       const primary = mkW('full');
       const proposals = new Set();
       const hiddenProposals = new Set();
       const actionProposals = new Set();
       let auxWorldTicks = 0;
       let checkpoints = 0;
-      const checkpointRows = [];
 
       for (let t = 1; t <= TOTAL_REAL_TICKS; t++) {
-        E.tick = t;
-        tickW(primary, env(t));
+        const envTick = offset + t;
+        E.tick = envTick;
+        tickW(primary, env(envTick));
 
         if (t >= CHECKPOINT_START && t % CHECKPOINT_EVERY === 0) {
           checkpoints++;
           const baseField = fieldSigs(primary);
           const baseHidden = hiddenSigs(primary);
           const baseChoices = choiceSigs(primary);
-          const before = proposals.size;
           const targets = topTargets(primary, PARALLEL_BRANCHES);
           const branches = [];
 
           if (mode === 'computeOnlySingle') {
-            const forced = targets[0];
-            branches.push(runVirtual(primary, t, TOTAL_AUX_PER_CHECKPOINT, forced));
+            branches.push(runVirtual(primary, envTick, TOTAL_AUX_PER_CHECKPOINT, targets[0]));
             auxWorldTicks += TOTAL_AUX_PER_CHECKPOINT;
-          } else if (mode === 'parallel') {
+          } else {
             for (let b = 0; b < PARALLEL_BRANCHES; b++) {
               const forced = targets[b % Math.max(1, targets.length)];
-              branches.push(runVirtual(primary, t, BRANCH_TICKS, forced));
+              branches.push(runVirtual(primary, envTick, BRANCH_TICKS, forced));
               auxWorldTicks += BRANCH_TICKS;
             }
           }
@@ -105,20 +98,12 @@ try {
             for (const x of hiddenSigs(V)) if (!baseHidden.has(x)) hiddenProposals.add(x);
             for (const x of choiceSigs(V)) if (!baseChoices.has(x)) actionProposals.add(x);
           }
-
-          checkpointRows.push({
-            tick: t,
-            primaryField: baseField.size,
-            newRelationPossibilitiesThisCheckpoint: proposals.size - before,
-            cumulativeRelationPossibilities: proposals.size,
-            branchTargets: mode === 'parallel' ? targets.slice(0, PARALLEL_BRANCHES) : targets.slice(0, 1)
-          });
         }
       }
 
-      E.tick = TOTAL_REAL_TICKS;
       return {
         mode,
+        offset,
         realTicks: TOTAL_REAL_TICKS,
         auxWorldTicks,
         checkpoints,
@@ -130,56 +115,80 @@ try {
         auxiliaryRelationPossibilities: proposals.size,
         auxiliaryHiddenPossibilities: hiddenProposals.size,
         auxiliaryActionPossibilities: actionProposals.size,
-        proposalSignatures: [...proposals].sort(),
-        checkpointRows
+        proposalSignatures: [...proposals].sort()
       };
     }
 
-    const single = runScenario('computeOnlySingle');
-    const parallel = runScenario('parallel');
+    const trials = CONDITION_OFFSETS.map(offset => {
+      const single = runScenario('computeOnlySingle', offset);
+      const parallel = runScenario('parallel', offset);
+      const exclusiveParallel = parallel.proposalSignatures.filter(x => !single.proposalSignatures.includes(x));
+      const exclusiveSingle = single.proposalSignatures.filter(x => !parallel.proposalSignatures.includes(x));
+      return {
+        offset,
+        single,
+        parallel,
+        difference: {
+          relationPossibilities: parallel.auxiliaryRelationPossibilities - single.auxiliaryRelationPossibilities,
+          hiddenPossibilities: parallel.auxiliaryHiddenPossibilities - single.auxiliaryHiddenPossibilities,
+          actionPossibilities: parallel.auxiliaryActionPossibilities - single.auxiliaryActionPossibilities,
+          exclusiveParallel: exclusiveParallel.length,
+          exclusiveSingle: exclusiveSingle.length
+        }
+      };
+    });
+
     E = originalE;
     actionableIds = originalActionable;
 
-    const exclusiveParallel = parallel.proposalSignatures.filter(x => !single.proposalSignatures.includes(x));
-    const exclusiveSingle = single.proposalSignatures.filter(x => !parallel.proposalSignatures.includes(x));
+    const sum = key => trials.reduce((n, r) => n + r.difference[key], 0);
+    const wins = trials.filter(r => r.difference.relationPossibilities > 0).length;
+    const ties = trials.filter(r => r.difference.relationPossibilities === 0).length;
+    const losses = trials.filter(r => r.difference.relationPossibilities < 0).length;
+    const exclusiveWins = trials.filter(r => r.difference.exclusiveParallel > r.difference.exclusiveSingle).length;
+    const anyParallelNovelty = trials.filter(r => r.difference.exclusiveParallel > 0).length;
+
     return {
       design: {
-        question: 'Does logical parallel OASIS expand relation-process possibility space beyond merely giving one OASIS more compute?',
-        realityRule: 'Only the primary OASIS acts in reality. Auxiliary trajectories are counterfactual explorers; their simulated experiences are never written into primary relation history.',
-        computeLock: 'Both conditions receive exactly the same auxiliary world-tick budget at the same checkpoints.',
-        singleControl: `one auxiliary trajectory x ${TOTAL_AUX_PER_CHECKPOINT} ticks per checkpoint`,
-        parallelTreatment: `${PARALLEL_BRANCHES} independent trajectories x ${BRANCH_TICKS} ticks per checkpoint`,
-        branchRule: 'Parallel branches start from the same primary present but commit to distinct currently available targets before continuing independently.',
-        successCriterion: 'Parallel must expose relation-process possibilities absent from the equal-compute single trajectory; raw candidate/action count alone is not sufficient.'
+        question: 'Across multiple matched environment phases, does logical parallel OASIS repeatedly expose relation-process possibilities beyond an equal-compute single trajectory?',
+        conditionOffsets: CONDITION_OFFSETS,
+        realTicksPerCondition: TOTAL_REAL_TICKS,
+        computeLock: `each condition gives both arms ${TOTAL_AUX_PER_CHECKPOINT} auxiliary ticks per checkpoint`,
+        singleControl: `1 trajectory x ${TOTAL_AUX_PER_CHECKPOINT}`,
+        parallelTreatment: `${PARALLEL_BRANCHES} trajectories x ${BRANCH_TICKS}`,
+        realityRule: 'Only primary reality forms confirmed experience; auxiliary trajectories remain possibility-only.'
       },
-      single,
-      parallel,
-      exclusiveParallel,
-      exclusiveSingle,
-      difference: {
-        relationPossibilities: parallel.auxiliaryRelationPossibilities - single.auxiliaryRelationPossibilities,
-        hiddenPossibilities: parallel.auxiliaryHiddenPossibilities - single.auxiliaryHiddenPossibilities,
-        actionPossibilities: parallel.auxiliaryActionPossibilities - single.auxiliaryActionPossibilities,
-        exclusiveParallel: exclusiveParallel.length,
-        exclusiveSingle: exclusiveSingle.length
+      trials,
+      aggregate: {
+        conditions: trials.length,
+        relationWins: wins,
+        relationTies: ties,
+        relationLosses: losses,
+        exclusiveParallelWins: exclusiveWins,
+        conditionsWithParallelNovelty: anyParallelNovelty,
+        totalRelationDifference: sum('relationPossibilities'),
+        totalExclusiveParallel: trials.reduce((n, r) => n + r.difference.exclusiveParallel, 0),
+        totalExclusiveSingle: trials.reduce((n, r) => n + r.difference.exclusiveSingle, 0),
+        totalHiddenDifference: sum('hiddenPossibilities'),
+        totalActionDifference: sum('actionPossibilities')
       }
     };
   });
 
-  console.log('\nOASIS EQUAL-COMPUTE PARALLEL RELATION-FIELD EXPERIMENT');
-  console.log(`compute-only single: auxTicks=${report.single.auxWorldTicks} relationPossibilities=${report.single.auxiliaryRelationPossibilities} hidden=${report.single.auxiliaryHiddenPossibilities} actions=${report.single.auxiliaryActionPossibilities}`);
-  console.log(`parallel OASIS:      auxTicks=${report.parallel.auxWorldTicks} relationPossibilities=${report.parallel.auxiliaryRelationPossibilities} hidden=${report.parallel.auxiliaryHiddenPossibilities} actions=${report.parallel.auxiliaryActionPossibilities}`);
-  console.log(`exclusive relation-process possibilities: parallel=${report.difference.exclusiveParallel}, single=${report.difference.exclusiveSingle}`);
-  console.log(`difference parallel-single: relations=${report.difference.relationPossibilities}, hidden=${report.difference.hiddenPossibilities}, actions=${report.difference.actionPossibilities}`);
-
-  assert(report.single.auxWorldTicks === report.parallel.auxWorldTicks, 'auxiliary compute budget is exactly matched');
-  assert(report.single.realTicks === report.parallel.realTicks, 'primary reality receives the same real tick budget');
-  assert(report.single.primaryActions > 0 && report.parallel.primaryActions > 0, 'primary OASIS acts in both conditions');
-  assert(report.difference.exclusiveParallel > 0 || report.difference.relationPossibilities > 0,
-    'parallel independent OASIS trajectories expose relation-process possibilities beyond equal-compute single trajectory');
+  console.log('\nOASIS MULTI-CONDITION EQUAL-COMPUTE PARALLEL ROBUSTNESS EXPERIMENT');
+  for (const r of report.trials) {
+    console.log(`offset=${r.offset} singleRel=${r.single.auxiliaryRelationPossibilities} parallelRel=${r.parallel.auxiliaryRelationPossibilities} diff=${r.difference.relationPossibilities} exclusiveP=${r.difference.exclusiveParallel} exclusiveS=${r.difference.exclusiveSingle} hiddenDiff=${r.difference.hiddenPossibilities} actionDiff=${r.difference.actionPossibilities}`);
+    assert(r.single.auxWorldTicks === r.parallel.auxWorldTicks, `offset ${r.offset}: auxiliary compute exactly matched`);
+    assert(r.single.realTicks === r.parallel.realTicks, `offset ${r.offset}: primary real ticks exactly matched`);
+    assert(r.single.primaryActions > 0 && r.parallel.primaryActions > 0, `offset ${r.offset}: primary OASIS acts in both conditions`);
+  }
+  console.log(`AGGREGATE relation wins/ties/losses=${report.aggregate.relationWins}/${report.aggregate.relationTies}/${report.aggregate.relationLosses}`);
+  console.log(`AGGREGATE totalRelationDifference=${report.aggregate.totalRelationDifference} totalExclusiveParallel=${report.aggregate.totalExclusiveParallel} totalExclusiveSingle=${report.aggregate.totalExclusiveSingle}`);
+  console.log(`AGGREGATE parallelNoveltyConditions=${report.aggregate.conditionsWithParallelNovelty}/${report.aggregate.conditions} exclusiveParallelWins=${report.aggregate.exclusiveParallelWins}/${report.aggregate.conditions}`);
+  console.log(`AGGREGATE hiddenDifference=${report.aggregate.totalHiddenDifference} actionDifference=${report.aggregate.totalActionDifference}`);
 
   await writeFile('parallel-oasis-report.json', JSON.stringify(report, null, 2));
-  console.log('RESULT: auxiliary exploration remained possibility-only; only primary reality formed confirmed experience.');
+  console.log('RESULT: robustness experiment completed without assuming that parallel must win.');
 } finally {
   if (browser) await browser.close();
   server.kill('SIGTERM');
