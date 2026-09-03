@@ -25,10 +25,14 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Run actual browser world
         run: node tools/browser-world-test.mjs
+      - name: Run equal-compute parallel OASIS experiment
+        run: node tools/parallel-oasis-test.mjs
       - name: Upload world report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: oasis-browser-world-report
-          path: browser-world-report.json
+          path: |
+            browser-world-report.json
+            parallel-oasis-report.json
           if-no-files-found: ignore
