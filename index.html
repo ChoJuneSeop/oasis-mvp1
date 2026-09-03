@@ -12,9 +12,9 @@
 </style>
 </head>
 <body><div class="app">
-<div class="top"><div><div class="title">OASIS MVP2 · Structural Relation Laboratory</div><div class="sub">비교군은 모두 현재 세계에서 계속 행동합니다. 관계나선은 단순히 관계가 생긴 턴의 변화가 아니라, 동일한 결과 상태에서 관계 참여만 제거했을 때 판단이 달라지는지 즉시 대조한 뒤 관계가 실제 차이를 만든 경우만 기록합니다. NoRelation의 경험 피드백 변화는 경험전이로 별도 기록됩니다.</div></div><div class="ctl"><button id="toggle">일시정지</button><button id="step">1틱</button><button id="run100">+100틱</button><button id="replay">동일상황 재시험</button><select id="speed"><option value="450">x1</option><option value="150">x3</option><option value="50">x8</option></select><button id="reset">초기화</button></div></div>
+<div class="top"><div><div class="title">OASIS MVP2 · Structural Relation Laboratory</div><div class="sub">비교군은 모두 현재 세계에서 계속 행동합니다. 관계 효과를 구조적 확장, 참여전이, 선택전이, 완성된 관계나선으로 분리합니다. 동일 경험 상태에서 관계 참여만 제거한 반사실 판단과 비교하고, 관계 때문에 달라진 실제 선택이 실행된 뒤 그 결과가 다시 다음 판단을 바꿀 때만 완성된 관계나선으로 기록합니다. NoRelation의 경험 피드백 변화는 경험전이로 별도 기록됩니다.</div></div><div class="ctl"><button id="toggle">일시정지</button><button id="step">1틱</button><button id="run100">+100틱</button><button id="replay">동일상황 재시험</button><select id="speed"><option value="450">x1</option><option value="150">x3</option><option value="50">x8</option></select><button id="reset">초기화</button></div></div>
 <div class="lab"><section class="card"><h2>세계 관찰 · <select id="focus"></select> · <select id="focusParty"></select></h2><canvas id="world" width="960" height="600"></canvas><div class="hud"><div class="met"><b id="day">1일</b><span>시간</span></div><div class="met"><b id="danger">낮음</b><span>위험</span></div><div class="met"><b id="relations">0</b><span>관계이력</span></div><div class="met"><b id="candidate">0</b><span>후보변화</span></div><div class="met"><b id="decision">0</b><span>전체전이</span></div><div class="met"><b id="spiral">0</b><span>관계나선</span></div><div class="met"><b id="hidden">0</b><span>히든 후보</span></div><div class="met"><b id="stories">0</b><span>히든 발생</span></div></div></section><div class="right"><section class="card"><h2>4군 동시 비교</h2><div class="compare" id="compare"></div></section><section class="card"><h2>원인 분해 지표</h2><div style="overflow:auto"><table class="table" id="metrics"></table></div></section><section class="card"><h2>현재 판단 / 스토리 로그</h2><div class="note" id="explain"></div><div class="log" id="log"></div></section></div></div>
-<div class="foot">현재 흐름, 경험전이, 관계기인 전이를 분리합니다. Full은 매 결과마다 '관계 포함 판단'과 '같은 경험을 유지한 관계 제거 판단'을 대조합니다. 두 판단이 다를 때만 관계기인 나선으로 인정합니다.</div></div>
+<div class="foot">관계가 후보를 넓히면 구조적 확장, 참여자를 바꾸면 참여전이, 실제 선택을 바꾸면 선택전이입니다. 그 관계기인 선택을 실제로 수행한 결과가 다음 판단까지 바꿀 때만 완성된 관계나선입니다.</div></div>
 <script>
 const $=x=>document.getElementById(x),cv=$('world'),ctx=cv.getContext('2d');
 const places={village:{x:120,y:345,n:'새벽마을',pub:1,r:.05},road:{x:300,y:390,n:'갈림길',pub:1,r:.12},forest:{x:370,y:215,n:'속삭임숲',pub:1,r:.25},lake:{x:670,y:455,n:'별빛호수',pub:1,r:.12},market:{x:205,y:155,n:'바람시장',pub:1,r:.08},camp:{x:500,y:350,n:'유랑캠프',pub:1,r:.18},ruin:{x:720,y:165,n:'고대유적',r:.5,gate:'엘리'},tower:{x:845,y:315,n:'감시탑',r:.42,gate:'도른'},shrine:{x:555,y:105,n:'별의성소',r:.3,gate:'미라'},canyon:{x:825,y:505,n:'붉은협곡',r:.62,gate:'아론'}};
@@ -28,9 +28,9 @@ function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function hash(s){let h=2166136261;for(let c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return(h>>>0)/4294967296}
 function noise(...x){return hash(x.join('|'))}
 function env(t){return{pulse:(noise('d',t)-.5)*.02+(noise('shock',Math.floor(t/5))<.07?(noise('dd',Math.floor(t/5))-.4)*.22:0)}}
-function mkP(d){const q=places[d[2]];return{id:d[0],name:d[1],target:'road',members:mem.map((m,i)=>({name:m[0],role:m[1],c:m[2],care:m[3],cur:m[4],hp:100,x:q.x+off[i][0],y:q.y+off[i][1]})),disc:new Set([d[2],'road']),vis:{},routes:new Set(),last:'',leader:'',hiddenCandidates:new Set(),hiddenDone:new Set(),seenNPC:new Set(),relationHistory:[],choiceHistory:[]}}
-function mkW(k){return{key:k,danger:.12,events:[],spiral:0,c:{exp:0,rel:0,part:0,cand:0,decision:0,flow:0,hidden:0,expTransition:0,relTransition:0,actions:0,relTests:0,relDivergence:0},parties:defs.map(mkP)}}
-function invariant(S){if(!V[S.key].rel){S.spiral=0;S.c.relTransition=0}if(!V[S.key].fb){S.c.decision=0;S.c.expTransition=0}}
+function mkP(d){const q=places[d[2]];return{id:d[0],name:d[1],target:'road',members:mem.map((m,i)=>({name:m[0],role:m[1],c:m[2],care:m[3],cur:m[4],hp:100,x:q.x+off[i][0],y:q.y+off[i][1]})),disc:new Set([d[2],'road']),vis:{},routes:new Set(),last:'',leader:'',hiddenCandidates:new Set(),hiddenDone:new Set(),seenNPC:new Set(),relationHistory:[],choiceHistory:[],pendingRelChoice:null}}
+function mkW(k){return{key:k,danger:.12,events:[],spiral:0,c:{exp:0,rel:0,part:0,cand:0,decision:0,flow:0,hidden:0,expTransition:0,relTransition:0,actions:0,relTests:0,relDivergence:0,structuralExpansion:0,participationTransition:0,choiceTransition:0,completedSpiral:0},parties:defs.map(mkP)}}
+function invariant(S){if(!V[S.key].rel){S.spiral=0;S.c.relTransition=0;S.c.structuralExpansion=0;S.c.participationTransition=0;S.c.choiceTransition=0;S.c.completedSpiral=0;for(const P of S.parties)P.pendingRelChoice=null}if(!V[S.key].fb){S.c.decision=0;S.c.expTransition=0}}
 function log(S,s){S.events.unshift({t:E.tick,s});S.events=S.events.slice(0,100)}
 function center(P){return{x:P.members.reduce((a,m)=>a+m.x,0)/4,y:P.members.reduce((a,m)=>a+m.y,0)/4}}
 function currentPlace(P){const c=center(P);return Object.keys(places).sort((a,b)=>Math.hypot(places[a].x-c.x,places[a].y-c.y)-Math.hypot(places[b].x-c.x,places[b].y-c.y))[0]}
@@ -69,11 +69,21 @@ function outcome(S,P,id){
   const afterNoRel=sig(evalP(S,P,0));
   const totalChanged=changedSig(before,afterFull);
   const experienceChanged=changedSig(before,afterNoRel);
-  const relationChanged=V[S.key].rel&&changedSig(afterFull,afterNoRel);
-  if(V[S.key].rel){S.c.relTests++;if(relationChanged)S.c.relDivergence++}
-  if(totalChanged||experienceChanged||relationChanged){S.c.decision++}
+  const candidateRelChanged=V[S.key].rel&&afterFull.cands!==afterNoRel.cands;
+  const participationRelChanged=V[S.key].rel&&afterFull.leader!==afterNoRel.leader;
+  const choiceRelChanged=V[S.key].rel&&afterFull.choice!==afterNoRel.choice;
+  const relationChanged=candidateRelChanged||participationRelChanged||choiceRelChanged;
+  if(V[S.key].rel){
+    S.c.relTests++;
+    if(relationChanged)S.c.relDivergence++;
+    if(candidateRelChanged){S.c.structuralExpansion++;log(S,`${P.name}: 관계 제거 시 후보구조가 달라짐 → 구조적 확장 +1`)}
+    if(participationRelChanged){S.c.participationTransition++;log(S,`${P.name}: 관계 제거 시 주요 참여자가 달라짐 → 참여전이 +1`)}
+    if(choiceRelChanged){S.c.choiceTransition++;P.pendingRelChoice=afterFull.choice;log(S,`${P.name}: 관계 제거 시 실제 선택이 달라짐 → 선택전이 +1`)}
+  }
+  if(totalChanged||experienceChanged||relationChanged)S.c.decision++;
   if(experienceChanged){S.c.expTransition++;log(S,`${P.name}: 같은 결과에서 관계를 제거해도 판단이 달라짐 → 경험전이 +1`)}
-  if(relationChanged){S.spiral++;S.c.relTransition++;log(S,`${P.name}: 동일 경험 유지 + 관계 제거 시 판단이 달라짐 → 관계기인 나선 +1`)}
+  const completed=V[S.key].rel&&P.pendingRelChoice===id&&totalChanged;
+  if(completed){S.spiral++;S.c.completedSpiral++;S.c.relTransition++;P.pendingRelChoice=null;log(S,`${P.name}: 관계기인 선택의 실제 결과가 다음 판단을 다시 변경 → 완성된 관계나선 +1`)}
   if(totalChanged&&!experienceChanged&&!relationChanged)log(S,`${P.name}: 전체 판단은 변했지만 경험/관계 단독 기여로 확정하지 않음`)
   if(first)log(S,`${P.name}: ${places[id].n} 첫 경험`)
 }
@@ -85,9 +95,9 @@ function draw(){const S=E.worlds[focus],P=S.parties.find(x=>x.id===focusParty);c
 function render(){
   for(const S of Object.values(E.worlds))invariant(S);const S=E.worlds[focus],P=S.parties.find(x=>x.id===focusParty);
   $('day').textContent=Math.floor(E.tick/144+1)+'일';$('danger').textContent=S.danger<.3?'낮음':S.danger<.6?'중간':'높음';$('relations').textContent=P.relationHistory.length;$('candidate').textContent=S.c.cand;$('decision').textContent=S.c.decision;$('spiral').textContent=S.spiral;$('hidden').textContent=P.hiddenCandidates.size;$('stories').textContent=P.hiddenDone.size;
-  $('compare').innerHTML=Object.entries(E.worlds).map(([k,w])=>`<div class="wc ${k===focus?'on':''}" data-k="${k}"><h3>${V[k].n}</h3><div class="mini">행동 <b>${w.c.actions}</b> · 관계나선 <b>${w.spiral}</b><br>경험전이 <b>${w.c.expTransition}</b> · 관계이력 <b>${w.c.rel}</b><br>흐름 <b>${w.c.flow}</b> · 관계검사 <b>${w.c.relDivergence}/${w.c.relTests}</b></div></div>`).join('');
+  $('compare').innerHTML=Object.entries(E.worlds).map(([k,w])=>`<div class="wc ${k===focus?'on':''}" data-k="${k}"><h3>${V[k].n}</h3><div class="mini">행동 <b>${w.c.actions}</b> · 완성나선 <b>${w.spiral}</b><br>확장 <b>${w.c.structuralExpansion}</b> · 참여전이 <b>${w.c.participationTransition}</b> · 선택전이 <b>${w.c.choiceTransition}</b><br>경험전이 <b>${w.c.expTransition}</b> · 관계검사 <b>${w.c.relDivergence}/${w.c.relTests}</b></div></div>`).join('');
   document.querySelectorAll('.wc').forEach(x=>x.onclick=()=>{focus=x.dataset.k;render()});
-  $('metrics').innerHTML='<tr><th>군</th><th>행동</th><th>흐름</th><th>경험</th><th>관계</th><th>경험전이</th><th>관계나선</th><th>관계검사</th><th>후보</th><th>참여</th></tr>'+Object.entries(E.worlds).map(([k,w])=>`<tr><td>${V[k].n}</td><td>${w.c.actions}</td><td>${w.c.flow}</td><td>${w.c.exp}</td><td>${w.c.rel}</td><td>${w.c.expTransition}</td><td>${w.spiral}</td><td>${w.c.relDivergence}/${w.c.relTests}</td><td>${w.c.cand}</td><td>${w.c.part}</td></tr>`).join('');
+  $('metrics').innerHTML='<tr><th>군</th><th>행동</th><th>경험전이</th><th>구조확장</th><th>참여전이</th><th>선택전이</th><th>완성나선</th><th>관계검사</th><th>관계</th><th>흐름</th></tr>'+Object.entries(E.worlds).map(([k,w])=>`<tr><td>${V[k].n}</td><td>${w.c.actions}</td><td>${w.c.expTransition}</td><td>${w.c.structuralExpansion}</td><td>${w.c.participationTransition}</td><td>${w.c.choiceTransition}</td><td>${w.spiral}</td><td>${w.c.relDivergence}/${w.c.relTests}</td><td>${w.c.rel}</td><td>${w.c.flow}</td></tr>`).join('');
   const hs=hiddenDefs.map(h=>`${h.name}: ${P.hiddenDone.has(h.id)?'발생':P.hiddenCandidates.has(h.id)?'현재 후보':'관계과정 미완성'}`).join('<br>');
   $('explain').innerHTML=`<b>${P.name}</b> → ${places[P.target]?.n||P.target}<br>현재 참여: ${[...participants(S,P,1)].join(', ')}<br>현재 위치: ${places[currentPlace(P)].n}<br><span class="hidden">히든 스토리</span><br>${hs}`;
   $('log').innerHTML=S.events.slice(0,35).map(e=>`<div>[${e.t}] ${e.s}</div>`).join('');draw()
