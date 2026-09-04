@@ -6,6 +6,7 @@ on:
       - verification/p1
     paths:
       - 'verification/P1/**'
+      - 'verification/NEUTRALITY_PROTOCOL.md'
       - '.github/workflows/oasis-p1-verification.yml'
   workflow_dispatch:
 
@@ -33,10 +34,40 @@ jobs:
             --seed 20260905 \
             --output verification/results/p1_latest.json
 
-      - name: Upload verification result
+      - name: Upload structural verification result
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: oasis-p1-verification-result
+          name: oasis-p1-structural-result
           path: verification/results/p1_latest.json
+          if-no-files-found: error
+
+  p1-neutral-synthetic-falsification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run preregistered P1-2 neutral falsification benchmark
+        run: |
+          python verification/P1/p1_neutral_falsification.py \
+            --seed 20260905 \
+            --reps 8 \
+            --train 700 \
+            --test 350 \
+            --output verification/results/p1_2_neutral_latest.json
+
+      - name: Upload neutral benchmark result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-p1-neutral-falsification-result
+          path: verification/results/p1_2_neutral_latest.json
           if-no-files-found: error
