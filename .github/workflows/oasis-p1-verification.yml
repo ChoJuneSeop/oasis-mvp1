@@ -1,0 +1,42 @@
+name: OASIS P1 Verification
+
+on:
+  push:
+    branches:
+      - verification/p1
+    paths:
+      - 'verification/P1/**'
+      - '.github/workflows/oasis-p1-verification.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  p1-structural-falsification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run P1 structural falsification
+        run: |
+          python verification/P1/p1_structural_falsification.py \
+            --trials 1000 \
+            --seed 20260905 \
+            --output verification/results/p1_latest.json
+
+      - name: Upload verification result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-p1-verification-result
+          path: verification/results/p1_latest.json
+          if-no-files-found: error
