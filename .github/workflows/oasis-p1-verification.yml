@@ -88,7 +88,7 @@ jobs:
       - name: Download preregistered external datasets
         run: |
           mkdir -p verification/external_data
-          wget -q https://snap.stanford.edu/jodie/mooc.csv -O verification/external_data/mooc.csv
+          wget -q http://snap.stanford.edu/jodie/mooc.csv -O verification/external_data/mooc.csv
           wget -q https://files.grouplens.org/datasets/movielens/ml-100k.zip -O verification/external_data/ml-100k.zip
           test -s verification/external_data/mooc.csv
           test -s verification/external_data/ml-100k.zip
