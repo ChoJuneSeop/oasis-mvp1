@@ -35,7 +35,10 @@ function resolveCalls(){
   E.huntCalls=(E.huntCalls||[]).filter(h=>E.tick-h.created<240)
 }
 function observeIndependentHunt(A,a,out){
-  if(a.type!=='hunt'||out<=0)return;const key=a.target+'|'+E.tick,E.sameTickHunts[key]=E.sameTickHunts[key]||[];E.sameTickHunts[key].push(A.id);
+  if(a.type!=='hunt'||out<=0)return;
+  const key=a.target+'|'+E.tick;
+  E.sameTickHunts[key]=E.sameTickHunts[key]||[];
+  E.sameTickHunts[key].push(A.id);
   const ids=[...new Set(E.sameTickHunts[key])];if(ids.length===2){E.coopHunts++;E.coopHuntSuccess++;const ps=ids.map(id=>E.people[id]).filter(Boolean);for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++)relation(ps[i],ps[j],.03);for(const P of ps){ensureM(P);P.metrics.coopSuccess++;P.culture.actions.coop_hunt=(P.culture.actions.coop_hunt||0)+1}if(!E.milestones.firstCoopHuntSuccess)E.milestones.firstCoopHuntSuccess={t:E.tick,leader:ids[0],participants:ids};log('서로 독립적으로 같은 먹이를 쫓던 두 사람이 결과적으로 협동 사냥을 이루었다.')}
 }
 reset=function(){oldReset();E.huntCalls=[];E.sameTickHunts={};E.coopHunts=0;E.coopHuntSuccess=0;E.milestones=E.milestones||{};E.milestones.firstCoopHunt=null;E.milestones.firstCoopHuntSuccess=null;for(const A of Object.values(E.people))ensureM(A);log('v0.6: 협동 사냥은 행동가능성으로만 제공되며 선택 보너스는 없다.')}
