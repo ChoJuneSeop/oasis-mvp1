@@ -1,1 +1,201 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OASIS MVP2</title></head><body><div id="boot">OASIS MVP2 불러오는 중…</div><script>(async()=>{try{const r=await fetch("https://raw.githubusercontent.com/ChoJuneSeop/oasis-mvp1/e4c02b2b22fcda0de153e3ff277ff41f1ee0bbdf/index.html",{cache:'no-store'});if(!r.ok)throw new Error(r.status);let h=await r.text();const p='<scr'+'ipt>'+"(function(){\nconst oldMkP=mkP,oldMkW=mkW,oldRender=render;\nmkP=function(d){const p=oldMkP(d);p.possibilityPaths={};return p};\nmkW=function(k){const s=oldMkW(k);Object.assign(s.c,{pathGenerated:0,pathCandidate:0,pathSelected:0,pathRealized:0,pathChanged:0});return s};\nfunction gatedForNPC(n){return Object.entries(places).filter(([_,d])=>d.gate===n).map(([id])=>id)}\nfunction pathSource(S){const k=MODELS[S.key].kind;return k==='oasis'?'관계과정':k==='rule'?'규칙':k==='utility'?'효용':k==='q'?'Q학습':k==='retrieval'?'검색기억':'기타'}\nfunction openPath(S,P,n,id){if(!id||P.possibilityPaths[id])return;P.possibilityPaths[id]={npc:n,source:pathSource(S),generated:E.tick,candidate:null,selected:null,realized:null,changed:null};S.c.pathGenerated++;log(S,`${P.name}: [가능성경로] 발견 ${n} → 생성 ${places[id].n} (${pathSource(S)})`)}\nfunction markCandidates(S,P,g){const cs=new Set((g.cands||'').split(',').filter(Boolean));for(const[id,x]of Object.entries(P.possibilityPaths))if(x.candidate==null&&cs.has(id)){x.candidate=E.tick;S.c.pathCandidate++;log(S,`${P.name}: [가능성경로] 후보참여 ${places[id].n}`)}}\nchoose=function(S,P){if(MODELS[S.key].kind==='oasis')refreshHidden(S,P);const g=sig(evalP(S,P,1));markCandidates(S,P,g);if(P.last&&P.last!==g.cands)S.c.cand++;if(P.leader&&P.leader!==g.leader)S.c.part++;P.last=g.cands;P.leader=g.leader;if(g.choice?.startsWith('hidden:')&&MODELS[S.key].rel){const h=hiddenDefs.find(x=>x.id===g.choice.slice(7));P.hiddenDone.add(h.id);P.hiddenCandidates.delete(h.id);P.target=h.places[h.places.length-1];log(S,`${P.name}: 히든 스토리 선택 ★ 「${h.name}」`)}else P.target=g.choice||actionableIds(S,P,1)[0]||'road';P.routes.add(P.target);const px=P.possibilityPaths[P.target];if(px&&px.selected==null){px.selected=E.tick;S.c.pathSelected++;log(S,`${P.name}: [가능성경로] 실제선택 ${places[P.target].n}`)}P.choiceHistory.push({t:E.tick,target:P.target});S.c.actions++;log(S,`${P.name} 행동 선택: ${places[P.target]?.n||P.target}`)};\noutcome=function(S,P,id){const M=MODELS[S.key],before=sig(evalP(S,P,1)),first=!P.disc.has(id),r=rewardFor(S,P,id),st=stateKey(S),metNPCs=npcs.filter(n=>n[1]===id);for(const[n]of metNPCs){const fresh=!P.seenNPC.has(n);P.seenNPC.add(n);if(fresh&&M.kind!=='static')for(const gid of gatedForNPC(n))openPath(S,P,n,gid)}if(M.fb){P.disc.add(id);P.vis[id]=(P.vis[id]||0)+1;S.c.exp++}if(M.kind==='oasis'&&M.fb){for(const[n,p]of metNPCs)if(M.rel){P.relationHistory.push({t:E.tick,npc:n,place:p});S.c.rel++}refreshHidden(S,P)}if(M.kind==='q'&&M.fb){const key=st+'|'+id,old=P.q[key]??0;P.q[key]=old+.22*(r-old)}if(M.kind==='retrieval'&&M.fb)P.memory.push({id,d:S.danger,r});const after=sig(evalP(S,P,1)),totalChanged=M.fb&&changedSig(before,after);markCandidates(S,P,after);const px=P.possibilityPaths[id];if(px&&px.selected!=null&&px.realized==null){px.realized=E.tick;S.c.pathRealized++;log(S,`${P.name}: [가능성경로] 결과도달 ${places[id].n}`)}if(px&&px.realized!=null&&px.changed==null&&totalChanged){px.changed=E.tick;S.c.pathChanged++;log(S,`${P.name}: [가능성경로] 후속변화 ${places[id].n} → 다음 판단 변경`)}if(totalChanged){S.spiral++;S.c.decision++;S.c.experienceSpiral++;S.c.expTransition++;log(S,`${P.name}: 결과가 다음 판단구조 변경 → 총나선 +1`)}if(M.kind==='oasis'&&M.rel){const noRel=sig(evalP(S,P,0)),cand=after.cands!==noRel.cands,part=after.leader!==noRel.leader,choice=after.choice!==noRel.choice;if(cand){S.c.structuralExpansion++;log(S,`${P.name}: 관계가 후보구조 확장`)}if(part){S.c.participationTransition++;log(S,`${P.name}: 관계가 참여구조 변경`)}if(choice){S.c.choiceTransition++;P.pendingRelChoice=after.choice;log(S,`${P.name}: 관계가 실제 선택 변경`)}if(P.pendingRelChoice===id&&totalChanged){S.c.relationSpiral++;P.pendingRelChoice=null;log(S,`${P.name}: 관계기인 선택 결과가 다음 판단 변경 → 관계나선 +1`)}}if(first&&M.fb)log(S,`${P.name}: ${places[id].n} 첫 경험`)};\nfunction ensurePanel(){if(document.getElementById('pathCard'))return;const sec=document.createElement('section');sec.className='card';sec.id='pathCard';sec.innerHTML='<h2>가능성 경로 추적</h2><div class=\"note\" id=\"pathSummary\"></div><div style=\"overflow:auto\"><table class=\"table\" id=\"pathMetrics\"></table></div>';document.querySelector('.right').appendChild(sec)}\nrender=function(){oldRender();ensurePanel();const keys=visibleKeys(),S=E.worlds[focus],P=S.parties.find(x=>x.id===focusParty);document.getElementById('pathMetrics').innerHTML='<tr><th>군</th><th>생성</th><th>후보</th><th>선택</th><th>도달</th><th>후속</th></tr>'+keys.map(k=>{const c=E.worlds[k].c;return `<tr><td>${MODELS[k].n}</td><td>${c.pathGenerated||0}</td><td>${c.pathCandidate||0}</td><td>${c.pathSelected||0}</td><td>${c.pathRealized||0}</td><td>${c.pathChanged||0}</td></tr>`}).join('');const rows=Object.entries(P.possibilityPaths||{}).map(([id,x])=>`${places[id].n}: 발견✓ → 생성✓ → 후보${x.candidate!=null?'✓':'·'} → 선택${x.selected!=null?'✓':'·'} → 도달${x.realized!=null?'✓':'·'} → 후속${x.changed!=null?'✓':'·'} [${x.source}]`);document.getElementById('pathSummary').innerHTML=`<b>${P.name} · ${MODELS[focus].n}</b><br>${rows.join('<br>')||'아직 생성된 확장 가능성 없음'}`};\n})();"+'</scr'+'ipt>';h=h.replace('</body>',p+'</body>');document.open();document.write(h);document.close();await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='./relation-field.js';s.onload=resolve;s.onerror=()=>reject(new Error('relation-field.js load failed'));document.body.appendChild(s)})}catch(e){const b=document.getElementById('boot');if(b)b.textContent='OASIS MVP2 로딩 실패: '+e}})();</script></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="manifest.json">
+<title>OASIS Integrated Core v1</title>
+<style>
+:root{color-scheme:dark;--bg:#07111f;--panel:#0e1b2b;--line:#23384e;--text:#e8f0f7;--muted:#91a4b7;--accent:#8dd3c7;--warn:#f3c677}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,"Noto Sans KR",sans-serif}
+.app{max-width:1280px;margin:auto;padding:12px}.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-size:20px;margin:0}.sub{font-size:11px;color:var(--muted);max-width:850px;line-height:1.6}
+button{background:#14263a;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.card h2{font-size:12px;margin:0;padding:9px;border-bottom:1px solid var(--line)}.body{padding:9px;font-size:11px;line-height:1.55}
+pre{white-space:pre-wrap;word-break:break-word;font-size:10px;color:#c8d7e5}.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 6px;margin:2px;color:var(--accent)}
+.warn{color:var(--warn)}.ok{color:var(--accent)}.full{grid-column:1/-1}.row{display:flex;gap:6px;flex-wrap:wrap}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div>
+      <h1>OASIS Integrated Core v1</h1>
+      <div class="sub">논문검증 기준 구현본의 동작 확인용 러너. 위험점수·보상점수·고정 임계값 없이 현재 흐름에서 관계과정, 참여, 가능성 조합, 책임, 단일 선택, 결과 재작성, 나선 계보를 표시한다. 이 화면은 검증 실험이 아니라 구현 확인용이다.</div>
+    </div>
+    <div class="row">
+      <button id="decide">현재 흐름 판단</button>
+      <button id="actualize">선택 현실화</button>
+      <button id="advance">다음 현실 입력</button>
+      <button id="baseline">최소 기본조건 추가</button>
+      <button id="reset">초기화</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <section class="card"><h2>현재 흐름</h2><div class="body" id="flow"></div></section>
+    <section class="card"><h2>인연필드 재구성</h2><div class="body" id="field"></div></section>
+    <section class="card"><h2>참여상태</h2><div class="body" id="participation"></div></section>
+    <section class="card"><h2>가능성 / 책임 / 선택</h2><div class="body" id="decision"></div></section>
+    <section class="card full"><h2>나선·구조확장·완결 경험</h2><div class="body" id="history"></div></section>
+    <section class="card full"><h2>전체 판단 추적</h2><div class="body"><pre id="trace"></pre></div></section>
+  </div>
+</div>
+
+<script type="module">
+import { createOASIS } from './src/oasis-core.mjs';
+
+let oasis;
+let pending = null;
+let externalStep = 0;
+
+const $ = id => document.getElementById(id);
+const safe = x => x == null ? '없음' : x;
+const tags = xs => (xs?.length ? xs.map(x=>`<span class="tag">${String(x)}</span>`).join('') : '<span class="warn">없음</span>');
+
+const initialEvent = () => ({
+  id: 'reality-0',
+  entities: ['OASIS','A','B','C'],
+  participants: [
+    {id:'OASIS', roles:['decision-agent'], capabilities:['observe','communicate']},
+    {id:'B', roles:['helper'], capabilities:['assist:C'], obligations:['care:C']},
+    {id:'C', roles:['affected']}
+  ],
+  relations: [
+    {id:'r0a', from:'OASIS', to:'A', kind:'observes'},
+    {id:'r0b', from:'B', to:'C', kind:'cares-for'}
+  ],
+  affordances: [
+    {id:'observe-A', actor:'OASIS', action:'observe', target:'A', provides:['knowledge:A']},
+    {id:'communicate-B', actor:'OASIS', action:'communicate', target:'B', provides:['contact:B']},
+    {id:'assist-C', actor:'B', action:'assist', target:'C', obligations:['care:C'], resolves:['care:C']}
+  ],
+  source:{kind:'demo-world'}
+});
+
+const realityEvents = [
+  {
+    id:'reality-1',
+    entities:['A','B'],
+    relations:[{id:'r1',from:'A',to:'B',kind:'requests-contact'}],
+    affordances:[
+      {id:'share-A-B',actor:'OASIS',action:'share',target:'B',requires:['knowledge:A'],provides:['shared:A:B'],entities:['A','B']},
+      {id:'confirm-B',actor:'OASIS',action:'confirm',target:'B',requires:['contact:B'],provides:['confirmed:B']}
+    ]
+  },
+  {
+    id:'reality-2',
+    entities:['B','C','D'],
+    participants:[{id:'D',roles:['observer'],capabilities:['verify:C']}],
+    relations:[{id:'r2',from:'C',to:'D',kind:'becomes-visible-to'}],
+    affordances:[
+      {id:'verify-C',actor:'D',action:'verify',target:'C',provides:['verified:C']},
+      {id:'support-C',actor:'OASIS',action:'support',target:'C',obligations:['care:C'],entities:['B','C']}
+    ]
+  }
+];
+
+function boot(){
+  oasis = createOASIS();
+  pending = null;
+  externalStep = 0;
+  oasis.observe(initialEvent());
+  render();
+}
+
+function makeOutcome(choice){
+  const steps = choice.steps;
+  return {
+    id:`outcome-${oasis.exportState().actualizations.length}`,
+    entities:[...new Set(steps.flatMap(s=>[s.actor,s.target,...(s.entities||[])]).filter(Boolean))],
+    facts:steps.flatMap(s=>(s.provides||[]).map(token=>({id:token,entities:[s.actor,s.target].filter(Boolean),value:true}))),
+    relations:steps.filter(s=>s.actor&&s.target).map((s,i)=>({id:`out:${oasis.exportState().actualizations.length}:${i}`,from:s.actor,to:s.target,kind:`realized:${s.action}`})),
+    affordances:steps.map(s=>({id:s.id,op:'remove'})),
+    meta:{demoOutcome:true}
+  };
+}
+
+function render(){
+  const state=oasis.exportState();
+  const latest=state.flow.at(-1);
+  $('flow').innerHTML = `
+    <b>사건</b> ${latest?.event.id ?? '없음'}<br>
+    <b>변화한 존재</b> ${tags(latest?.changedEntities)}<br>
+    <b>누적 현실사건</b> ${state.flow.length}<br>
+    <b>이전 실제 선택</b> ${safe(latest?.previousChoiceId)}
+  `;
+  if(!pending){
+    $('field').innerHTML='판단 전';
+    $('participation').innerHTML='판단 전';
+    $('decision').innerHTML='판단 전';
+    $('trace').textContent='';
+  }else{
+    $('field').innerHTML=`
+      <b>현재 시작 존재</b> ${tags(pending.field.seedEntities)}<br>
+      <b>재활성 완결경험</b> ${tags(pending.field.reactivatedExperienceIds)}<br>
+      <b>관계 방향/순서</b><br>${pending.field.relationSignature.map(x=>`<div>${x}</div>`).join('')||'없음'}
+    `;
+    $('participation').innerHTML=`
+      <b>현재 참여</b> ${tags(pending.participation.current.map(x=>x.id))}<br>
+      <b>역사적 참여</b> ${tags(pending.participation.historical)}<br>
+      <b>영향 존재</b> ${tags(pending.participation.affectedEntities)}
+    `;
+    $('decision').innerHTML=`
+      <b>가능성</b> ${pending.possibilities.length}<br>
+      ${pending.possibilities.map(p=>`<div>• ${p.id} [${p.steps.map(s=>s.id).join(' → ')}]</div>`).join('')}
+      <hr>
+      <b>책임 미해결</b> ${tags(pending.responsibility?.unresolved)}<br>
+      <b>불변 제약 충돌</b> ${tags(pending.responsibility?.invariantViolations)}<br>
+      <b>단일 선택</b> <span class="ok">${pending.choice?.id ?? '없음'}</span><br>
+      <b>기본조건 필요</b> ${pending.continuationRequired ? '<span class="warn">예</span>':'아니오'}<br>
+      <b>타이브레이커 사용</b> ${pending.tieBreakUsed?'예':'아니오'}
+    `;
+    $('trace').textContent=JSON.stringify(pending,null,2);
+  }
+  $('history').innerHTML=`
+    <b>완결 경험</b> ${state.closedExperiences.length}<br>
+    ${state.closedExperiences.map(e=>`<div>• ${e.id}: ${e.choice.id} → ${e.outcome.eventId}</div>`).join('')||'없음'}
+    <br><b>나선 계보</b><br>
+    ${state.spiralLineage.map(e=>`<div>${e.fromExperienceId} → ${e.toExperienceId} (${e.viaChoiceId})</div>`).join('')||'없음'}
+    <br><b>관찰된 구조 수</b> ${state.seenStructures.length}
+  `;
+}
+
+$('decide').onclick=()=>{
+  pending=oasis.deliberate();
+  render();
+};
+$('actualize').onclick=()=>{
+  if(!pending?.choice) return;
+  oasis.actualize(pending.choice.id,makeOutcome(pending.choice));
+  pending=null;
+  render();
+};
+$('advance').onclick=()=>{
+  if(externalStep>=realityEvents.length) return;
+  oasis.observe(realityEvents[externalStep++]);
+  pending=null;
+  render();
+};
+$('baseline').onclick=()=>{
+  if(!pending?.continuationRequired) return;
+  const state=oasis.exportState();
+  const eventId=`baseline-${state.flow.length}`;
+  oasis.observe({
+    id:eventId,
+    entities:['OASIS'],
+    affordances:[{id:`observe-current-${state.flow.length}`,actor:'OASIS',action:'observe-current',target:'current-flow'}],
+    intervention:{kind:'minimal-baseline',reason:'experiment-could-not-continue'}
+  });
+  pending=null;
+  render();
+};
+$('reset').onclick=boot;
+boot();
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+</script>
+</body>
+</html>
