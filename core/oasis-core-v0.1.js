@@ -53,16 +53,16 @@
     return Object.freeze({steps:Object.freeze(steps),key:processKey(steps),start:steps[0].from,end:steps[steps.length-1].to,participants:Object.freeze(unique(steps.flatMap(s=>s.participants)))});
   }
 
-  // Structural bridge v0.1: no graded similarity and no forced retrieval.
-  // A completed past process may participate only if its directed endpoint can
-  // continue into the present flow, or the boundary relation explicitly shares
-  // a participant and the past endpoint participates in the current relation.
+  // Structural bridge v0.1: direction continuity is necessary but not sufficient.
+  // A second exact symbolic bridge must exist: shared participant or same relation kind.
+  // No graded similarity, threshold, or forced top-k retrieval is used.
   function hasStructuralBridge(past,flow){
     const p=past.steps[past.steps.length-1], n=flow.steps[0];
-    if(p.to===n.from)return true;
-    const shared=p.participants.some(v=>n.participants.includes(v));
-    const endpointNow=p.to===n.from||p.to===n.to||n.participants.includes(p.to);
-    return shared&&endpointNow&&p.to!==n.to;
+    const directionContinues=p.to===n.from;
+    if(!directionContinues)return false;
+    const sharedParticipant=p.participants.some(v=>n.participants.includes(v));
+    const sameRelationKind=p.relation===n.relation;
+    return sharedParticipant||sameRelationKind;
   }
 
   function reactivate(memory,flowInput){
