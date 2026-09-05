@@ -1,11 +1,11 @@
 {
-  "name": "OASIS MVP2 Relational World Laboratory",
-  "short_name": "OASIS MVP2",
+  "name": "OASIS Integrated Core v1",
+  "short_name": "OASIS Core",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#07111f",
   "theme_color": "#111827",
-  "description": "OASIS multi-party relational RPG comparison laboratory",
+  "description": "OASIS integrated current-flow, relational-process, participation, possibility, choice, responsibility and spiral reference implementation",
   "icons": [
     {
       "src": "icon.svg",
