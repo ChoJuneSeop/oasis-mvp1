@@ -1,0 +1,59 @@
+{
+  "case_id": "agadir-1911-blind-v1",
+  "engine_input": true,
+  "notes_ko": "실험 엔진에는 익명화된 행위자/관계/순서만 제공한다. 실제 지명·국가명·결말은 이 파일에 포함하지 않는다.",
+  "phases": [
+    {
+      "id": "H0",
+      "fact": "Actor A and Actor B previously entered an economic arrangement concerning Territory M.",
+      "relations": [
+        {"from": "A", "to": "B", "kind": "economic-arrangement"}
+      ]
+    },
+    {
+      "id": "H1",
+      "fact": "Actor A intervened inside Territory M during an internal disturbance.",
+      "relations": [
+        {"from": "A", "to": "M", "kind": "intervenes"}
+      ]
+    },
+    {
+      "id": "H2",
+      "fact": "Actor C acted in Territory M without consulting Actor A after interpreting Actor A's prior external relations as relevant to its own position.",
+      "relations": [
+        {"from": "C", "to": "A", "kind": "acts-without-consultation"}
+      ]
+    },
+    {
+      "id": "H3",
+      "fact": "Actor B interpreted Actor C's action as part of a wider coordination and deployed a state vessel into Territory M.",
+      "relations": [
+        {"from": "B", "to": "C", "kind": "attributes-coordination"},
+        {"from": "B", "to": "M", "kind": "deploys"}
+      ]
+    },
+    {
+      "id": "H4",
+      "fact": "Actor D made a public signal directed at Actor B during the developing dispute.",
+      "relations": [
+        {"from": "D", "to": "B", "kind": "public-warning"}
+      ]
+    },
+    {
+      "id": "H5",
+      "fact": "Actors A and B continued direct negotiations while Actor C sought participation in the discussion.",
+      "relations": [
+        {"from": "A", "to": "B", "kind": "negotiates"},
+        {"from": "C", "to": "A", "kind": "requests-inclusion"}
+      ]
+    },
+    {
+      "id": "H6",
+      "fact": "Actors A and B concluded a settlement that altered their formal positions and exchanged territorial concessions.",
+      "relations": [
+        {"from": "B", "to": "A", "kind": "recognizes-position"},
+        {"from": "A", "to": "B", "kind": "compensates-territory"}
+      ]
+    }
+  ]
+}
