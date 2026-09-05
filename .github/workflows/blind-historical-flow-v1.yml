@@ -1,0 +1,32 @@
+name: Blind Historical Flow v1
+
+on:
+  push:
+    branches:
+      - experiment/blind-historical-flow-v1
+    paths:
+      - 'tools/blind-historical-flow-v1.mjs'
+      - 'experiments/blind-historical-flow/**'
+      - 'docs/validation/blind-historical-flow-v1-protocol.md'
+      - '.github/workflows/blind-historical-flow-v1.yml'
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run historical-flow mechanism validation
+        run: node tools/blind-historical-flow-v1.mjs
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: blind-historical-flow-v1-report
+          path: |
+            reports/blind-historical-flow-v1.json
+            reports/blind-historical-flow-v1.md
