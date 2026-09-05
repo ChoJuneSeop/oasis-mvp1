@@ -28,11 +28,6 @@ function relationOccurrences(history) {
   );
 }
 
-// OASIS/strong-comparator current-flow reconstruction:
-// Begin from participants in the newly disclosed current fact, then walk backward once
-// through completed historical relations. A past relation can re-participate only if it
-// touches the entities that are already participating at that point in the backward flow.
-// There is no age cut-off, risk threshold, score, or permanent activation weight.
 function orderedCurrentField(history, current) {
   const participating = new Set(current.relations.flatMap(e => [e.from, e.to]));
   const selected = [];
@@ -57,8 +52,6 @@ function orderedCurrentField(history, current) {
   return selected.reverse();
 }
 
-// Control: relational connectivity is retained but historical order does not gate
-// re-participation. Closure is repeatedly expanded until no new connected relation appears.
 function unorderedCurrentField(history, current) {
   const participating = new Set(current.relations.flatMap(e => [e.from, e.to]));
   const all = relationOccurrences(history);
@@ -81,8 +74,6 @@ function unorderedCurrentField(history, current) {
     }
   }
 
-  // Sorting here is output normalization only. This arm intentionally removes order
-  // from its comparison signature below.
   return [...selected.values()].sort((a, b) =>
     a.eventId.localeCompare(b.eventId) || edgeKey(a).localeCompare(edgeKey(b))
   );
@@ -96,9 +87,6 @@ function explicitDirectedPairs(history, current) {
   return pairs;
 }
 
-// Structural recombination only: temporally ordered directed relations may compose when
-// the target of an earlier relation becomes the source of a later relation. No utility,
-// success value, danger value, or preferred endpoint is attached to the new possibility.
 function reconstitutedPossibilities(field, history, current) {
   const currentEdges = current.relations.map((edge, relationIndex) =>
     occurrence(current, history.length, relationIndex, edge)
@@ -150,7 +138,6 @@ function modelStep(kind, history, current) {
     field = orderedCurrentField(history, current);
     possibilities = reconstitutedPossibilities(field, history, current);
   } else if (kind === 'ordered-relational-memory') {
-    // Strong falsifier for any claim that ordered current-conditioned reactivation is unique.
     field = orderedCurrentField(history, current);
   } else if (kind === 'unordered-relational-memory') {
     field = unorderedCurrentField(history, current);
@@ -162,16 +149,11 @@ function modelStep(kind, history, current) {
     throw new Error(`Unknown model kind: ${kind}`);
   }
 
-  // OASIS realizes one internally generated relational possibility when one exists.
-  // This is not ranked by a reward or success function. The selection operator itself
-  // is not treated as evidence of decision quality in v1.
   let selection = possibilities.length ? {
     source: 'internal',
     relation: possibilities[0]
   } : null;
 
-  // Minimal Baseline Intervention Principle: only if the mechanism cannot continue on
-  // its own, provide the minimum common continuation relation from the current fact.
   let minimalBaselineIntervention = false;
   if (!selection) {
     minimalBaselineIntervention = true;
@@ -239,12 +221,12 @@ function directionAblation(sequence) {
   });
 }
 
-const canonical = phases.map(structuredClone);
+const canonical = phases.map(x => structuredClone(x));
 const orderAblation = [
   structuredClone(phases[0]),
   structuredClone(phases[2]),
   structuredClone(phases[1]),
-  ...phases.slice(3).map(structuredClone)
+  ...phases.slice(3).map(x => structuredClone(x))
 ];
 const reversedDirection = directionAblation(canonical);
 const models = [
@@ -299,11 +281,6 @@ for (const model of models) {
   };
 }
 
-// Future-information audit for this deterministic mechanism harness: each output row is
-// produced before current is appended to history; only prior disclosed events and current
-// are passed into modelStep. This check verifies the trace never lists a future event ID as
-// a reactivated experience or as possibility support.
-const phaseIndex = new Map(canonical.map((p, i) => [p.id, i]));
 let futureLeakDetected = false;
 const futureLeakRows = [];
 for (const [model, variants] of Object.entries(runs)) {
