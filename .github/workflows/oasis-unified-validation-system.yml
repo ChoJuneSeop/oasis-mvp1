@@ -1,0 +1,33 @@
+name: OASIS Unified Validation System Audit
+
+on:
+  push:
+    branches:
+      - architecture/oasis-unified-validation-system-v1
+    paths:
+      - 'src/validation/oasis-unified-validation-system.mjs'
+      - 'tools/oasis-unified-validation-system-audit.mjs'
+      - 'docs/OASIS_UNIFIED_VALIDATION_SYSTEM_V1.md'
+      - '.github/workflows/oasis-unified-validation-system.yml'
+  workflow_dispatch:
+
+jobs:
+  unified-system-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check unified validation system
+        run: node --check src/validation/oasis-unified-validation-system.mjs
+      - name: Syntax check contamination audit
+        run: node --check tools/oasis-unified-validation-system-audit.mjs
+      - name: Run contamination-boundary audit
+        run: node tools/oasis-unified-validation-system-audit.mjs
+      - name: Confirm old contaminated harness is not imported
+        run: |
+          if grep -q "blind-historical-flow-v2" src/validation/oasis-unified-validation-system.mjs; then exit 1; fi
+          if grep -q "relation-field.js" src/validation/oasis-unified-validation-system.mjs; then exit 1; fi
