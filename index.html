@@ -5,26 +5,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#111827">
 <link rel="manifest" href="manifest.json">
-<title>OASIS Integrated Core v1</title>
+<title>OASIS Reference Core v1</title>
 <style>
-:root{color-scheme:dark;--bg:#07111f;--panel:#0e1b2b;--line:#23384e;--text:#e8f0f7;--muted:#91a4b7;--accent:#8dd3c7;--warn:#f3c677}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,"Noto Sans KR",sans-serif}
-.app{max-width:1280px;margin:auto;padding:12px}.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-h1{font-size:20px;margin:0}.sub{font-size:11px;color:var(--muted);max-width:850px;line-height:1.6}
-button{background:#14263a;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-weight:700}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.card h2{font-size:12px;margin:0;padding:9px;border-bottom:1px solid var(--line)}.body{padding:9px;font-size:11px;line-height:1.55}
-pre{white-space:pre-wrap;word-break:break-word;font-size:10px;color:#c8d7e5}.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 6px;margin:2px;color:var(--accent)}
-.warn{color:var(--warn)}.ok{color:var(--accent)}.full{grid-column:1/-1}.row{display:flex;gap:6px;flex-wrap:wrap}
-@media(max-width:800px){.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+:root{color-scheme:dark;--bg:#07111f;--panel:#0e1b2b;--line:#23384e;--text:#e8f0f7;--muted:#91a4b7;--accent:#8dd3c7;--warn:#f3c677}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,"Noto Sans KR",sans-serif}.app{max-width:1280px;margin:auto;padding:12px}.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}h1{font-size:20px;margin:0}.sub{font-size:11px;color:var(--muted);max-width:900px;line-height:1.6}button{background:#14263a;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-weight:700}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}.card h2{font-size:12px;margin:0;padding:9px;border-bottom:1px solid var(--line)}.body{padding:9px;font-size:11px;line-height:1.55}pre{white-space:pre-wrap;word-break:break-word;font-size:10px;color:#c8d7e5}.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 6px;margin:2px;color:var(--accent)}.warn{color:var(--warn)}.ok{color:var(--accent)}.full{grid-column:1/-1}.row{display:flex;gap:6px;flex-wrap:wrap}@media(max-width:800px){.grid{grid-template-columns:1fr}.full{grid-column:auto}}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="top">
     <div>
-      <h1>OASIS Integrated Core v1</h1>
-      <div class="sub">논문검증 기준 구현본의 동작 확인용 러너. 위험점수·보상점수·고정 임계값 없이 현재 흐름에서 관계과정, 참여, 가능성 조합, 책임, 단일 선택, 결과 재작성, 나선 계보를 표시한다. 이 화면은 검증 실험이 아니라 구현 확인용이다.</div>
+      <h1>OASIS Reference Core v1</h1>
+      <div class="sub">논문검증 권위 구현의 동작 확인용 러너. 이 화면은 성능 실험이 아니다. 위험점수·보상점수·고정 임계값 없이 현재 흐름, 관계과정, 참여, 가능성 조합, 책임, 단일 현실화, 결과에 의한 다음 현실 재작성, 완결 경험과 나선 계보를 확인한다.</div>
     </div>
     <div class="row">
       <button id="decide">현재 흐름 판단</button>
@@ -34,168 +25,79 @@ pre{white-space:pre-wrap;word-break:break-word;font-size:10px;color:#c8d7e5}.tag
       <button id="reset">초기화</button>
     </div>
   </div>
-
   <div class="grid">
     <section class="card"><h2>현재 흐름</h2><div class="body" id="flow"></div></section>
     <section class="card"><h2>인연필드 재구성</h2><div class="body" id="field"></div></section>
     <section class="card"><h2>참여상태</h2><div class="body" id="participation"></div></section>
-    <section class="card"><h2>가능성 / 책임 / 선택</h2><div class="body" id="decision"></div></section>
-    <section class="card full"><h2>나선·구조확장·완결 경험</h2><div class="body" id="history"></div></section>
+    <section class="card"><h2>가능성 / 책임 / 단일 현실화</h2><div class="body" id="decision"></div></section>
+    <section class="card full"><h2>완결 경험 · 나선 · 구조확장</h2><div class="body" id="history"></div></section>
     <section class="card full"><h2>전체 판단 추적</h2><div class="body"><pre id="trace"></pre></div></section>
   </div>
 </div>
-
 <script type="module">
-import { createOASIS } from './src/oasis-integrated-core.mjs';
+import { createOASIS } from './src/oasis-reference-core.mjs';
 
 let oasis;
-let pending = null;
-let externalStep = 0;
+let pending=null;
+let externalStep=0;
+const $=id=>document.getElementById(id);
+const tags=xs=>(xs?.length?xs.map(x=>`<span class="tag">${String(x)}</span>`).join(''):'<span class="warn">없음</span>');
 
-const $ = id => document.getElementById(id);
-const safe = x => x == null ? '없음' : x;
-const tags = xs => (xs?.length ? xs.map(x=>`<span class="tag">${String(x)}</span>`).join('') : '<span class="warn">없음</span>');
-
-const initialEvent = () => ({
-  id: 'reality-0',
-  entities: ['OASIS','A','B','C'],
-  participants: [
-    {id:'OASIS', roles:['decision-agent'], capabilities:['observe','communicate']},
-    {id:'B', roles:['helper'], capabilities:['assist:C'], obligations:['care:C']},
-    {id:'C', roles:['affected']}
+const initialEvent=()=>({
+  id:'reality-0',
+  entities:['OASIS','A','B','C'],
+  participants:[
+    {id:'OASIS',roles:['decision-agent'],capabilities:['observe','communicate','share','support']},
+    {id:'B',roles:['helper'],capabilities:['assist:C'],obligations:['care:C']},
+    {id:'C',roles:['affected']}
   ],
-  relations: [
-    {id:'r0a', from:'OASIS', to:'A', kind:'observes'},
-    {id:'r0b', from:'B', to:'C', kind:'cares-for'}
+  relations:[
+    {id:'r0a',from:'OASIS',to:'A',kind:'observes'},
+    {id:'r0b',from:'B',to:'C',kind:'cares-for'}
   ],
-  affordances: [
-    {id:'observe-A', actor:'OASIS', action:'observe', target:'A', provides:['knowledge:A']},
-    {id:'communicate-B', actor:'OASIS', action:'communicate', target:'B', provides:['contact:B']},
-    {id:'assist-C', actor:'B', action:'assist', target:'C', obligations:['care:C'], resolves:['care:C']}
+  affordances:[
+    {id:'observe-A',actor:'OASIS',action:'observe',target:'A',provides:['knowledge:A']},
+    {id:'communicate-B',actor:'OASIS',action:'communicate',target:'B',provides:['contact:B']},
+    {id:'assist-C',actor:'B',action:'assist:C',target:'C',resolves:['care:C']}
   ],
-  source:{kind:'demo-world'}
+  source:{kind:'implementation-runner'}
 });
 
-const realityEvents = [
-  {
-    id:'reality-1',
-    entities:['A','B'],
-    relations:[{id:'r1',from:'A',to:'B',kind:'requests-contact'}],
-    affordances:[
-      {id:'share-A-B',actor:'OASIS',action:'share',target:'B',requires:['knowledge:A'],provides:['shared:A:B'],entities:['A','B']},
-      {id:'confirm-B',actor:'OASIS',action:'confirm',target:'B',requires:['contact:B'],provides:['confirmed:B']}
-    ]
-  },
-  {
-    id:'reality-2',
-    entities:['B','C','D'],
-    participants:[{id:'D',roles:['observer'],capabilities:['verify:C']}],
-    relations:[{id:'r2',from:'C',to:'D',kind:'becomes-visible-to'}],
-    affordances:[
-      {id:'verify-C',actor:'D',action:'verify',target:'C',provides:['verified:C']},
-      {id:'support-C',actor:'OASIS',action:'support',target:'C',obligations:['care:C'],entities:['B','C']}
-    ]
-  }
+const realityEvents=[
+  {id:'reality-1',entities:['A','B'],relations:[{id:'r1',from:'A',to:'B',kind:'requests-contact'}],affordances:[
+    {id:'share-A-B',actor:'OASIS',action:'share',target:'B',requires:['knowledge:A'],provides:['shared:A:B'],entities:['A','B']},
+    {id:'confirm-B',actor:'OASIS',action:'communicate',target:'B',requires:['contact:B'],provides:['confirmed:B']}
+  ]},
+  {id:'reality-2',entities:['B','C','D'],participants:[{id:'D',roles:['observer'],capabilities:['verify']}],relations:[{id:'r2',from:'C',to:'D',kind:'becomes-visible-to'}],affordances:[
+    {id:'verify-C',actor:'D',action:'verify',target:'C',provides:['verified:C']},
+    {id:'support-C',actor:'OASIS',action:'support',target:'C',entities:['B','C']}
+  ]}
 ];
 
-function boot(){
-  oasis = createOASIS();
-  pending = null;
-  externalStep = 0;
-  oasis.observe(initialEvent());
-  render();
-}
-
+function boot(){oasis=createOASIS();pending=null;externalStep=0;oasis.observe(initialEvent());render()}
 function makeOutcome(choice){
-  const steps = choice.steps;
-  return {
-    id:`outcome-${oasis.exportState().actualizations.length}`,
-    entities:[...new Set(steps.flatMap(s=>[s.actor,s.target,...(s.entities||[])]).filter(Boolean))],
-    facts:steps.flatMap(s=>(s.provides||[]).map(token=>({id:token,entities:[s.actor,s.target].filter(Boolean),value:true}))),
-    relations:steps.filter(s=>s.actor&&s.target).map((s,i)=>({id:`out:${oasis.exportState().actualizations.length}:${i}`,from:s.actor,to:s.target,kind:`realized:${s.action}`})),
-    affordances:steps.map(s=>({id:s.id,op:'remove'})),
-    meta:{demoOutcome:true}
-  };
-}
-
-function render(){
   const state=oasis.exportState();
-  const latest=state.flow.at(-1);
-  $('flow').innerHTML = `
-    <b>사건</b> ${latest?.event.id ?? '없음'}<br>
-    <b>변화한 존재</b> ${tags(latest?.changedEntities)}<br>
-    <b>누적 현실사건</b> ${state.flow.length}<br>
-    <b>이전 실제 선택</b> ${safe(latest?.previousChoiceId)}
-  `;
-  if(!pending){
-    $('field').innerHTML='판단 전';
-    $('participation').innerHTML='판단 전';
-    $('decision').innerHTML='판단 전';
-    $('trace').textContent='';
-  }else{
-    $('field').innerHTML=`
-      <b>현재 시작 존재</b> ${tags(pending.field.seedEntities)}<br>
-      <b>재활성 완결경험</b> ${tags(pending.field.reactivatedExperienceIds)}<br>
-      <b>관계 방향/순서</b><br>${pending.field.relationSignature.map(x=>`<div>${x}</div>`).join('')||'없음'}
-    `;
-    $('participation').innerHTML=`
-      <b>현재 참여</b> ${tags(pending.participation.current.map(x=>x.id))}<br>
-      <b>역사적 참여</b> ${tags(pending.participation.historical)}<br>
-      <b>영향 존재</b> ${tags(pending.participation.affectedEntities)}
-    `;
-    $('decision').innerHTML=`
-      <b>가능성</b> ${pending.possibilities.length}<br>
-      ${pending.possibilities.map(p=>`<div>• ${p.id} [${p.steps.map(s=>s.id).join(' → ')}]</div>`).join('')}
-      <hr>
-      <b>책임 미해결</b> ${tags(pending.responsibility?.unresolved)}<br>
-      <b>불변 제약 충돌</b> ${tags(pending.responsibility?.invariantViolations)}<br>
-      <b>단일 선택</b> <span class="ok">${pending.choice?.id ?? '없음'}</span><br>
-      <b>기본조건 필요</b> ${pending.continuationRequired ? '<span class="warn">예</span>':'아니오'}<br>
-      <b>타이브레이커 사용</b> ${pending.tieBreakUsed?'예':'아니오'}
-    `;
+  const steps=choice.steps;
+  return {id:`outcome-${state.actualizations.length}`,entities:[...new Set(steps.flatMap(s=>[s.actor,s.target,...(s.entities||[])]).filter(Boolean))],facts:steps.flatMap(s=>(s.provides||[]).map(token=>({id:token,entities:[s.actor,s.target].filter(Boolean),value:true}))),relations:steps.filter(s=>s.actor&&s.target).map((s,i)=>({id:`out:${state.actualizations.length}:${i}`,from:s.actor,to:s.target,kind:`realized:${s.action}`})),affordances:steps.map(s=>({id:s.meta?.originalStepId??s.id,op:'remove'})),meta:{implementationRunnerOutcome:true}};
+}
+function render(){
+  const state=oasis.exportState();const latest=state.flow.at(-1);
+  $('flow').innerHTML=`<b>사건</b> ${latest?.event.id??'없음'}<br><b>변화한 존재</b> ${tags(latest?.changedEntities)}<br><b>누적 현실사건</b> ${state.flow.length}<br><b>이전 실제 선택</b> ${latest?.previousChoiceId??'없음'}<br><b>현실화 seed</b> ${state.options.realizationSeed}`;
+  if(!pending){$('field').innerHTML='판단 전';$('participation').innerHTML='판단 전';$('decision').innerHTML='판단 전';$('trace').textContent=''}else{
+    $('field').innerHTML=`<b>현재 시작 존재</b> ${tags(pending.field.seedEntities)}<br><b>재활성 완결경험</b> ${tags(pending.field.reactivatedExperienceIds)}<br><b>관계 방향/순서</b><br>${pending.field.relationSignature.map(x=>`<div>${x}</div>`).join('')||'없음'}`;
+    $('participation').innerHTML=`<b>현재 참여</b> ${tags(pending.participation.current.map(x=>x.id))}<br><b>역사적 참여</b> ${tags(pending.participation.historical)}<br><b>영향 존재</b> ${tags(pending.participation.affectedEntities)}`;
+    $('decision').innerHTML=`<b>가능성</b> ${pending.possibilities.length}<br>${pending.possibilities.map(p=>`<div>• ${p.id} [${p.steps.map(s=>s.id).join(' → ')}]</div>`).join('')}<hr><b>책임 미해결</b> ${tags(pending.responsibility?.unresolved)}<br><b>불변 제약 충돌</b> ${tags(pending.responsibility?.invariantViolations)}<br><b>단일 현실화</b> <span class="ok">${pending.choice?.id??'없음'}</span><br><b>현재 흐름 앵커 사용</b> ${pending.currentFlowAnchoringUsed?'예':'아니오'}<br><b>동등전선 현실화 장치 사용</b> ${pending.tieBreakUsed?'예':'아니오'}<br><b>기본조건 필요</b> ${pending.continuationRequired?'<span class="warn">예</span>':'아니오'}${pending.tieBreakMeaning?`<br><span class="warn">${pending.tieBreakMeaning}</span>`:''}`;
     $('trace').textContent=JSON.stringify(pending,null,2);
   }
-  $('history').innerHTML=`
-    <b>완결 경험</b> ${state.closedExperiences.length}<br>
-    ${state.closedExperiences.map(e=>`<div>• ${e.id}: ${e.choice.id} → ${e.outcome.eventId}</div>`).join('')||'없음'}
-    <br><b>나선 계보</b><br>
-    ${state.spiralLineage.map(e=>`<div>${e.fromExperienceId} → ${e.toExperienceId} (${e.viaChoiceId})</div>`).join('')||'없음'}
-    <br><b>관찰된 구조 수</b> ${state.seenStructures.length}
-  `;
+  $('history').innerHTML=`<b>완결 경험</b> ${state.closedExperiences.length}<br>${state.closedExperiences.map(e=>`<div>• ${e.id}: ${e.choice.id} → ${e.outcome.eventId}</div>`).join('')||'없음'}<br><b>나선 계보</b><br>${state.spiralLineage.map(e=>`<div>${e.fromExperienceId} → ${e.toExperienceId} (${e.viaChoiceId})</div>`).join('')||'없음'}<br><b>관찰된 구조 수</b> ${state.seenStructures.length}`;
 }
-
-$('decide').onclick=()=>{
-  pending=oasis.deliberate();
-  render();
-};
-$('actualize').onclick=()=>{
-  if(!pending?.choice) return;
-  oasis.actualize(pending.choice.id,makeOutcome(pending.choice));
-  pending=null;
-  render();
-};
-$('advance').onclick=()=>{
-  if(externalStep>=realityEvents.length) return;
-  oasis.observe(realityEvents[externalStep++]);
-  pending=null;
-  render();
-};
-$('baseline').onclick=()=>{
-  if(!pending?.continuationRequired) return;
-  const state=oasis.exportState();
-  const eventId=`baseline-${state.flow.length}`;
-  oasis.observe({
-    id:eventId,
-    entities:['OASIS'],
-    affordances:[{id:`observe-current-${state.flow.length}`,actor:'OASIS',action:'observe-current',target:'current-flow'}],
-    intervention:{kind:'minimal-baseline',reason:'experiment-could-not-continue'}
-  });
-  pending=null;
-  render();
-};
+$('decide').onclick=()=>{pending=oasis.deliberate();render()};
+$('actualize').onclick=()=>{if(!pending?.choice)return;oasis.actualize(pending.choice.id,makeOutcome(pending.choice));pending=null;render()};
+$('advance').onclick=()=>{if(externalStep>=realityEvents.length)return;oasis.observe(realityEvents[externalStep++]);pending=null;render()};
+$('baseline').onclick=()=>{if(!pending?.continuationRequired)return;const state=oasis.exportState();oasis.observe({id:`baseline-${state.flow.length}`,entities:['OASIS'],affordances:[{id:`observe-current-${state.flow.length}`,actor:'OASIS',action:'observe',target:'current-flow'}],intervention:{kind:'minimal-baseline',reason:'experiment-could-not-continue'}});pending=null;render()};
 $('reset').onclick=boot;
 boot();
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
 </script>
 </body>
 </html>
