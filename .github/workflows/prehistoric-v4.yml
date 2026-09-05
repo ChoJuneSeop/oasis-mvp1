@@ -1,0 +1,26 @@
+name: prehistoric-v4
+on:
+  push:
+    branches: [experiment/prehistoric-personality-lab]
+    paths:
+      - 'experiments/prehistoric-society-v3-*.js'
+      - 'experiments/prehistoric-singularity-v4.js'
+      - 'experiments/prehistoric-headless-v4.mjs'
+      - '.github/workflows/prehistoric-v4.yml'
+  workflow_dispatch:
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run exact headless simulation
+        run: node experiments/prehistoric-headless-v4.mjs | tee prehistoric-v4-result.json
+      - name: Upload result
+        uses: actions/upload-artifact@v4
+        with:
+          name: prehistoric-v4-result
+          path: prehistoric-v4-result.json
