@@ -1,0 +1,30 @@
+name: oasis-core-regression-v22
+on:
+  push:
+    branches: [experiment/prehistoric-personality-lab]
+    paths:
+      - 'experiments/oasis-core-v2.js'
+      - 'experiments/oasis-core-v2-stability.js'
+      - 'experiments/oasis-core-regression-v22.mjs'
+      - '.github/workflows/oasis-core-regression-v22.yml'
+  workflow_dispatch:
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run anti-amplification regressions
+        shell: bash
+        run: |
+          set +e
+          node experiments/oasis-core-regression-v22.mjs | tee oasis-core-regression-v22-result.json
+          code=${PIPESTATUS[0]}
+          echo "regression_exit_code=$code"
+          exit 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oasis-core-regression-v22-result
+          path: oasis-core-regression-v22-result.json
