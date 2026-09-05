@@ -27,7 +27,6 @@ function execute(A,P,a){
  A.lastOutcome=out;return out;
 }
 function bodyFlow(A){
- // 생리적 항상성은 의사결정 모델의 목표가 아니라 모든 인간에게 동일한 신체 과정으로 둔다.
  const river=E.nodes.find(n=>n.kind==='water'),cave=E.nodes.find(n=>n.kind==='shelter');
  if(A.water<24&&river&&dist(A,river)<38)A.water=clamp(A.water+18,0,100);
  if(A.energy<24&&A.inventory.food>0){A.inventory.food--;A.energy=clamp(A.energy+20,0,100)}
@@ -54,11 +53,10 @@ function reproduction(){
  }
 }
 function homeostaticReflex(A){
-  // 관찰자/모델의 목표가 아니라 인간 신체의 공통 비의사결정 반사층.
-  if(A.water<23){const n=E.nodes.find(x=>x.kind==='water');if(n){if(dist(A,n)<30)A.water=clamp(A.water+30,0,100);else moveToward(A,n.x,n.y,8);A.metrics.bioReflex++;return true}}
-  if(A.energy<21){if(A.inventory.food>0){A.inventory.food--;A.energy=clamp(A.energy+22,0,100);A.metrics.bioReflex++;return true}const n=E.nodes.filter(x=>x.kind==='food').sort((x,y)=>dist(A,x)-dist(A,y))[0];if(n){if(dist(A,n)<30&&n.stock>=1){n.stock-=1;A.energy=clamp(A.energy+18,0,100)}else moveToward(A,n.x,n.y,8);A.metrics.bioReflex++;return true}}
-  if(A.warmth<13){const n=E.nodes.find(x=>x.kind==='shelter');if(n){if(dist(A,n)<30)A.warmth=clamp(A.warmth+10,0,100);else moveToward(A,n.x,n.y,7);A.metrics.bioReflex++;return true}}
-  return false;
+ if(A.water<23){const n=E.nodes.find(x=>x.kind==='water');if(n){if(dist(A,n)<30)A.water=clamp(A.water+30,0,100);else moveToward(A,n.x,n.y,8);A.metrics.bioReflex++;return true}}
+ if(A.energy<21){if(A.inventory.food>0){A.inventory.food--;A.energy=clamp(A.energy+22,0,100);A.metrics.bioReflex++;return true}const n=E.nodes.filter(x=>x.kind==='food').sort((x,y)=>dist(A,x)-dist(A,y))[0];if(n){if(dist(A,n)<30&&n.stock>=1){n.stock-=1;A.energy=clamp(A.energy+18,0,100)}else moveToward(A,n.x,n.y,8);A.metrics.bioReflex++;return true}}
+ if(A.warmth<13){const n=E.nodes.find(x=>x.kind==='shelter');if(n){if(dist(A,n)<30)A.warmth=clamp(A.warmth+10,0,100);else moveToward(A,n.x,n.y,7);A.metrics.bioReflex++;return true}}
+ return false;
 }
 function stepPerson(A){if(!A.alive||E.tick<A.recoveryUntil)return;if(homeostaticReflex(A)){bodyFlow(A);return}const P=perception(A),as=acts(A,P),d=decide(A,P,as);if(!d||!d.a)return;execute(A,P,d.a);A.lastAction=d.a.type;A.lastWhy=d.why;A.lastPerception=P;bodyFlow(A)}
 function tick(n=1){while(n--){E.tick++;updateEnvironment();for(const A of [...living()])stepPerson(A);passiveCoPresence();reproduction();}render()}
