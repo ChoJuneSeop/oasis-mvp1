@@ -105,7 +105,7 @@ function o2Responsibility(P,a){
   const steps=Array.isArray(a?.steps)&&a.steps.length?a.steps:[a];let r=0;
   for(const s of steps)r=Math.max(r,needScore(P,s));return r;
 }
-function oasisRank(A,P,a,active){
+oasisRank=function(A,P,a,active){
   const flow=o2FlowState(A,P),responsibility=o2Responsibility(P,a)*(1+flow.fall*2.2);
   const relationSupport=o2ActionSupport(a,active,P),combination=o2CombinationPotential(active);
   const generatedSynergy=a?.generated?(Math.log2(1+(a.sourceEpisodes?.length||1))+.28*(a.steps?.length||1)):0;
@@ -120,7 +120,7 @@ function oasisRank(A,P,a,active){
   const total=responsibility*responsibilityGain+relationSupport*relationGain+combination*combinationGain+coupling*.85+generatedSynergy*(.65+.6*flow.stability)+novelty*.18+participation*.025-waitPenalty;
   // [integrated score, responsibility, combination, relation support, generated synergy, novelty, participation]
   return[total,responsibility,combination,relationSupport,generatedSynergy,novelty,participation];
-}
+};
 cmpTuple=function(a,b){const x=a?.[0]??0,y=b?.[0]??0;if(x!==y)return y-x;for(let i=1;i<Math.max(a.length,b.length);i++){const p=a[i]??0,q=b[i]??0;if(p!==q)return q-p}return 0;};
 
 function o2PrimitiveIdentity(a){return actionKey(a)+'|'+(a.target||'');}
