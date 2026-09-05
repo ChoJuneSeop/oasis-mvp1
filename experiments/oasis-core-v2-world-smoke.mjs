@@ -8,7 +8,7 @@ const ctx={clearRect(){},fillRect(){},beginPath(){},arc(){},fill(){},fillText(){
 const elements=new Map();
 globalThis.document={getElementById(id){if(!elements.has(id))elements.set(id,el());return elements.get(id)},querySelectorAll(){return[]},querySelector(){return el()},createElement(){return el()}};
 globalThis.setInterval=()=>0;globalThis.clearInterval=()=>{};
-for(const f of ['prehistoric-society-v3-core.js','prehistoric-society-v3-decisions.js','prehistoric-society-v3-world.js','prehistoric-singularity-v4.js','prehistoric-cooperation-v4.js','prehistoric-late-paleolithic-v5.js','prehistoric-exposure-v6.js','prehistoric-ritual-observer-v6.js','oasis-core-v2.js'])vm.runInThisContext(fs.readFileSync(path.join(here,f),'utf8'),{filename:f});
+for(const f of ['prehistoric-society-v3-core.js','prehistoric-society-v3-decisions.js','prehistoric-society-v3-world.js','prehistoric-singularity-v4.js','prehistoric-cooperation-v4.js','prehistoric-late-paleolithic-v5.js','prehistoric-exposure-v6.js','prehistoric-ritual-observer-v6.js','oasis-core-v2.js','oasis-core-v2-stability.js'])vm.runInThisContext(fs.readFileSync(path.join(here,f),'utf8'),{filename:f});
 vm.runInThisContext(`
 const first={};for(let i=0;i<25;i++){tick(1);for(const id of Object.keys(FOUNDERS)){const a=E.people[id];if(!first[id]&&a.lastAction)first[id]={tick:E.tick,action:a.lastAction,why:a.lastWhy}}}
 tick(975);
