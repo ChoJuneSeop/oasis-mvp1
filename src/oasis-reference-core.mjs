@@ -88,7 +88,30 @@ export class OASISReferenceCore extends OASISIntegratedCore {
     const usedSemanticActions = new Set(possibility.steps.map(semanticActionId).filter(Boolean));
     const nextSemanticAction = semanticActionId(affordance);
     if (nextSemanticAction && usedSemanticActions.has(nextSemanticAction)) return false;
-    return super._canAppend(possibility, affordance);
+
+    const availableTokens = new Set([
+      ...possibility.provides,
+      ...possibility.resolves,
+      ...this.state.world.facts.keys()
+    ]);
+    if (!arr(affordance.requires).every(req => availableTokens.has(req))) return false;
+
+    // Structural composition must have an explicit process bridge. Merely touching the
+    // same entity does not make two actions a meaningful OASIS possibility process.
+    const tokenBridge = arr(affordance.requires).some(req =>
+      possibility.provides.includes(req) || possibility.resolves.includes(req)
+    );
+    const responsibilityBridge = arr(affordance.resolves).some(o =>
+      possibility.obligations.includes(o)
+    );
+    const createdEntities = new Set(
+      possibility.steps.flatMap(step => arr(step.createsEntities))
+    );
+    const createdEntityBridge = arr(affordance.requiresEntities).some(e =>
+      createdEntities.has(e)
+    );
+
+    return tokenBridge || responsibilityBridge || createdEntityBridge;
   }
 
   _responsibilityFor(possibility, participation) {
@@ -117,9 +140,6 @@ export class OASISReferenceCore extends OASISIntegratedCore {
     for (const c of possibility.consequences) {
       for (const o of arr(c.obligations)) obligations.add(o);
     }
-    // A responsibility already carried by a participant who is actually involved in
-    // this possibility remains part of the present responsibility structure even when
-    // the candidate action does not redundantly restate that obligation.
     for (const id of involvedParticipantIds) {
       for (const o of participants.get(id)?.obligations ?? []) obligations.add(o);
     }
@@ -154,8 +174,6 @@ export class OASISReferenceCore extends OASISIntegratedCore {
       }
     }
 
-    // Assignment or capability is not fulfillment. Only an actually executable
-    // possibility carrying an explicit `resolves` relation closes the obligation.
     const unresolved = new Set([...obligations].filter(o => !resolved.has(o)));
 
     const invariantViolations = new Set(
@@ -182,14 +200,9 @@ export class OASISReferenceCore extends OASISIntegratedCore {
   _candidateView(possibility, responsibility, participation) {
     const view = super._candidateView(possibility, responsibility, participation);
     const latestChanged = new Set(this.state.flow.at(-1)?.changedEntities ?? []);
-
-    // Current flow can be expressed by a changed fact, participant, affordance or
-    // relation. Do not require a new relation edge to exist before the change can
-    // participate in the present decision.
     for (const entity of possibility.entities) {
       if (latestChanged.has(entity)) view.currentFlowSupport.add(`current-entity:${entity}`);
     }
-
     return view;
   }
 
