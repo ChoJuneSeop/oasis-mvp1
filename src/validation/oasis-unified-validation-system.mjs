@@ -53,6 +53,13 @@ function hash32(text) {
   return h.toString(16).padStart(8, '0');
 }
 
+function realityHash(snapshot) {
+  const canonical = clone(snapshot);
+  delete canonical.ledgerId;
+  delete canonical.realityHash;
+  return hash32(stable(canonical));
+}
+
 function scanForbiddenRealityKeys(value, path = '$', seen = new WeakSet()) {
   if (!value || typeof value !== 'object' || seen.has(value)) return [];
   seen.add(value);
@@ -172,7 +179,7 @@ export class RealityLedger {
       currentPersistentClaims: [...this.persistentClaims.values()].map(publicClaim),
       meta: clone(frame.meta)
     };
-    snapshot.realityHash = hash32(stable(snapshot));
+    snapshot.realityHash = realityHash(snapshot);
     return deepFreeze(snapshot);
   }
 
@@ -189,7 +196,7 @@ export class RealityLedger {
       currentPersistentClaims: [...this.persistentClaims.values()].map(publicClaim),
       meta: clone(last.meta)
     };
-    snapshot.realityHash = hash32(stable(snapshot));
+    snapshot.realityHash = realityHash(snapshot);
     return deepFreeze(snapshot);
   }
 
