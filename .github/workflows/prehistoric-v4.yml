@@ -1,4 +1,4 @@
-name: prehistoric-v4
+name: prehistoric-v5
 on:
   push:
     branches: [experiment/prehistoric-personality-lab]
@@ -7,7 +7,8 @@ on:
       - 'experiments/prehistoric-singularity-v4.js'
       - 'experiments/prehistoric-cooperation-v4.js'
       - 'experiments/prehistoric-human-substrate-v4.js'
-      - 'experiments/prehistoric-headless-v4*.mjs'
+      - 'experiments/prehistoric-late-paleolithic-v5.js'
+      - 'experiments/prehistoric-headless-v*.mjs'
       - '.github/workflows/prehistoric-v4.yml'
   workflow_dispatch:
 jobs:
@@ -19,10 +20,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run exact headless simulation
-        run: node experiments/prehistoric-headless-v4-human.mjs | tee prehistoric-v4-result.json
+      - name: Run strict late Paleolithic simulation
+        run: node experiments/prehistoric-headless-v5.mjs | tee prehistoric-v5-result.json
       - name: Upload result
         uses: actions/upload-artifact@v4
         with:
-          name: prehistoric-v4-result
-          path: prehistoric-v4-result.json
+          name: prehistoric-v5-result
+          path: prehistoric-v5-result.json
