@@ -34,6 +34,8 @@ jobs:
         run: node --check tools/blind-historical-flow-v2.mjs
       - name: Re-run authoritative core audit
         run: node tools/oasis-reference-core-audit.mjs
+      - name: Prepare artifact directory
+        run: mkdir -p artifacts
       - name: Run blind historical flow
         run: node tools/blind-historical-flow-v2.mjs | tee artifacts/blind-historical-flow-v2-console.json
       - name: Upload raw traces
