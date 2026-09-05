@@ -30,3 +30,5 @@ jobs:
           path: |
             reports/blind-historical-flow-v1.json
             reports/blind-historical-flow-v1.md
+
+# Protocol and harness were corrected before this rerun; no result-dependent rule was changed.
