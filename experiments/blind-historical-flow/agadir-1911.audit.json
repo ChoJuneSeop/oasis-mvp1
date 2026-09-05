@@ -1,0 +1,48 @@
+{
+  "case_id": "agadir-1911-blind-v1",
+  "engine_input": false,
+  "mapping": {
+    "A": "France",
+    "B": "Germany",
+    "C": "Spain",
+    "D": "Britain",
+    "M": "Morocco"
+  },
+  "phase_audit": [
+    {
+      "id": "H0",
+      "historical_basis": "France and Germany signed an economic partnership agreement concerning Morocco in February 1909.",
+      "source": "Jean-Marc Delaunay, Moroccan Crises 1905-1911, 1914-1918-online, DOI 10.15463/ie1418.10300"
+    },
+    {
+      "id": "H1",
+      "historical_basis": "French forces intervened at Fez in April-May 1911 amid revolt and pressure on the sultan.",
+      "source": "Jean-Marc Delaunay, Moroccan Crises 1905-1911, 1914-1918-online, DOI 10.15463/ie1418.10300"
+    },
+    {
+      "id": "H2",
+      "historical_basis": "Spain, believing French action implicated German-French coordination and acting without consulting France, occupied Larache and its hinterland in early June 1911.",
+      "source": "Jean-Marc Delaunay, Moroccan Crises 1905-1911, 1914-1918-online, DOI 10.15463/ie1418.10300"
+    },
+    {
+      "id": "H3",
+      "historical_basis": "German diplomacy interpreted French and Spanish moves as coordinated partition and sent the gunboat Panther to Agadir on 1 July 1911.",
+      "source": "Jean-Marc Delaunay, Moroccan Crises 1905-1911, 1914-1918-online, DOI 10.15463/ie1418.10300"
+    },
+    {
+      "id": "H4",
+      "historical_basis": "Britain publicly signaled its position during the crisis in Lloyd George's Mansion House speech on 21 July 1911, widely interpreted as a warning to Germany.",
+      "source": "Keith Wilson, The Agadir Crisis, the Mansion House Speech, and the Double-Edgedness of Agreements, The Historical Journal 15(3), DOI 10.1017/S0018246X00002806"
+    },
+    {
+      "id": "H5",
+      "historical_basis": "Franco-German negotiations proceeded while Spain sought involvement but was excluded from the Berlin discussion.",
+      "source": "Jean-Marc Delaunay, Moroccan Crises 1905-1911, 1914-1918-online, DOI 10.15463/ie1418.10300"
+    },
+    {
+      "id": "H6",
+      "historical_basis": "The crisis was resolved by the 4 November 1911 Franco-German agreement; Germany recognized France's special position in Morocco while receiving territorial concessions in French Equatorial Africa.",
+      "source": "U.S. Office of the Historian historical documents; Jean-Marc Delaunay, Moroccan Crises 1905-1911"
+    }
+  ]
+}
