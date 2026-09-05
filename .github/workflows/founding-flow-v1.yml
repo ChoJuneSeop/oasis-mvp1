@@ -35,7 +35,7 @@ jobs:
           node --check tools/founding-flow-v1.mjs
 
       - name: Unified-system contamination boundary audit
-        run: node tools/oasis-unified-validation-audit.mjs
+        run: node tools/oasis-unified-validation-system-audit.mjs
 
       - name: Founding Flow pre-experiment four-axis audit
         run: node tools/founding-flow-v1.mjs --audit-only
