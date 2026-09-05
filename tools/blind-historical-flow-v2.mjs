@@ -108,50 +108,69 @@ const systems = {
 
 const commonParticipants = [
   { id: 'Authority-A', roles: ['home-authority'], capabilities: ['hold','request-report','open-channel','prepare-move','request-supply','withdraw','request-support','contest-order','comply-order'] },
-  { id: 'Expedition-A', roles: ['field-expedition'], capabilities: ['establish-post','defend-post','hold','withdraw','comply-order'] },
+  { id: 'Expedition-A', roles: ['field-expedition'], capabilities: ['hold','withdraw','comply-order'] },
   { id: 'Force-B', roles: ['opposing-force'], capabilities: ['advance','demand-withdrawal'] }
+];
+
+const warmup0Participants = [
+  { id: 'Authority-A', roles: ['home-authority'], capabilities: [] },
+  { id: 'Expedition-A', roles: ['field-expedition'], capabilities: ['establish-post'] },
+  { id: 'Force-B', roles: ['opposing-force'], capabilities: [] }
+];
+
+const warmup1Participants = [
+  { id: 'Authority-A', roles: ['home-authority'], capabilities: [] },
+  { id: 'Expedition-A', roles: ['field-expedition'], capabilities: ['defend-post'] },
+  { id: 'Force-B', roles: ['opposing-force'], capabilities: [] }
 ];
 
 const warmup = [
   {
+    expectedStep: 'establish-post',
     event: {
       id: 'warmup-0-arrival',
       entities: ['Authority-A','Expedition-A','Region-Q','Route-W'],
-      participants: commonParticipants,
+      participants: warmup0Participants,
+      facts: [{ id: 'state:Region-Q:open-for-establishment', entities: ['Region-Q'], value: true }],
       relations: [
         { id: 'w0-r1', from: 'Authority-A', to: 'Expedition-A', kind: 'commands' },
         { id: 'w0-r2', from: 'Expedition-A', to: 'Region-Q', kind: 'arrives-at' },
         { id: 'w0-r3', from: 'Expedition-A', to: 'Route-W', kind: 'depends-on-long-route' }
       ],
       affordances: [
-        { id: 'establish-post', actor: 'Expedition-A', action: 'establish-post', target: 'Region-Q', entities: ['Region-Q'] }
+        { id: 'establish-post', actor: 'Expedition-A', action: 'establish-post', target: 'Region-Q', entities: ['Region-Q'], requires: ['state:Region-Q:open-for-establishment'] }
       ],
       meta: { blindStage: 'W0', evaluated: false }
     },
     outcome: {
       id: 'warmup-0-outcome',
       entities: ['Expedition-A','Region-Q'],
+      facts: [{ id: 'state:Region-Q:open-for-establishment', op: 'remove' }],
       relations: [{ id: 'w0-o1', from: 'Expedition-A', to: 'Region-Q', kind: 'holds-post' }],
       affordances: [{ id: 'establish-post', op: 'remove' }],
       meta: { blindStage: 'W0-outcome', historicalRealization: true, evaluated: false }
     }
   },
   {
+    expectedStep: 'defend-post',
     event: {
       id: 'warmup-1-attack',
       entities: ['Expedition-A','Local-Force','Region-Q'],
+      participants: warmup1Participants,
+      facts: [{ id: 'state:Expedition-A:under-attack', entities: ['Expedition-A','Local-Force'], value: true }],
       relations: [
         { id: 'w1-r1', from: 'Local-Force', to: 'Expedition-A', kind: 'attacks' },
         { id: 'w1-r2', from: 'Expedition-A', to: 'Region-Q', kind: 'holds-post' }
       ],
       affordances: [
-        { id: 'defend-post', actor: 'Expedition-A', action: 'defend-post', target: 'Region-Q', entities: ['Local-Force','Region-Q'] }
+        { id: 'defend-post', actor: 'Expedition-A', action: 'defend-post', target: 'Region-Q', entities: ['Local-Force','Region-Q'], requires: ['state:Expedition-A:under-attack'] }
       ],
       meta: { blindStage: 'W1', evaluated: false }
     },
     outcome: {
       id: 'warmup-1-outcome',
       entities: ['Expedition-A','Local-Force','Region-Q'],
+      facts: [{ id: 'state:Expedition-A:under-attack', op: 'remove' }],
       relations: [{ id: 'w1-o1', from: 'Expedition-A', to: 'Local-Force', kind: 'repels' }],
       affordances: [{ id: 'defend-post', op: 'remove' }],
       meta: { blindStage: 'W1-outcome', historicalRealization: true, evaluated: false }
@@ -307,12 +326,31 @@ function runOne(seed) {
       agent.observe(clone(phase.event));
       const d = agent.deliberate();
       if (!d.choice) throw new Error(`${name} failed warmup at ${phase.event.id}`);
+      const selectedSteps = d.choice.steps.map(step => step.meta?.originalStepId ?? step.id);
+      if (selectedSteps.length !== 1 || selectedSteps[0] !== phase.expectedStep) {
+        throw new Error(`${name} warmup mismatch at ${phase.event.id}: expected=${phase.expectedStep} actual=${selectedSteps.join('>')}`);
+      }
       agent.actualize(d.choice.id, clone(phase.outcome));
       warmupAudit[name].push({
         eventId: phase.event.id,
-        choice: d.choice.id,
+        expectedStep: phase.expectedStep,
+        selectedSteps,
         closedExperiences: agent.exportState().closedExperiences.length
       });
+    }
+  }
+
+  const experienceShapes = Object.fromEntries(Object.entries(agents).map(([name, agent]) => [
+    name,
+    agent.exportState().closedExperiences.map(exp => ({
+      choiceSteps: exp.choice.steps.map(step => step.meta?.originalStepId ?? step.id),
+      outcomeEventId: exp.outcome.eventId
+    }))
+  ]));
+  const canonicalExperienceShape = JSON.stringify(experienceShapes.oasis);
+  for (const [name, shape] of Object.entries(experienceShapes)) {
+    if (JSON.stringify(shape) !== canonicalExperienceShape) {
+      throw new Error(`common completed-experience set diverged before test: ${name}`);
     }
   }
 
@@ -332,7 +370,7 @@ function runOne(seed) {
     return { stage: event.meta.blindStage, choices, reactivated, possibilityCounts };
   });
 
-  return { seed, warmupAudit, traces, stageDifferences };
+  return { seed, warmupAudit, experienceShapes, traces, stageDifferences };
 }
 
 const seeds = ['flow-a','flow-b','flow-c','flow-d','flow-e'];
