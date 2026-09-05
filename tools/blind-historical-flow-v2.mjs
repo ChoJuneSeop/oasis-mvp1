@@ -281,9 +281,11 @@ const testStream = [
 ];
 
 function makeSystem(ClassType, seed) {
-  const s = new ClassType({ agentId: 'Decision-Center-A', invariants: ['irreversible-loss-of-life'] });
-  s.options.realizationSeed = seed;
-  return s;
+  return new ClassType({
+    agentId: 'Decision-Center-A',
+    invariants: ['irreversible-loss-of-life'],
+    realizationSeed: seed
+  });
 }
 
 function compactTrace(d) {
@@ -360,6 +362,14 @@ function runOne(seed) {
       agent.observe(clone(event));
       const d = agent.deliberate();
       traces[name].push(compactTrace(d));
+
+      // The historical continuation is exogenous to this hypothetical choice.
+      // Preserve the trace, but do not let an unrealized test choice become part of
+      // the next current field or a completed experience.
+      agent.state.lastDeliberation = null;
+      if (agent.exportState().actualizations.length !== warmup.length) {
+        throw new Error(`${name} accidentally actualized a hypothetical test choice at ${event.id}`);
+      }
     }
   }
 
@@ -373,7 +383,7 @@ function runOne(seed) {
   return { seed, warmupAudit, experienceShapes, traces, stageDifferences };
 }
 
-const seeds = ['flow-a','flow-b','flow-c','flow-d','flow-e'];
+const seeds = [101, 211, 307, 401, 503];
 const runs = seeds.map(runOne);
 
 const summary = {
@@ -387,6 +397,7 @@ const summary = {
   },
   noSuccessMetric: true,
   historyContinuationExogenous: true,
+  hypotheticalTestChoicesDiscardedBeforeNextHistoricalReveal: true,
   runs
 };
 
