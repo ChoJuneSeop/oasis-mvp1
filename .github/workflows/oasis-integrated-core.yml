@@ -1,4 +1,4 @@
-name: OASIS Integrated Core Audit
+name: OASIS Reference Core Audit
 
 on:
   push:
@@ -7,8 +7,10 @@ on:
     paths:
       - 'src/oasis-core.mjs'
       - 'src/oasis-integrated-core.mjs'
+      - 'src/oasis-reference-core.mjs'
       - 'tools/oasis-integrated-core-audit.mjs'
       - 'tools/oasis-integrated-core-audit-v2.mjs'
+      - 'tools/oasis-reference-core-audit.mjs'
       - 'docs/OASIS_THEORY_CODE_MAPPING_v1.md'
       - 'docs/OASIS_IMPLEMENTATION_BASELINE_v1.md'
       - 'index.html'
@@ -31,12 +33,17 @@ jobs:
         run: node --check src/oasis-core.mjs
       - name: Syntax check integrated algorithm
         run: node --check src/oasis-integrated-core.mjs
+      - name: Syntax check authoritative reference core
+        run: node --check src/oasis-reference-core.mjs
       - name: Run base implementation audit
         run: node tools/oasis-integrated-core-audit.mjs
       - name: Run expanded integrated algorithm audit
         run: node tools/oasis-integrated-core-audit-v2.mjs
-      - name: Verify PWA final core reference
+      - name: Run authoritative reference-core audit
+        run: node tools/oasis-reference-core-audit.mjs
+      - name: Verify PWA authoritative core reference
         run: |
-          grep -q "./src/oasis-integrated-core.mjs" index.html
+          grep -q "./src/oasis-reference-core.mjs" index.html
+          grep -q "./src/oasis-reference-core.mjs" service-worker.js
           grep -q "./src/oasis-integrated-core.mjs" service-worker.js
           grep -q "./src/oasis-core.mjs" service-worker.js
