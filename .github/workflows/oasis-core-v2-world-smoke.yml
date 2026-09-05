@@ -1,0 +1,23 @@
+name: oasis-core-v2-world-smoke
+on:
+  push:
+    branches: [experiment/prehistoric-personality-lab]
+    paths:
+      - 'experiments/oasis-core-v2.js'
+      - 'experiments/oasis-core-v2-world-smoke.mjs'
+      - '.github/workflows/oasis-core-v2-world-smoke.yml'
+  workflow_dispatch:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run OASIS v2 shared-world smoke
+        run: node experiments/oasis-core-v2-world-smoke.mjs | tee oasis-core-v2-world-smoke-result.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oasis-core-v2-world-smoke-result
+          path: oasis-core-v2-world-smoke-result.json
