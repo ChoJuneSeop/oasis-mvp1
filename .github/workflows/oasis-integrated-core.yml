@@ -6,8 +6,11 @@ on:
       - implementation/oasis-integrated-core-v1
     paths:
       - 'src/oasis-core.mjs'
+      - 'src/oasis-integrated-core.mjs'
       - 'tools/oasis-integrated-core-audit.mjs'
+      - 'tools/oasis-integrated-core-audit-v2.mjs'
       - 'docs/OASIS_THEORY_CODE_MAPPING_v1.md'
+      - 'docs/OASIS_IMPLEMENTATION_BASELINE_v1.md'
       - 'index.html'
       - 'manifest.json'
       - 'service-worker.js'
@@ -24,11 +27,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Syntax check
+      - name: Syntax check base core
         run: node --check src/oasis-core.mjs
-      - name: Run OASIS implementation audit
+      - name: Syntax check integrated algorithm
+        run: node --check src/oasis-integrated-core.mjs
+      - name: Run base implementation audit
         run: node tools/oasis-integrated-core-audit.mjs
-      - name: Verify PWA core reference
+      - name: Run expanded integrated algorithm audit
+        run: node tools/oasis-integrated-core-audit-v2.mjs
+      - name: Verify PWA final core reference
         run: |
-          grep -q "./src/oasis-core.mjs" index.html
+          grep -q "./src/oasis-integrated-core.mjs" index.html
+          grep -q "./src/oasis-integrated-core.mjs" service-worker.js
           grep -q "./src/oasis-core.mjs" service-worker.js
