@@ -5,6 +5,7 @@ on:
     paths:
       - 'experiments/prehistoric-society-v3-*.js'
       - 'experiments/prehistoric-singularity-v4.js'
+      - 'experiments/prehistoric-cooperation-v4.js'
       - 'experiments/prehistoric-headless-v4.mjs'
       - '.github/workflows/prehistoric-v4.yml'
   workflow_dispatch:
