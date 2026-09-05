@@ -53,28 +53,37 @@
     return Object.freeze({steps:Object.freeze(steps),key:processKey(steps),start:steps[0].from,end:steps[steps.length-1].to,participants:Object.freeze(unique(steps.flatMap(s=>s.participants)))});
   }
 
-  // Structural bridge v0.1: direction continuity is necessary but not sufficient.
-  // A second exact symbolic bridge must exist: shared participant or same relation kind.
-  // No graded similarity, threshold, or forced top-k retrieval is used.
-  function hasStructuralBridge(past,flow){
-    const p=past.steps[past.steps.length-1], n=flow.steps[0];
-    const directionContinues=p.to===n.from;
-    if(!directionContinues)return false;
-    const sharedParticipant=p.participants.some(v=>n.participants.includes(v));
-    const sameRelationKind=p.relation===n.relation;
-    return sharedParticipant||sameRelationKind;
+  function universalParticipants(memory){
+    if(!memory.length)return new Set();
+    const count=new Map();
+    for(const p of memory){
+      for(const v of new Set(p.participants||[]))count.set(v,(count.get(v)||0)+1);
+    }
+    return new Set([...count].filter(([,n])=>n===memory.length).map(([v])=>v));
   }
 
-  function reactivate(memory,flowInput){
-    if(!Array.isArray(memory))throw new TypeError('memory must be an array');
+  // Structural bridge v0.1:
+  // 1) directed boundary continuity is necessary;
+  // 2) a non-ubiquitous relational participant must reappear at the boundary.
+  // Endpoints themselves and participants present in every memory process are
+  // not accepted as bridge evidence. This prevents shared place/self tokens
+  // from reactivating an entire field.
+  function hasStructuralBridge(past,flow,ignoredParticipants=new Set()){
+    const p=past.steps[past.steps.length-1], n=flow.steps[0];
+    if(p.to!==n.from)return false;
+    const blocked=new Set([p.from,p.to,n.from,n.to,...ignoredParticipants]);
+    return p.participants.some(v=>!blocked.has(v)&&n.participants.includes(v));
+  }
+
+  function reactivate(memoryInput,flowInput){
+    if(!Array.isArray(memoryInput))throw new TypeError('memory must be an array');
+    const memory=memoryInput.map(item=>item&&item.steps&&!item.key?relationProcess(item):item);
+    for(const p of memory)if(!p||!Array.isArray(p.steps))throw new TypeError('invalid memory process');
     const flow=flowInput&&flowInput.steps&&!flowInput.key?presentFlow(flowInput):flowInput;
     if(!flow||!Array.isArray(flow.steps))throw new TypeError('valid present flow required');
+    const ignored=universalParticipants(memory);
     const out=[];
-    for(const item of memory){
-      const past=item&&item.steps&&!item.key?relationProcess(item):item;
-      if(!past||!Array.isArray(past.steps))throw new TypeError('invalid memory process');
-      if(hasStructuralBridge(past,flow))out.push(past);
-    }
+    for(const past of memory)if(hasStructuralBridge(past,flow,ignored))out.push(past);
     return Object.freeze(out);
   }
 
@@ -88,5 +97,5 @@
     });
   }
 
-  return Object.freeze({directedStep,relationProcess,presentFlow,stepKey,processKey,hasStructuralBridge,reactivate,createCore});
+  return Object.freeze({directedStep,relationProcess,presentFlow,stepKey,processKey,universalParticipants,hasStructuralBridge,reactivate,createCore});
 });
