@@ -15,8 +15,14 @@ function execute(A,P,a){
  if(A.controller==='q'&&A.lastPerception){const st=stateKey(A.lastPerception),qk=st+'|'+key,reward=((A.energy-before.e)+(A.water-before.w)+(A.warmth-before.t)+(A.health-before.h))/30;A.q[qk]=(A.q[qk]??0)+.22*(reward-(A.q[qk]??0));out+=reward}
  if(A.controller==='retrieval')A.memory.push({ctx:contextVector(P),action:key,outcome:out});
  if(A.controller==='oasis'){
-   const context=['weather:'+P.weather,...P.nearNodes.map(n=>'node:'+n.kind),...P.nearAgents.map(n=>'agent:'+n.id)];
-   A.relationEpisodes.push({t:E.tick,action:key,context:[...new Set(context)],outcome:out});A.relationEpisodes=A.relationEpisodes.slice(-160);
+   const context=['weather:'+P.weather];
+   if(a.target){if(String(a.target).startsWith('agent:'))context.push(a.target);else if(E.people[a.target])context.push('agent:'+a.target);else if(!String(a.target).startsWith('dir:'))context.push('node:'+a.target)}
+   if((a.type==='craft'||a.type==='fire')&&P.nearNodes.length)for(const n of P.nearNodes.filter(n=>n.kind==='stone'||n.kind==='wood'))context.push('node:'+n.id);
+   const relContext=[...new Set(context.filter(c=>!c.startsWith('weather:')))].sort();
+   const sig=key+'|'+relContext.join(',');
+   const ep={t:E.tick,action:key,context:[...new Set(context)],sig,outcome:out};
+   const ix=A.relationEpisodes.findIndex(x=>x.sig===sig);if(ix>=0)A.relationEpisodes[ix]=ep;else A.relationEpisodes.push(ep);
+   A.relationEpisodes=A.relationEpisodes.slice(-160);
  }
  A.lastOutcome=out;return out;
 }
