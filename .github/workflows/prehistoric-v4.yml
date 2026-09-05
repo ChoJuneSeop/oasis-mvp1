@@ -6,7 +6,8 @@ on:
       - 'experiments/prehistoric-society-v3-*.js'
       - 'experiments/prehistoric-singularity-v4.js'
       - 'experiments/prehistoric-cooperation-v4.js'
-      - 'experiments/prehistoric-headless-v4.mjs'
+      - 'experiments/prehistoric-human-substrate-v4.js'
+      - 'experiments/prehistoric-headless-v4*.mjs'
       - '.github/workflows/prehistoric-v4.yml'
   workflow_dispatch:
 jobs:
@@ -19,7 +20,7 @@ jobs:
         with:
           node-version: '22'
       - name: Run exact headless simulation
-        run: node experiments/prehistoric-headless-v4.mjs | tee prehistoric-v4-result.json
+        run: node experiments/prehistoric-headless-v4-human.mjs | tee prehistoric-v4-result.json
       - name: Upload result
         uses: actions/upload-artifact@v4
         with:
