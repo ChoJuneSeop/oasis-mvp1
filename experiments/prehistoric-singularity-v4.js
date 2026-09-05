@@ -3,7 +3,11 @@
 // When the world remains technologically stagnant, only physical opportunities appear.
 const oldReset=reset,oldUpdateEnvironment=updateEnvironment,oldActs=acts,oldExecute=execute,oldHomeostaticReflex=homeostaticReflex,oldRender=render;
 
-function techSnapshot(){const pop=living();return{tools:pop.filter(a=>a.tool).length,fires:pop.filter(a=>a.fire).length,pop:pop.length};}
+function ensureFoodState(A){
+  if(A.inventory.rawMeat==null)A.inventory.rawMeat=0;
+  if(A.inventory.cookedMeat==null)A.inventory.cookedMeat=0;
+}
+function techSnapshot(){const pop=living();return{tools:pop.filter(a=>a.tool).length,fires:pop.filter(a=>a.fire).length,cooks:pop.reduce((n,a)=>n+(a.inventory.cookedMeat||0),0),pop:pop.length};}
 function spawnFire(){
   if(E.nodes.some(n=>n.id==='wildfire'))return;
   const f=E.singularities.fire,spots=[[655,405],[210,330],[760,255],[520,500]],spot=spots[f.attempts%spots.length];
@@ -19,23 +23,33 @@ function spawnEdge(){
 }
 function maybeSingularity(){
   const s=techSnapshot(),f=E.singularities.fire,e=E.singularities.edge;
-  // Observer intervention reacts only to prolonged stagnation, never to a model label.
   if(!f.adopted&&s.fires===0&&E.tick>=f.next&&!E.nodes.some(n=>n.id==='wildfire'))spawnFire();
   if(!e.spawned&&s.tools===0&&E.tick>=6500)spawnEdge();
   const wf=E.nodes.find(n=>n.id==='wildfire');
   if(wf&&wf.expires&&E.tick>wf.expires&&!f.adopted){E.nodes=E.nodes.filter(n=>n.id!=='wildfire');log('자연불은 보존되지 못하고 사라졌다.');}
 }
+function rawMeatSpoilage(){
+  if(E.tick%260!==0)return;
+  for(const A of living()){
+    ensureFoodState(A);
+    if(A.inventory.rawMeat>0&&noise('spoil|'+A.id)<.48){A.inventory.rawMeat--;log('보관하던 생고기 일부가 상해 먹을 수 없게 되었다.');}
+  }
+}
 
 reset=function(){
   oldReset();
+  for(const A of Object.values(E.people))ensureFoodState(A);
   E.singularities={fire:{adopted:false,attempts:0,next:3000,lastSpawn:null},edge:{spawned:false,adopted:false,lastSpawn:null}};
-  E.milestones={firstPreservedFire:null,firstSharpTool:null};
+  E.milestones={firstPreservedFire:null,firstSharpTool:null,firstRawMeat:null,firstCookedMeat:null,firstCookedMeal:null};
   log('v0.4: 장기 정체 시 관찰자 레이어가 자연적 특이점만 허용한다.');
 };
-updateEnvironment=function(){oldUpdateEnvironment();maybeSingularity();};
+updateEnvironment=function(){oldUpdateEnvironment();maybeSingularity();rawMeatSpoilage();};
 
 acts=function(A,P){
+  ensureFoodState(A);
   const xs=oldActs(A,P);
+  const nearNaturalFire=P.nearNodes.some(n=>n.kind==='natural_fire'&&n.d<=30);
+  if((nearNaturalFire||A.fire)&&A.inventory.rawMeat>0)xs.push({type:'cook_meat',kind:nearNaturalFire?'natural_fire':'preserved_fire'});
   for(const n of P.nearNodes){
     if(n.kind==='natural_fire'&&n.d<=30){xs.push({type:'rest',target:n.id,kind:'natural_fire'});xs.push({type:'study_fire',target:n.id,kind:'natural_fire'});if(A.inventory.wood>=1)xs.push({type:'preserve_fire',target:n.id,kind:'natural_fire'});}
     if(n.kind==='sharp_stone'&&n.d<=30&&n.stock>0){xs.push({type:'inspect_edge',target:n.id,kind:'sharp_stone'});xs.push({type:'gather',target:n.id,kind:'sharp_stone'});}
@@ -43,8 +57,17 @@ acts=function(A,P){
   return dedupe(xs);
 };
 
-// Consequences of interacting with a physical opportunity, not assigned objectives.
+// Consequences of interacting with physical opportunities, not assigned objectives.
 execute=function(A,P,a){
+  ensureFoodState(A);
+  if(a.type==='hunt'){
+    const n=E.nodes.find(n=>n.id===a.target);A.actions++;A.metrics.resource++;A.culture.actions[actionKey(a)]=(A.culture.actions[actionKey(a)]||0)+1;
+    if(n&&n.stock>=1&&A.tool){n.stock--;A.inventory.rawMeat++;if(!E.milestones.firstRawMeat)E.milestones.firstRawMeat={t:E.tick,id:A.id};log('사냥 뒤 먹을 수 있는 생고기가 남았다.');A.lastOutcome=1.0;return 1.0}return 0;
+  }
+  if(a.type==='cook_meat'){
+    A.actions++;A.metrics.innovation++;A.culture.actions[actionKey(a)]=(A.culture.actions[actionKey(a)]||0)+1;
+    if(A.inventory.rawMeat>0){A.inventory.rawMeat--;A.inventory.cookedMeat++;E.innovations++;if(!E.milestones.firstCookedMeat)E.milestones.firstCookedMeat={t:E.tick,id:A.id};log('한 사람이 생고기를 불 가까이에 두었고 고기의 상태가 변했다.');A.lastOutcome=1.35;return 1.35}return 0;
+  }
   if(a.type==='study_fire'){A.actions++;A.metrics.observe++;A.culture.actions[actionKey(a)]=(A.culture.actions[actionKey(a)]||0)+1;A.warmth=clamp(A.warmth+10,0,100);A.culture.knownKinds.add('natural_fire');A.lastOutcome=.45;return .45;}
   if(a.type==='preserve_fire'){
     A.actions++;A.metrics.innovation++;A.culture.actions[actionKey(a)]=(A.culture.actions[actionKey(a)]||0)+1;
@@ -59,14 +82,19 @@ execute=function(A,P,a){
 };
 
 homeostaticReflex=function(A){
-  // Correct v0.3 physiological dead-zone: feeding can restore an adult above the reproduction threshold.
+  ensureFoodState(A);
   if(A.water<23){const n=E.nodes.find(x=>x.kind==='water');if(n){if(dist(A,n)<30)A.water=clamp(A.water+30,0,100);else moveToward(A,n.x,n.y,8);A.metrics.bioReflex++;return true}}
-  if(A.energy<24){if(A.inventory.food>0){A.inventory.food--;A.energy=clamp(A.energy+36,0,100);A.metrics.bioReflex++;return true}const n=E.nodes.filter(x=>x.kind==='food').sort((x,y)=>dist(A,x)-dist(A,y))[0];if(n){if(dist(A,n)<30&&n.stock>=1){n.stock-=1;A.energy=clamp(A.energy+36,0,100)}else moveToward(A,n.x,n.y,8);A.metrics.bioReflex++;return true}}
+  if(A.energy<24){
+    if(A.inventory.cookedMeat>0){A.inventory.cookedMeat--;A.energy=clamp(A.energy+48,0,100);A.health=clamp(A.health+2,0,100);if(!E.milestones.firstCookedMeal)E.milestones.firstCookedMeal={t:E.tick,id:A.id};A.metrics.bioReflex++;return true}
+    if(A.inventory.rawMeat>0){A.inventory.rawMeat--;A.energy=clamp(A.energy+26,0,100);if(noise('rawrisk|'+A.id)<.08)A.health=clamp(A.health-4,0,100);A.metrics.bioReflex++;return true}
+    if(A.inventory.food>0){A.inventory.food--;A.energy=clamp(A.energy+36,0,100);A.metrics.bioReflex++;return true}
+    const n=E.nodes.filter(x=>x.kind==='food').sort((x,y)=>dist(A,x)-dist(A,y))[0];if(n){if(dist(A,n)<30&&n.stock>=1){n.stock-=1;A.energy=clamp(A.energy+36,0,100)}else moveToward(A,n.x,n.y,8);A.metrics.bioReflex++;return true}
+  }
   if(A.warmth<13){const n=E.nodes.find(x=>x.kind==='shelter');if(n){if(dist(A,n)<30)A.warmth=clamp(A.warmth+10,0,100);else moveToward(A,n.x,n.y,7);A.metrics.bioReflex++;return true}}
   return false;
 };
 
-render=function(){oldRender();if(document.getElementById('singularityStatus'))return;const box=document.createElement('div');box.id='singularityStatus';box.className='foot';box.textContent='특이점은 정체 시 세계에 물리적 가능성으로만 출현하며, 사용법·가치·목표는 에이전트에게 전달되지 않는다.';document.querySelector('.app')?.appendChild(box);};
+render=function(){oldRender();let box=document.getElementById('singularityStatus');if(!box){box=document.createElement('div');box.id='singularityStatus';box.className='foot';document.querySelector('.app')?.appendChild(box);}const m=E.milestones||{};box.textContent='특이점: 자연불 '+(E.singularities?.fire?.attempts||0)+'회 · 불 보존 '+(m.firstPreservedFire?'발생':'미발생')+' · 생고기 '+(m.firstRawMeat?'발생':'미발생')+' · 최초 조리 '+(m.firstCookedMeat?'발생':'미발생')+' · 익힌 고기 섭취 '+(m.firstCookedMeal?'발생':'미발생')+' · 예리한 돌 '+(m.firstSharpTool?'사용됨':'미사용');};
 
 reset();render();
 })();
