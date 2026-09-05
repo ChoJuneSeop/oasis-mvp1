@@ -1,0 +1,32 @@
+name: Enron Real-World C0 Validation
+
+on:
+  push:
+    branches:
+      - experiment/enron-realworld-c0-20260905
+    paths:
+      - 'tools/enron-realworld-c0.py'
+      - '.github/workflows/enron-realworld-c0.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check numpy scikit-learn
+      - name: Run real-world validation
+        run: python tools/enron-realworld-c0.py --out enron-realworld-c0-report.json
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: enron-realworld-c0-report
+          path: enron-realworld-c0-report.json
