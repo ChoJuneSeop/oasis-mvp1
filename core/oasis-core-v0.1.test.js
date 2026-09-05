@@ -28,18 +28,18 @@ const flow=(...steps)=>O.presentFlow({steps});
 
 // O2/O4 — current directed flow selects structurally connected past.
 {
-  const ab=proc(step('A','r','B'));
-  const xy=proc(step('X','r','Y'));
-  const active=O.reactivate([ab,xy],flow(step('B','next','C')));
+  const ab=proc(step('A','r','B',['agent-1']));
+  const xy=proc(step('X','r','Y',['agent-2']));
+  const active=O.reactivate([ab,xy],flow(step('B','next','C',['agent-1'])));
   assert.deepEqual(active.map(x=>x.key),[ab.key]);
 }
 
 // O2 — same present endpoint, different incoming flow can reactivate different past.
 {
-  const ab=proc(step('A','r','B'));
-  const xy=proc(step('X','r','Y'));
-  assert.deepEqual(O.reactivate([ab,xy],flow(step('B','arrives','C'))).map(x=>x.key),[ab.key]);
-  assert.deepEqual(O.reactivate([ab,xy],flow(step('Y','arrives','C'))).map(x=>x.key),[xy.key]);
+  const ab=proc(step('A','r','B',['agent-1']));
+  const xy=proc(step('X','r','Y',['agent-2']));
+  assert.deepEqual(O.reactivate([ab,xy],flow(step('B','arrives','C',['agent-1']))).map(x=>x.key),[ab.key]);
+  assert.deepEqual(O.reactivate([ab,xy],flow(step('Y','arrives','C',['agent-2']))).map(x=>x.key),[xy.key]);
 }
 
 // O11 — memory existence does not imply mandatory activation.
@@ -61,10 +61,28 @@ const flow=(...steps)=>O.presentFlow({steps});
 {
   const memory=[];
   for(let i=0;i<500;i++)memory.push(proc(step(`A${i}`,'r',`B${i}`)));
-  const bridge=proc(step('P','r','Q'));
+  const bridge=proc(step('P','r','Q',['agent-true']));
   memory.splice(243,0,bridge);
-  const active=O.reactivate(memory,flow(step('Q','continues','R')));
+  const active=O.reactivate(memory,flow(step('Q','continues','R',['agent-true'])));
   assert.deepEqual(active.map(x=>x.key),[bridge.key]);
 }
 
-console.log('OASIS Core v0.1 tests: 8/8 passed');
+// Endpoint collision alone must not reactivate a whole relation field.
+{
+  const memory=[];
+  for(let i=0;i<500;i++)memory.push(proc(step(`A${i}`,`r${i}`,'B',[`agent-${i}`])));
+  const active=O.reactivate(memory,flow(step('B','new-relation','C',['current-agent'])));
+  assert.equal(active.length,0,'shared endpoint alone is not a sufficient relational bridge');
+}
+
+// One genuine structural bridge remains selective among endpoint collisions.
+{
+  const memory=[];
+  for(let i=0;i<500;i++)memory.push(proc(step(`A${i}`,`r${i}`,'B',[`agent-${i}`])));
+  const bridge=proc(step('TRUE','old-relation','B',['current-agent']));
+  memory.splice(177,0,bridge);
+  const active=O.reactivate(memory,flow(step('B','new-relation','C',['current-agent'])));
+  assert.deepEqual(active.map(x=>x.key),[bridge.key]);
+}
+
+console.log('OASIS Core v0.1 tests: 10/10 passed');
