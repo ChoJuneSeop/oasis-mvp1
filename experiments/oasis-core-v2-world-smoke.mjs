@@ -11,7 +11,7 @@ globalThis.setInterval=()=>0;globalThis.clearInterval=()=>{};
 for(const f of ['prehistoric-society-v3-core.js','prehistoric-society-v3-decisions.js','prehistoric-society-v3-world.js','prehistoric-singularity-v4.js','prehistoric-cooperation-v4.js','prehistoric-late-paleolithic-v5.js','prehistoric-exposure-v6.js','prehistoric-ritual-observer-v6.js','oasis-core-v2.js'])vm.runInThisContext(fs.readFileSync(path.join(here,f),'utf8'),{filename:f});
 vm.runInThisContext(`
 const first={};for(let i=0;i<25;i++){tick(1);for(const id of Object.keys(FOUNDERS)){const a=E.people[id];if(!first[id]&&a.lastAction)first[id]={tick:E.tick,action:a.lastAction,why:a.lastWhy}}}
-tick(4975);
+tick(975);
 const O=E.people.oasis,V=O.oasisV2||{};
 const generatedUses=Object.values(V.generatedUses||{}).reduce((a,b)=>a+b,0);
 const result={tick:E.tick,population:living().length,births:E.births,deaths:E.deaths,maxGeneration:E.maxGeneration,firstActions:first,oasis:{actions:O.actions,relationEpisodes:O.relationEpisodes.length,activeNow:O.activeRelations.length,generatedUses,generatedPatterns:Object.keys(V.generatedUses||{}).length,relationGraphEdges:Object.keys(V.relationGraph||{}).length,relationUse:O.metrics.relationUse,lastAction:O.lastAction,lastWhy:O.lastWhy,health:+O.health.toFixed(2),energy:+O.energy.toFixed(2),water:+O.water.toFixed(2)},founders:Object.fromEntries(Object.keys(FOUNDERS).map(id=>[id,{actions:E.people[id].actions,children:E.people[id].metrics.births,topAction:topAction(E.people[id])}]))};
