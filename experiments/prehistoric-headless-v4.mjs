@@ -15,7 +15,7 @@ globalThis.document={
 };
 globalThis.setInterval=()=>0;globalThis.clearInterval=()=>{};
 
-for(const f of ['prehistoric-society-v3-core.js','prehistoric-society-v3-decisions.js','prehistoric-society-v3-world.js','prehistoric-singularity-v4.js']){
+for(const f of ['prehistoric-society-v3-core.js','prehistoric-society-v3-decisions.js','prehistoric-society-v3-world.js','prehistoric-singularity-v4.js','prehistoric-cooperation-v4.js']){
   vm.runInThisContext(fs.readFileSync(path.join(here,f),'utf8'),{filename:f});
 }
 
@@ -25,24 +25,25 @@ function observerSnapshot(){
   const hearths=E.nodes.filter(n=>n.kind==='hearth').length;
   const tools=pop.filter(a=>a.tool).length;
   const fireUsers=non.filter(a=>Object.keys(a.culture.actions).some(k=>k.startsWith('cook_meat:')||k.startsWith('study_fire:')||k.startsWith('preserve_fire:'))).length;
-  const toolUsers=non.filter(a=>a.tool||Object.keys(a.culture.actions).some(k=>k.startsWith('gather:sharp_stone')||k.startsWith('hunt'))).length;
+  const toolUsers=non.filter(a=>a.tool||Object.keys(a.culture.actions).some(k=>k.startsWith('gather:sharp_stone')||k.startsWith('hunt')||k==='coop_hunt')).length;
+  const coopHunters=non.filter(a=>(a.metrics.coopJoin||0)+(a.metrics.coopPropose||0)>0||a.culture.actions.coop_hunt).length;
   const relPairs=new Set();
   for(const a of pop)for(const [bid,v] of Object.entries(a.relations))if(v>=.10&&E.people[bid]?.alive)relPairs.add([a.id,bid].sort().join('|'));
   const cultureRich=non.filter(a=>Object.keys(a.culture.actions).length>=5).length;
-  return {tick:E.tick,population:pop.length,births:E.births,deaths:E.deaths,maxGeneration:E.maxGeneration,hearths,tools,fireUsers,toolUsers,relationPairs:relPairs.size,cultureRich,innovations:E.innovations,milestones:E.milestones,singularities:E.singularities};
+  return {tick:E.tick,population:pop.length,births:E.births,deaths:E.deaths,maxGeneration:E.maxGeneration,hearths,tools,fireUsers,toolUsers,coopHunters,coopHunts:E.coopHunts||0,coopHuntSuccess:E.coopHuntSuccess||0,relationPairs:relPairs.size,cultureRich,innovations:E.innovations,milestones:E.milestones,singularities:E.singularities};
 }
 function latePaleolithicReached(s){
-  return s.maxGeneration>=3 && s.population>=20 && s.hearths>=1 && s.milestones.firstCookedMeat && s.milestones.firstCookedMeal && s.milestones.firstSharpTool && s.milestones.firstHearthUseByOther && s.relationPairs>=Math.max(12,Math.floor(s.population*.65)) && s.cultureRich>=Math.max(3,Math.floor(s.population*.12));
+  return s.maxGeneration>=3 && s.population>=20 && s.hearths>=1 && s.milestones.firstCookedMeat && s.milestones.firstCookedMeal && s.milestones.firstSharpTool && s.milestones.firstHearthUseByOther && s.milestones.firstCoopHuntSuccess && s.coopHunters>=3 && s.relationPairs>=Math.max(12,Math.floor(s.population*.65)) && s.cultureRich>=Math.max(3,Math.floor(s.population*.12));
 }
 let reached=null, checkpoints=[];
 for(let target=500;target<=50000;target+=500){
   tick(500);const s=observerSnapshot();
-  if(target%2500===0||s.milestones.firstPreservedFire||s.milestones.firstSharpTool)checkpoints.push(s);
+  if(target%2500===0||s.milestones.firstPreservedFire||s.milestones.firstSharpTool||s.milestones.firstCoopHuntSuccess)checkpoints.push(s);
   if(latePaleolithicReached(s)){reached=s;break;}
 }
 const finalState=reached||observerSnapshot();
 const founders={};
-for(const id of Object.keys(FOUNDERS)){const a=E.people[id];founders[id]={actions:a.actions,children:a.metrics.births,relations:Object.keys(a.relations).length,relationUse:a.metrics.relationUse,memoryUse:a.metrics.memoryUse,topAction:topAction(a),health:+a.health.toFixed(2),energy:+a.energy.toFixed(2),water:+a.water.toFixed(2)};}
-globalThis.__RESULT__={reached:!!reached,finalState,founders,checkpoints:checkpoints.slice(-12),recentLog:E.log.slice(0,30)};
+for(const id of Object.keys(FOUNDERS)){const a=E.people[id];founders[id]={actions:a.actions,children:a.metrics.births,relations:Object.keys(a.relations).length,relationUse:a.metrics.relationUse,memoryUse:a.metrics.memoryUse,coopPropose:a.metrics.coopPropose||0,coopJoin:a.metrics.coopJoin||0,coopSuccess:a.metrics.coopSuccess||0,topAction:topAction(a),health:+a.health.toFixed(2),energy:+a.energy.toFixed(2),water:+a.water.toFixed(2)};}
+globalThis.__RESULT__={reached:!!reached,finalState,founders,checkpoints:checkpoints.slice(-12),recentLog:E.log.slice(0,40)};
 `);
 console.log(JSON.stringify(globalThis.__RESULT__,null,2));
