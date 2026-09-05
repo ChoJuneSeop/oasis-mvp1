@@ -1,0 +1,46 @@
+name: Blind Historical Flow Replay v2
+
+on:
+  push:
+    branches:
+      - experiment/blind-historical-flow-v2
+    paths:
+      - 'src/oasis-core.mjs'
+      - 'src/oasis-integrated-core.mjs'
+      - 'src/oasis-reference-core.mjs'
+      - 'tools/oasis-reference-core-audit.mjs'
+      - 'tools/blind-historical-flow-v2.mjs'
+      - 'experiments/blind-historical-flow-v2/PROTOCOL.md'
+      - '.github/workflows/blind-historical-flow-v2.yml'
+  workflow_dispatch:
+
+jobs:
+  historical-flow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify protocol lock
+        run: test -f experiments/blind-historical-flow-v2/PROTOCOL.md
+      - name: Verify authoritative implementation import
+        run: |
+          grep -q "../src/oasis-reference-core.mjs" tools/blind-historical-flow-v2.mjs
+          if grep -q "relation-field.js" tools/blind-historical-flow-v2.mjs; then exit 1; fi
+      - name: Syntax check experiment harness
+        run: node --check tools/blind-historical-flow-v2.mjs
+      - name: Re-run authoritative core audit
+        run: node tools/oasis-reference-core-audit.mjs
+      - name: Run blind historical flow
+        run: node tools/blind-historical-flow-v2.mjs | tee artifacts/blind-historical-flow-v2-console.json
+      - name: Upload raw traces
+        uses: actions/upload-artifact@v4
+        with:
+          name: blind-historical-flow-v2-report
+          path: |
+            artifacts/blind-historical-flow-v2.json
+            artifacts/blind-historical-flow-v2-console.json
+          if-no-files-found: error
