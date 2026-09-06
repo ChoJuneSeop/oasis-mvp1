@@ -1,0 +1,33 @@
+name: OASIS 120k Responsibility-Flow Reactivation Validation
+
+on:
+  push:
+    paths:
+      - 'tools/latent-relation-responsibility-flow-shadow-full.mjs'
+      - '.github/workflows/latent-relation-responsibility-flow-shadow-full.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run 120k responsibility-flow shadow validation
+        run: node tools/latent-relation-responsibility-flow-shadow-full.mjs
+      - name: Upload responsibility-flow full report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-latent-responsibility-flow-shadow-full
+          path: latent-relation-responsibility-flow-shadow-full-report.json
+          if-no-files-found: ignore
