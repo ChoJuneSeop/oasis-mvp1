@@ -1,0 +1,47 @@
+name: OASIS Latent Relation Admission Gate Validation
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "tools/latent-relation-admission-gate-validation.mjs"
+      - "tools/validation-compatibility-guard.mjs"
+      - ".github/workflows/latent-relation-admission-gate.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: oasis-latent-relation-admission-gate
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run retrieval-admission separation validation
+        run: node tools/latent-relation-admission-gate-validation.mjs
+      - name: Upload exact admission audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-latent-relation-admission-gate-report
+          path: |
+            latent-relation-admission-report.json
+            latent-relation-admission-audit.jsonl
+            latent-relation-admission-counterfactual.jsonl
+          if-no-files-found: ignore
