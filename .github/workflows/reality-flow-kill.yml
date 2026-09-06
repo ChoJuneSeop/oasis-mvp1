@@ -47,11 +47,13 @@ jobs:
         run: node tools/reality-flow-relation-gate-contamination-kill.mjs
       - name: Run Stage 12 evidence-execution authority validation
         run: node tools/reality-flow-execution-authority-validation.mjs
+      - name: Run Stage 12 live authority-turnover regression
+        run: node tools/reality-flow-execution-authority-live-regression.mjs
       - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reality-flow-stage2-stage12-reports
+          name: reality-flow-stage2-stage12-live-reports
           path: |
             reality-flow-mvp2-falsification-report.json
             reality-flow-mvp3-validation-report.json
@@ -65,4 +67,5 @@ jobs:
             reality-flow-topology-isolation-report.json
             reality-flow-relation-gate-contamination-report.json
             reality-flow-execution-authority-report.json
+            reality-flow-execution-authority-live-report.json
           if-no-files-found: ignore
