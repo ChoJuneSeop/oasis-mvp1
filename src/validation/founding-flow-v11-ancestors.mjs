@@ -4,6 +4,7 @@ import {
   roleAwareRelationKey,
   sharedGoalForSeedV9
 } from './founding-flow-v9-ancestors.mjs';
+import { processEvidenceEntities } from './founding-flow-v5-ancestors.mjs';
 import {
   ReactiveAncestorNode,
   StateMemoryAncestorNode
@@ -17,6 +18,16 @@ import { TemporalRelationalAncestorV4Node } from './founding-flow-v4-ancestors.m
 
 const clone = value => value == null ? value : structuredClone(value);
 const arr = value => Array.isArray(value) ? value : value == null ? [] : [value];
+const uniq = values => [...new Set(values.filter(v => v != null && v !== ''))];
+const intersects = (a, b) => {
+  const bs = b instanceof Set ? b : new Set(b);
+  for (const x of a) if (bs.has(x)) return true;
+  return false;
+};
+
+function relationEntities(relation) {
+  return uniq([relation?.from, relation?.to, ...arr(relation?.entities)]);
+}
 
 function canonicalRelationSortKey(relation) {
   return [
@@ -53,11 +64,11 @@ export function canonicalizeProcessRelations(relations) {
       // Choice-step ordering may carry actual process order, so preserve it.
       choice.push(clone(relation));
     } else if (relation?.processRole === 'outcome-mutation') {
-      // Multiple mutations from one actual outcome are an unordered set unless
-      // explicit sub-event order is represented elsewhere.
+      // Multiple mutations from one observed outcome are treated as one concurrent
+      // mutation set unless explicit sub-event ordering exists elsewhere.
       outcome.push(clone(relation));
     } else {
-      // Unknown/legacy order is left untouched rather than guessed away.
+      // Unknown/legacy order is not guessed away.
       legacy.push(clone(relation));
     }
   }
@@ -70,25 +81,90 @@ export function canonicalizeProcessRelations(relations) {
   ];
 }
 
+function canonicalEntitySet(values) {
+  return uniq(values).sort((a, b) => String(a).localeCompare(String(b)));
+}
+
 export class OASISConcurrentCanonicalCore extends OASISRelationRoleCore {
   reconstituteAffinityField() {
-    const field = super.reconstituteAffinityField();
+    const anchor = this._anchorEntityId ?? 'founder';
+    const seedEntities = canonicalEntitySet([...this._currentSeeds()]);
+    const frontier = new Set(seedEntities);
 
-    // Reactivated experience sequence itself remains untouched. Only the relation
-    // set inside each completed experience is normalized where order is not explicit.
-    const reactivated = arr(field.reactivated).map(exp => ({
-      ...clone(exp),
-      relations: canonicalizeProcessRelations(exp.relations)
-    }));
+    // Canonicalize the current simultaneous relation set BEFORE traversal so
+    // serialization order cannot alter frontier expansion order.
+    const currentRelations = canonicalizeCurrentRelations([...this.state.world.relations.values()]);
+    const currentRelevant = [];
+    const selectedCurrent = new Set();
+    let changed = true;
+
+    while (changed) {
+      changed = false;
+      for (const relation of currentRelations) {
+        const occurrence = `${relation?.id ?? ''}|${roleAwareRelationKey(relation)}`;
+        if (selectedCurrent.has(occurrence)) continue;
+        if (!intersects(relationEntities(relation), frontier)) continue;
+        selectedCurrent.add(occurrence);
+        currentRelevant.push(clone(relation));
+        for (const entity of canonicalEntitySet(relationEntities(relation))) {
+          if (!frontier.has(entity)) {
+            frontier.add(entity);
+            changed = true;
+          }
+        }
+      }
+    }
+
+    // Experience sequence remains temporal and is NOT globally sorted away.
+    const reactivated = [];
+    const paths = [];
+    let upperBound = this.state.closedExperiences.length;
+    while (upperBound > 0) {
+      let found = false;
+      for (let i = upperBound - 1; i >= 0; i--) {
+        const exp = this.state.closedExperiences[i];
+        const evidenceEntities = canonicalEntitySet(processEvidenceEntities(exp, anchor));
+        const touched = evidenceEntities.filter(entity => frontier.has(entity));
+        if (!touched.length) continue;
+
+        const relations = canonicalizeProcessRelations(exp.processRelations);
+        reactivated.push({
+          experienceId: exp.id,
+          sequence: exp.sequence,
+          touchedEntities: touched,
+          relations,
+          choice: clone(exp.choice),
+          outcome: clone(exp.outcome)
+        });
+        paths.push({
+          fromCurrentEntities: touched,
+          toExperienceId: exp.id,
+          sequence: exp.sequence,
+          evidenceBasis: 'process-relations-choice-outcome'
+        });
+
+        for (const entity of evidenceEntities) frontier.add(entity);
+        upperBound = i;
+        found = true;
+        break;
+      }
+      if (!found) break;
+    }
+
+    reactivated.reverse();
+    paths.reverse();
 
     const historicalRelations = reactivated.flatMap(exp => exp.relations.map(clone));
-    const currentRelations = canonicalizeCurrentRelations(field.currentRelations);
-    const relations = [...historicalRelations, ...currentRelations];
+    const canonicalCurrentRelevant = canonicalizeCurrentRelations(currentRelevant);
+    const relations = [...historicalRelations, ...canonicalCurrentRelevant];
 
     return {
-      ...field,
+      seedEntities,
+      participatingEntities: canonicalEntitySet([...frontier]),
+      reactivatedExperienceIds: reactivated.map(exp => exp.experienceId),
       reactivated,
-      currentRelations,
+      paths,
+      currentRelations: canonicalCurrentRelevant,
       historicalRelations,
       relations,
       relationSignature: relations.map(roleAwareRelationKey)
@@ -100,7 +176,8 @@ export class OASISConcurrentCanonicalCore extends OASISRelationRoleCore {
     const stored = this.state.closedExperiences.at(-1);
     if (!stored || stored.id !== returned.id) return returned;
 
-    // Normalize representation only. No relation is added, deleted or reinterpreted.
+    // Representation-only normalization. Contents and temporal experience sequence
+    // are unchanged.
     stored.processRelations = canonicalizeProcessRelations(stored.processRelations);
     return clone(stored);
   }
