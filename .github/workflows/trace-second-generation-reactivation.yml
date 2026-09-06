@@ -1,0 +1,45 @@
+name: OASIS Second Generation Reactivation Trace
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "tools/trace-second-generation-reactivation.mjs"
+      - "tools/validation-compatibility-guard.mjs"
+      - ".github/workflows/trace-second-generation-reactivation.yml"
+      - "relation-field.js"
+  workflow_dispatch:
+
+concurrency:
+  group: oasis-second-generation-reactivation-trace
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Trace second-generation reactivation
+        run: node tools/trace-second-generation-reactivation.mjs
+      - name: Upload reactivation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-second-generation-reactivation-report
+          path: second-generation-reactivation-report.json
+          if-no-files-found: ignore
