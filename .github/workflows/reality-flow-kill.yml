@@ -39,11 +39,13 @@ jobs:
         run: node tools/reality-flow-topology-validation.mjs
       - name: Run Stage 8 topology live viability regression
         run: node tools/reality-flow-topology-live-regression.mjs
+      - name: Run Stage 9 legacy authority contamination kill
+        run: node tools/reality-flow-legacy-contamination-kill.mjs
       - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reality-flow-stage2-stage8-topology-reports
+          name: reality-flow-stage2-stage9-reports
           path: |
             reality-flow-mvp2-falsification-report.json
             reality-flow-mvp3-validation-report.json
@@ -53,4 +55,5 @@ jobs:
             reality-flow-runstructure-observation-report.json
             reality-flow-topology-validation-report.json
             reality-flow-topology-live-report.json
+            reality-flow-legacy-contamination-report.json
           if-no-files-found: ignore
