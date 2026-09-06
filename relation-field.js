@@ -4,7 +4,7 @@ const rfOldMkP=mkP, rfOldMkW=mkW, rfOldOutcome=outcome, rfOldParticipants=partic
 function latentEnabled(){return globalThis.OASIS_LATENT_RELATION_STORE===true&&globalThis.__OASIS_LATENT_DIAGNOSTIC_DISABLE!==true}
 function ensureLatent(P){
   const F=P.relationField;
-  if(!F.latent)F.latent={byId:new Map(),byClue:new Map(),activeIds:[],seq:0,audit:[]};
+  if(!F.latent)F.latent={byId:new Map(),byClue:new Map(),activeIds:[],seq:0,audit:[],cacheKey:null,cacheEpisodes:[]};
   return F.latent;
 }
 function epId(ep){return `${ep.t}|${ep.key}|${ep.from?.[0]}|${ep.from?.[1]}`}
@@ -17,7 +17,7 @@ function audit(P,type,data={}){
 function indexLatent(P,ep,reason){
   const L=ensureLatent(P),id=epId(ep);
   if(L.byId.has(id))return;
-  L.byId.set(id,ep);
+  L.byId.set(id,ep);L.cacheKey=null;L.cacheEpisodes=[];
   clueAdd(L,`npc:${ep.a}`,id);clueAdd(L,`npc:${ep.b}`,id);
   for(const p of ep.places){
     clueAdd(L,`place:${p}`,id);
@@ -61,7 +61,9 @@ function latentCandidates(S,P){
 function latentActive(S,P){
   if(!latentEnabled())return [];
   moveAgedToLatent(P);
-  const L=ensureLatent(P),active=[];
+  const L=ensureLatent(P),cacheKey=`${E.tick}|${currentPlace(P)}|${P.target}|${Math.round(S.danger*1000)}|${L.byId.size}`;
+  if(L.cacheKey===cacheKey)return L.cacheEpisodes;
+  const active=[];
   for(const [id,ep] of latentCandidates(S,P)){
     const reasons=relevantReasons(S,P,ep);
     if(reasons.length)active.push({id,ep,reasons});
@@ -72,7 +74,9 @@ function latentActive(S,P){
     const ep=L.byId.get(id);audit(P,'noncurrent',{episodeId:id,key:ep?.key||null,createdTick:ep?.t??null,age:ep?E.tick-ep.t:null});
   }
   L.activeIds=[...now];
-  return active.map(x=>x.ep);
+  L.cacheKey=cacheKey;
+  L.cacheEpisodes=active.map(x=>x.ep);
+  return L.cacheEpisodes;
 }
 
 mkP=function(d){
