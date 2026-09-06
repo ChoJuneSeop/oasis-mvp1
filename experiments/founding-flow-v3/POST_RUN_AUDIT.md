@@ -12,6 +12,27 @@
 
 Run `34000726311`은 protocol의 금지문장을 목표선언으로 오인한 정규식 false positive 때문에 실제 실행 전에 중단된 비실험 run이다.
 
+## 재시작 재현성 확인
+
+사용자 요청에 따라 frozen v3를 조건 변경 없이 다시 실행했다.
+
+- Restart reproducibility run: `34001644800`
+- Job: `101401453464`
+- Head: `96ecfa2b4fb513b4d45012c0c86f69fdeeea8f47`
+- Artifact: `9979654345`
+- Artifact digest: `sha256:d1fd71251bc5818a6b031313cfae4e87e080992c1566d7fd6fd6a0737025d5b6`
+
+두 valid artifact를 직접 비교한 결과:
+
+- seeds: identical
+- systems: identical
+- preExperimentAudit: identical
+- 모든 5개 seed의 actionSequences: identical
+- 모든 5개 seed의 mechanismDiagnostics: identical
+- 모든 5개 seed의 nodeStates: identical
+
+따라서 아래 C1~C4 문제는 일회성 CI 변동이나 우연한 trajectory가 아니라 현재 frozen v3 구현에서 **재현되는 구조적 현상**으로 본다. 이 재현성은 OASIS 우월성의 증거가 아니라 오염/구현 문제의 재현성 증거다.
+
 ## 사전 감사
 
 - Unified contamination boundary: PASS
