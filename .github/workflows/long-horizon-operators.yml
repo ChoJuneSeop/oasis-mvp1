@@ -8,6 +8,10 @@ on:
       - ".github/workflows/long-horizon-operators.yml"
   workflow_dispatch:
 
+concurrency:
+  group: oasis-long-horizon-operators
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
