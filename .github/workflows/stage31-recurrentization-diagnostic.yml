@@ -1,0 +1,41 @@
+name: Stage31 Deferred Judgment Re-currentization Diagnostic
+
+on:
+  push:
+    branches: ["mvp3-reality-flow-kill"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stage31:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run Stage31 with isolated harness fix
+        shell: bash
+        run: |
+          set +e
+          node tools/reality-flow-stage31-harness-runner.mjs 2>&1 | tee reality-flow-stage31-isolated-console.log
+          status=${PIPESTATUS[0]}
+          exit $status
+      - name: Upload Stage31 diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage31-deferred-judgment-diagnostic
+          path: |
+            reality-flow-deferred-judgment-stage31-report.json
+            reality-flow-stage31-isolated-console.log
+          if-no-files-found: ignore
