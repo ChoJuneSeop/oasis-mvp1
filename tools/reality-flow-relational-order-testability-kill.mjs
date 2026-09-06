@@ -37,8 +37,8 @@ try{
     const[gatedId,gatedDef]=gatedEntry,gate=gatedDef.gate;
     const gateNpc=(npcs||[]).find(x=>x[0]===gate);
     const others=(npcs||[]).filter(x=>x[0]!==gate);
-    const other=others[0],third=others.find(x=>x[0]!==other?.[0]),fourth=others.find(x=>x[0]!==other?.[0]&&x[0]!==third?.[0]);
-    if(!gateNpc||!other||!third||!fourth)throw new Error('Stage 29 requires four distinct NPCs');
+    const other=others[0],third=others.find(x=>x[0]!==other?.[0]),fourth=others.find(x=>x[0]!==other?.[0]&&x[0]!==third?.[0]&&(npcs||[]).filter(n=>n[1]===x[1]).length===1);
+    if(!gateNpc||!other||!third||!fourth)throw new Error('Stage 29 requires four distinct NPCs and an isolated normal-outcome NPC');
 
     E={tick:103,worlds:{},paused:true};
     const A=mkW('full'),B=mkW('full');
@@ -138,7 +138,7 @@ try{
         deduplication:'같은 경험을 중복 저장하지 않기 위한 저장 무결성 검사',
         readInstrumentation:'어떤 실행 단계가 특정 필드를 실제로 읽는지 계측하는 진단 방법'
       },
-      controls:{productionFullHistoryPath:true,newAuthorityRule:false,newOutcomeRule:false,newObserverLoaded:false,identicalNormalOutcome:true},
+      controls:{productionFullHistoryPath:true,newAuthorityRule:false,newOutcomeRule:false,newObserverLoaded:false,identicalNormalOutcome:true,isolatedOutcomeNpc:true},
       gatedPlace:{id:gatedId,gate},npcs:{gate:gateNpc,other,third,fourth},trace,
       reads:{decisionBefore:decisionReads,normalOutcome:outcomeReads,decisionAfterAdditional:postDecisionAdditionalReads},
       states:{before:{orderAB:beforeA,orderBA:beforeB},after:{orderAB:postA,orderBA:postB}},
