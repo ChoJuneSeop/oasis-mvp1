@@ -1,0 +1,70 @@
+name: OASIS Pre-Main Overall Implementation Audit v12
+
+on:
+  push:
+    branches:
+      - architecture/oasis-unified-validation-system-v1
+    paths:
+      - 'tools/oasis-pre-main-overall-audit-v12.mjs'
+      - 'src/validation/founding-flow-v12-ancestors.mjs'
+      - 'src/validation/founding-flow-v11-ancestors.mjs'
+      - 'src/validation/founding-flow-v9-ancestors.mjs'
+      - 'src/validation/founding-flow-v3-world.mjs'
+      - 'src/validation/oasis-unified-validation-system.mjs'
+      - 'src/oasis-core.mjs'
+      - 'src/oasis-integrated-core.mjs'
+      - 'src/oasis-reference-core.mjs'
+      - '.github/workflows/oasis-pre-main-overall-audit-v12.yml'
+
+jobs:
+  pre-main-overall-v12:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Syntax check
+        run: node --check tools/oasis-pre-main-overall-audit-v12.mjs
+
+      - name: Pin validated layers
+        run: |
+          test "$(git hash-object src/oasis-core.mjs)" = "ab212e6389ad43aeb347e9d7f6a2e018ad43e4bd"
+          test "$(git hash-object src/oasis-integrated-core.mjs)" = "39d50160e0923601cf6b9386ebc4fc7b4f061406"
+          test "$(git hash-object src/oasis-reference-core.mjs)" = "017eb52d5a3ad7777f6562d2ecc147409f7b7a5c"
+          test "$(git hash-object src/validation/founding-flow-v9-ancestors.mjs)" = "1f8b2dadae7eb652a2a1a11f50a2b74333ca9938"
+          test "$(git hash-object src/validation/founding-flow-v11-ancestors.mjs)" = "c5e37d90311572fb4fb4ab096c50dc1243178468"
+          test "$(git hash-object src/validation/founding-flow-v12-ancestors.mjs)" = "c6c113c0a51addb8ac0b0d06cd0527c3ba504a02"
+
+      - name: Unified validation boundary audit
+        run: node tools/oasis-unified-validation-system-audit.mjs
+
+      - name: Reconfirm v9 audit
+        run: node tools/founding-flow-v9.mjs --audit-only
+
+      - name: Reconfirm v11 representation audit
+        run: node tools/founding-flow-v11.mjs --audit-only
+
+      - name: Reconfirm v12 fingerprint audit
+        run: node tools/founding-flow-v12.mjs --audit-only
+
+      - name: Execute cumulative audit
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          node tools/oasis-pre-main-overall-audit-v12.mjs 2>&1 | tee artifacts/oasis-pre-main-overall-audit-v12.log
+
+      - name: Upload audit artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-pre-main-overall-audit-v12
+          path: |
+            artifacts/oasis-pre-main-overall-audit-v12.json
+            artifacts/oasis-pre-main-overall-audit-v12.log
+          if-no-files-found: error
