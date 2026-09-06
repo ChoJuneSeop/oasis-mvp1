@@ -1,0 +1,33 @@
+name: OASIS O3 Post-Reactivation Verification Allocation
+
+on:
+  push:
+    paths:
+      - 'tools/o3-post-reactivation-verification-allocation-test.mjs'
+      - '.github/workflows/o3-post-reactivation-verification-allocation.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run O3 post-reactivation verification allocation test
+        run: node tools/o3-post-reactivation-verification-allocation-test.mjs
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-o3-post-reactivation-verification-allocation
+          path: o3-post-reactivation-verification-allocation-report.json
+          if-no-files-found: ignore
