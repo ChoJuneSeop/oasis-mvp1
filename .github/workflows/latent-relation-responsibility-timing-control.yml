@@ -1,0 +1,33 @@
+name: OASIS Responsibility Timing Control
+
+on:
+  push:
+    paths:
+      - 'tools/latent-relation-responsibility-timing-control.mjs'
+      - '.github/workflows/latent-relation-responsibility-timing-control.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run 30k responsibility timing controls
+        run: node tools/latent-relation-responsibility-timing-control.mjs
+      - name: Upload timing control report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-latent-responsibility-timing-control
+          path: latent-relation-responsibility-timing-control-report.json
+          if-no-files-found: ignore
