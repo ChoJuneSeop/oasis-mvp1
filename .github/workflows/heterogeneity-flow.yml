@@ -5,6 +5,7 @@ on:
     branches: ["validation/heterogeneity-flow"]
     paths:
       - "tools/heterogeneity-flow-test.mjs"
+      - "tools/heterogeneity-closed-experience-test.mjs"
       - "relation-field.js"
       - "index.html"
       - ".github/workflows/heterogeneity-flow.yml"
@@ -28,12 +29,16 @@ jobs:
         run: |
           npm install --no-save playwright
           npx playwright install --with-deps chromium
-      - name: Run post-hoc heterogeneity flow validation
+      - name: Run legacy post-hoc heterogeneity flow validation
         run: node tools/heterogeneity-flow-test.mjs
-      - name: Upload heterogeneity flow report
+      - name: Run isolated closed-experience flow validation
+        run: node tools/heterogeneity-closed-experience-test.mjs
+      - name: Upload heterogeneity flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: heterogeneity-flow-report
-          path: heterogeneity-flow-report.json
+          path: |
+            heterogeneity-flow-report.json
+            heterogeneity-closed-experience-report.json
           if-no-files-found: ignore
