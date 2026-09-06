@@ -16,24 +16,31 @@ try{
     const originalE=E,originalActionable=actionableIds,originalMemberRank=memberRank,originalChoose=choose,originalOutcome=outcome,originalTickW=tickW,originalFullRel=MODELS.full.rel;
     const MODEL_KEYS=['full','norel','rule','utility','qlite','retrieval'];
     const OFFSETS=[0,137,311,733,1201,1777,2473,3251,4099];
-    const TOTAL_TICKS=4800,ANALYSIS_START=700,BASELINE=.28,ACTION_FEEDBACK=.007,NATURAL_RETURN=.006;
+    const TOTAL_TICKS=5200,ANALYSIS_START=700,BASELINE=.28,ACTION_FEEDBACK=.007,NATURAL_RETURN=.006;
     const mean=xs=>xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:null;
     const median=xs=>{if(!xs.length)return null;const a=xs.slice().sort((x,y)=>x-y),m=Math.floor(a.length/2);return a.length%2?a[m]:(a[m-1]+a[m])/2};
     const quantile=(xs,q)=>{if(!xs.length)return null;const a=xs.slice().sort((x,y)=>x-y),p=(a.length-1)*q,lo=Math.floor(p),hi=Math.ceil(p);return lo===hi?a[lo]:a[lo]*(hi-p)+a[hi]*(p-lo)};
-    const clamp01=x=>Math.max(0,Math.min(1,x));
 
     actionableIds=function(S,P,use=1){const here=currentPlace(P),ids=Object.keys(places),other=ids.filter(id=>id!==here);return other.length?other:ids};
-    MODELS.full.rel=0; // isolate the closed-experience coupling path from legacy relation logic.
+    MODELS.full.rel=0;
 
-    function makeDrive(offset){let latent=0;const out=[];for(let t=0;t<TOTAL_TICKS;t++){
-      const z=(offset+t)/90,b=Math.floor(z),f=z-b;
-      const smooth=noise('hetero-rho',offset,b)*(1-f)+noise('hetero-rho',offset,b+1)*f;
-      const rho=.62+.36*smooth,u=noise('hetero-innov',offset,t);
-      const centered=(u-.5)*.010,heavy=Math.sign(u-.5)*Math.pow(Math.abs(u-.5)*2,6)*.035;
-      latent=Math.max(-.045,Math.min(.045,rho*latent+centered+heavy));out.push(latent);
-    }return out}
+    // Bounded continuous latent flow. Persistence changes smoothly; no anomaly/event label is inserted.
+    // Reference is constructed first inside a fixed interior range, then the implied pulse is given identically to every model.
+    function makeEnvironment(offset){
+      let latent=0,prev=BASELINE;const drive=[],reference=[];
+      const phase=2*Math.PI*noise('hetero-phase-v2',offset);
+      for(let t=0;t<TOTAL_TICKS;t++){
+        const persistence=.45+.52*(.5+.5*Math.sin(2*Math.PI*t/840+phase));
+        const u=noise('hetero-innov-v2',offset,t),small=(u-.5)*.045;
+        const heavy=Math.sign(u-.5)*Math.pow(Math.abs(u-.5)*2,5)*.025;
+        latent=persistence*latent+small+heavy;
+        const desired=BASELINE+.17*Math.tanh(latent*4.2);
+        const pulse=desired-prev-NATURAL_RETURN*(BASELINE-prev);
+        drive.push(pulse);reference.push(desired);prev=desired;
+      }
+      return {drive,reference};
+    }
 
-    function referenceFromDrive(drive){let d=.12;const ref=[];for(const ex of drive){d=clamp01(d+ex+NATURAL_RETURN*(BASELINE-d));ref.push(d)}return ref}
     function recoverTick(series,start,threshold,horizonEnd){let calm=0;for(let t=start;t<=horizonEnd;t++){if(Math.abs(series[t]-BASELINE)<=threshold)calm++;else calm=0;if(calm>=30)return t-29}return null}
     function segmentWithinSeed(reference){
       const dev=reference.map(x=>Math.abs(x-BASELINE)),tail=dev.slice(ANALYSIS_START),q75=quantile(tail,.75)||.01,q90=quantile(tail,.90)||q75,windows=[];
@@ -51,17 +58,16 @@ try{
       const quick=new Set(ranked.slice(0,n).map(x=>x.start)),long=new Set(ranked.slice(-n).map(x=>x.start));
       for(const w of windows)w.flowClass=quick.has(w.start)?'quick-return':long.has(w.start)?'long-lasting':'middle';
       const q=windows.filter(w=>w.flowClass==='quick-return').map(w=>w.referenceRecoveryLag),l=windows.filter(w=>w.flowClass==='long-lasting').map(w=>w.referenceRecoveryLag);
-      const valid=q.length>=2&&l.length>=2&&median(l)>median(q);
+      const valid=q.length>=2&&l.length>=2&&median(l)>median(q)&&q90>q75;
       return {valid,reason:valid?null:'no-within-seed-duration-separation',q75,q90,quickMedian:median(q),longMedian:median(l),windows};
     }
 
-    // Phase A: validate the reference environment before any agent is run.
-    const environment=OFFSETS.map(offset=>{const drive=makeDrive(offset),reference=referenceFromDrive(drive),seg=segmentWithinSeed(reference);return {offset,drive,reference,seg}});
-    const invalid=environment.filter(x=>!x.seg.valid).map(x=>({offset:x.offset,reason:x.seg.reason,windows:x.seg.windows.length}));
+    // Phase A: reference environment is fully validated before agent worlds are created.
+    const environment=OFFSETS.map(offset=>{const x=makeEnvironment(offset),seg=segmentWithinSeed(x.reference);return {offset,...x,seg,minReference:Math.min(...x.reference),maxReference:Math.max(...x.reference)}});
+    const invalid=environment.filter(x=>!x.seg.valid).map(x=>({offset:x.offset,reason:x.seg.reason,windows:x.seg.windows.length,minReference:x.minReference,maxReference:x.maxReference}));
 
     function ensureClosed(P){if(!P.closedRelation)P.closedRelation={flow:{lastTick:null,lastDanger:null,fast:null,slow:null,volatility:.02,need:0,peakNeed:0},pending:null,events:[],episodes:[],completed:0,positive:0,choiceChanges:0,positiveSupportDecisions:0,totalSupportAtDecisions:0,changedSupportMass:0};return P.closedRelation}
-    function updateNeed(S,P){const X=ensureClosed(P).flow;if(X.lastTick===E.tick)return X.need;const x=S.danger;if(X.lastDanger==null){X.lastDanger=x;X.fast=x;X.slow=x;X.lastTick=E.tick;return X.need}
-      const delta=Math.abs(x-X.lastDanger);X.fast=.72*X.fast+.28*x;X.slow=.985*X.slow+.015*x;X.volatility=.94*X.volatility+.06*delta;const unresolved=Math.abs(X.fast-X.slow),scale=.02+2*X.volatility,instant=unresolved/(unresolved+scale),alpha=instant>X.need?.035:.12;X.need=(1-alpha)*X.need+alpha*instant;X.peakNeed=Math.max(X.peakNeed,X.need);X.lastDanger=x;X.lastTick=E.tick;return X.need}
+    function updateNeed(S,P){const X=ensureClosed(P).flow;if(X.lastTick===E.tick)return X.need;const x=S.danger;if(X.lastDanger==null){X.lastDanger=x;X.fast=x;X.slow=x;X.lastTick=E.tick;return X.need}const delta=Math.abs(x-X.lastDanger);X.fast=.72*X.fast+.28*x;X.slow=.985*X.slow+.015*x;X.volatility=.94*X.volatility+.06*delta;const unresolved=Math.abs(X.fast-X.slow),scale=.02+2*X.volatility,instant=unresolved/(unresolved+scale),alpha=instant>X.need?.035:.12;X.need=(1-alpha)*X.need+alpha*instant;X.peakNeed=Math.max(X.peakNeed,X.need);X.lastDanger=x;X.lastTick=E.tick;return X.need}
     function closeJourney(S,P,id){const C=ensureClosed(P),J=C.pending;if(!J||J.target!==id)return null;const endNeed=updateNeed(S,P),closed={startTick:J.t,endTick:E.tick,target:id,startNeed:J.need,endNeed,resolution:J.need-endNeed};C.pending=null;C.completed++;if(closed.resolution>0)C.positive++;return closed}
     function addCompletedRelation(S,P,id,closed){if(!closed)return;const C=ensureClosed(P),met=npcs.filter(n=>n[1]===id);for(const[npc,place]of met){const cur={t:E.tick,npc,place,journey:closed},prior=C.events.slice(-18);for(const prev of prior){if(prev.npc===cur.npc)continue;const rs=[prev.journey?.resolution,cur.journey?.resolution].filter(Number.isFinite);C.episodes.push({t:E.tick,key:[prev.npc,cur.npc].sort().join('↔'),places:[prev.place,cur.place],resolution:rs.length?mean(rs):0})}C.events.push(cur)}C.events=C.events.slice(-40);C.episodes=C.episodes.slice(-120)}
     function relationSupport(S,P,id){const C=ensureClosed(P),need=updateNeed(S,P);if(!(need>0))return 0;const weights=[];for(const ep of C.episodes){if(!ep.places.includes(id))continue;const gain=Math.max(0,ep.resolution||0);if(!gain)continue;const recency=Math.exp(-Math.max(0,E.tick-ep.t)/1200),outcomeWeight=gain/(gain+need+1e-9);weights.push(need*outcomeWeight*recency)}weights.sort((a,b)=>b-a);return weights.slice(0,4).reduce((a,b)=>a+b,0)}
@@ -89,38 +95,27 @@ try{
         return {id:idx+1,flowClass:w.flowClass,referenceRecoveryLag:w.referenceRecoveryLag,start:w.start,end:w.end,models};
       });
       const C=E.worlds.full.parties.map(P=>ensureClosed(P));
-      return {offset:env.offset,environment:{totalWindows:env.seg.windows.length,quickMedian:env.seg.quickMedian,longMedian:env.seg.longMedian},windows,mechanism:{completed:C.reduce((n,x)=>n+x.completed,0),positive:C.reduce((n,x)=>n+x.positive,0),episodes:C.reduce((n,x)=>n+x.episodes.length,0),positiveEpisodes:C.reduce((n,x)=>n+x.episodes.filter(e=>e.resolution>0).length,0),choiceChanges:C.reduce((n,x)=>n+x.choiceChanges,0),positiveSupportDecisions:C.reduce((n,x)=>n+x.positiveSupportDecisions,0),peakNeed:Math.max(...C.map(x=>x.flow.peakNeed||0))}};
+      return {offset:env.offset,environment:{totalWindows:env.seg.windows.length,quickMedian:env.seg.quickMedian,longMedian:env.seg.longMedian,minReference:env.minReference,maxReference:env.maxReference},windows,mechanism:{completed:C.reduce((n,x)=>n+x.completed,0),positive:C.reduce((n,x)=>n+x.positive,0),episodes:C.reduce((n,x)=>n+x.episodes.length,0),positiveEpisodes:C.reduce((n,x)=>n+x.episodes.filter(e=>e.resolution>0).length,0),choiceChanges:C.reduce((n,x)=>n+x.choiceChanges,0),positiveSupportDecisions:C.reduce((n,x)=>n+x.positiveSupportDecisions,0),peakNeed:Math.max(...C.map(x=>x.flow.peakNeed||0))}};
     }
 
     const trials=invalid.length?[]:environment.map(runAgents);
     function classMean(trial,k,c,field){const xs=trial.windows.filter(w=>w.flowClass===c).map(w=>w.models[k][field]).filter(Number.isFinite);return mean(xs)}
     const paired=trials.map(tr=>{const fields=['recoveryLag','integratedDeviation','meanNeed','maxNeed','meanSupportMass','maxSupportMass','positiveSupportDecisions','relationChoiceChanges','transmissionRate','massTransmissionRate'];const full={};for(const f of fields){const q=classMean(tr,'full','quick-return',f),l=classMean(tr,'full','long-lasting',f);full[f]={quick:q,long:l,diff:q==null||l==null?null:l-q}}return {offset:tr.offset,full}});
-    const validDiffs=(f)=>paired.map(x=>x.full[f].diff).filter(Number.isFinite);
-    const couplingSummary={
-      seeds:paired.length,
-      needLongerIn:validDiffs('meanNeed').filter(x=>x>0).length,
-      supportMassLongerIn:validDiffs('meanSupportMass').filter(x=>x>0).length,
-      choiceChangesLongerIn:validDiffs('relationChoiceChanges').filter(x=>x>0).length,
-      transmissionRateLongerIn:validDiffs('transmissionRate').filter(x=>x>0).length,
-      meanPairedNeedDiff:mean(validDiffs('meanNeed')),
-      meanPairedSupportMassDiff:mean(validDiffs('meanSupportMass')),
-      meanPairedChoiceChangeDiff:mean(validDiffs('relationChoiceChanges')),
-      meanPairedTransmissionRateDiff:mean(validDiffs('transmissionRate'))
-    };
+    const validDiffs=f=>paired.map(x=>x.full[f].diff).filter(Number.isFinite);
+    const couplingSummary={seeds:paired.length,needLongerIn:validDiffs('meanNeed').filter(x=>x>0).length,supportMassLongerIn:validDiffs('meanSupportMass').filter(x=>x>0).length,choiceChangesLongerIn:validDiffs('relationChoiceChanges').filter(x=>x>0).length,transmissionRateLongerIn:validDiffs('transmissionRate').filter(x=>x>0).length,meanPairedNeedDiff:mean(validDiffs('meanNeed')),meanPairedSupportMassDiff:mean(validDiffs('meanSupportMass')),meanPairedChoiceChangeDiff:mean(validDiffs('relationChoiceChanges')),meanPairedTransmissionRateDiff:mean(validDiffs('transmissionRate'))};
     const modelRecovery={};for(const k of MODEL_KEYS)modelRecovery[k]={quick:mean(trials.flatMap(tr=>tr.windows.filter(w=>w.flowClass==='quick-return').map(w=>w.models[k].recoveryLag).filter(Number.isFinite))),long:mean(trials.flatMap(tr=>tr.windows.filter(w=>w.flowClass==='long-lasting').map(w=>w.models[k].recoveryLag).filter(Number.isFinite)))};
     const mechanism={completedJourneys:trials.reduce((n,t)=>n+t.mechanism.completed,0),positiveResolutionJourneys:trials.reduce((n,t)=>n+t.mechanism.positive,0),episodes:trials.reduce((n,t)=>n+t.mechanism.episodes,0),positiveEpisodes:trials.reduce((n,t)=>n+t.mechanism.positiveEpisodes,0),relationChoiceChanges:trials.reduce((n,t)=>n+t.mechanism.choiceChanges,0),positiveSupportDecisions:trials.reduce((n,t)=>n+t.mechanism.positiveSupportDecisions,0),peakNeed:trials.length?Math.max(...trials.map(t=>t.mechanism.peakNeed)):null};
 
     MODELS.full.rel=originalFullRel;memberRank=originalMemberRank;choose=originalChoose;outcome=originalOutcome;tickW=originalTickW;actionableIds=originalActionable;E=originalE;
-    return {design:{koreanQuestion:'동일 시드 내부에서 자연복귀가 빠른 흐름과 오래 지속되는 흐름이 모두 존재할 때, 미해소 흐름이 완결 관계경험의 지원량을 키우고 그 지원량이 실제 선택 변경으로 전달되는가?',englishTermNote:'Relation-support mass = 현재 미해소 흐름에서 과거 완결 경험들이 각 실행가능 행동에 제공하는 연속 지원량의 합. Transmission rate = 양의 관계지원이 존재한 결정들 중 실제 선택이 무관계 반사실과 달라진 비율.',scope:'이질성 라벨/위험 임계값을 모델에 주지 않는다. reference trajectory를 먼저 실행해 동일 시드 내부 자연복귀 시간의 하위/상위 35% 구간만 사후 비교한다.',fairness:'모든 모델 동일 외생흐름, 동일 실행가능 장소, 동일 행동→현실 피드백. OASIS-Full의 기존 relation 경로는 끄고 완결경험 결합부만 격리한다.',nonCircularity:'OASIS 우위나 양의 차이는 assert하지 않는다. 환경 성립 여부만 실행 전 검증한다.',offsets:OFFSETS,totalTicks:TOTAL_TICKS},environmentValidation:{allSeedsValid:invalid.length===0,invalid,seeds:environment.map(x=>({offset:x.offset,valid:x.seg.valid,windows:x.seg.windows.length,quickMedian:x.seg.quickMedian,longMedian:x.seg.longMedian}))},trials,paired,couplingSummary,modelRecovery,mechanism};
+    return {design:{koreanQuestion:'동일 시드 내부에서 자연복귀가 빠른 흐름과 오래 지속되는 흐름이 모두 존재할 때, 미해소 흐름이 완결 관계경험의 지원량을 키우고 그 지원량이 실제 선택 변경으로 전달되는가?',englishTermNote:'Relation-support mass = 현재 미해소 흐름에서 과거 완결 경험들이 각 실행가능 행동에 제공하는 연속 지원량의 합. Transmission rate = 양의 관계지원이 존재한 결정들 중 실제 선택이 무관계 반사실과 달라진 비율.',scope:'이질성 라벨/위험 임계값을 모델에 주지 않는다. bounded continuous reference trajectory를 먼저 생성·검증하고, 동일 시드 내부 자연복귀 시간 하위/상위 35%만 사후 비교한다.',fairness:'모든 모델 동일 외생흐름, 동일 실행가능 장소, 동일 행동→현실 피드백. OASIS-Full의 기존 relation 경로는 끄고 완결경험 결합부만 격리한다.',nonCircularity:'OASIS 우위나 양의 차이는 assert하지 않는다. 모든 사전 지정 시드의 환경 성립 여부만 실행 전 검증한다.',offsets:OFFSETS,totalTicks:TOTAL_TICKS},environmentValidation:{allSeedsValid:invalid.length===0,invalid,seeds:environment.map(x=>({offset:x.offset,valid:x.seg.valid,windows:x.seg.windows.length,quickMedian:x.seg.quickMedian,longMedian:x.seg.longMedian,minReference:x.minReference,maxReference:x.maxReference}))},trials,paired,couplingSummary,modelRecovery,mechanism};
   });
 
-  console.log('\nOASIS WITHIN-SEED HETEROGENEITY COUPLING VALIDATION');
+  console.log('\nOASIS WITHIN-SEED HETEROGENEITY COUPLING VALIDATION V2');
   console.log(`environment valid=${report.environmentValidation.allSeedsValid} invalid=${report.environmentValidation.invalid.length}`);
-  for(const s of report.environmentValidation.seeds)console.log(`seed=${s.offset} valid=${s.valid} windows=${s.windows} quickMed=${s.quickMedian} longMed=${s.longMedian}`);
-  console.log('COUPLING',report.couplingSummary);
-  console.log('MECHANISM',report.mechanism);
+  for(const s of report.environmentValidation.seeds)console.log(`seed=${s.offset} valid=${s.valid} windows=${s.windows} quickMed=${s.quickMedian} longMed=${s.longMedian} ref=[${s.minReference.toFixed(3)},${s.maxReference.toFixed(3)}]`);
+  console.log('COUPLING',report.couplingSummary);console.log('MECHANISM',report.mechanism);
   for(const[k,r]of Object.entries(report.modelRecovery))console.log(`${k}: quickLag=${r.quick?.toFixed?.(2)??r.quick} longLag=${r.long?.toFixed?.(2)??r.long}`);
-  if(!report.environmentValidation.allSeedsValid)throw new Error(`FAIL - reference environment invalid for ${report.environmentValidation.invalid.length} predeclared seeds; agent comparison not run`);
-  console.log('RESULT: environment passed before agent comparison; OASIS coupling differences are reported without a success assertion.');
   await writeFile('heterogeneity-within-seed-coupling-report.json',JSON.stringify(report,null,2));
+  if(!report.environmentValidation.allSeedsValid)throw new Error(`FAIL - reference environment invalid for ${report.environmentValidation.invalid.length} predeclared seeds; agent comparison not run`);
+  console.log('RESULT: all predeclared reference environments passed before agent comparison; OASIS coupling differences are reported without a success assertion.');
 }finally{if(browser)await browser.close();server.kill('SIGTERM')}
