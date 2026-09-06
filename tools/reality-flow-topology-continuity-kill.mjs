@@ -61,7 +61,6 @@ try{
     });
 
     const checks={
-      cleanPage:errors.length===0,
       referenceKeyIsMonotone:reference.key==='1'&&JSON.stringify(reference.runs)===JSON.stringify([1]),
       referenceRelationAuthorized:reference.active.includes('stage17-reference')&&reference.gateAuthority&&reference.gatedActionable,
       allSameEndpoint:perturbations.every(x=>x.endpoint===reference.endpoint),
@@ -84,12 +83,15 @@ try{
       },
       gatedPlace:{id:gatedId,gate},
       referenceTrace,reference,perturbations,checks,
-      interpretation:Object.values(checks).every(Boolean)
-        ?'STAGE17_EXACT_TOPOLOGY_AUTHORITY_DISCONTINUITY_CONFIRMED'
-        :'STAGE17_DISCONTINUITY_NOT_ESTABLISHED',
       nextBoundary:'If confirmed, the next experiment must distinguish meaningful reversal from negligible perturbation without assuming a fixed epsilon threshold as the answer.'
     };
   });
+
+  report.errors=errors;
+  report.checks.cleanPage=errors.length===0;
+  report.interpretation=Object.values(report.checks).every(Boolean)
+    ?'STAGE17_EXACT_TOPOLOGY_AUTHORITY_DISCONTINUITY_CONFIRMED'
+    :'STAGE17_DISCONTINUITY_NOT_ESTABLISHED';
 
   console.log('\nSTAGE 17 — EXACT TOPOLOGY MICRO-REVERSAL CONTINUITY KILL');
   console.log(JSON.stringify(report,null,2));
