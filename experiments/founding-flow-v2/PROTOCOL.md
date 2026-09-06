@@ -81,9 +81,9 @@ v2에서 환경까지 복잡하게 바꾸면 comparator correction 효과와 wor
 
 ## 금지된 평가
 
-- reward ranking
-- accuracy ranking
-- winner
+- 보상 기반 서열화
+- 정확도 기반 서열화
+- 우승자 판정
 - stability/recovery를 성공으로 정의
 - action diversity를 창의성으로 정의
 - 반복행동을 곧바로 열등성으로 정의
@@ -92,7 +92,7 @@ v2에서 환경까지 복잡하게 바꾸면 comparator correction 효과와 wor
 ## OASIS 실험 선행 4축 감사
 
 ### 1. 성공값 감사
-사전 목표 결과, winner, desired trajectory가 없어야 한다.
+사전 목표 결과, 우승자, desired trajectory가 없어야 한다.
 
 ### 2. 평가기준 감사
 cross-system 성능점수를 계산하지 않는다.
