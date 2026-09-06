@@ -6,6 +6,7 @@ on:
     paths:
       - "tools/heterogeneity-flow-test.mjs"
       - "tools/heterogeneity-closed-experience-test.mjs"
+      - "tools/heterogeneity-within-seed-coupling-test.mjs"
       - "relation-field.js"
       - "index.html"
       - ".github/workflows/heterogeneity-flow.yml"
@@ -33,6 +34,8 @@ jobs:
         run: node tools/heterogeneity-flow-test.mjs
       - name: Run isolated closed-experience flow validation
         run: node tools/heterogeneity-closed-experience-test.mjs
+      - name: Run within-seed coupling validation
+        run: node tools/heterogeneity-within-seed-coupling-test.mjs
       - name: Upload heterogeneity flow reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -41,4 +44,5 @@ jobs:
           path: |
             heterogeneity-flow-report.json
             heterogeneity-closed-experience-report.json
+            heterogeneity-within-seed-coupling-report.json
           if-no-files-found: ignore
