@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OASIS MVP3 Pure Reality Flow</title></head>
+<body><div id="boot">OASIS MVP3 Pure Reality Flow 불러오는 중…</div>
+<script>
+(async()=>{try{
+  const r=await fetch('./index.html',{cache:'no-store'});if(!r.ok)throw new Error(`index ${r.status}`);let h=await r.text();
+  const legacyLoad="await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='./relation-field.js';s.onload=resolve;s.onerror=()=>reject(new Error('relation-field.js load failed'));document.body.appendChild(s)})";
+  const pureLoad="await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='./reality-flow-pure.js';s.onload=resolve;s.onerror=()=>reject(new Error('reality-flow-pure.js load failed'));document.body.appendChild(s)});document.title='OASIS MVP3 - Pure Reality Flow Laboratory';reset();render()";
+  if(!h.includes(legacyLoad))throw new Error('legacy loader signature not found');
+  h=h.replace(legacyLoad,pureLoad);document.open();document.write(h);document.close();
+}catch(e){const b=document.getElementById('boot');if(b)b.textContent='OASIS MVP3 pure 로딩 실패: '+e;console.error(e)}})();
+</script></body></html>
