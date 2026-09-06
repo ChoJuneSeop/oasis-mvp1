@@ -27,12 +27,15 @@ jobs:
         run: node tools/reality-flow-mvp2-falsification.mjs
       - name: Run MVP3 Reality Flow validation
         run: node tools/reality-flow-mvp3-validation.mjs
+      - name: Run Reality Flow compatibility regression
+        run: node tools/reality-flow-regression.mjs
       - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reality-flow-stage2-stage4-reports
+          name: reality-flow-stage2-stage5-reports
           path: |
             reality-flow-mvp2-falsification-report.json
             reality-flow-mvp3-validation-report.json
+            reality-flow-regression-report.json
           if-no-files-found: ignore
