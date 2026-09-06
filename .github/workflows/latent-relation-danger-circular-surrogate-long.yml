@@ -1,0 +1,45 @@
+name: OASIS Danger Circular-Shift Surrogate Long Horizon
+
+on:
+  push:
+    paths:
+      - 'tools/latent-relation-danger-circular-surrogate-control.mjs'
+      - '.github/workflows/latent-relation-danger-circular-surrogate-long.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Prepare unchanged 120k horizon copy
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('tools/latent-relation-danger-circular-surrogate-control.mjs')
+          s = p.read_text()
+          old = 'const PORT=4200, MAX_TICK=30000, SURROGATE_COUNT=127;'
+          new = 'const PORT=4200, MAX_TICK=120000, SURROGATE_COUNT=127;'
+          if old not in s:
+              raise SystemExit('horizon replacement target missing')
+          p.write_text(s.replace(old, new, 1))
+          PY
+      - name: Run 120k 127-shift circular surrogate control
+        run: node tools/latent-relation-danger-circular-surrogate-control.mjs
+      - name: Upload long-horizon circular-surrogate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-danger-circular-surrogate-control-120k
+          path: latent-relation-danger-circular-surrogate-control-report.json
+          if-no-files-found: ignore
