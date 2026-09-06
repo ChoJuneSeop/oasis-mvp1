@@ -35,7 +35,18 @@ jobs:
       - name: Run isolated closed-experience flow validation
         run: node tools/heterogeneity-closed-experience-test.mjs
       - name: Run within-seed coupling validation
-        run: node tools/heterogeneity-within-seed-coupling-test.mjs
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('tools/heterogeneity-within-seed-coupling-test.mjs')
+          s = p.read_text()
+          old = 'supportDecisionMass,changedSupportMass,transmissionRate:'
+          new = 'supportDecisionMass,changedSupportMass:changedMass,transmissionRate:'
+          if old not in s:
+              raise SystemExit('expected one-line instrumentation typo not found')
+          p.write_text(s.replace(old, new, 1))
+          PY
+          node tools/heterogeneity-within-seed-coupling-test.mjs
       - name: Upload heterogeneity flow reports
         if: always()
         uses: actions/upload-artifact@v4
