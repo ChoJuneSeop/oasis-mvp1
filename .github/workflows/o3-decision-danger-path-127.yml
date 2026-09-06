@@ -1,0 +1,33 @@
+name: OASIS O3 Decision Danger Path 127 Control
+
+on:
+  push:
+    paths:
+      - 'tools/o3-decision-danger-path-127-control.mjs'
+      - '.github/workflows/o3-decision-danger-path-127.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run 127-shift decision-danger path control
+        run: node tools/o3-decision-danger-path-127-control.mjs
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-o3-decision-danger-path-127
+          path: o3-decision-danger-path-127-report.json
+          if-no-files-found: ignore
