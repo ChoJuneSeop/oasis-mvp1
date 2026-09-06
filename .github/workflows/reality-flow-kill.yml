@@ -59,11 +59,13 @@ jobs:
         run: node tools/reality-flow-episode-cap-kill.mjs
       - name: Run Stage 15 delayed-relevance retention kill
         run: node tools/reality-flow-delayed-relevance-retention-kill.mjs
+      - name: Run Stage 16 retention-witness field ablation
+        run: node tools/reality-flow-retention-witness-ablation.mjs
       - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reality-flow-stage2-stage15-reports
+          name: reality-flow-stage2-stage16-reports
           path: |
             reality-flow-mvp2-falsification-report.json
             reality-flow-mvp3-validation-report.json
@@ -83,4 +85,5 @@ jobs:
             reality-flow-retention-window-kill-report.json
             reality-flow-episode-cap-kill-report.json
             reality-flow-delayed-relevance-retention-report.json
+            reality-flow-retention-witness-ablation-report.json
           if-no-files-found: ignore
