@@ -5,6 +5,7 @@ on:
     branches: ["main"]
     paths:
       - "tools/long-horizon-operator-test.mjs"
+      - "tools/o1-order-long-horizon-paired-test.mjs"
       - ".github/workflows/long-horizon-operators.yml"
   workflow_dispatch:
 
@@ -28,6 +29,8 @@ jobs:
           node-version: '24'
       - name: Run 1M-tick O1-O4 long-horizon validation
         run: node tools/long-horizon-operator-test.mjs
+      - name: Run paired 1M-step O1 order-history validation
+        run: node tools/o1-order-long-horizon-paired-test.mjs
       - name: Upload long-horizon report
         if: always()
         uses: actions/upload-artifact@v4
