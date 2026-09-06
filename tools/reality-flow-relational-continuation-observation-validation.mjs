@@ -16,13 +16,15 @@ try{
   await page.goto('http://127.0.0.1:4191/mvp3-authority-separated.html',{waitUntil:'domcontentloaded',timeout:60000});
   await page.waitForFunction(()=>document.title.includes('Authority Separated')&&!!window.OASISRealityFlowTopology&&!!window.OASISRelationAuthority,null,{timeout:60000});
 
-  const beforeRefs=await page.evaluate(()=>({
-    actionableIds,
-    activeEpisodes:OASISRealityFlowTopology.activeEpisodes,
-    currentGateAuthority:OASISRelationAuthority.currentGateAuthority,
-    participants,
-    evalP
-  }));
+  await page.evaluate(()=>{
+    window.__stage21CoreRefs={
+      actionableIds,
+      activeEpisodes:OASISRealityFlowTopology.activeEpisodes,
+      currentGateAuthority:OASISRelationAuthority.currentGateAuthority,
+      participants,
+      evalP
+    };
+  });
   await page.addScriptTag({path:path.resolve('relation-continuation-observer.js')});
   await page.waitForFunction(()=>!!window.OASISRelationContinuation);
 
@@ -74,6 +76,7 @@ try{
 
     const relationReturn=arm([otherNpc,gate],'relation-return');
     const relationTransition=arm([gate,otherNpc],'relation-transition');
+    const refs=window.__stage21CoreRefs;
     const checks={
       observerLoaded:!!window.OASISRelationContinuation,
       sameScalarTopology:relationReturn.topologyKey===relationTransition.topologyKey&&relationReturn.topologyKey==='1>-1>1',
@@ -83,7 +86,13 @@ try{
       sameGateAuthority:relationReturn.gateAuthority===relationTransition.gateAuthority,
       sameGatedActionability:relationReturn.gatedActionable===relationTransition.gatedActionable,
       sameParticipants:JSON.stringify(relationReturn.participants)===JSON.stringify(relationTransition.participants),
-      sameRanking:JSON.stringify(relationReturn.ranking)===JSON.stringify(relationTransition.ranking)
+      sameRanking:JSON.stringify(relationReturn.ranking)===JSON.stringify(relationTransition.ranking),
+      noCoreFunctionReplacement:
+        refs.actionableIds===actionableIds&&
+        refs.activeEpisodes===OASISRealityFlowTopology.activeEpisodes&&
+        refs.currentGateAuthority===OASISRelationAuthority.currentGateAuthority&&
+        refs.participants===participants&&
+        refs.evalP===evalP
     };
 
     E=originalE;
@@ -106,19 +115,6 @@ try{
     };
   });
 
-  const afterRefs=await page.evaluate(()=>({
-    actionableIds,
-    activeEpisodes:OASISRealityFlowTopology.activeEpisodes,
-    currentGateAuthority:OASISRelationAuthority.currentGateAuthority,
-    participants,
-    evalP
-  }));
-  report.checks.noCoreFunctionReplacement=
-    beforeRefs.actionableIds===afterRefs.actionableIds&&
-    beforeRefs.activeEpisodes===afterRefs.activeEpisodes&&
-    beforeRefs.currentGateAuthority===afterRefs.currentGateAuthority&&
-    beforeRefs.participants===afterRefs.participants&&
-    beforeRefs.evalP===afterRefs.evalP;
   report.errors=errors;report.checks.cleanPage=errors.length===0;
   if(!Object.values(report.checks).every(Boolean))report.interpretation='STAGE21_RELATIONAL_CONTINUATION_OBSERVATION_FAILED';
 
