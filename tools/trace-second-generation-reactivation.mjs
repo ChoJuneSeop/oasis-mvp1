@@ -4,9 +4,11 @@ import { readFile, writeFile } from 'node:fs/promises';
 
 // Long-horizon O2/O3 diagnostic for the six blue-party relation episodes created
 // at tick 3595 in the established A=18/80/12000 trajectory.
-// No future trigger, timer, or random reactivation is injected. The persistent
-// variant changes only post-3595 retention/age so 'never reactivated' is not
-// confounded with eviction. Production relation-field.js remains unchanged.
+// No future trigger, timer, or random reactivation is injected.
+// IMPORTANT: after the six episodes are actually created, the persistent variant
+// exempts ONLY those six from age/retention eviction. Every other episode keeps
+// the 80-episode retention and 12000-tick extension behavior. Production source
+// remains unchanged; all changes are browser-test instrumentation.
 
 const PORT=4180;
 const GENERATION_TICK=3595;
@@ -18,19 +20,19 @@ const server=spawn('python3',['-m','http.server',String(PORT),'--bind','127.0.0.
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 const VARIANTS=[
-  {name:'persistent-after-3595',persistent:true},
-  {name:'production-window-control',persistent:false}
+  {name:'tracked-six-persistent-after-3595',persistent:true},
+  {name:'extension-80-12000-control',persistent:false}
 ];
 
 function patchSource(source,cfg){
   let out=source;
   const ageFrom='if(E.tick-ep.t>1200)return false';
-  const ageTo='if(E.tick-ep.t>(globalThis.__RF_TEST_AGE_OVERRIDE??1200))return false';
+  const ageTo="if(!(globalThis.__RF_KEEP_TRACKED_3595&&ep.t===3595&&ep.from?.[1]===3595)&&E.tick-ep.t>(globalThis.__RF_TEST_AGE_OVERRIDE??1200))return false";
   if(!out.includes(ageFrom))throw new Error('canonical age gate not found');
   out=out.replace(ageFrom,ageTo);
   if(cfg.persistent){
     const keepFrom='P.relationField.episodes=P.relationField.episodes.slice(-80)';
-    const keepTo=`P.relationField.episodes=E.tick<${GENERATION_TICK}?P.relationField.episodes.slice(-80):P.relationField.episodes`;
+    const keepTo="if(globalThis.__RF_KEEP_TRACKED_3595){const __tracked=P.relationField.episodes.filter(ep=>ep.t===3595&&ep.from?.[1]===3595);const __recent=P.relationField.episodes.filter(ep=>!(ep.t===3595&&ep.from?.[1]===3595)).slice(-80);P.relationField.episodes=[...__tracked,...__recent]}else P.relationField.episodes=P.relationField.episodes.slice(-80)";
     if(!out.includes(keepFrom))throw new Error('canonical episode retention gate not found');
     out=out.replace(keepFrom,keepTo);
   }
@@ -50,6 +52,8 @@ async function runVariant(browser,cfg){
   const result=await page.evaluate(({cfg,generationTick,baseAge,preAge,maxTick})=>{
     const savedE=E;
     E={tick:0,worlds:{full:mkW('full')},paused:true};
+    globalThis.__RF_KEEP_TRACKED_3595=false;
+    globalThis.__RF_TEST_AGE_OVERRIDE=preAge;
     const S=E.worlds.full;
     let tracked=[];
     const states=new Map();
@@ -146,6 +150,8 @@ async function runVariant(browser,cfg){
         const created=P.relationField.episodes.slice(beforeLen).filter(ep=>ep.t===generationTick&&ep.from?.[1]===generationTick);
         tracked=created.map(ep=>({id:epId(ep),t:ep.t,key:ep.key,a:ep.a,b:ep.b,places:[...ep.places],from:[...ep.from]}));
         for(const m of tracked)states.set(m.id,{...m,initialRelevant:null,initialReasons:[],prevRelevant:null,nonCurrentStart:null,firstReactivationTick:null,reactivations:0,maxNonCurrentGap:0,relevantTicks:0,nonCurrentTicks:0,evictedTick:null,presentThrough:generationTick,transitions:[]});
+        // The test-only persistence exemption is enabled only after the cohort exists.
+        globalThis.__RF_KEEP_TRACKED_3595=cfg.persistent;
       }
     };
     choose=function(S0,P){
@@ -159,7 +165,7 @@ async function runVariant(browser,cfg){
 
     for(let t=1;t<=maxTick;t++){
       E.tick=t;
-      globalThis.__RF_TEST_AGE_OVERRIDE=t<generationTick?preAge:(cfg.persistent?maxTick+1:preAge);
+      globalThis.__RF_TEST_AGE_OVERRIDE=preAge;
       tickW(S,env(t));
       const P=S.parties.find(x=>x.id==='blue');
       if(t>=generationTick)trackTick(P);
@@ -172,7 +178,7 @@ async function runVariant(browser,cfg){
       return st;
     });
     const out={
-      design:{variant:cfg.name,persistentAfter3595:cfg.persistent,generationTick,maxTick,preGenerationAge:preAge,productionAge:baseAge,canonicalProductionUnchanged:true,noFutureTriggerInjected:true,diagnosticsDoNotRewriteRealizedTrajectory:true},
+      design:{variant:cfg.name,persistentTrackedSixAfter3595:cfg.persistent,generationTick,maxTick,extensionAge:preAge,canonicalBaseAge:baseAge,canonicalProductionUnchanged:true,noFutureTriggerInjected:true,cohortPersistenceEnabledOnlyAfterFormation:true,diagnosticsDoNotRewriteRealizedTrajectory:true},
       reproduction:{blueChoice3304,blueChoice3595,trackedCount:tracked.length,tracked},
       states:stateRows,
       activationTimeline,
@@ -192,6 +198,8 @@ async function runVariant(browser,cfg){
         finalEpisodes:finalP.relationField.episodes.length
       }
     };
+    delete globalThis.__RF_KEEP_TRACKED_3595;
+    delete globalThis.__RF_TEST_AGE_OVERRIDE;
     E=savedE;
     return out;
   },{cfg,generationTick:GENERATION_TICK,baseAge:BASE_AGE,preAge:PRE_AGE,maxTick:MAX_TICK});
@@ -214,12 +222,13 @@ try{
     console.log(`groupDecisionContributionEvents=${r.summary.groupDecisionContributionEvents} individualDecisionContributionEvents=${r.summary.individualDecisionContributionEvents}`);
     for(const s of r.states)console.log(`${s.id} reactivations=${s.reactivations} first=${s.firstReactivationTick??'none'} maxGap=${s.maxNonCurrentGap} evicted=${s.evictedTick??'no'}`);
   }
-  const persistent=results.find(x=>x.design.persistentAfter3595);
+  const persistent=results.find(x=>x.design.persistentTrackedSixAfter3595);
   if(persistent.reproduction.blueChoice3304!=='road')throw new Error(`reproduction failed at tick3304: ${persistent.reproduction.blueChoice3304}`);
   if(persistent.reproduction.trackedCount!==6)throw new Error(`expected 6 tick-3595 episodes, got ${persistent.reproduction.trackedCount}`);
   const report={
     purpose:'Track the six second-generation relation episodes created at tick 3595 without pre-scheduling reactivation; separate contextual reactivation from actual decision contribution.',
     priorArtBoundary:['Long-delay memory influence and context-dependent retrieval are not claimed as OASIS-unique.','The test targets the combined OASIS mechanism: actual relation-process formation -> non-current interval -> current-context re-entry -> possible decision participation -> subsequent relation-process formation.'],
+    isolationNote:'Only the six already-formed tick-3595 episodes receive persistence exemption in the experimental variant; all other episode retention remains capped at the most recent 80 and age remains at the 12000-tick extension.',
     results
   };
   await writeFile('second-generation-reactivation-report.json',JSON.stringify(report,null,2));
