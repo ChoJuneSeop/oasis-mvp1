@@ -33,15 +33,18 @@ jobs:
         run: node tools/reality-flow-live-app-test.mjs
       - name: Run Stage 7 trajectory aliasing kill
         run: node tools/reality-flow-aliasing-kill.mjs
+      - name: Run Stage 8 run-structure observation
+        run: node tools/reality-flow-runstructure-observation.mjs
       - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reality-flow-stage2-stage7-reports
+          name: reality-flow-stage2-stage8-reports
           path: |
             reality-flow-mvp2-falsification-report.json
             reality-flow-mvp3-validation-report.json
             reality-flow-regression-report.json
             reality-flow-live-app-report.json
             reality-flow-aliasing-kill-report.json
+            reality-flow-runstructure-observation-report.json
           if-no-files-found: ignore
