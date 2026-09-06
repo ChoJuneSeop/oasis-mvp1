@@ -1,0 +1,46 @@
+name: OASIS Latent Relation Retention Validation
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "tools/latent-relation-admission-retention-validation.mjs"
+      - "tools/latent-relation-admission-gate-fast-validation.mjs"
+      - "tools/validation-compatibility-guard.mjs"
+      - ".github/workflows/latent-relation-admission-retention.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: oasis-latent-relation-admission-retention
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run stable currentization retention validation
+        run: node tools/latent-relation-admission-retention-validation.mjs
+      - name: Upload retention audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-latent-relation-retention-report
+          path: |
+            latent-relation-retention-report.json
+            latent-relation-retention-audit.jsonl
+            latent-relation-retention-counterfactual.jsonl
+          if-no-files-found: ignore
