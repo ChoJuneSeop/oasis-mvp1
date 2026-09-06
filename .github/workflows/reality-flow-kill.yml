@@ -55,11 +55,13 @@ jobs:
         run: node tools/reality-flow-authority-live-regression.mjs
       - name: Run Stage 13 fixed recency-window artifact kill
         run: node tools/reality-flow-retention-window-kill.mjs
+      - name: Run Stage 14 fixed episode-cap artifact kill
+        run: node tools/reality-flow-episode-cap-kill.mjs
       - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reality-flow-stage2-stage13-reports
+          name: reality-flow-stage2-stage14-reports
           path: |
             reality-flow-mvp2-falsification-report.json
             reality-flow-mvp3-validation-report.json
@@ -77,4 +79,5 @@ jobs:
             reality-flow-authority-separation-report.json
             reality-flow-authority-live-report.json
             reality-flow-retention-window-kill-report.json
+            reality-flow-episode-cap-kill-report.json
           if-no-files-found: ignore
