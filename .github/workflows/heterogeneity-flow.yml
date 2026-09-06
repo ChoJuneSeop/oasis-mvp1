@@ -7,6 +7,7 @@ on:
       - "tools/heterogeneity-flow-test.mjs"
       - "tools/heterogeneity-closed-experience-test.mjs"
       - "tools/heterogeneity-within-seed-coupling-test.mjs"
+      - "tools/flow-responsibility-estimator-test.mjs"
       - "relation-field.js"
       - "index.html"
       - ".github/workflows/heterogeneity-flow.yml"
@@ -47,6 +48,8 @@ jobs:
           p.write_text(s.replace(old, new, 1))
           PY
           node tools/heterogeneity-within-seed-coupling-test.mjs
+      - name: Run isolated flow responsibility estimator validation
+        run: node tools/flow-responsibility-estimator-test.mjs
       - name: Upload heterogeneity flow reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -56,4 +59,5 @@ jobs:
             heterogeneity-flow-report.json
             heterogeneity-closed-experience-report.json
             heterogeneity-within-seed-coupling-report.json
+            flow-responsibility-estimator-report.json
           if-no-files-found: ignore
