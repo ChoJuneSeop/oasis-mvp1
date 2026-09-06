@@ -90,6 +90,7 @@ jobs:
       - name: Run Stage 30 v2.3 unrealized possibility causal-consumption kill
         run: node tools/reality-flow-unrealized-possibility-causal-consumption-stage30.mjs
       - name: Run Stage 31 v2.3 deferred judgment relational re-currentization kill
+        if: always()
         run: node tools/reality-flow-deferred-judgment-relational-recurrentization-stage31.mjs
       - name: Upload Reality Flow reports
         if: always()
