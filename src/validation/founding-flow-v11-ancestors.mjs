@@ -29,6 +29,13 @@ function relationEntities(relation) {
   return uniq([relation?.from, relation?.to, ...arr(relation?.entities)]);
 }
 
+function tagCurrentRelation(relation) {
+  return {
+    ...clone(relation),
+    processRole: relation?.meta?.derivedFromGeometry ? 'derived-observation' : 'current-state'
+  };
+}
+
 function canonicalRelationSortKey(relation) {
   return [
     roleAwareRelationKey(relation),
@@ -48,7 +55,7 @@ function canonicalSort(relations) {
 }
 
 export function canonicalizeCurrentRelations(relations) {
-  return canonicalSort(relations);
+  return canonicalSort(arr(relations).map(tagCurrentRelation));
 }
 
 export function canonicalizeProcessRelations(relations) {
@@ -91,8 +98,9 @@ export class OASISConcurrentCanonicalCore extends OASISRelationRoleCore {
     const seedEntities = canonicalEntitySet([...this._currentSeeds()]);
     const frontier = new Set(seedEntities);
 
-    // Canonicalize the current simultaneous relation set BEFORE traversal so
-    // serialization order cannot alter frontier expansion order.
+    // Preserve the v9 relation-role semantics first, then canonicalize the current
+    // simultaneous relation set BEFORE traversal so serialization order cannot alter
+    // frontier expansion order.
     const currentRelations = canonicalizeCurrentRelations([...this.state.world.relations.values()]);
     const currentRelevant = [];
     const selectedCurrent = new Set();
@@ -155,7 +163,7 @@ export class OASISConcurrentCanonicalCore extends OASISRelationRoleCore {
     paths.reverse();
 
     const historicalRelations = reactivated.flatMap(exp => exp.relations.map(clone));
-    const canonicalCurrentRelevant = canonicalizeCurrentRelations(currentRelevant);
+    const canonicalCurrentRelevant = canonicalSort(currentRelevant);
     const relations = [...historicalRelations, ...canonicalCurrentRelevant];
 
     return {
