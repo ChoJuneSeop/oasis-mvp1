@@ -91,7 +91,12 @@ jobs:
         run: node tools/reality-flow-unrealized-possibility-causal-consumption-stage30.mjs
       - name: Run Stage 31 v2.3 deferred judgment relational re-currentization kill
         if: always()
-        run: node tools/reality-flow-deferred-judgment-relational-recurrentization-stage31.mjs
+        shell: bash
+        run: |
+          set +e
+          node tools/reality-flow-deferred-judgment-relational-recurrentization-stage31.mjs 2>&1 | tee reality-flow-stage31-console.log
+          status=${PIPESTATUS[0]}
+          exit $status
       - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -132,4 +137,5 @@ jobs:
             reality-flow-v22-realization-propensity-stage29-report.json
             reality-flow-unrealized-possibility-stage30-report.json
             reality-flow-deferred-judgment-stage31-report.json
+            reality-flow-stage31-console.log
           if-no-files-found: ignore
