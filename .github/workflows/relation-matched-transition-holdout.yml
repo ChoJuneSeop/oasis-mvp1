@@ -1,0 +1,33 @@
+name: OASIS Matched Relational Transition Holdout
+
+on:
+  push:
+    branches: ["validation/relation-matched-transition-holdout"]
+    paths:
+      - "tools/relation-matched-transition-holdout-test.mjs"
+      - ".github/workflows/relation-matched-transition-holdout.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  matched-transition-holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Run frozen matched-transition holdout
+        run: node tools/relation-matched-transition-holdout-test.mjs
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relation-matched-transition-holdout-report
+          path: relation-matched-transition-holdout-report.json
+          if-no-files-found: ignore
