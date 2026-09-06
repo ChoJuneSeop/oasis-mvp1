@@ -55,16 +55,25 @@ try{
     knownEvidence:perParty.some(x=>!x.sameKnown),authorizedPossibilities:perParty.some(x=>!x.sameAuthorized),dormantEvidence:perParty.some(x=>!x.sameDormant),
     realizedChoicePath:perParty.some(x=>!x.sameChoicePath)
   };
-  const downstream=treatmentDifference.topologyActivation||treatmentDifference.currentAuthority||treatmentDifference.knownEvidence||treatmentDifference.authorizedPossibilities||treatmentDifference.dormantEvidence||treatmentDifference.realizedChoicePath;
+  const relationalAuthorityDifference=treatmentDifference.topologyActivation||treatmentDifference.currentAuthority;
+  const executionDifference=treatmentDifference.knownEvidence||treatmentDifference.authorizedPossibilities||treatmentDifference.dormantEvidence||treatmentDifference.realizedChoicePath;
   const controls={bothRunsClean:cap80.errors.length===0&&nocap.errors.length===0,noLegacyAuthority:cap80.out.legacyActivations===0&&nocap.out.legacyActivations===0,sameObservationBudget:cap80.out.topologyObservations===1800&&nocap.out.topologyObservations===1800,actionsContinue:cap80.out.actions>0&&nocap.out.actions>0,externalComparisonEqual:Object.values(externalEqual).every(Boolean),capActuallyBinding:binding};
-  const interpretation=!Object.values(controls).every(Boolean)?'STAGE14_EPISODE_CAP_TEST_INVALID_CONTROL':downstream?'STAGE14_EPISODE_CAP_PROPAGATES_TO_CURRENT_FLOW':treatmentDifference.episodeStorage?'STAGE14_EPISODE_CAP_ALTERS_STORED_EXPERIENCE_BUT_NOT_CURRENT_FLOW':'STAGE14_EPISODE_CAP_NO_OBSERVED_EFFECT';
+  const interpretation=!Object.values(controls).every(Boolean)
+    ?'STAGE14_EPISODE_CAP_TEST_INVALID_CONTROL'
+    :executionDifference
+      ?'STAGE14_EPISODE_CAP_PROPAGATES_TO_EXECUTABLE_FLOW'
+      :relationalAuthorityDifference
+        ?'STAGE14_EPISODE_CAP_PROPAGATES_TO_RELATIONAL_AUTHORITY_NOT_EXECUTION'
+        :treatmentDifference.episodeStorage
+          ?'STAGE14_EPISODE_CAP_ALTERS_STORED_EXPERIENCE_ONLY'
+          :'STAGE14_EPISODE_CAP_NO_OBSERVED_EFFECT';
   const report={
     question:'With the last-18 relation composition rule held fixed, does the fixed 80-episode cap alter present Reality Flow compared with retaining all composed episodes?',
-    scope:'Single-factor cap ablation on the authority-separated candidate. Only final episode truncation differs; current topology authority and evidence/execution separation are unchanged. A storage difference alone is not classified as a present-flow effect.',
+    scope:'Single-factor cap ablation on the authority-separated candidate. Only final episode truncation differs; current topology authority and evidence/execution separation are unchanged. Storage, relational-authority, and executable-flow effects are classified separately.',
     priorArtBoundary:'Bounded memory and adaptive retention are established agent-memory techniques; this stage tests OASIS internal validity rather than novelty.',
     cap80:{actions:cap80.out.actions,recombinations:cap80.out.recombinations,topologyActivations:cap80.out.topologyActivations,errors:cap80.errors},
     noCap:{actions:nocap.out.actions,recombinations:nocap.out.recombinations,topologyActivations:nocap.out.topologyActivations,errors:nocap.errors},
-    externalEqual,perParty,treatmentDifference,classification:{downstreamDifference:downstream},controls,interpretation
+    externalEqual,perParty,treatmentDifference,classification:{relationalAuthorityDifference,executionDifference},controls,interpretation
   };
   console.log('\nSTAGE 14 — FIXED EPISODE-CAP ARTIFACT KILL');console.log(JSON.stringify(report,null,2));
   for(const[k,v]of Object.entries(controls))assert(v,k);
