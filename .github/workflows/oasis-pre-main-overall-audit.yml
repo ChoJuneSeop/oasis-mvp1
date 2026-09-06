@@ -1,0 +1,65 @@
+name: OASIS Pre-Main Overall Implementation Audit
+
+on:
+  push:
+    branches:
+      - architecture/oasis-unified-validation-system-v1
+    paths:
+      - 'experiments/pre-main-overall-audit/**'
+      - 'tools/oasis-pre-main-overall-audit.mjs'
+      - 'src/validation/oasis-unified-validation-system.mjs'
+      - 'src/validation/founding-flow-v3-world.mjs'
+      - 'src/validation/founding-flow-v4-ancestors.mjs'
+      - 'src/validation/founding-flow-v5-ancestors.mjs'
+      - 'src/validation/founding-flow-v7-ancestors.mjs'
+      - 'src/validation/founding-flow-v9-ancestors.mjs'
+      - 'src/oasis-core.mjs'
+      - 'src/oasis-integrated-core.mjs'
+      - 'src/oasis-reference-core.mjs'
+      - '.github/workflows/oasis-pre-main-overall-audit.yml'
+
+jobs:
+  pre-main-overall-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Syntax check
+        run: |
+          node --check tools/oasis-pre-main-overall-audit.mjs
+          node --check src/validation/founding-flow-v9-ancestors.mjs
+          node --check src/validation/oasis-unified-validation-system.mjs
+
+      - name: Pin validated reference implementation files
+        run: |
+          test "$(git hash-object src/oasis-core.mjs)" = "ab212e6389ad43aeb347e9d7f6a2e018ad43e4bd"
+          test "$(git hash-object src/oasis-integrated-core.mjs)" = "39d50160e0923601cf6b9386ebc4fc7b4f061406"
+          test "$(git hash-object src/oasis-reference-core.mjs)" = "017eb52d5a3ad7777f6562d2ecc147409f7b7a5c"
+          test "$(git hash-object src/validation/founding-flow-v3-world.mjs)" = "83371b841b9ca1403a02a210ee2aba7ba48e0942"
+          test "$(git hash-object src/validation/founding-flow-v9-ancestors.mjs)" = "1f8b2dadae7eb652a2a1a11f50a2b74333ca9938"
+
+      - name: Unified-system contamination boundary audit
+        run: node tools/oasis-unified-validation-system-audit.mjs
+
+      - name: Reconfirm v9 four-axis and role-separation audit
+        run: node tools/founding-flow-v9.mjs --audit-only
+
+      - name: Execute cumulative pre-main implementation audit
+        run: |
+          mkdir -p artifacts
+          node tools/oasis-pre-main-overall-audit.mjs | tee artifacts/oasis-pre-main-overall-audit.log
+
+      - name: Upload audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-pre-main-overall-audit
+          path: |
+            artifacts/oasis-pre-main-overall-audit.json
+            artifacts/oasis-pre-main-overall-audit.log
+          if-no-files-found: error
