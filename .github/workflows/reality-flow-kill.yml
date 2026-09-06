@@ -85,11 +85,13 @@ jobs:
         run: node tools/reality-flow-time-batched-future-information.mjs
       - name: Run Stage 28 relational order causal-consumption kill
         run: node tools/reality-flow-relational-order-consumption-kill.mjs
+      - name: Run Stage 29 relational order testability kill
+        run: node tools/reality-flow-relational-order-testability-kill.mjs
       - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reality-flow-stage2-stage28-reports
+          name: reality-flow-stage2-stage29-reports
           path: |
             reality-flow-mvp2-falsification-report.json
             reality-flow-mvp3-validation-report.json
@@ -122,4 +124,5 @@ jobs:
             reality-flow-time-batched-relational-observer-report.json
             reality-flow-time-batched-future-information-report.json
             reality-flow-relational-order-consumption-report.json
+            reality-flow-relational-order-testability-report.json
           if-no-files-found: ignore
