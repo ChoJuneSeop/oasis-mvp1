@@ -1,0 +1,56 @@
+name: Founding Flow v9
+
+on:
+  push:
+    branches:
+      - architecture/oasis-unified-validation-system-v1
+    paths:
+      - 'experiments/founding-flow-v9/**'
+      - 'src/validation/founding-flow-v9-ancestors.mjs'
+      - 'src/validation/founding-flow-v7-ancestors.mjs'
+      - 'src/validation/founding-flow-v5-ancestors.mjs'
+      - 'src/validation/founding-flow-v4-ancestors.mjs'
+      - 'src/validation/founding-flow-v3-world.mjs'
+      - 'src/validation/oasis-unified-validation-system.mjs'
+      - 'src/oasis-core.mjs'
+      - 'src/oasis-integrated-core.mjs'
+      - 'src/oasis-reference-core.mjs'
+      - 'tools/founding-flow-v9.mjs'
+      - '.github/workflows/founding-flow-v9.yml'
+
+jobs:
+  founding-flow-v9:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check
+        run: |
+          node --check src/validation/founding-flow-v9-ancestors.mjs
+          node --check tools/founding-flow-v9.mjs
+      - name: Unified-system contamination boundary audit
+        run: node tools/oasis-unified-validation-system-audit.mjs
+      - name: Founding Flow v9 four-axis and role-separation audit
+        run: node tools/founding-flow-v9.mjs --audit-only
+      - name: Confirm contaminated historical harness is not imported
+        run: |
+          if grep -R "blind-historical-flow-v2" src/validation/founding-flow-v9-ancestors.mjs tools/founding-flow-v9.mjs; then
+            echo "Old contaminated harness reference found"
+            exit 1
+          fi
+      - name: Execute Founding Flow v9
+        run: |
+          mkdir -p artifacts
+          node tools/founding-flow-v9.mjs | tee artifacts/founding-flow-v9.log
+      - name: Upload raw traces
+        uses: actions/upload-artifact@v4
+        with:
+          name: founding-flow-v9-report
+          path: |
+            artifacts/founding-flow-v9.json
+            artifacts/founding-flow-v9.log
+          if-no-files-found: error
