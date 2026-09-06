@@ -1,0 +1,45 @@
+name: OASIS O3 Responsibility Signal Discovery Long Horizon
+
+on:
+  push:
+    paths:
+      - 'tools/o3-responsibility-signal-discovery-test.mjs'
+      - '.github/workflows/o3-responsibility-signal-discovery-long.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Expand only signal-discovery horizon to 120k
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tools/o3-responsibility-signal-discovery-test.mjs')
+          s=p.read_text()
+          old='const PORT=4202, MAX_TICK=30000, SURROGATE_COUNT=127;'
+          new='const PORT=4202, MAX_TICK=120000, SURROGATE_COUNT=127;'
+          if old not in s:
+              raise SystemExit('horizon replacement target missing')
+          p.write_text(s.replace(old,new,1))
+          PY
+      - name: Run 120k O3 responsibility signal discovery
+        run: node tools/o3-responsibility-signal-discovery-test.mjs
+      - name: Upload long-horizon report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-o3-responsibility-signal-discovery-120k
+          path: o3-responsibility-signal-discovery-report.json
+          if-no-files-found: ignore
