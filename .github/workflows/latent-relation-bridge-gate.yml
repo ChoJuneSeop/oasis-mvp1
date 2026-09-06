@@ -1,0 +1,38 @@
+name: OASIS Relational Bridge Reactivation Pilot
+
+on:
+  push:
+    paths:
+      - 'tools/latent-relation-bridge-gate-validation.mjs'
+      - '.github/workflows/latent-relation-bridge-gate.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run 30k relational bridge pilot
+        env:
+          OASIS_BRIDGE_MAX_TICK: 30000
+        run: node tools/latent-relation-bridge-gate-validation.mjs
+      - name: Upload bridge audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-latent-relation-bridge-pilot
+          path: |
+            latent-relation-bridge-report.json
+            latent-relation-bridge-audit.jsonl
+            latent-relation-bridge-counterfactual.jsonl
+          if-no-files-found: ignore
