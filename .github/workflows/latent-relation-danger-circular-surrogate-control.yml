@@ -1,0 +1,33 @@
+name: OASIS Danger Circular-Shift Surrogate Control
+
+on:
+  push:
+    paths:
+      - 'tools/latent-relation-danger-circular-surrogate-control.mjs'
+      - '.github/workflows/latent-relation-danger-circular-surrogate-control.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run 30k circular-shift danger surrogate control
+        run: node tools/latent-relation-danger-circular-surrogate-control.mjs
+      - name: Upload circular-surrogate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-danger-circular-surrogate-control
+          path: latent-relation-danger-circular-surrogate-control-report.json
+          if-no-files-found: ignore
