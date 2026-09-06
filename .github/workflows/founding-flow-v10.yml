@@ -1,0 +1,61 @@
+name: Founding Flow v10 C7 Necessity Audit
+
+on:
+  push:
+    branches:
+      - architecture/oasis-unified-validation-system-v1
+    paths:
+      - 'experiments/founding-flow-v10/**'
+      - 'tools/founding-flow-v10.mjs'
+      - 'src/validation/founding-flow-v9-ancestors.mjs'
+      - 'src/validation/founding-flow-v7-ancestors.mjs'
+      - 'src/validation/founding-flow-v5-ancestors.mjs'
+      - 'src/validation/founding-flow-v4-ancestors.mjs'
+      - 'src/oasis-core.mjs'
+      - 'src/oasis-integrated-core.mjs'
+      - 'src/oasis-reference-core.mjs'
+      - '.github/workflows/founding-flow-v10.yml'
+
+jobs:
+  founding-flow-v10:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Syntax check
+        run: |
+          node --check tools/founding-flow-v10.mjs
+          node --check src/validation/founding-flow-v9-ancestors.mjs
+
+      - name: Pin v9 audited implementation
+        run: |
+          test "$(git hash-object src/oasis-core.mjs)" = "ab212e6389ad43aeb347e9d7f6a2e018ad43e4bd"
+          test "$(git hash-object src/oasis-integrated-core.mjs)" = "39d50160e0923601cf6b9386ebc4fc7b4f061406"
+          test "$(git hash-object src/oasis-reference-core.mjs)" = "017eb52d5a3ad7777f6562d2ecc147409f7b7a5c"
+          test "$(git hash-object src/validation/founding-flow-v9-ancestors.mjs)" = "1f8b2dadae7eb652a2a1a11f50a2b74333ca9938"
+
+      - name: Unified-system contamination boundary audit
+        run: node tools/oasis-unified-validation-system-audit.mjs
+
+      - name: Execute C7 read-only necessity audit
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          node tools/founding-flow-v10.mjs 2>&1 | tee artifacts/founding-flow-v10.log
+
+      - name: Upload audit artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: founding-flow-v10-report
+          path: |
+            artifacts/founding-flow-v10.json
+            artifacts/founding-flow-v10.log
+          if-no-files-found: error
