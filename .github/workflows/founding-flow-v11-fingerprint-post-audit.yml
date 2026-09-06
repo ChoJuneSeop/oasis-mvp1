@@ -1,0 +1,44 @@
+name: Founding Flow v11 Fingerprint Post-Audit
+
+on:
+  push:
+    branches:
+      - architecture/oasis-unified-validation-system-v1
+    paths:
+      - 'tools/founding-flow-v11-fingerprint-post-audit.mjs'
+      - 'src/validation/founding-flow-v11-ancestors.mjs'
+      - 'src/oasis-reference-core.mjs'
+      - '.github/workflows/founding-flow-v11-fingerprint-post-audit.yml'
+
+jobs:
+  v11-fingerprint-post-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Pin v11 implementation
+        run: |
+          test "$(git hash-object src/oasis-reference-core.mjs)" = "017eb52d5a3ad7777f6562d2ecc147409f7b7a5c"
+          test "$(git hash-object src/validation/founding-flow-v11-ancestors.mjs)" = "c5e37d90311572fb4fb4ab096c50dc1243178468"
+
+      - name: Execute read-only fingerprint audit
+        shell: bash
+        run: |
+          set +e
+          node tools/founding-flow-v11-fingerprint-post-audit.mjs | tee v11-fingerprint-post-audit.json
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ] && [ "$code" -ne 3 ]; then exit "$code"; fi
+          exit 0
+
+      - name: Upload audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: founding-flow-v11-fingerprint-post-audit
+          path: v11-fingerprint-post-audit.json
+          if-no-files-found: error
