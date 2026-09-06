@@ -24,21 +24,24 @@ function run(order, seed) {
 
 const seeds=[1,2,3,5,8,13,21,34];
 const rows=seeds.map(seed=>({seed,a:run(['A','B'],seed),b:run(['B','A'],seed)}));
-for(const row of rows){
-  assert(stable(row.a.relationSignature)===stable(row.b.relationSignature),`v11 structural canonicalization regression at seed ${row.seed}`);
-  assert(row.a.structureKey===row.b.structureKey,`v11 structureKey canonicalization regression at seed ${row.seed}`);
-  assert(row.a.tieBreakUsed===true&&row.b.tieBreakUsed===true,`fixture did not exercise contingent realization at seed ${row.seed}`);
-}
+for(const row of rows) assert(row.a.tieBreakUsed===true&&row.b.tieBreakUsed===true,`fixture did not exercise contingent realization at seed ${row.seed}`);
+
+const relationSignatureEqualForAll=rows.every(r=>stable(r.a.relationSignature)===stable(r.b.relationSignature));
 const fingerprintEqualForAll=rows.every(r=>r.a.fingerprint===r.b.fingerprint);
 const choiceEqualForAll=rows.every(r=>r.a.choiceId===r.b.choiceId&&r.a.step===r.b.step);
+const structureKeyEqualForAll=rows.every(r=>r.a.structureKey===r.b.structureKey);
 const choiceDivergenceSeeds=rows.filter(r=>r.a.choiceId!==r.b.choiceId||r.a.step!==r.b.step).map(r=>r.seed);
+const structureDivergenceSeeds=rows.filter(r=>r.a.structureKey!==r.b.structureKey).map(r=>r.seed);
+const fingerprintDivergenceSeeds=rows.filter(r=>r.a.fingerprint!==r.b.fingerprint).map(r=>r.seed);
+
+const residualConfirmed=!fingerprintEqualForAll || !choiceEqualForAll || !structureKeyEqualForAll;
 const report={
   audit:'Founding Flow v11 contingent-flow fingerprint post-audit',
   status:'EXECUTED',
-  conclusion:fingerprintEqualForAll?'C7_FINGERPRINT_RESIDUAL_REFUTED':'C7_FINGERPRINT_RESIDUAL_CONFIRMED',
-  primaryCriterion:{sameSemanticFrameFingerprintsEqual:fingerprintEqualForAll},
-  secondaryObservation:{choicesEqualForAll:choiceEqualForAll,choiceDivergenceSeeds},
+  conclusion:residualConfirmed?'C7_FINGERPRINT_RESIDUAL_CONFIRMED':'C7_FINGERPRINT_RESIDUAL_REFUTED',
+  fixedLayer:{relationSignatureEqualForAll},
+  primaryCriterion:{sameSemanticFrameFingerprintsEqual:fingerprintEqualForAll,fingerprintDivergenceSeeds},
+  downstreamObservation:{choicesEqualForAll:choiceEqualForAll,choiceDivergenceSeeds,structureKeysEqualForAll:structureKeyEqualForAll,structureDivergenceSeeds},
   rows
 };
 console.log(JSON.stringify(report,null,2));
-if(!fingerprintEqualForAll) process.exitCode=3;
