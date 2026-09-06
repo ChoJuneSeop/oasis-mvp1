@@ -1,0 +1,47 @@
+name: OASIS Long Horizon Relation Adapter Validation
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "tools/long-horizon-relation-field-adapter-test.mjs"
+      - "tools/validation-compatibility-guard.mjs"
+      - ".github/workflows/long-horizon-relation-adapter.yml"
+      - "relation-field.js"
+      - "tools/browser-world-test.mjs"
+      - "tools/open-possibility-flow-test.mjs"
+  workflow_dispatch:
+
+concurrency:
+  group: oasis-long-horizon-relation-adapter
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  relation-adapter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run production relation-field long-horizon adapter
+        run: node tools/long-horizon-relation-field-adapter-test.mjs
+      - name: Upload adapter report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-long-horizon-relation-adapter-report
+          path: long-horizon-relation-field-adapter-report.json
+          if-no-files-found: ignore
