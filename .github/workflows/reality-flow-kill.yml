@@ -75,11 +75,13 @@ jobs:
         run: node tools/reality-flow-relational-continuation-flow-anchor-validation.mjs
       - name: Run Stage 23 downstream causal-path diagnostic
         run: node tools/reality-flow-relational-continuation-downstream-diagnostic.mjs
+      - name: Run Stage 24 relational continuation future-information diagnostic
+        run: node tools/reality-flow-relational-continuation-future-information.mjs
       - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reality-flow-stage2-stage23-reports
+          name: reality-flow-stage2-stage24-reports
           path: |
             reality-flow-mvp2-falsification-report.json
             reality-flow-mvp3-validation-report.json
@@ -107,4 +109,5 @@ jobs:
             reality-flow-relational-continuation-observation-report.json
             reality-flow-relational-continuation-flow-anchor-report.json
             reality-flow-relational-continuation-downstream-diagnostic-report.json
+            reality-flow-relational-continuation-future-information-report.json
           if-no-files-found: ignore
