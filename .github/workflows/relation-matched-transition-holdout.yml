@@ -1,4 +1,5 @@
 name: OASIS Matched Relational Transition Holdout
+# Execution trigger only; experiment logic remains frozen in the test file.
 
 on:
   push:
