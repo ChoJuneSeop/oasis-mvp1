@@ -1,0 +1,33 @@
+name: OASIS 120k Same-Flow Latent Gate Shadow Comparison
+
+on:
+  push:
+    paths:
+      - 'tools/latent-relation-shadow-gate-comparison-full.mjs'
+      - '.github/workflows/latent-relation-shadow-gate-comparison-full.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run same-flow 120k shadow comparison
+        run: node tools/latent-relation-shadow-gate-comparison-full.mjs
+      - name: Upload 120k shadow comparison report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-latent-gate-shadow-comparison-full
+          path: latent-relation-shadow-gate-comparison-full-report.json
+          if-no-files-found: ignore
