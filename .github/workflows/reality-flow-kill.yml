@@ -25,10 +25,14 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Run MVP2 same-coordinate different-flow falsification
         run: node tools/reality-flow-mvp2-falsification.mjs
-      - name: Upload falsification report
+      - name: Run MVP3 Reality Flow validation
+        run: node tools/reality-flow-mvp3-validation.mjs
+      - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reality-flow-mvp2-falsification-report
-          path: reality-flow-mvp2-falsification-report.json
+          name: reality-flow-stage2-stage4-reports
+          path: |
+            reality-flow-mvp2-falsification-report.json
+            reality-flow-mvp3-validation-report.json
           if-no-files-found: ignore
