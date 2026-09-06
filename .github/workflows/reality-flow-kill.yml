@@ -57,11 +57,13 @@ jobs:
         run: node tools/reality-flow-retention-window-kill.mjs
       - name: Run Stage 14 fixed episode-cap artifact kill
         run: node tools/reality-flow-episode-cap-kill.mjs
+      - name: Run Stage 15 delayed-relevance retention kill
+        run: node tools/reality-flow-delayed-relevance-retention-kill.mjs
       - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reality-flow-stage2-stage14-reports
+          name: reality-flow-stage2-stage15-reports
           path: |
             reality-flow-mvp2-falsification-report.json
             reality-flow-mvp3-validation-report.json
@@ -80,4 +82,5 @@ jobs:
             reality-flow-authority-live-report.json
             reality-flow-retention-window-kill-report.json
             reality-flow-episode-cap-kill-report.json
+            reality-flow-delayed-relevance-retention-report.json
           if-no-files-found: ignore
