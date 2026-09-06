@@ -51,11 +51,14 @@ jobs:
         run: node tools/founding-flow-v9.mjs --audit-only
 
       - name: Execute cumulative pre-main implementation audit
+        shell: bash
         run: |
+          set -o pipefail
           mkdir -p artifacts
-          node tools/oasis-pre-main-overall-audit.mjs | tee artifacts/oasis-pre-main-overall-audit.log
+          node tools/oasis-pre-main-overall-audit.mjs 2>&1 | tee artifacts/oasis-pre-main-overall-audit.log
 
       - name: Upload audit artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: oasis-pre-main-overall-audit
