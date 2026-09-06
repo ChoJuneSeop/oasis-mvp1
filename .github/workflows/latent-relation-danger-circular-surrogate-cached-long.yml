@@ -27,27 +27,12 @@ jobs:
           from pathlib import Path
           p=Path('tools/latent-relation-danger-circular-surrogate-control.mjs')
           s=p.read_text()
-          old="""    function shadow(P,idx){
-      const L=P.relationField?.latent;if(!L||!L.byId?.size)return;
-      const retrieved=I.candidates(S,P),noLat=evalIds(P,[]);
-      for(const name of names){
-        const ids=gateIds(name,P,retrieved,idx),out=evalIds(P,ids),st=gateState[name].stats;
-        if(changedSig(out,noLat)){st.decisionDiffs++;if(out.choice!==noLat.choice)st.choiceDiffs++;if(out.leader!==noLat.leader)st.leaderDiffs++;if(out.cands!==noLat.cands)st.candidateDiffs++}
-      }
-    }
-"""
-          new="""    function shadow(P,idx){
-      const L=P.relationField?.latent;if(!L||!L.byId?.size)return;
-      const retrieved=I.candidates(S,P),noLat=evalIds(P,[]),evalCache=new Map([['',noLat]]);
-      for(const name of names){
-        const ids=gateIds(name,P,retrieved,idx),cacheKey=[...ids].sort().join('|'),st=gateState[name].stats;
-        let out=evalCache.get(cacheKey);if(!out){out=evalIds(P,ids);evalCache.set(cacheKey,out)}
-        if(changedSig(out,noLat)){st.decisionDiffs++;if(out.choice!==noLat.choice)st.choiceDiffs++;if(out.leader!==noLat.leader)st.leaderDiffs++;if(out.cands!==noLat.cands)st.candidateDiffs++}
-      }
-    }
-"""
-          if old not in s: raise SystemExit('shadow patch target missing')
-          p.write_text(s.replace(old,new,1))
+          old1="const retrieved=I.candidates(S,P),noLat=evalIds(P,[]);"
+          new1="const retrieved=I.candidates(S,P),noLat=evalIds(P,[]),evalCache=new Map([['',noLat]]);"
+          old2="const ids=gateIds(name,P,retrieved,idx),out=evalIds(P,ids),st=gateState[name].stats;"
+          new2="const ids=gateIds(name,P,retrieved,idx),cacheKey=[...ids].sort().join('|'),st=gateState[name].stats;let out=evalCache.get(cacheKey);if(!out){out=evalIds(P,ids);evalCache.set(cacheKey,out)}"
+          if old1 not in s or old2 not in s: raise SystemExit('cache patch target missing')
+          p.write_text(s.replace(old1,new1,1).replace(old2,new2,1))
           PY
       - name: Run cached 30k equivalence check
         run: node tools/latent-relation-danger-circular-surrogate-control.mjs
@@ -57,18 +42,11 @@ jobs:
           import json, math
           r=json.load(open('latent-relation-danger-circular-surrogate-control-report.json'))
           g=r['gates']; n=r['null']
-          expected={
-            'exactProvenance':(5668,3,3),
-            'completedProcess':(34304,33,28),
-            'lag0':(21388,28,23),
-            'lag1':(21250,33,28),
-            'lag2':(22499,30,25),
-            'lag3':(21510,34,29),
-          }
+          expected={'exactProvenance':(5668,3,3),'completedProcess':(34304,33,28),'lag0':(21388,28,23),'lag1':(21250,33,28),'lag2':(22499,30,25),'lag3':(21510,34,29)}
           assert r['replayMismatch']==0
           assert r['uniqueOffsetTuples']==127
           for k,(entries,dd,cd) in expected.items():
-            assert (g[k]['entries'],g[k]['decisionDiffs'],g[k]['choiceDiffs'])==(entries,dd,cd),(k,g[k])
+              assert (g[k]['entries'],g[k]['decisionDiffs'],g[k]['choiceDiffs'])==(entries,dd,cd),(k,g[k])
           assert n['count']==127 and n['exceedLag3']==1
           assert math.isclose(n['empiricalP'],0.015625,rel_tol=0,abs_tol=1e-15)
           assert math.isclose(n['bonferroniP'],0.0625,rel_tol=0,abs_tol=1e-15)
