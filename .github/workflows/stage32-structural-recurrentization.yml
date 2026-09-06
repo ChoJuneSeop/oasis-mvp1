@@ -1,0 +1,37 @@
+name: Stage32 Structural Re-currentization Diagnostic
+
+on:
+  push:
+    branches: ["mvp3-reality-flow-kill"]
+    paths:
+      - "tools/reality-flow-structural-recurrentization-stage32.mjs"
+      - ".github/workflows/stage32-structural-recurrentization.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stage32:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run Stage32 structural re-currentization kill
+        run: node tools/reality-flow-structural-recurrentization-stage32.mjs
+      - name: Upload Stage32 report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage32-structural-recurrentization-report
+          path: reality-flow-structural-recurrentization-stage32-report.json
+          if-no-files-found: ignore
