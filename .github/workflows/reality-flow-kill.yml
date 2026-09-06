@@ -87,11 +87,13 @@ jobs:
         run: node tools/reality-flow-relational-order-consumption-kill.mjs
       - name: Run Stage 29 v2.2 relation-process conditioned realization diagnostic
         run: node tools/reality-flow-v22-realization-propensity-stage29.mjs
+      - name: Run Stage 30 v2.3 unrealized possibility causal-consumption kill
+        run: node tools/reality-flow-unrealized-possibility-causal-consumption-stage30.mjs
       - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reality-flow-stage2-stage29-v22-reports
+          name: reality-flow-stage2-stage30-v23-reports
           path: |
             reality-flow-mvp2-falsification-report.json
             reality-flow-mvp3-validation-report.json
@@ -125,4 +127,5 @@ jobs:
             reality-flow-time-batched-future-information-report.json
             reality-flow-relational-order-consumption-report.json
             reality-flow-v22-realization-propensity-stage29-report.json
+            reality-flow-unrealized-possibility-stage30-report.json
           if-no-files-found: ignore
