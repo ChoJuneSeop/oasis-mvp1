@@ -69,11 +69,13 @@ jobs:
         run: node tools/reality-flow-structural-anchor-boundary-kill.mjs
       - name: Run Stage 20 post-heterogeneity relational-sequence aliasing kill
         run: node tools/reality-flow-post-heterogeneity-relation-aliasing-kill.mjs
+      - name: Run Stage 21 relational continuation observation validation
+        run: node tools/reality-flow-relational-continuation-observation-validation.mjs
       - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reality-flow-stage2-stage20-reports
+          name: reality-flow-stage2-stage21-reports
           path: |
             reality-flow-mvp2-falsification-report.json
             reality-flow-mvp3-validation-report.json
@@ -98,4 +100,5 @@ jobs:
             reality-flow-structural-crossing-report.json
             reality-flow-structural-anchor-boundary-report.json
             reality-flow-post-heterogeneity-relation-aliasing-report.json
+            reality-flow-relational-continuation-observation-report.json
           if-no-files-found: ignore
