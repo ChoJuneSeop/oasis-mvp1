@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OASIS MVP3 Full-History Flow Topology</title></head>
+<body><div id="boot">OASIS MVP3 full-history topology 불러오는 중…</div>
+<script>
+(async()=>{try{
+  const r=await fetch('./index.html',{cache:'no-store'});if(!r.ok)throw new Error(`index ${r.status}`);let h=await r.text();
+  const legacyLoad="await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='./relation-field.js';s.onload=resolve;s.onerror=()=>reject(new Error('relation-field.js load failed'));document.body.appendChild(s)})";
+  const loadStore="await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='./relation-experience-store-fullhistory.js';s.onload=resolve;s.onerror=()=>reject(new Error('relation-experience-store-fullhistory.js load failed'));document.body.appendChild(s)})";
+  const loadTopology="await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='./reality-flow-topology.js';s.onload=resolve;s.onerror=()=>reject(new Error('reality-flow-topology.js load failed'));document.body.appendChild(s)})";
+  const newLoad=loadStore+';'+loadTopology+";document.title='OASIS MVP3 - Full-History Flow Topology Laboratory';reset();render()";
+  if(!h.includes(legacyLoad))throw new Error('MVP2 loader signature not found');
+  h=h.replace(legacyLoad,newLoad);document.open();document.write(h);document.close();
+}catch(e){const b=document.getElementById('boot');if(b)b.textContent='OASIS MVP3 full-history topology 로딩 실패: '+e;console.error(e)}})();
+</script></body></html>
