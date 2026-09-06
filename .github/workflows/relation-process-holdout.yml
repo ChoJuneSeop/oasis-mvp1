@@ -1,0 +1,33 @@
+name: OASIS Relation Process Holdout Validation
+
+on:
+  push:
+    branches: ["validation/relation-process-holdout"]
+    paths:
+      - "tools/relation-process-novel-action-holdout-test.mjs"
+      - ".github/workflows/relation-process-holdout.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  relation-process-holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Run frozen holdout validation
+        run: node tools/relation-process-novel-action-holdout-test.mjs
+      - name: Upload holdout report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relation-process-novel-action-holdout-report
+          path: relation-process-novel-action-holdout-report.json
+          if-no-files-found: ignore
