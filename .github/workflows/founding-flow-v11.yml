@@ -1,0 +1,65 @@
+name: Founding Flow v11
+
+on:
+  push:
+    branches:
+      - architecture/oasis-unified-validation-system-v1
+    paths:
+      - 'experiments/founding-flow-v11/**'
+      - 'src/validation/founding-flow-v11-ancestors.mjs'
+      - 'tools/founding-flow-v11.mjs'
+      - 'src/validation/founding-flow-v9-ancestors.mjs'
+      - 'src/validation/founding-flow-v3-world.mjs'
+      - 'src/validation/oasis-unified-validation-system.mjs'
+      - 'src/oasis-core.mjs'
+      - 'src/oasis-integrated-core.mjs'
+      - 'src/oasis-reference-core.mjs'
+      - '.github/workflows/founding-flow-v11.yml'
+
+jobs:
+  founding-flow-v11:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Syntax check
+        run: |
+          node --check src/validation/founding-flow-v11-ancestors.mjs
+          node --check tools/founding-flow-v11.mjs
+
+      - name: Pin audited base implementation
+        run: |
+          test "$(git hash-object src/oasis-core.mjs)" = "ab212e6389ad43aeb347e9d7f6a2e018ad43e4bd"
+          test "$(git hash-object src/oasis-integrated-core.mjs)" = "39d50160e0923601cf6b9386ebc4fc7b4f061406"
+          test "$(git hash-object src/oasis-reference-core.mjs)" = "017eb52d5a3ad7777f6562d2ecc147409f7b7a5c"
+          test "$(git hash-object src/validation/founding-flow-v9-ancestors.mjs)" = "1f8b2dadae7eb652a2a1a11f50a2b74333ca9938"
+          test "$(git hash-object src/validation/founding-flow-v11-ancestors.mjs)" = "c8eb6c39d3f73f24a3582ac62f3dec6b0e790467"
+
+      - name: Unified-system contamination boundary audit
+        run: node tools/oasis-unified-validation-system-audit.mjs
+
+      - name: Founding Flow v11 four-axis and C7 audit
+        run: node tools/founding-flow-v11.mjs --audit-only
+
+      - name: Execute Founding Flow v11
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts
+          node tools/founding-flow-v11.mjs 2>&1 | tee artifacts/founding-flow-v11.log
+
+      - name: Upload raw traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: founding-flow-v11-report
+          path: |
+            artifacts/founding-flow-v11.json
+            artifacts/founding-flow-v11.log
+          if-no-files-found: error
