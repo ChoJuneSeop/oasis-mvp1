@@ -1,0 +1,38 @@
+name: OASIS Completed Process Bridge Pilot
+
+on:
+  push:
+    paths:
+      - 'tools/latent-relation-process-bridge-validation.mjs'
+      - '.github/workflows/latent-relation-process-bridge.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run 30k completed-process bridge pilot
+        env:
+          OASIS_PROCESS_BRIDGE_MAX_TICK: 30000
+        run: node tools/latent-relation-process-bridge-validation.mjs
+      - name: Upload process bridge audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-latent-relation-process-bridge-pilot
+          path: |
+            latent-relation-process-bridge-report.json
+            latent-relation-process-bridge-audit.jsonl
+            latent-relation-process-bridge-counterfactual.jsonl
+          if-no-files-found: ignore
