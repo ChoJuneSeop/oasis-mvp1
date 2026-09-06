@@ -1,0 +1,33 @@
+name: OASIS 37 Danger Time-Shift Surrogates
+
+on:
+  push:
+    paths:
+      - 'tools/latent-relation-danger-surrogate-37.mjs'
+      - '.github/workflows/latent-relation-danger-surrogate-37.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run 30k 37-surrogate danger alignment test
+        run: node tools/latent-relation-danger-surrogate-37.mjs
+      - name: Upload 37-surrogate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-danger-surrogate-37
+          path: latent-relation-danger-surrogate-37-report.json
+          if-no-files-found: ignore
