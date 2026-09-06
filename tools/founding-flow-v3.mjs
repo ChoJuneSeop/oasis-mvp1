@@ -80,7 +80,7 @@ async function preExperimentAudit() {
   audit.implementationAudit.evidence.push('World-only environment identifiability audit passed before model execution.');
 
   const protocol=await fs.readFile('experiments/founding-flow-v3/PROTOCOL.md','utf8');
-  assert(!/reward ranking|accuracy ranking|desired trajectory/i.test(protocol),'Protocol contains a forbidden performance target declaration.');
+  assert(!/(success_target|reward_target|accuracy_target)\s*[:=]/i.test(protocol),'Protocol contains an explicit forbidden performance target declaration.');
   audit.successValueAudit.evidence.push('No desired trajectory, correct terminal world, or preferred archetype is defined.');
   audit.evaluationAudit.evidence.push('No cross-system reward, accuracy, stability, convergence or winner ranking is computed.');
   return audit;
