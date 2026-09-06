@@ -31,11 +31,45 @@ function snapshot(P,afterTick=null){
   };
 }
 
+function timeBatches(P,afterTick=null){
+  const byTime=new Map();
+  for(const e of orderedEvents(P,afterTick)){
+    if(!byTime.has(e.t))byTime.set(e.t,[]);
+    byTime.get(e.t).push({npc:e.npc,place:e.place});
+  }
+  return [...byTime.entries()]
+    .sort((a,b)=>a[0]-b[0])
+    .map(([t,events])=>({
+      t,
+      events:[...events].sort((a,b)=>a.npc.localeCompare(b.npc)||a.place.localeCompare(b.place))
+    }));
+}
+
+function batchedSignature(P,afterTick=null){
+  return timeBatches(P,afterTick)
+    .map(batch=>`[${batch.events.map(e=>`${e.npc}@${e.place}`).join('&')}]`)
+    .join('>');
+}
+
+function batchedSnapshot(P,afterTick=null){
+  const batches=timeBatches(P,afterTick);
+  return{
+    afterTick,
+    batches,
+    signature:batches.map(batch=>`[${batch.events.map(e=>`${e.npc}@${e.place}`).join('&')}]`).join('>'),
+    currentRelationalFrontier:batches.at(-1)?.events||[]
+  };
+}
+
 window.OASISRelationContinuation={
   orderedEvents,
   compressedSequence,
   signature,
   snapshot,
-  principle:'observation only: preserve relational event order without granting decision or execution authority'
+  timeBatches,
+  batchedSignature,
+  batchedSnapshot,
+  principle:'observation only: preserve relational event order without granting decision or execution authority',
+  batchedPrinciple:'observation only: preserve order across distinguishable timestamps while treating tied timestamps as unordered relational batches'
 };
 })();
