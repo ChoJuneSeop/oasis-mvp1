@@ -5,6 +5,7 @@ on:
     branches: ["main"]
     paths:
       - "tools/long-horizon-relation-field-adapter-test.mjs"
+      - "tools/relation-window-factorial-long-horizon-test.mjs"
       - "tools/validation-compatibility-guard.mjs"
       - ".github/workflows/long-horizon-relation-adapter.yml"
       - "relation-field.js"
@@ -38,10 +39,14 @@ jobs:
         run: node tools/validation-compatibility-guard.mjs
       - name: Run production relation-field long-horizon adapter
         run: node tools/long-horizon-relation-field-adapter-test.mjs
-      - name: Upload adapter report
+      - name: Run 2x2x2 relation-window factorial attribution
+        run: node tools/relation-window-factorial-long-horizon-test.mjs
+      - name: Upload adapter reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: oasis-long-horizon-relation-adapter-report
-          path: long-horizon-relation-field-adapter-report.json
+          path: |
+            long-horizon-relation-field-adapter-report.json
+            relation-window-factorial-long-horizon-report.json
           if-no-files-found: ignore
