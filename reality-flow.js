@@ -11,7 +11,11 @@ function orientation(from,to){
 }
 
 function ensureFlow(S){
-  if(!S.realityFlow) S.realityFlow={edges:[],lastNonZero:0,observations:0};
+  if(!S.realityFlow) S.realityFlow={edges:[],runs:[],lastNonZero:0,observations:0};
+  if(!Array.isArray(S.realityFlow.edges)) S.realityFlow.edges=[];
+  if(!Array.isArray(S.realityFlow.runs)) S.realityFlow.runs=[];
+  if(!Number.isFinite(S.realityFlow.lastNonZero)) S.realityFlow.lastNonZero=0;
+  if(!Number.isFinite(S.realityFlow.observations)) S.realityFlow.observations=0;
   if(!S.c) S.c={};
   if(!Number.isFinite(S.c.realityFlowObservation)) S.c.realityFlowObservation=0;
   if(!Number.isFinite(S.c.realityFlowRelationActivation)) S.c.realityFlowRelationActivation=0;
@@ -23,13 +27,16 @@ function observe(S,from,to,t=E.tick,source='world'){
   const dir=orientation(from,to);
   F.edges.push({t,source,from,to,dir});
   F.observations++;
-  if(dir!==0) F.lastNonZero=dir;
+  if(dir!==0){
+    if(F.runs.length===0||F.runs[F.runs.length-1]!==dir) F.runs.push(dir);
+    F.lastNonZero=dir;
+  }
   return dir;
 }
 
 function ingestTrace(S,trace,source='test-trace'){
   const F=ensureFlow(S);
-  F.edges=[];F.lastNonZero=0;F.observations=0;
+  F.edges=[];F.runs=[];F.lastNonZero=0;F.observations=0;
   for(let i=1;i<trace.length;i++) observe(S,trace[i-1],trace[i],(E.tick-trace.length+1)+i,source);
   if(trace.length) S.danger=trace[trace.length-1];
   return F.lastNonZero;
@@ -37,6 +44,10 @@ function ingestTrace(S,trace,source='test-trace'){
 
 function currentOrientation(S){
   return ensureFlow(S).lastNonZero||0;
+}
+
+function currentRunStructure(S){
+  return ensureFlow(S).runs.slice();
 }
 
 function annotateEpisodes(S,P){
@@ -68,7 +79,7 @@ function flowHasPair(S,P,a,b){
 
 mkW=function(k){
   const S=rfMkW(k);
-  S.realityFlow={edges:[],lastNonZero:0,observations:0};
+  S.realityFlow={edges:[],runs:[],lastNonZero:0,observations:0};
   Object.assign(S.c,{realityFlowObservation:0,realityFlowRelationActivation:0});
   return S;
 };
@@ -126,6 +137,7 @@ window.OASISRealityFlow={
   observe,
   ingestTrace,
   currentOrientation,
+  currentRunStructure,
   annotateEpisodes,
   flowActiveEpisodes,
   flowRelevantToPlace
