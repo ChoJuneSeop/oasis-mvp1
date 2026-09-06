@@ -1,4 +1,4 @@
-name: OASIS Relational Bridge Reactivation Pilot
+name: OASIS Relational Bridge Reactivation Full Validation
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,15 +22,15 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Guard canonical validation conditions
         run: node tools/validation-compatibility-guard.mjs
-      - name: Run 30k relational bridge pilot
+      - name: Run 120k relational bridge validation
         env:
-          OASIS_BRIDGE_MAX_TICK: 30000
+          OASIS_BRIDGE_MAX_TICK: 120000
         run: node tools/latent-relation-bridge-gate-validation.mjs
       - name: Upload bridge audit
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: oasis-latent-relation-bridge-pilot
+          name: oasis-latent-relation-bridge-full
           path: |
             latent-relation-bridge-report.json
             latent-relation-bridge-audit.jsonl
