@@ -2,7 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 
 const BASE='tools/latent-relation-admission-gate-fast-validation.mjs';
-const TMP='/tmp/oasis-latent-retention-validation.mjs';
+const TMP='tools/.tmp-oasis-latent-retention-validation.mjs';
 let src=await readFile(BASE,'utf8');
 
 src=src
