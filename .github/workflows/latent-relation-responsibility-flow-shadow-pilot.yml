@@ -1,0 +1,33 @@
+name: OASIS Responsibility-Flow Reactivation Pilot
+
+on:
+  push:
+    paths:
+      - 'tools/latent-relation-responsibility-flow-shadow-pilot.mjs'
+      - '.github/workflows/latent-relation-responsibility-flow-shadow-pilot.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run 30k responsibility-flow shadow pilot
+        run: node tools/latent-relation-responsibility-flow-shadow-pilot.mjs
+      - name: Upload responsibility-flow report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-latent-responsibility-flow-shadow-pilot
+          path: latent-relation-responsibility-flow-shadow-pilot-report.json
+          if-no-files-found: ignore
