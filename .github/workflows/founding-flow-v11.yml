@@ -8,6 +8,7 @@ on:
       - 'experiments/founding-flow-v11/**'
       - 'src/validation/founding-flow-v11-ancestors.mjs'
       - 'tools/founding-flow-v11.mjs'
+      - 'tools/founding-flow-v11-role-regression.mjs'
       - 'src/validation/founding-flow-v9-ancestors.mjs'
       - 'src/validation/founding-flow-v3-world.mjs'
       - 'src/validation/oasis-unified-validation-system.mjs'
@@ -32,6 +33,7 @@ jobs:
         run: |
           node --check src/validation/founding-flow-v11-ancestors.mjs
           node --check tools/founding-flow-v11.mjs
+          node --check tools/founding-flow-v11-role-regression.mjs
 
       - name: Pin audited base implementation
         run: |
@@ -39,10 +41,13 @@ jobs:
           test "$(git hash-object src/oasis-integrated-core.mjs)" = "39d50160e0923601cf6b9386ebc4fc7b4f061406"
           test "$(git hash-object src/oasis-reference-core.mjs)" = "017eb52d5a3ad7777f6562d2ecc147409f7b7a5c"
           test "$(git hash-object src/validation/founding-flow-v9-ancestors.mjs)" = "1f8b2dadae7eb652a2a1a11f50a2b74333ca9938"
-          test "$(git hash-object src/validation/founding-flow-v11-ancestors.mjs)" = "c8eb6c39d3f73f24a3582ac62f3dec6b0e790467"
+          test "$(git hash-object src/validation/founding-flow-v11-ancestors.mjs)" = "c5e37d90311572fb4fb4ab096c50dc1243178468"
 
       - name: Unified-system contamination boundary audit
         run: node tools/oasis-unified-validation-system-audit.mjs
+
+      - name: V11 current relation role regression guard
+        run: node tools/founding-flow-v11-role-regression.mjs
 
       - name: Founding Flow v11 four-axis and C7 audit
         run: node tools/founding-flow-v11.mjs --audit-only
