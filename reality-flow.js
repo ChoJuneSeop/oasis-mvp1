@@ -12,6 +12,9 @@ function orientation(from,to){
 
 function ensureFlow(S){
   if(!S.realityFlow) S.realityFlow={edges:[],lastNonZero:0,observations:0};
+  if(!S.c) S.c={};
+  if(!Number.isFinite(S.c.realityFlowObservation)) S.c.realityFlowObservation=0;
+  if(!Number.isFinite(S.c.realityFlowRelationActivation)) S.c.realityFlowRelationActivation=0;
   return S.realityFlow;
 }
 
@@ -71,16 +74,17 @@ mkW=function(k){
 };
 
 tickW=function(S,e){
+  ensureFlow(S);
   const before=S.danger;
   rfTickW(S,e);
   const dir=observe(S,before,S.danger,E.tick,'tick');
-  S.c.realityFlowObservation++;
+  S.c.realityFlowObservation=(S.c.realityFlowObservation||0)+1;
   if(dir!==0&&MODELS[S.key].kind==='oasis'&&MODELS[S.key].rel){
     for(const P of S.parties){
       const active=flowActiveEpisodes(S,P);
       const sig=active.map(ep=>ep.key).sort().join('|');
       if(P._lastRealityFlowActive!==sig){
-        if(sig) S.c.realityFlowRelationActivation++;
+        if(sig) S.c.realityFlowRelationActivation=(S.c.realityFlowRelationActivation||0)+1;
         P._lastRealityFlowActive=sig;
       }
     }
@@ -88,6 +92,7 @@ tickW=function(S,e){
 };
 
 outcome=function(S,P,id){
+  ensureFlow(S);
   rfOutcome(S,P,id);
   annotateEpisodes(S,P);
 };
@@ -113,6 +118,8 @@ hiddenReady=function(S,P,h){
   if(h.links.length) return h.links.every(n=>flowHasPair(S,P,h.npc,n));
   return relationExists(P,h.npc)&&flowActiveEpisodes(S,P).some(ep=>ep.a===h.npc||ep.b===h.npc);
 };
+
+for(const S of Object.values(E?.worlds||{})) ensureFlow(S);
 
 window.OASISRealityFlow={
   orientation,
