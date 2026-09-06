@@ -81,11 +81,13 @@ jobs:
         run: node tools/reality-flow-same-tick-relational-order-aliasing-kill.mjs
       - name: Run Stage 26 time-batched relational observer validation
         run: node tools/reality-flow-time-batched-relational-observer-validation.mjs
+      - name: Run Stage 27 time-batched relational future-information diagnostic
+        run: node tools/reality-flow-time-batched-future-information.mjs
       - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reality-flow-stage2-stage26-reports
+          name: reality-flow-stage2-stage27-reports
           path: |
             reality-flow-mvp2-falsification-report.json
             reality-flow-mvp3-validation-report.json
@@ -116,4 +118,5 @@ jobs:
             reality-flow-relational-continuation-future-information-report.json
             reality-flow-same-tick-relational-order-aliasing-report.json
             reality-flow-time-batched-relational-observer-report.json
+            reality-flow-time-batched-future-information-report.json
           if-no-files-found: ignore
