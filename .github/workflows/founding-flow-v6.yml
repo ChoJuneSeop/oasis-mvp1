@@ -1,0 +1,44 @@
+name: Founding Flow v6
+
+on:
+  push:
+    branches:
+      - architecture/oasis-unified-validation-system-v1
+    paths:
+      - 'experiments/founding-flow-v6/**'
+      - 'src/validation/founding-flow-v5-ancestors.mjs'
+      - 'src/validation/founding-flow-v4-ancestors.mjs'
+      - 'src/oasis-core.mjs'
+      - 'src/oasis-integrated-core.mjs'
+      - 'src/oasis-reference-core.mjs'
+      - 'tools/founding-flow-v6.mjs'
+      - '.github/workflows/founding-flow-v6.yml'
+
+jobs:
+  founding-flow-v6:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check
+        run: |
+          node --check src/validation/founding-flow-v5-ancestors.mjs
+          node --check tools/founding-flow-v6.mjs
+      - name: Unified-system contamination boundary audit
+        run: node tools/oasis-unified-validation-system-audit.mjs
+      - name: Execute C4 necessity audit
+        run: |
+          mkdir -p artifacts
+          node tools/founding-flow-v6.mjs | tee artifacts/founding-flow-v6.log
+      - name: Upload audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: founding-flow-v6-report
+          path: |
+            artifacts/founding-flow-v6.json
+            artifacts/founding-flow-v6.log
+          if-no-files-found: error
