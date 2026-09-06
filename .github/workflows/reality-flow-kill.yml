@@ -77,11 +77,13 @@ jobs:
         run: node tools/reality-flow-relational-continuation-downstream-diagnostic.mjs
       - name: Run Stage 24 relational continuation future-information diagnostic
         run: node tools/reality-flow-relational-continuation-future-information.mjs
+      - name: Run Stage 25 same-tick relational order aliasing kill
+        run: node tools/reality-flow-same-tick-relational-order-aliasing-kill.mjs
       - name: Upload Reality Flow reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reality-flow-stage2-stage24-reports
+          name: reality-flow-stage2-stage25-reports
           path: |
             reality-flow-mvp2-falsification-report.json
             reality-flow-mvp3-validation-report.json
@@ -110,4 +112,5 @@ jobs:
             reality-flow-relational-continuation-flow-anchor-report.json
             reality-flow-relational-continuation-downstream-diagnostic-report.json
             reality-flow-relational-continuation-future-information-report.json
+            reality-flow-same-tick-relational-order-aliasing-report.json
           if-no-files-found: ignore
