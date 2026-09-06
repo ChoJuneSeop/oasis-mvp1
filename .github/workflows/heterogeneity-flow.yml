@@ -1,0 +1,39 @@
+name: OASIS Heterogeneity Flow Validation
+
+on:
+  push:
+    branches: ["validation/heterogeneity-flow"]
+    paths:
+      - "tools/heterogeneity-flow-test.mjs"
+      - "relation-field.js"
+      - "index.html"
+      - ".github/workflows/heterogeneity-flow.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  heterogeneity-flow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run post-hoc heterogeneity flow validation
+        run: node tools/heterogeneity-flow-test.mjs
+      - name: Upload heterogeneity flow report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: heterogeneity-flow-report
+          path: heterogeneity-flow-report.json
+          if-no-files-found: ignore
