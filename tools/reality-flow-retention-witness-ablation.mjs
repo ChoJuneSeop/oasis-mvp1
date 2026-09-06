@@ -83,7 +83,7 @@ try{
     const checks={
       controlFullyFunctional:full.activeCount===2&&full.ruinAuthorized&&full.ruinCandidate&&full.marketRelevant&&full.linkedHiddenReady,
       topologyKeyRequiredForReactivation:noTopologyKey.activeCount===0&&!noTopologyKey.ruinAuthorized&&!noTopologyKey.linkedHiddenReady,
-      endpointsRequiredForGatedAuthority:noEndpoints.activeCount===2&&!noEndpoints.ruinAuthorized&&!noEndpoints.ruinRelevant,
+      endpointsRequiredForGatedExecutionAuthority:noEndpoints.activeCount===2&&!noEndpoints.ruinAuthorized&&!noEndpoints.ruinCandidate&&noEndpoints.ruinRelevant,
       pairKeyRequiredForLinkedHiddenRelation:noPairKey.activeCount===2&&noPairKey.ruinAuthorized&&!noPairKey.linkedHiddenReady,
       placesRequiredForPublicPlaceRelation:noPlaces.activeCount===2&&noPlaces.ruinAuthorized&&!noPlaces.marketRelevant,
       temporalProvenanceNotUsedAfterAnnotation:noTemporalProvenance.activeCount===2&&noTemporalProvenance.ruinAuthorized&&noTemporalProvenance.marketRelevant&&noTemporalProvenance.linkedHiddenReady,
@@ -93,7 +93,7 @@ try{
     E=originalE;
     return{
       question:'After an episode has already been assigned a qualitative Reality Flow topology key, which stored relation fields are causally required for later reactivation in the current MVP3 mechanisms?',
-      scope:'Post-annotation retention-witness ablation only. This does not prove a globally minimal memory representation, and it does not authorize deleting provenance needed for audit, reconstruction, re-annotation, or mechanisms not exercised here.',
+      scope:'Post-annotation retention-witness ablation only. Relevance and execution authority are evaluated separately. This does not prove a globally minimal memory representation, and it does not authorize deleting provenance needed for audit, reconstruction, re-annotation, or mechanisms not exercised here.',
       priorArtBoundary:'Memory consolidation/compression and graph/episodic representations are established prior art. The experiment tests which fields the present OASIS implementation actually consumes for delayed relation reactivation.',
       cases:{full,noTopologyKey,noEndpoints,noPairKey,noPlaces,noTemporalProvenance,noRawRuns},
       checks,
