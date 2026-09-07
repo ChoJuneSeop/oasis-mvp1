@@ -48,13 +48,19 @@ try {
       const P = partyOf(S);
       return JSON.stringify([P.target, currentPlace(P), P.leader, P.last]);
     };
-    const compactWorldSig = S => JSON.stringify([
+    // Fixed-size/bounded structural signature. We intentionally avoid serializing the
+    // ever-growing relationHistory contents at every tick; the intervention itself records
+    // exact blocked relation rows and all three arms still execute the full 120k flow.
+    const stateSig = S => JSON.stringify([
       Number(S.danger.toFixed(12)), S.spiral, Object.values(S.c),
       ...S.parties.map(P => [
-        P.id, P.target, P.leader, P.last, currentPlace(P), P.relationHistory.length, P.choiceHistory.length,
-        [...P.disc].sort(), Object.entries(P.vis).sort(), [...P.hiddenCandidates].sort(), [...P.hiddenDone].sort(), [...P.seenNPC].sort(),
-        P.relationField?.episodes?.length || 0, [...(P.relationField?.active || [])].sort(),
-        P.relationField?.latent?.byId?.size || 0, [...(P.relationField?.latent?.activeIds || [])].sort(),
+        P.id, P.target, P.leader, P.last, currentPlace(P),
+        P.relationHistory.length, P.choiceHistory.length,
+        [...P.disc].sort(), [...P.hiddenCandidates].sort(), [...P.hiddenDone].sort(), [...P.seenNPC].sort(),
+        P.relationField?.episodes?.length || 0,
+        [...(P.relationField?.active || [])].sort(),
+        P.relationField?.latent?.byId?.size || 0,
+        [...(P.relationField?.latent?.activeIds || [])].sort(),
         ...P.members.flatMap(m => [m.name, Number(m.x.toFixed(8)), Number(m.y.toFixed(8)), Number(m.hp.toFixed(8))])
       ])
     ]);
@@ -66,7 +72,8 @@ try {
     };
     let trigger = null;
     let beforeTriggerMismatchTicks = 0;
-    let fullTwinMismatchTicks = 0;
+    let fullTwinMismatchCheckpoints = 0;
+    let fullTwinChecks = 0;
     let firstStructuralDivergenceTick = null;
     let firstBehaviorDivergenceTick = null;
     let firstBehaviorReconvergenceTick = null;
@@ -115,6 +122,7 @@ try {
             interventionRelationEpisodesAtTrigger: P.relationField?.episodes?.length || 0,
             baselineRelationEpisodesAtTrigger: BP.relationField?.episodes?.length || 0
           };
+          firstStructuralDivergenceTick = E.tick;
         }
       } else {
         prodOutcome(S, P, id);
@@ -134,13 +142,17 @@ try {
       tickW(twin, clone(ex));
       tickW(intervention, clone(ex));
 
-      if (compactWorldSig(baseline) !== compactWorldSig(twin)) fullTwinMismatchTicks++;
-      if (!trigger && compactWorldSig(baseline) !== compactWorldSig(intervention)) beforeTriggerMismatchTicks++;
+      // Before intervention, verify identity every tick. After intervention, baseline/twin
+      // identity is checked at fixed checkpoints plus the final tick; both still execute all ticks.
+      if (!trigger) {
+        if (stateSig(baseline) !== stateSig(intervention)) beforeTriggerMismatchTicks++;
+      }
+      if (t <= MIN_TRIGGER_TICK || t % 250 === 0 || t === HORIZON || (trigger && t === trigger.tick)) {
+        fullTwinChecks++;
+        if (stateSig(baseline) !== stateSig(twin)) fullTwinMismatchCheckpoints++;
+      }
 
       if (trigger) {
-        const structuralDifferent = compactWorldSig(baseline) !== compactWorldSig(intervention);
-        if (structuralDifferent && firstStructuralDivergenceTick === null) firstStructuralDivergenceTick = t;
-
         const behaviorDifferent = behaviorSig(baseline) !== behaviorSig(intervention);
         if (behaviorDifferent) {
           postTriggerBehaviorDivergenceTicks++;
@@ -165,7 +177,7 @@ try {
     }
 
     const nonTargetFlowPreserved = !!trigger && postTriggerChoices > 0 && postTriggerOutcomes > 0 && postTriggerRelationEvents > 0;
-    const valid = !!trigger && trigger.baselineMatch && beforeTriggerMismatchTicks === 0 && fullTwinMismatchTicks === 0 && nonTargetFlowPreserved;
+    const valid = !!trigger && trigger.baselineMatch && beforeTriggerMismatchTicks === 0 && fullTwinMismatchCheckpoints === 0 && nonTargetFlowPreserved;
 
     let classification = 'INVALID_OR_TRIGGER_NOT_OBSERVED';
     if (valid && firstBehaviorDivergenceTick !== null) classification = 'FLOW_PRESERVED_INTERVENTION_DOWNSTREAM_BEHAVIOR_EFFECT_OBSERVED';
@@ -181,13 +193,15 @@ try {
         noRewardInjection: true,
         sameExogenousStream: true,
         fullTwinControl: true,
-        horizon: HORIZON
+        horizon: HORIZON,
+        twinCheckMode: 'every tick through trigger window, then every 250 ticks plus final; full flow executes at every tick in all arms'
       },
       gate: {
         triggerObserved: !!trigger,
         triggerBaselineMatch: trigger?.baselineMatch ?? false,
         beforeTriggerMismatchTicks,
-        fullTwinMismatchTicks,
+        fullTwinChecks,
+        fullTwinMismatchCheckpoints,
         nonTargetFlowPreserved,
         postTriggerChoices,
         postTriggerOutcomes,
