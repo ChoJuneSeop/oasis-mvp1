@@ -10,6 +10,7 @@ on:
       - "tools/causal-trace-ledger-v2-safe.mjs"
       - "tools/causal-trace-ledger-v3.mjs"
       - "tools/h1-structural-incorporation-v3.mjs"
+      - "tools/h2-integrated-structure-v3.mjs"
       - "tools/validation-compatibility-guard.mjs"
       - "OASIS_RESEARCH_PROTOCOL.md"
       - "docs/OASIS_CAUSAL_RESEARCH_SYSTEM_v3.0_ko.md"
@@ -47,8 +48,10 @@ jobs:
         run: node tools/latent-relation-store-validation.mjs
       - name: Assemble scale-safe inherited v2 causal traces
         run: node tools/causal-trace-ledger-v2-safe.mjs
-      - name: Analyze H1 structural incorporation genealogy
+      - name: Analyze H1 exact structural incorporation genealogy
         run: node tools/h1-structural-incorporation-v3.mjs
+      - name: Analyze H2 integrated downstream structural genealogy
+        run: node tools/h2-integrated-structure-v3.mjs
       - name: Assemble v3 behavioral causal evidence
         run: node tools/causal-trace-ledger-v3.mjs
       - name: Upload causal v3 research artifacts
@@ -63,5 +66,6 @@ jobs:
             causal-trace-ledger-v2-report.json
             causal-v2-traces.jsonl
             h1-structural-incorporation-v3-report.json
+            h2-integrated-structure-v3-report.json
             causal-trace-ledger-v3-report.json
           if-no-files-found: ignore
