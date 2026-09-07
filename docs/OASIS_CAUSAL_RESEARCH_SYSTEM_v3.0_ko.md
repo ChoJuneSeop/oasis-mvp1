@@ -14,6 +14,7 @@ v3.0의 변경점은 다음을 공식 실험구조에 통합한 것이다.
 - 자기개입 / Self-Intervention
 - 선택축과 책임축 / Choice Axis and Responsibility Axis
 - 개성 / Individual Disposition
+- 행동 결정 관계 후보군 / Behavioral Decision Relational Candidate Set
 - 실험자 비개입 / No Experimenter Intervention
 - 초기 개성과 장기 행동경향의 분리 관찰 / Separation of Initial Disposition Prior and Longitudinal Observed Disposition Pattern
 - 다중 OASIS 장기 비교 / Multi-OASIS Longitudinal Comparison
@@ -108,15 +109,33 @@ OASIS는 인과를 `원인 A → 결과 B`의 단일 연결로 한정하지 않�
 
 자기개입, 선택축, 책임축은 인과율 자체와 동일하지 않으며 핵심 4축을 대체하지 않는다.
 
-## 7. 개성의 연구상 위치 / Research Position of Individual Disposition
+## 7. 행동결정 구조에서 개성의 위치 / Position of Individual Disposition in Behavioral Decision Structure
 
-1차 핵심 인과연구는 개성을 필수 초기값으로 넣지 않은 기존 OASIS 조건에서 먼저 수행한다.
+v3.0은 개성 / Individual Disposition을 OASIS 행동결정 구조에서 사용할 수 있는 공식 초기조건 / Formal Behavioral Initial Condition으로 둔다.
 
-1차 조건에서 충분한 구조적 성과가 관측되지 않거나 가능성 탐색과 선택이 사실상 정지하여 핵심구조를 충분히 시험하기 어려운 경우, 별도 2차 조건으로 개성 / Individual Disposition을 사용할 수 있다.
+개성은 **AI에게 허용된 최소값 / Minimum Permitted AI Prior**으로 정의한다.
 
-이때 개성은 **AI에게 허용된 최소값 / Minimum Permitted AI Prior**으로 정의한다.
+행동결정 관점의 연구구조는 다음과 같이 둔다.
 
-이는 특정 결과나 행동을 강제하는 값이 아니라 완전한 무규정 상태에서 가능성 탐색과 선택이 시작될 수 있도록 허용하는 최소 초기조건이다.
+과거 관계구조 / Past Relational Structure
++ 현재 현실 / Current Reality
++ 개성 / Individual Disposition (Initial Condition)
+→ 행동 결정 관계 후보군 / Behavioral Decision Relational Candidate Set
+→ 가능성 조합 / Possibility Composition
+→ 참여상태·선택축·책임축·현실 제약 / Participation, Choice, Responsibility, and Reality Constraints
+→ 단일 행동 현실화 / Single Behavioral Realization
+
+개성은 동일하거나 유사한 현실조건에서도 어떤 관계와 가능성에 먼저 주목하고 탐색할 것인지에 차이를 만들 수 있는 초기조건으로 연구한다.
+
+그러나 개성 자체가 특정 행동을 직접 결정한다고 가정하지 않는다.
+
+행동 결정 관계 후보군의 형성 역시 특정 행동 현실화의 충분조건으로 보지 않는다. 가능성 조합, 참여상태, 선택, 책임 및 현재 현실의 제약조건이 함께 필요하다.
+
+또한 개성이 OASIS 행동결정의 필요조건인지 여부는 현재 확정하지 않는다. 이는 실험으로 판단할 문제다.
+
+따라서 1차 핵심 인과실험에서는 개성 초기조건을 `NONE`으로 둔 대조조건을 먼저 사용할 수 있다. 이는 개성이 OASIS의 공식 행동결정 초기조건이라는 정의를 폐기하는 것이 아니라, 개성의 필요성과 효과를 분리 검증하기 위한 연구상 대조조건이다.
+
+1차 조건에서 충분한 구조적 성과가 관측되지 않거나 가능성 탐색과 선택이 사실상 정지하여 핵심구조를 충분히 시험하기 어려운 경우, 별도 2차 조건에서 최소 개성 초기값을 부여해 재실험할 수 있다.
 
 개성을 고정 성격, 영구 상수, 결과 결정값으로 확정하지 않는다.
 
@@ -194,6 +213,8 @@ OASIS 인과연구는 인과율 / Causal Rate이 반드시 하나의 특정 상�
 - 자기개입이 항상 더 좋은 결과를 만든다는 주장
 - 강한 의지일수록 인과율이 크다는 주장
 - 개성을 고정된 결과 결정값으로 해석하는 것
+- 개성이 필요조건 또는 충분조건이라고 실험 전에 확정하는 것
+- 행동 결정 관계 후보군 자체를 행동 현실화의 충분조건으로 해석하는 것
 - 개성 조건의 2차 성공을 1차 실험 성공으로 소급하는 것
 - 실험자 중간개입이 있는 run을 자율적 변화 증거로 사용하는 것
 
@@ -204,6 +225,7 @@ OASIS 인과연구는 인과율 / Causal Rate이 반드시 하나의 특정 상�
 → H2 새로운 과거 관계구조와 이후 현실관계 검증
 → H3 자연적 재출현 검증
 → H4 장기 지속 제한 탐색
+→ 개성 `NONE` 대조조건과 최소 개성 조건의 필요성·효과 비교
 → 필요 시 최소 개성 조건 재실험
 → 다중 OASIS 장기 비교
 → 반복·반증
@@ -212,7 +234,7 @@ OASIS 인과연구는 인과율 / Causal Rate이 반드시 하나의 특정 상�
 
 ## 15. 현장 적용 / Deployment Position
 
-개성이 실제 구현에서 필요하다고 판단되는 경우, 개성은 AI에게 허용되는 최소 초기조건으로 취급한다.
+개성은 OASIS 행동결정 구조에서 사용할 수 있는 최소 초기조건으로 둔다.
 
 제품·서비스 단계에서는 이 초기 개성을 사용자 또는 고객이 커스터마이징할 수 있는 고객 맞춤형 구성으로 제공할 수 있다.
 
@@ -223,6 +245,8 @@ OASIS 인과연구는 인과율 / Causal Rate이 반드시 하나의 특정 상�
 OASIS 인과연구는 원인이 하나의 결과를 얼마나 변화시키는지를 측정하는 데서 끝나지 않는다.
 
 원인 개입에 의해 현실화된 경험이 기존 과거 관계구조에 편입되고, 그 결과 새로운 과거 관계구조가 형성되며, 그 새로운 과거 관계구조 전체가 이후 현실과 관계하면서 새로운 관계구조와 가능성 조합을 형성하는 연속적 과정을 연구한다.
+
+행동결정 관점에서는 과거 관계구조, 현재 현실, 그리고 공식 초기조건으로서의 개성이 행동 결정 관계 후보군과 가능성 탐색에 참여할 수 있는지를 연구한다. 그러나 개성이나 행동 결정 관계 후보군 어느 하나도 특정 행동 현실화의 충분조건으로 두지 않는다.
 
 이 과정에서 자기개입과 서로 다른 초기 개성이 가능성 탐색과 선택에 어떤 조건을 제공하는지, 그 초기조건을 가진 OASIS가 실험자 개입 없이 장기 현실흐름 속에서 어떻게 서로 다른 행동경향과 과거 관계구조를 형성하는지 함께 관찰할 수 있다.
 
