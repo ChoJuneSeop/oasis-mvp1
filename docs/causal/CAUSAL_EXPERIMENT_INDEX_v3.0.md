@@ -1,12 +1,13 @@
 # OASIS Causal Research Experiment Index v3.0
 
-상태 / Status: current experiment sequence
-기준일 / Date: 2026-09-07
-상위 기준 / Governing protocol: `../../OASIS_RESEARCH_PROTOCOL.md`
-정의 기준 / Canonical semantics: `../OASIS_CAUSAL_RESEARCH_SYSTEM_v3.0_ko.md`
-구현 기준 / Implementation specification: `CAUSAL_RESEARCH_SYSTEM_SPEC_v3.0.md`
-증거 기준 / Evidence ledger: `CAUSAL_EVIDENCE_LEDGER_v3.0.md`
-Predecessor sequence: `CAUSAL_EXPERIMENT_INDEX_v2.0.md`
+상태 / Status: current experiment sequence  
+기준일 / Date: 2026-09-07  
+상위 기준 / Governing protocol: `../../OASIS_RESEARCH_PROTOCOL.md`  
+정의 기준 / Canonical semantics: `../OASIS_CAUSAL_RESEARCH_SYSTEM_v3.0_ko.md`  
+구현 기준 / Implementation specification: `CAUSAL_RESEARCH_SYSTEM_SPEC_v3.0.md`  
+증거 기준 / Evidence ledger: `CAUSAL_EVIDENCE_LEDGER_v3.0.md`  
+EX-04P 상세 증거 / Disposition evidence: `EX04P_DISPOSITION_EVIDENCE_v3.0.md`  
+Predecessor sequence: `CAUSAL_EXPERIMENT_INDEX_v2.0.md`  
 Legacy comparator sequence: `CAUSAL_EXPERIMENT_INDEX_v1.2.md`
 
 ## EX-00 — 내부 선행연구 확인 / Internal Prior-Work Gate
@@ -41,7 +42,7 @@ Status: REQUIRED BEFORE NEW RUNS
 - 후보군은 인연필드 전체가 아니며 특정 행동의 충분조건도 아니다.
 
 ## EX-00H — H0 행동결정 참여 검증 / H0 Behavioral Decision Participation Test
-Status: FIRST BEHAVIORAL GATE
+Status: DIRECT NATIVE RELATIONAL-CANDIDATE TRACE PARTIALLY SUPPORTED; OPEN COMPONENTS REMAIN
 Hypothesis: H0
 
 질문:
@@ -83,17 +84,11 @@ Hypothesis: H0
 개성 또는 행동 결정 관계 후보군 어느 하나도 특정 행동 현실화의 충분조건으로 판정하지 않는다.
 
 ## EX-01 — 현실화와 과거 관계구조 편입 / Realization and Past-Structure Incorporation
-Status: AFTER EX-00H
+Status: SUPPORTED WITHIN CANONICAL HARNESS FOR EXACT STRUCTURAL LINEAGE
 Hypothesis: H1
 
 질문:
 원인 개입에 의해 현실화된 경험이 기존 과거 관계구조의 실제 구성요소로 편입되어 새로운 과거 관계구조 형성에 참여하는가?
-
-설계:
-- 가능한 한 동일한 초기 과거 관계구조와 현재 현실
-- 하나의 정의된 원인 개입만 다르게 설정
-- 실제 현실화 기록
-- 구현 필드 증가와 구조적 편입 구별
 
 필수 관찰:
 1. realized event
@@ -105,7 +100,7 @@ Hypothesis: H1
 - 단순 저장량 증가만으로 H1 SUPPORTED 판정
 
 ## EX-02 — 새로운 과거 관계구조와 이후 현실관계 / New Past Structure and Subsequent Reality Relation
-Status: AFTER EX-01
+Status: PARTIALLY SUPPORTED; WHOLE-PAST-RELATIONAL-STRUCTURE CLAIM REMAINS OPEN
 Hypothesis: H2
 
 질문:
@@ -117,16 +112,8 @@ Hypothesis: H2
 - 이미 달라진 현실을 강제로 동일상태로 복원하지 않음
 - 과거 구조 변화와 이후 현실관계를 하나의 연속과정으로 추적
 
-필수 관찰:
-- 전체 과거 관계구조의 구성 차이
-- 이후 현실과의 관계과정
-- 가능성 조합
-- 참여상태
-- 새로운 관계 형성
-- 후속 현실화
-
 ## EX-03 — 인연의 자연적 재출현 / Natural Relational Reappearance
-Status: AFTER EX-02
+Status: IMPLEMENTATION OBSERVED / CAUSAL GENERALIZATION OPEN
 Hypothesis: H3
 
 질문:
@@ -139,31 +126,12 @@ Hypothesis: H3
 - 미래정보 사용 금지
 - 미실현 가능성을 인연으로 취급하지 않음
 
-필수 관찰:
-- non-participating interval
-- subsequent reactivation
-- reactivation reason/context
-- renewed participation
-- repeated reappearance if observed
-
 ## EX-04 — 인연 지속 제한 장기탐색 / Long-Horizon Relational Persistence-Limit Inquiry
-Status: AFTER EX-03
+Status: OPEN_INQUIRY
 Hypothesis: H4
 
 질문:
 과거 관계가 이후 현실과 다시 관계할 가능성에 관찰 가능한 시간적 또는 구조적 제한이 존재하는가?
-
-설계:
-- 충분히 긴 현실흐름
-- 시간경과와 구조변화 조건을 가능한 한 구분
-- 재출현 간격과 반복 재출현 기록
-
-필수 관찰:
-- reappearance gaps
-- repeated reappearance counts
-- long non-participating intervals
-- context/structure at reappearance
-- not-reobserved-within-horizon cases
 
 금지:
 - 미재출현 = 소멸
@@ -171,62 +139,164 @@ Hypothesis: H4
 
 기본 판정:
 - `OPEN_INQUIRY`
+- 관찰기간 미재출현은 `NOT_REOBSERVED_WITHIN_HORIZON`
 
 ## EX-04P — 개성 초기조건 비교 / Disposition Initial-Condition Comparison
-Status: CONTROL + FOLLOW-UP
+Status: INITIAL-CONDITION QUESTION MATERIALLY ANSWERED WITHIN CURRENT HARNESS; FULL DISPOSITION CONSTRUCT REMAINS OPEN
 
 목적:
-- 개성이 공식 초기조건이라는 구조와 별개로, 실제 행동결정의 필요조건인지 여부를 검증한다.
+- 개성이 공식 초기조건이라는 구조와 별개로 실제 행동결정의 필요조건인지 검증한다.
 - `NONE` 대조조건과 최소 개성 초기값 조건을 분리 비교한다.
+- 최소 개성 초기조건의 효과가 관계 identity에 조건화된 것인지 일반 tie-breaker와 분리한다.
+- 조건부 참여가 이후 현실화 경험 및 과거 관계구조의 장기 차이로 이어질 수 있는지 검증한다.
 
-조건 A — NONE 대조조건:
-- `initialDispositionPrior = NONE`
-- H0 및 H1~H4 관련 구조가 개성값 없이도 작동하는지 관찰
-- 행동 결정 관계 후보군, 가능성 탐색과 선택이 정지하는지 여부 기록
+공통 판정원칙:
+- NONE 조건과 최소 개성 조건을 분리 보고한다.
+- 초기 개성값은 run 시작 후 변경하지 않는다.
+- 특정 결과·보상·목표값을 개성 prior에 직접 넣지 않는다.
+- 개성의 효과가 관찰되어도 특정 행동의 단독 원인 또는 충분조건으로 판정하지 않는다.
+- 초기 prior와 장기 관찰된 행동경향을 동일시하지 않는다.
+- 동일 현실화 = 동일한 인과과정으로 해석하지 않는다.
 
-조건 B — 최소 개성 초기값 조건:
-- 개성 / Individual Disposition을 `Minimum Permitted AI Prior`로 부여
-- 특정 결과나 행동을 강제하지 않음
-- 가능한 한 조건 A와 동일한 환경·관측조건 유지
-- 초기 개성값 명시
-- 실험 시작 이후 초기 개성값 변경 금지
+### EX-04P-A — Minimum Disposition Initial-Condition Comparison
+Status: COMPLETED / EXPLORATORY POSITIVE EFFECT + NEGATIVE NECESSITY RESULT
 
-필수 추가 기록:
-1. `initialDispositionPrior`
-2. `behavioralDecisionRelationalCandidateSetTrace`
-3. `possibilityCompositionTrace`
-4. `selfInterventionTrace`
-5. `choiceResponsibilityTrace`
-6. `realizationTrace`
-7. `pastRelationalStructureChangeTrace`
-8. `observedDispositionPatternTrace`
-9. `experimenterInterventionCount`
+Workflow run id: `34119083697`  
+Head commit: `9813aa439647320c6bbc08e6bd9becb73d123b80`
 
-판정원칙:
-- NONE 조건과 최소 개성 조건 결과를 분리 보고
-- 최소 개성 조건의 성공을 NONE 조건의 성공으로 소급하지 않음
-- 개성 조건에서만 구조가 활성화되더라도 즉시 보편적 필요조건으로 일반화하지 않음
-- 초기값과 이후 행동경향 차이를 내부 개성 파라미터 학습으로 자동 해석하지 않음
-- 개성이 행동 결정 관계 후보군 또는 가능성 탐색과 차이를 보이더라도 특정 행동의 단독 원인으로 자동 판정하지 않음
+설계:
+- `NONE` vs fixed minimum relational-context attention prior
+- 120,000 ticks
+- top-vote tie + relational context에서만 prior 적용
+- candidate membership 변경 금지
+- deterministic twin per condition
 
-연구해석:
-- 개성 조건에서만 구조가 반복적으로 활성화된다면 개성이 OASIS 행동결정에 필요한 최소 초기조건일 가능성을 후속 검증한다.
-- NONE 조건에서도 구조가 충분히 작동한다면 개성은 필요조건이 아니라 행동결정의 방향과 다양성에 영향을 줄 수 있는 초기조건으로 해석할 가능성을 검토한다.
-- 어느 결론도 사전에 확정하지 않는다.
+핵심결과:
+- NONE decisions/outcomes: **1,997 / 1,997**
+- eligible relational-context top ties: **11**
+- same-current shadow choice changes: **4**
+- first longitudinal divergence: **tick 1,439**
+- NONE vs PRIOR choice-distribution TV distance: **0.21125765955666664**
+- twin mismatch: **0**
+- `experimenterInterventionCount = 0`
+
+판정:
+- minimum prior는 현재 harness에서 행동/현실화의 필요조건이 아님.
+- 일부 동일현재 선택효과는 관찰되었으나 relation-identity specificity와 일반 deterministic tie-breaking을 완전히 분리하지 못했으므로 탐색증거로 보존.
+
+### EX-04P-B — Relational-Support Specificity Gate
+Status: COMPLETED / INCONCLUSIVE DUE TO ZERO ELIGIBLE NATURAL MOMENTS
+
+Workflow run id: `34120121323`  
+Head commit: `79edf25800f5a5aa97bb751720219be23db5009d`
+
+설계:
+- canonical NONE 120,000-tick trajectory에 대한 shadow-only 분석
+- relational-support prior vs candidate-only placebo vs support-identity permutation
+- 모든 최상위 동률 가능성이 비어 있지 않고 서로 다른 direct relational support를 가져야 eligible
+
+결과:
+- decision evaluations: **1,997**
+- top-vote ties: **11**
+- eligible distinct-direct-support ties: **0**
+- twin mismatch: **0**
+- `experimenterInterventionCount = 0`
+
+판정:
+- `INCONCLUSIVE_NO_ELIGIBLE_DISTINCT_SUPPORT_TIES`
+- 자연 canonical trajectory에서 해당 검증조건의 빈도는 미확정.
+
+### EX-04P-C — Matched Initial-Condition Relational-Support Specificity Battery
+Status: COMPLETED / OPERATIONAL SPECIFICITY SUPPORTED UNDER MATCHED ELIGIBLE CONDITIONS
+
+Workflow run id: `34121040185`  
+Head commit: `ac81c834264544811520ac42320fc33f9562b395`
+
+사전 factorial axes:
+- party
+- current public place
+- danger `0.00–0.70`, step `0.01`
+- distinct target/support pair
+
+Past Relational Structure는 각 scenario의 판단 시작 전에만 구성하고, 시작 후 개입하지 않는다.
+
+결과:
+- evaluated: **76,680 / 76,680**
+- top-vote ties: **6,348**
+- eligible distinct-support scenarios: **4,809**
+- relational vs placebo choice disagreements: **2,455 / 4,809**
+- support-identity permutation choice changes: **4,797 / 4,809**
+- candidate membership changes: **0**
+- `experimenterInterventionCount = 0`
+
+판정:
+- 관계 identity에 조건화된 최소 attention prior의 구현 가능성과 candidate-only placebo와의 특이성 분리를 지지한다.
+- prior가 support identity를 입력으로 사용하도록 사전 정의되었으므로 이 결과 자체를 자연 개성의 발견 또는 장기 인과효과로 해석하지 않는다.
+
+### EX-04P-D — Longitudinal Relational-Disposition Matched Branch Test
+Status: COMPLETED / CONDITIONAL LONGITUDINAL CONTRIBUTION OBSERVED
+
+Workflow run id: `34121565845`  
+Head commit: `be0c7b8d019d7faa90a85c0bd6b6310929498ea7`
+
+사전 선택규칙:
+- EX-04P-C와 동일한 lexicographic factorial order에서 eligibility만으로 각 party의 첫 2개 eligible configuration 선택
+- 총 6개 scenario
+- outcome을 보고 scenario를 선택하지 않음
+
+조건:
+- `NONE`
+- `RELATIONAL`
+- `PLACEBO`
+- `SUPPORT_PERMUTED`
+- 각 조건 deterministic twin
+- horizon **12,000 ticks**
+
+결과:
+- completed: **6/6**
+- initial RELATIONAL vs PLACEBO choice differences: **0/6**
+- RELATIONAL vs PLACEBO longitudinal divergence: **3/6**
+- final Past Relational Structure difference RELATIONAL vs PLACEBO: **3/6**
+- choice-distribution difference RELATIONAL vs PLACEBO: **3/6**
+- total twin mismatch ticks: **0**
+- `experimenterInterventionCount = 0`
+
+특이성 음성대조:
+- 양성 scenario 1, 3, 5: RELATIONAL prior가 각 **4회** 실제 적용되었고 장기분기 및 최종 과거 관계구조 차이가 관찰됨.
+- 음성 scenario 2, 4, 6: RELATIONAL prior applied decisions가 **0**이고 12,000 ticks 동안 분기, 선택분포 차이, 과거 관계구조 차이가 모두 **0**.
+
+판정:
+- 본 최소 relation-conditioned attention operationalization은 matched canonical harness에서 **조건부 장기 인과기여**를 가질 수 있음.
+- 효과는 prior가 실제 판단조건에 참여할 수 있을 때만 관찰되었음.
+- necessity: **NOT NECESSARY WITHIN CURRENT HARNESS**
+- sufficiency: **NOT ESTABLISHED**
+- natural prevalence/generalization: **OPEN**
+- full theoretical Individual Disposition: **PARTIALLY VALIDATED / OPEN COMPONENTS REMAIN**
+
+### EX-04P-DL — Longitudinal Relational-Disposition Lineage Replay
+Status: RUNNING / FINAL GENEALOGY GATE
+
+목적:
+- EX-04P-D의 장기분기만 보고 인과기여를 추론하지 않는다.
+- RELATIONAL과 PLACEBO가 동일한 직전 party-state를 가진 판단에서 실제 policy/target이 달라지는 최초 branch point를 직접 기록한다.
+- 첫 branch point 이후 차이는 현실화 경험 편입과 새로운 과거 관계구조 형성에 따른 누적결과로 분리한다.
+
+통과조건:
+- deterministic twin mismatch `0`
+- `experimenterInterventionCount = 0`
+- D에서 분기한 각 scenario에 matched pre-state policy difference 또는 actual target difference의 직접 lineage 존재
 
 ## EX-04M — 다중 OASIS 비교 장기실험 / Multi-OASIS Comparative Longitudinal Study
-Status: AFTER EX-04P INITIAL-CONDITION COMPARISON
+Status: NEXT AFTER EX-04P-DL GENEALOGY CLOSURE
 
 목적:
 - 여러 OASIS를 같은 또는 엄격히 대응되는 외생조건 아래 장기 관찰
 - 서로 다른 과거 관계구조, 행동 결정 관계 후보군, 가능성 조합, 자기개입, 선택·책임, 현실화, 인연 재출현, 장기 행동경향 형성 비교
 
-비교조건:
-
 ### A. 동일 NONE 대조조건 / Same NONE Control
 - 두 개 이상의 OASIS에 가능한 한 동일한 초기 과거 관계구조·현재 현실·환경규칙 제공
 - `initialDispositionPrior = NONE`
-- 동일 또는 다른 장기 현실흐름을 그대로 관찰
+- 장기 현실흐름을 그대로 관찰
 
 ### B. 동일 최소 개성조건 비교 / Same Minimum Disposition Prior
 - 여러 OASIS에 동일한 `initialDispositionPrior` 부여
@@ -239,30 +309,7 @@ Status: AFTER EX-04P INITIAL-CONDITION COMPARISON
 공통 필수조건:
 - 초기 설정 이후 실험자 개입 금지
 - 각 OASIS의 `experimenterInterventionCount = 0`
-- 결과를 보고 초기조건·개성·환경규칙·관계·행동 결정 관계 후보군·가능성·선택조건 수정 금지
 - 이미 달라진 현실흐름을 강제로 동일상태로 되돌리지 않음
-
-필수 비교기록:
-1. `oasisId`
-2. `multiOasisGroupId`
-3. `initialDispositionPrior` 또는 `NONE`
-4. 초기 과거 관계구조
-5. 외생조건 식별정보
-6. `behavioralDecisionRelationalCandidateSetTrace`
-7. `possibilityCompositionTrace`
-8. `selfInterventionTrace`
-9. `choiceResponsibilityTrace`
-10. `realizationTrace`
-11. `pastRelationalStructureChangeTrace`
-12. `relationalReappearanceTrace`
-13. `observedDispositionPatternTrace`
-14. `experimenterInterventionCount`
-
-비교질문:
-- 동일 초기조건의 OASIS들이 장기적으로 같은 또는 다른 관계과정을 형성하는가?
-- 동일 최소 개성값에서도 경험 차이에 따라 행동 결정 관계 후보군과 장기 행동경향이 달라지는가?
-- 서로 다른 최소 개성값이 행동 결정 관계 후보군, 가능성 탐색과 선택의 방향 차이와 함께 나타나는가?
-- 최종 현실화가 같더라도 과거 관계구조와 참여 관계과정은 다른가?
 
 해석 제한:
 - OASIS 간 차이 = 개성의 단독 인과효과 아님
@@ -280,7 +327,7 @@ Status: AFTER CORE AND MULTI-OASIS TESTS
 - falsification conditions
 - implementation artifact removal
 - H0 및 H1~H4의 재현성 확인
-- 개성 NONE/최소값 비교 결과의 재현성 확인
+- EX-04P 결과의 재현성 확인
 - 다중 OASIS 결과의 재현성 확인
 - 모든 자율적 장기 run의 실험자 비개입 확인
 
@@ -295,11 +342,6 @@ Status: AFTER CORE AND MULTI-OASIS TESTS
 Status: AFTER CORE v3 EVIDENCE
 
 동일 자료에 v1 분절형 축을 별도로 적용한다.
-
-비교질문:
-- v1이 포착하는 결과·구간 정보는 무엇인가?
-- v3가 포착하는 과거 관계구조 편입·전체 구조와 현실의 관계·인연 재출현·행동 결정 관계 후보군 정보는 무엇인가?
-- v1 관측틀에서 누락되거나 다른 의미로 해석되는 관계정보가 있는가?
 
 이 비교는 `v3의 우월성`을 자동 증명하지 않는다.
 
@@ -336,4 +378,4 @@ Status: LAST
 
 ## Current Order
 
-`EX-00 -> EX-00H H0 -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> EX-04P disposition comparison -> EX-04M multi-OASIS -> EX-05 -> EX-06 -> EX-07`
+`EX-00 -> EX-00H H0 -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> EX-04P A/B/C/D -> EX-04P-DL lineage gate -> EX-04M multi-OASIS -> EX-05 -> EX-06 -> EX-07`
