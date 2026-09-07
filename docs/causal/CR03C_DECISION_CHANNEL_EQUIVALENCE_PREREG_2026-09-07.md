@@ -26,29 +26,30 @@ Therefore CR-03C does not test novelty of multiple realizability or degeneracy. 
 
 ## Downstream relation-decision channel trace
 
-For each independently sufficient relation key acting alone, record the relation-field effects *without including the relation-key identity itself*:
+For each independently sufficient relation key acting alone, the **primary channel signature** contains only relation-field outputs actually consumed by the current decision path, without relation-key identity:
 
 1. participant-role set returned to OASIS decision logic.
 2. actionable-place set.
-3. per-place `fieldRelevantToPlace` boolean vector.
-4. set of NPC endpoints touched by the active field.
-5. hidden-story readiness vector.
-6. hidden-candidate set after production-equivalent `refreshHidden`.
-7. member-rank tuple matrix across active participants and actionable places.
+3. per-place `fieldRelevantToPlace` boolean vector used by relation-aware member ranking.
+4. hidden-story readiness vector used by hidden possibility generation.
+5. hidden-candidate set after production-equivalent `refreshHidden`.
+6. member-rank tuple matrix across active participants and actionable places.
 
-This trace is the currently instrumentable downstream interface by which relation-field state enters the decision mechanism.
+Raw endpoint identity / `fieldTouchesNPC` may be recorded only as a **secondary diagnostic**. It is excluded from the primary channel classification because endpoint differences that are never consumed by the current decision would falsely inflate apparent pathway diversity.
+
+This correction is made before execution and narrows, rather than relaxes, the criterion for declaring different downstream channels.
 
 ## Primary classifications
 
 For every CR-03R cross-key moment:
 
 ### CHANNEL_EQUIVALENT
-All independently sufficient relation keys produce exactly the same downstream channel trace.
+All independently sufficient relation keys produce exactly the same primary downstream channel signature.
 
 Interpretation: cross-key identity differences collapse before or at the measured relation-decision interface. Current cross-key sufficiency is functional degeneracy at this interface.
 
 ### CHANNEL_EQUIFINAL
-At least two independently sufficient relation keys produce different downstream channel traces while still reproducing the same full decision signature or resolved target.
+At least two independently sufficient relation keys produce different primary downstream channel signatures while still reproducing the same full decision signature or resolved target.
 
 Interpretation: distinct measured decision pathways converge on the same current result. This is same-current equifinality evidence in the implementation.
 
@@ -66,7 +67,7 @@ Interpretation: distinct measured decision pathways converge on the same current
 
 If all cross-key cases are CHANNEL_EQUIVALENT, CR-03R does not support distinct downstream causal pathways; it mainly identifies multiple relation identities collapsed into the same functional channel.
 
-If CHANNEL_EQUIFINAL cases occur, cross-key redundancy cannot be fully explained by a single measured boolean/ranking channel. The next experiment must then test whether those currently convergent pathways later diverge under identical exogenous flow.
+If CHANNEL_EQUIFINAL cases occur, cross-key redundancy cannot be fully explained by one measured decision-consumed channel. The next experiment must then test whether those currently convergent pathways later diverge under identical exogenous flow.
 
 ## Evidence boundary
 
