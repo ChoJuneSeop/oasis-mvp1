@@ -1,10 +1,18 @@
 # OASIS MVP2
 
+## Governing research protocol / 최상위 연구 프로토콜
+
+All OASIS research, paper production, causal research, mathematical formalization, experiment design, falsification, kill-search, code validation, and research reporting are governed by:
+
+`OASIS_RESEARCH_PROTOCOL.md`
+
+This root protocol has precedence over domain-specific research documents. If a lower-level document conflicts with it, the master protocol governs. Historical conflicting systems are preserved as Legacy/comparator material rather than silently overwritten.
+
 OASIS is implemented here as a 2D autonomous RPG observation laboratory, not as a score-maximizing game bot.
 
 ## Current causal research baseline
 
-The active causal research baseline is **OASIS Causal Research System v1.0 (2026-09-07)**.
+The active causal research baseline is **OASIS Causal Research System v1.0 (2026-09-07)**, subordinate to `OASIS_RESEARCH_PROTOCOL.md`.
 
 Canonical definition: `docs/OASIS_CAUSAL_RESEARCH_SYSTEM_v1.0_ko.md`
 Implementation spec: `docs/causal/CAUSAL_RESEARCH_SYSTEM_SPEC_v1.0.md`
@@ -55,7 +63,7 @@ The previous single spiral count was not sufficient to explain why OASIS-Full an
 
 A higher number is not treated as proof of superiority. The important observation is whether the structure and realized path diverge, and why.
 
-For causal v1.0, long-horizon interpretation additionally separates divergence delay, realized change, persistence, reconvergence, accumulated relational effect, and downstream effect rather than prematurely collapsing them into one causal scalar.
+The current causal-v1 measurement-axis block remains subject to revision under the master protocol. It must not override the continuous-reality and internal-prior-work principles. Historical versions may be retained as comparator/Legacy systems.
 
 ## Same-state counterfactual replay
 
