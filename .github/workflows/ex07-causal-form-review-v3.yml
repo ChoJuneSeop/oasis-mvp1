@@ -1,0 +1,47 @@
+name: OASIS EX-07 Causal Form Review v3
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "tools/ex07-causal-form-review-v3.mjs"
+      - "tools/ex04p-matched-initialization-specificity-v3.mjs"
+      - "tools/ex04m-multi-oasis-longitudinal-v3.mjs"
+      - "tools/ex05-replication-falsification-v3.mjs"
+      - "relation-field.js"
+      - "index.html"
+      - "tools/validation-compatibility-guard.mjs"
+      - ".github/workflows/ex07-causal-form-review-v3.yml"
+
+concurrency:
+  group: oasis-ex07-causal-form-review-v3
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run EX-07 causal form review
+        run: node tools/ex07-causal-form-review-v3.mjs
+      - name: Upload EX-07 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-ex07-causal-form-review-v3
+          path: ex07-causal-form-review-v3-report.json
+          if-no-files-found: ignore
