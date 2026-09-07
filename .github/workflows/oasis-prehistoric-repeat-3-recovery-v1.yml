@@ -1,0 +1,46 @@
+name: OASIS Prehistoric Repeat 3 Recovery v1
+
+on:
+  push:
+    branches:
+      - storage/oasis-integrated-research-system-v1.0
+    paths:
+      - '.github/workflows/oasis-prehistoric-repeat-3-recovery-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repeat3:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      NODE_OPTIONS: --max-old-space-size=7168
+      OASIS_RUN_SEED: prehistoric-civilization-v1-repeat-3
+      OASIS_MAX_CYCLES: '240'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax audit corrected experiment
+        run: |
+          node --check integrated-research-system-storage/prehistoric/src/prehistoric-clean-world-v1.1.mjs
+          node --check integrated-research-system-storage/prehistoric/src/prehistoric-experiment-v1.1.mjs
+          node --check integrated-research-system-storage/prehistoric/src/prehistoric-civilization-observer-v1.mjs
+      - name: Rerun identical repeat 3 with larger runtime heap
+        run: node integrated-research-system-storage/prehistoric/src/prehistoric-experiment-v1.1.mjs
+      - name: Preserve compact repeat 3 result
+        if: always()
+        run: |
+          if [ -f prehistoric-experiment-v1.1-result.json ]; then
+            cp prehistoric-experiment-v1.1-result.json prehistoric-experiment-repeat-3-recovery.json
+          fi
+      - name: Upload repeat 3 recovery result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-prehistoric-repeat-3-recovery
+          path: prehistoric-experiment-repeat-3-recovery.json
+          if-no-files-found: warn
