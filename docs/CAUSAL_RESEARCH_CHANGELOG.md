@@ -21,6 +21,8 @@
 - Added v2 experiment sequence EX-00 through EX-07, beginning with internal OASIS prior-work review and ending with causal-rate mathematical formalization only after structural, long-horizon, replication, and comparator validation.
 - Added `tools/causal-trace-ledger-v2.mjs` and switched the active causal validation workflow to v2.
 - Preserved v1 documents, trace implementation, evidence, and experiment index unchanged as Legacy/comparator material for future head-to-head analysis.
+- Added `CAUSAL_AUXILIARY_COMPONENTS_v2.0.md` without changing the four v2 core axes. The auxiliary components are self-intervention, choice/responsibility axes, individuality, openness of the causal-rate form, and the Legacy v1 observer-comparison role.
+- Applied those auxiliary components to the experiment index as optional observations only; they do not by themselves establish causal strength or validate H1-H4.
 
 ## v1.0 — 2026-09-07
 
