@@ -1,0 +1,165 @@
+# OASIS Causal Research Experiment Index v2.0
+
+상태 / Status: current experiment sequence
+기준일 / Date: 2026-09-07
+상위 기준 / Governing protocol: `../../OASIS_RESEARCH_PROTOCOL.md`
+정의 기준 / Canonical semantics: `../OASIS_CAUSAL_RESEARCH_SYSTEM_v2.0_ko.md`
+Legacy comparator sequence: `CAUSAL_EXPERIMENT_INDEX_v1.2.md`
+
+## EX-00 — 내부 선행연구 확인 / Internal prior-work gate
+Status: REQUIRED BEFORE NEW RUNS
+
+목적:
+- 이미 검증·반증·폐기된 문제를 반복하지 않는다.
+- 기존 OASIS audit, latent-relation, same-current, long-horizon 결과를 우선 검토한다.
+- 외부 인과프레임을 OASIS 핵심축으로 역수입하지 않는다.
+
+통과조건:
+- 새 실험이 기존 내부 연구와 무엇이 다른지 명시
+- 기존 v1/v1.5 evidence와 중복 여부 확인
+- 미해결 질문을 H1~H4 중 하나에 연결
+
+## EX-01 — 현실화와 과거 관계구조 편입 검증 / Realization and Past-Structure Incorporation
+Status: NEXT CORE TEST
+Hypothesis: H1
+
+질문:
+원인 개입에 의해 현실화된 경험이 기존 과거 관계구조에 실제 구성요소로 편입되어 새로운 과거 관계구조 형성에 참여하는가?
+
+설계:
+- 가능한 한 동일한 초기 과거 관계구조와 현재 현실을 사용한다.
+- 하나의 정의된 원인 개입만 다르게 한다.
+- 실제 현실화를 기록한다.
+- 구현 필드 증가와 구조적 편입을 구별한다.
+
+필수 관찰:
+1. realized event
+2. incorporation candidate signal
+3. realized experience와 기존 과거 관계 사이의 후속 관계
+4. 이후 구조적 참여
+
+금지:
+- `relationHistoryAfter > relationHistoryBefore` 하나만으로 H1 SUPPORTED 판정
+
+## EX-02 — 새로운 과거 관계구조와 이후 현실관계 검증 / New Past Structure and Subsequent Reality Relation
+Status: PLANNED AFTER EX-01
+Hypothesis: H2
+
+질문:
+현실화된 경험의 편입으로 형성된 새로운 과거 관계구조 전체가 이후 현실과 관계하면서 새로운 관계구조와 가능성 조합의 형성에 참여하는가?
+
+설계:
+- EX-01에서 형성된 서로 다른 과거 관계구조를 이후에도 계속 진행한다.
+- 가능한 외생조건은 통제하되 이미 달라진 현실을 강제로 동일상태로 되돌리지 않는다.
+- `과거 구조 변화`와 `이후 현실과의 관계`를 별도 독립실험으로 쪼개지 않는다.
+
+필수 관찰:
+- 전체 과거 관계구조의 구성 차이
+- 이후 현실과의 관계과정
+- 가능성 조합
+- 참여상태
+- 새로운 관계 형성
+- 후속 현실화
+
+보조 관측:
+- divergence delay는 기록 가능하나 인과강도로 해석하지 않는다.
+
+## EX-03 — 인연의 자연적 재출현 검증 / Natural Relational Reappearance
+Status: PLANNED AFTER EX-02
+Hypothesis: H3
+
+질문:
+과거 관계가 한동안 현재 판단이나 관계형성에 직접 참여하지 않은 뒤 변화한 현실조건에서 다시 현재 현실과 관계할 수 있는가?
+
+설계:
+- 과거에 실제 형성된 관계를 추적한다.
+- 일정 기간 현재 관계형성에 직접 참여하지 않는 상태를 자연스럽게 허용한다.
+- 재출현 tick을 사전 지정하지 않는다.
+- 미래정보를 재출현 조건으로 사용하지 않는다.
+
+필수 관찰:
+- non-participating/non-current interval
+- subsequent reactivation
+- reactivation reason/context
+- renewed participation in possibility composition or choice
+- repeated reappearance if observed
+
+해석:
+- 재출현은 과거 상태 복원이나 reconvergence가 아니다.
+
+## EX-04 — 인연 지속 제한 장기탐색 / Long-Horizon Relational Persistence-Limit Inquiry
+Status: PLANNED AFTER EX-03
+Hypothesis: H4
+
+질문:
+과거 관계가 이후 현실과 다시 관계할 가능성에 관찰 가능한 시간적 또는 구조적 제한이 존재하는가?
+
+설계:
+- 충분히 긴 현실흐름을 사용한다.
+- 가능하면 시간경과가 크고 구조변화가 작은 조건과, 구조변화가 큰 조건을 분리한다.
+- 재출현 간격과 반복 재출현을 기록한다.
+
+필수 관찰:
+- reappearance gaps
+- repeated reappearance counts
+- long non-participating intervals
+- context/structure at reappearance
+- not-reobserved-within-horizon cases
+
+금지:
+- 관찰기간 미재출현 = 소멸
+- 미재출현 = 영구적 재관계 불가능
+
+기본 판정:
+- `OPEN_INQUIRY`
+
+## EX-05 — 반복·반증 / Replication and Falsification
+Status: AFTER EX-01~04
+
+목적:
+- alternative seeds/worlds
+- longer horizons
+- stronger controls
+- falsification conditions
+- implementation-specific artifact removal
+
+결과 등급:
+- OBSERVED
+- SUPPORTED_WITHIN_HARNESS
+- REFUTED_WITHIN_HARNESS
+- UNVALIDATED
+- OPEN_INQUIRY
+
+## EX-06 — Legacy v1 비교분석 / Legacy v1 Comparator Analysis
+Status: AFTER CORE V2 EVIDENCE
+
+동일 자료에 v1의 분절형 축을 별도로 적용한다.
+
+Legacy axes:
+- divergence delay
+- realized change
+- persistence
+- reconvergence
+- accumulated relational effect
+- downstream long-horizon effect
+
+비교질문:
+- v1이 포착하는 결과·구간 정보는 무엇인가?
+- v2가 추가로 포착하는 과거 관계구조 편입·전체 구조와 현실의 관계·인연 재출현 정보는 무엇인가?
+
+Legacy 결과를 v2 핵심증거로 혼합하지 않는다.
+
+## EX-07 — 인과율 수학화 검토 / Causal-Rate Formalization Review
+Status: LAST
+
+진입조건:
+- H1~H3에 반복 가능한 구조적 증거
+- H4에 충분한 장기 관찰
+- Legacy comparator와 v2의 정보차이 확인
+- 변수 정의와 수학기호 검수
+
+단일 인과율 값은 사전에 가정하지 않는다.
+
+## Current order
+
+`EX-00 internal prior-work gate -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> EX-05 replication/falsification -> EX-06 Legacy comparison -> EX-07 mathematical formalization review`
