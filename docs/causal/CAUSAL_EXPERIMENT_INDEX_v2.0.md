@@ -33,6 +33,12 @@ Status: REQUIRED BEFORE NEW RUNS
 
 개성을 고정 상수로 가정하지 않으며, 자기개입이 항상 더 좋은 결과를 만든다고 가정하지 않는다.
 
+## 1차 연구 원칙 / Primary Research Rule
+
+OASIS v2 핵심 인과연구는 우선 개성을 필수 초기값으로 넣지 않은 기존 관점에서 진행한다.
+
+개성을 먼저 넣어 핵심가설의 결과를 만들지 않는다.
+
 ## EX-01 — 현실화와 과거 관계구조 편입 검증 / Realization and Past-Structure Incorporation
 Status: NEXT CORE TEST
 Hypothesis: H1
@@ -130,8 +136,31 @@ Hypothesis: H4
 기본 판정:
 - `OPEN_INQUIRY`
 
+## EX-04P — 조건부 개성 재실험 / Conditional Disposition Rerun
+Status: CONDITIONAL ONLY
+
+진입조건:
+- EX-01~04의 1차 조건에서 충분한 구조적 성과가 관측되지 않음, 또는
+- 가능성 탐색과 선택이 사실상 정지하여 핵심구조를 충분히 시험하기 어려움
+
+설계:
+- 기존 핵심가설 H1~H4는 변경하지 않는다.
+- 개성 / Individual Disposition을 AI에게 허용된 최소값 / Minimum Permitted AI Prior로만 추가한다.
+- 개성은 특정 결과나 행동을 강제하지 않는다.
+- 1차 실험과 가능한 한 동일한 환경·관측조건을 유지한다.
+- 어떤 개성 초기조건을 사용했는지 명시한다.
+
+판정원칙:
+- 2차 결과는 1차 결과와 분리하여 보고한다.
+- 2차 성공을 1차 성공으로 소급하지 않는다.
+- 1차에서 명확한 반증이 있었다면 그 반증을 유지한 채 `개성 조건에서는 다른 결과가 관측되었는가`만 별도로 판단한다.
+
+연구해석:
+- 개성 조건에서만 구조가 활성화된다면, 개성이 OASIS 작동에 필요한 최소 초기조건일 가능성을 후속 연구문제로 제시할 수 있다.
+- 그 가능성을 사전에 확정하지 않는다.
+
 ## EX-05 — 반복·반증 / Replication and Falsification
-Status: AFTER EX-01~04
+Status: AFTER EX-01~04 AND CONDITIONAL EX-04P IF USED
 
 목적:
 - alternative seeds/worlds
@@ -185,6 +214,14 @@ Status: LAST
 
 상수화 실패 역시 연구결과로 보존한다.
 
+## 현장 적용 마무리 / Deployment Position
+
+개성이 후속 실험 또는 실제 구현에서 필요하다고 판단되는 경우, 개성은 AI에게 허용되는 최소 초기조건으로 정의한다.
+
+실제 제품·서비스 단계에서는 이 초기 개성을 사용자 또는 고객이 커스터마이징할 수 있는 고객 맞춤형 구성으로 제공할 수 있다.
+
+이는 OASIS 핵심 인과축을 변경하는 것이 아니라, 동일한 OASIS 코어가 서로 다른 초기조건에서 다양한 가능성 흐름을 형성하도록 하는 적용 방식이다.
+
 ## Current order
 
-`EX-00 internal prior-work gate -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> EX-05 replication/falsification -> EX-06 Legacy observer comparison -> EX-07 causal-rate form review`
+`EX-00 internal prior-work gate -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> [if needed: EX-04P minimum-disposition rerun] -> EX-05 replication/falsification -> EX-06 Legacy observer comparison -> EX-07 causal-rate form review`
