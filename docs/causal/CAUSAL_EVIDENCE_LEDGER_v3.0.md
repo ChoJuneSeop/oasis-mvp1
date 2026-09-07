@@ -9,7 +9,7 @@ Legacy evidence: `CAUSAL_EVIDENCE_LEDGER_v1.5.md`
 
 ## 1. Evidence Migration Rule
 
-v3는 v2의 증거를 성공결과로 재작성하지 않는다. v2/Legacy의 관측·반증·미검증 상태를 보존하고, v3에서 새로 직접 계측한 결과만 v3 증거등급으로 승격한다.
+v3는 v2/Legacy의 증거를 성공결과로 재작성하지 않는다. 기존 관측·반증·미검증 상태를 보존하고, v3에서 직접 계측·재검증한 결과만 v3 증거등급으로 승격한다.
 
 특허성, 과학적 타당성, 산업적 가치, 투자 가치는 서로 다른 판정축이다.
 
@@ -22,6 +22,8 @@ v3는 v2의 증거를 성공결과로 재작성하지 않는다. v2/Legacy의 �
 - 행동 결정 관계 후보군 / Behavioral Decision Relational Candidate Set: 현재 행동결정에 참여할 수 있는 관계 후보들의 현재적 집합. 인연필드 전체와 동일하지 않다.
 - 구현 필드 `relationHistory`는 계측용 구현 흔적이며 이론적 존재론 용어가 아니다.
 - 구현 필드 `cands`는 행동/목적지 후보목록이며 이론적 Behavioral Decision Relational Candidate Set과 동일시하지 않는다.
+- 구현에서 반복 primitive relation event가 `relationExists(P,npc)` 또는 `relationHistory.length > 0`로 압축될 경우, 개별 event identity를 독립 인과단위로 자동 해석하지 않는다.
+- `relationField.active`가 relation key 단위로 행동결정에 노출될 경우 exact episode identity는 provenance로 보존하되 개별 episode의 필요·충분성을 자동 추론하지 않는다.
 
 ## 3. Canonical v3 Validation Run
 
@@ -47,11 +49,11 @@ Methodological invariants:
 
 ## 4. H0 — Behavioral Decision Participation
 
-Current status: **PARTIALLY SUPPORTED WITHIN CANONICAL HARNESS FOR THE RELATIONAL COMPONENT**
+Current status: **PARTIALLY SUPPORTED WITH DIRECT NATIVE RELATIONAL-CANDIDATE INSTRUMENTATION WITHIN THE CANONICAL HARNESS; FULL H0 REMAINS OPEN**
 
-Same-current-state relational ablation rows: **297**
+### 4.1 Same-current relational ablation
 
-Observed:
+Observed across **297** matched same-current shadow rows:
 - reactivated relational layer present: **297/297**
 - action/destination candidate-list differences: **0/297**
 - participation-leader differences: **284/297**
@@ -62,15 +64,84 @@ Observed:
 
 Interpretation:
 - reactivated past relations contributed to participation and/or selected action under a fixed current state in this harness.
-- this does **not** show that the implementation destination list `cands` is the theoretical Behavioral Decision Relational Candidate Set.
-- H0 as a full hypothesis remains incomplete because native candidate-set formation, possibility composition, Individual Disposition, and full factor interaction are not yet directly identified.
+- this does **not** show that implementation destination list `cands` is the theoretical Behavioral Decision Relational Candidate Set.
+
+### 4.2 Native relational-candidate direct instrumentation
+
+Primary validation run: **OASIS H0 Native Relational Candidate Trace v3 #3**  
+GitHub Actions run id: `34114248846`  
+Head commit: `e76ba9a579d414e7800db5eaddf7a344e7448edf`  
+Result: **SUCCESS**
+
+Exact-lineage replay: **OASIS H0 Native Relational Candidate Lineage v3 #1**  
+GitHub Actions run id: `34114757668`  
+Head commit: `c37d329156171ddfc030280ca5e6945109e3afae`  
+Result: **SUCCESS**
+
+The two 120,000-tick runs reproduced the same aggregate summary exactly.
+
+Method:
+- production decision semantics unchanged; instrumentation only
+- `initialDispositionPrior = NONE`
+- no experimenter intervention after initialization
+- non-anticipatory
+- a semantic twin receives the same exogenous conditions
+- any instrumented/twin world-state mismatch invalidates the run
+- reconstructed active relation keys must exactly equal production `relationField.active`
+
+Native implementation-level relational candidate representation:
+1. global past-relation presence predicate used by participation: `P.relationHistory.length > 0`;
+2. NPC-level relation-presence predicates used by gate, destination ranking and hidden readiness: `relationExists(P,npc)`;
+3. currently active composed relation keys used by relational-field participation/ranking/hidden readiness;
+4. primitive event identities and exact composed episode identities are retained only as provenance where production has already compressed them to predicate/key level.
+
+Observed:
+- completed ticks: **120,000**
+- decision evaluations: **1,997**
+- decisions with a native relational candidate layer: **1,997/1,997**
+- decisions without that layer: **0/1,997**
+- total native relational-candidate items observed: **23,335**
+- primitive relation-presence candidate items: **11,177**
+- active relation-key candidate items: **12,158**
+- unique candidate identifiers: **28**
+  - primitive relation-presence identifiers: **9**
+  - active relation-key identifiers: **19**
+- decisions with implemented current possibility projection: **1,997/1,997**
+- candidate-to-possibility direct support links: **40,103**
+- collective-participation candidate items: **14,155**
+- decisions where the selected possibility had direct relational support: **1,988/1,997 = 99.55%**
+- decisions where the relational set participated collectively: **1,997/1,997**
+- selected decisions later realized within horizon: **1,994/1,997 = 99.85%**
+- superseded before realization: **0**
+- unresolved at horizon: **3**
+- reconstructed active-key mismatch: **0**
+- semantic-twin behavior mismatch ticks: **0**
+- `experimenterInterventionCount`: **0**
+
+Exact-lineage replay:
+- sampled decision lineages: **60**
+- sampled lineages with completed realization record: **60/60**
+- example: at tick **217**, current reality at `forest` contained relational candidates including `relation-presence:엘리` and active relation key `루카↔엘리`; these directly supported the selected decision row `hidden:herbRuin`, whose actual target `ruin` was realized at tick **439**.
+
+Interpretation boundary:
+- the run directly instruments an **implementation-level native relational candidate layer** that is distinct from destination `cands` and that participates in current decision construction.
+- the recorded possibility rows are the **implemented current decision possibility projection** (`id`, votes, voices, direct relational support, collective relational participation). They are not claimed to exhaust the theoretical Open Field of Possibility Combinations.
+- candidate membership is distinguished from action-specific direct support and from collective participation-state influence.
+- the observation does not establish candidate-set sufficiency or necessity for every AI behavior.
+- primitive relation event identity is not declared an independent cause when production uses only relation-presence predicates.
+- exact composed episode identity is not declared individually necessary when production exposes relation-key-level active structure.
+- Individual Disposition remains unvalidated because the run used `NONE`.
+- Responsibility Axis and Self-Intervention are not fully isolated by this run.
 
 Evidence grades:
-- Past Relational Structure contribution through reactivated past relations: **OBSERVED_WITHIN_CANONICAL_HARNESS**
-- selected-action contribution: **OBSERVED_WITHIN_CANONICAL_HARNESS**
-- Behavioral Decision Relational Candidate Set native trace: **UNVALIDATED / DIRECT TRACE REQUIRED**
+- Past Relational Structure contribution through relational predicates/active relations: **OBSERVED_WITHIN_CANONICAL_HARNESS**
+- Behavioral Decision Relational Candidate Set native implementation-level trace: **DIRECTLY_INSTRUMENTED_WITHIN_CANONICAL_HARNESS_AT_CURRENT_IMPLEMENTATION_GRANULARITY**
+- implemented Possibility Composition projection: **DIRECTLY_INSTRUMENTED_IMPLEMENTATION_PROJECTION_WITHIN_CANONICAL_HARNESS**
+- candidate → participation/selection → realization chain: **OBSERVED_WITHIN_CANONICAL_HARNESS; SUFFICIENCY_AND NECESSITY NOT ESTABLISHED**
+- theoretical Possibility Composition as a complete abstract object: **UNVALIDATED**
 - Individual Disposition contribution: **UNVALIDATED**
-- any single component as sufficient cause: **NOT ESTABLISHED**
+- full H0 including disposition, responsibility, self-intervention and complete factor interaction: **PARTIALLY SUPPORTED / OPEN COMPONENTS REMAIN**
+- any single component as universal sufficient cause: **NOT ESTABLISHED**
 
 ## 5. H1 — Realization and Incorporation into Past Relational Structure
 
@@ -130,13 +201,6 @@ GitHub Actions run id: `34098060582`
 Head commit: `6fafe08c585704ce008fc1f0e59f6849363259f2`  
 Result: **SUCCESS**
 
-Method:
-- same-current production replay
-- shadow-only counterfactual analysis
-- current jointly active reactivated past-relation episode identities compared with no-reactivated-relation and component-removal shadows
-- no experimenter intervention after initialization
-- non-anticipatory
-
 Validity:
 - replay mismatch: **0**
 - full-choice mismatch: **0**
@@ -192,28 +256,70 @@ Interpretation:
 Evidence grade:
 - cross-key alternative relational contribution: **SUPPORTED_WITHIN_CANONICAL_HARNESS_FOR_CROSS_KEY_ALTERNATIVE_RELATIONAL_CONTRIBUTION**
 
-### 6.4 H2 integrated interpretation and remaining boundary
+### 6.4 Dormant/noncurrent future-effect falsification tests
 
-The combined H2 evidence now supports:
+Two additional initial-condition ablations tested whether later natural reappearance of currently nonparticipating relational material is by itself sufficient to alter the autonomous future behavioral path.
+
+Dormant exact-episode removal:
+- valid checkpoints: **3/3**
+- removed dormant episodes later naturally reappeared: **3/3**
+- forward horizon: **15,000 ticks** per checkpoint
+- behavior, leader, candidate-signature, resolved-target and position divergence: **0/3**
+
+Noncurrent relation-key removal:
+- valid checkpoints: **3/3**
+- removed noncurrent relation keys later naturally reactivated in full branches: **3/3**
+- forward horizon: **15,000 ticks** per checkpoint
+- behavior, leader, candidate-signature, resolved-target and position divergence: **0/3**
+- ablated branches later regenerated the same relation keys from new experience.
+
+Interpretation:
+- **reappearance itself is not sufficient for behavioral divergence** in the tested horizon.
+- dormant episode count is not a sufficient behavioral causal unit.
+- bare relation-key existence is not a sufficient behavioral causal unit.
+- these are valid negative results and are preserved rather than rewritten as support.
+
+### 6.5 Relational-footprint testability boundary
+
+A finer proposed unit, `relation key + place/context footprint`, was tested next.
+
+Result:
+- semantic twin mismatch: **0**
+- eligible checkpoints satisfying the required distinct within-key footprint condition: **0**
+- classification: **NOT TESTABLE IN THE CURRENT CANONICAL HARNESS**
+
+Interpretation:
+- the current canonical runtime does not preserve enough distinct within-key place/context footprint structure for this specific ablation to be instantiated.
+- this is an implementation representation limit, not evidence that H2 is false.
+- the result also warns against attributing causal individuality to information that the runtime has already compressed away.
+
+### 6.6 H2 integrated interpretation and remaining boundary
+
+The combined H2 evidence supports:
 1. long-horizon feed-forward from past relational participation into realized outcome and new relational structure formation;
 2. joint contribution of the currently active reactivated relational subset;
 3. alternative sufficient routes across distinct relation keys in the same-current active structure.
+
+The negative tests additionally establish that:
+4. natural reappearance alone is not sufficient for behavioral divergence within the tested horizon;
+5. episode identity/count and bare relation-key existence should not be treated as automatically sufficient causal units;
+6. current implementation compression limits finer footprint-level testing.
 
 Still not established:
 - that every element of Past Relational Structure is active at a given moment;
 - that the **entire newly formed Past Relational Structure**, including currently inactive/nonparticipating relations, is jointly necessary;
 - that the entire Past Relational Structure is jointly sufficient;
-- direct instrumentation of the theoretical `Possibility Composition` object;
 - universal actual-causation or real-world generalization.
 
 Therefore:
 - downstream structural process: **OBSERVED_WITHIN_CANONICAL_HARNESS**
 - joint active-relational contribution: **SUPPORTED_WITHIN_CANONICAL_HARNESS**
 - cross-key alternative sufficient routes: **SUPPORTED_WITHIN_CANONICAL_HARNESS**
+- dormant episode/key reappearance as sufficient cause of behavior divergence: **NOT SUPPORTED WITHIN TESTED HORIZON**
+- finer within-key relational footprint test: **NOT TESTABLE IN CURRENT CANONICAL HARNESS**
 - H2 integrated hypothesis: **PARTIALLY SUPPORTED / STRONGLY NARROWED REMAINING GAP**
 - whole Past Relational Structure joint causal necessity: **UNVALIDATED**
 - whole Past Relational Structure joint causal sufficiency: **UNVALIDATED**
-- direct Possibility Composition instrumentation: **UNVALIDATED**
 
 ## 7. H3 — Relational Reappearance
 
@@ -222,6 +328,8 @@ Current status: **OBSERVED IMPLEMENTATION / CAUSAL GENERALIZATION UNVALIDATED**
 Canonical harness contains natural `latentize/noncurrent` and contextual `reactivate` events without researcher intervention after initialization.
 
 Current long-horizon re-analysis additionally observes repeated reappearance. This supports the existence of reappearance behavior inside the harness but does not establish universal environmental generalization.
+
+The H2 negative future-effect tests also show that reappearance must not be equated with behavioral effect: a relation may naturally reappear without producing observed behavioral divergence in the tested horizon.
 
 ## 8. H4 — Relational Persistence-Limit Inquiry
 
@@ -241,7 +349,7 @@ Never infer extinction from horizon non-observation.
 Definitional status: **FORMAL BEHAVIORAL INITIAL CONDITION**  
 Empirical status: **NECESSITY AND EFFECT UNVALIDATED**
 
-`NONE` remains a valid control condition for testing necessity/effect. The canonical H0-H2 run used `NONE`; its success therefore cannot be used to claim that disposition caused those results.
+`NONE` remains a valid control condition for testing necessity/effect. The canonical H0-H2 runs used `NONE`; their success therefore cannot be used to claim that disposition caused those results.
 
 Required follow-up:
 - EX-04P NONE vs minimum-disposition prior
@@ -252,16 +360,24 @@ Required follow-up:
 ## 10. Behavioral Decision Relational Candidate Set
 
 Definitional status: **FORMAL BEHAVIORAL INTERMEDIATE**  
-Empirical status: **NATIVE TRACE NOT YET VALIDATED**
+Empirical status: **DIRECTLY INSTRUMENTED AT CURRENT IMPLEMENTATION GRANULARITY / FULL THEORETICAL CONSTRUCT NOT YET EXHAUSTIVELY VALIDATED**
 
-Required evidence:
-1. explicit candidate-set formation trace
-2. reason/current relational basis for entry
-3. candidate membership vs actual participation
-4. connection to Possibility Composition
-5. connection to Participation, Choice, Responsibility and Realization
+Direct evidence now exists for:
+1. explicit native relational candidate-set trace at production predicate/key granularity;
+2. current relational reason/basis for candidate entry;
+3. candidate membership vs direct possibility support vs collective participation;
+4. connection to an implemented current Possibility Composition projection;
+5. connection through participation/selection to later realization;
+6. semantic-twin equality and `experimenterInterventionCount = 0`.
 
-Do not infer candidate-set validation from destination-list equality/difference.
+Still required before full construct closure:
+- disposition comparison;
+- explicit Responsibility Axis isolation;
+- explicit Self-Intervention isolation where applicable;
+- validation that the implemented possibility projection sufficiently represents the intended theoretical Possibility Composition across broader conditions;
+- replication across additional environments/harnesses.
+
+Do not infer candidate-set validation from destination-list equality/difference alone. The direct v3 trace is the current evidence basis.
 
 ## 11. Self-Intervention
 
@@ -282,13 +398,15 @@ Not established:
 - responsibility = causal strength
 - responsibility alone constitutes an intervention
 
+The H0 direct trace observes implemented selection and realization but does not by itself isolate Responsibility Axis necessity or sufficiency.
+
 ## 13. No-Experimenter-Intervention
 
 Current status: **MANDATORY METHODOLOGICAL INVARIANT**
 
 After initialization, researcher intervention into judgment, disposition, relations, candidate set, possibility composition, choice, responsibility, realization or Past Relational Structure invalidates that run as autonomous longitudinal evidence.
 
-Run #15 and the two H2 same-current shadow validations preserve the production reality and satisfy the no-mid-run-intervention boundary for evidence interpretation.
+Run #15, the H2 shadow validations, the H2 future-effect tests, H0 direct candidate trace and H0 lineage replay preserve the no-mid-run-intervention boundary for evidence interpretation.
 
 ## 14. Multi-OASIS and Longitudinal Disposition
 
@@ -322,29 +440,30 @@ v3-specific reproducible instrumentation now exists:
 - `tools/causal-trace-ledger-v3.mjs`
 - `tools/h2-joint-active-relational-set-v3.mjs`
 - `tools/h2-cross-key-overdetermination-v3.mjs`
-- `.github/workflows/causal-trace-ledger.yml`
-- `.github/workflows/h2-joint-active-relational-set-v3.yml`
-- `.github/workflows/h2-cross-key-overdetermination-v3.yml`
+- H2 dormant/noncurrent future-effect analyzers
+- `tools/h0-native-relational-candidate-trace-v3.mjs`
+- `tools/h0-native-relational-candidate-lineage-v3.mjs`
+- corresponding GitHub Actions validation workflows
 
 Therefore the prior statement that v3 had only definitions and no v3-specific evidence implementation is retired.
 
 Remaining implementation gaps:
-- native Behavioral Decision Relational Candidate Set trace
-- direct Possibility Composition trace
 - Individual Disposition comparison instrumentation
-- whole-Past-Relational-Structure test that explicitly distinguishes currently active and inactive/nonparticipating relations
-- explicit self-intervention trace
+- whole-Past-Relational-Structure test beyond the current runtime's compressed inactive/nonparticipating representation
+- explicit Self-Intervention trace
+- explicit Responsibility Axis isolation
 - multi-OASIS longitudinal comparison
+- broader replication of the native candidate/Possibility Composition projection outside the canonical harness
 
 ## 18. Current Evidence Priorities
 
-1. H2 whole-Past-Relational-Structure test including inactive/nonparticipating past relations, without collapsing it into the active-set result
-2. native Behavioral Decision Relational Candidate Set + Possibility Composition instrumentation for H0
+1. EX-04P disposition comparison: `NONE` vs fixed minimum-disposition prior
+2. explicit Responsibility Axis / Self-Intervention isolation within the behavioral chain
 3. EX-03/H3 causal replication across conditions
 4. EX-04 long-horizon persistence-limit inquiry
-5. EX-04P disposition comparison
-6. EX-04M multi-OASIS longitudinal comparison
-7. replication/falsification
+5. EX-04M multi-OASIS longitudinal comparison
+6. H2 whole-Past-Relational-Structure test if a runtime representation capable of preserving the required inactive relational structure is available
+7. replication/falsification across environments
 8. Legacy observer comparison
 9. causal-rate form review
 
@@ -357,9 +476,12 @@ Do not claim:
 - persistent unrealized parallel paths
 - extinction from horizon non-observation
 - H1 from count growth alone
-- full H2 from longitudinal lineage, joint-active-set, or cross-key evidence alone
+- full H2 from longitudinal lineage, joint-active-set, cross-key evidence, or reappearance alone
 - full Past Relational Structure joint necessity/sufficiency from the active relational subset
-- Behavioral Decision Relational Candidate Set from implementation destination `cands`
+- behavioral effect merely from relation reappearance
+- individual causal identity for primitive events or exact episodes when production has compressed them to presence/key-level predicates
+- theoretical Behavioral Decision Relational Candidate Set from implementation destination `cands`
+- full theoretical Possibility Composition from the current implementation projection
 - disposition necessity/sufficiency before comparison evidence
 - causal strength from divergence delay
 - responsibility = danger
