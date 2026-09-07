@@ -4,6 +4,7 @@
 기준일 / Date: 2026-09-07
 상위 기준 / Governing protocol: `../../OASIS_RESEARCH_PROTOCOL.md`
 정의 기준 / Canonical semantics: `../OASIS_CAUSAL_RESEARCH_SYSTEM_v2.0_ko.md`
+보조 구성요소 / Auxiliary components: `CAUSAL_AUXILIARY_COMPONENTS_v2.0.md`
 Legacy comparator sequence: `CAUSAL_EXPERIMENT_INDEX_v1.2.md`
 
 ## EX-00 — 내부 선행연구 확인 / Internal prior-work gate
@@ -19,6 +20,19 @@ Status: REQUIRED BEFORE NEW RUNS
 - 기존 v1/v1.5 evidence와 중복 여부 확인
 - 미해결 질문을 H1~H4 중 하나에 연결
 
+## 공통 보조 관측 / Common Auxiliary Observations
+
+핵심 H1~H4 판정과 별도로, 실험과 직접 관련되는 경우 다음을 보조적으로 기록할 수 있다.
+
+- 원인 개입이 외부 개입인지 자기개입 / Self-Intervention인지
+- 자기개입이 관측되는 경우 선택축 / Choice Axis과 책임축 / Responsibility Axis이 함께 어떻게 작동했는지
+- 서로 다른 존재가 동일하거나 유사한 현실조건에서 서로 다른 방향을 선택하는 개성 / Individual Disposition의 차이가 관측되는지
+- 이러한 보조요소가 가능성 조합과 현실화 과정에서 어떤 차이와 함께 나타나는지
+
+이 보조관측 자체를 인과강도 또는 인과율 값으로 해석하지 않는다.
+
+개성을 고정 상수로 가정하지 않으며, 자기개입이 항상 더 좋은 결과를 만든다고 가정하지 않는다.
+
 ## EX-01 — 현실화와 과거 관계구조 편입 검증 / Realization and Past-Structure Incorporation
 Status: NEXT CORE TEST
 Hypothesis: H1
@@ -31,6 +45,7 @@ Hypothesis: H1
 - 하나의 정의된 원인 개입만 다르게 한다.
 - 실제 현실화를 기록한다.
 - 구현 필드 증가와 구조적 편입을 구별한다.
+- 개입이 외부 개입인지 자기개입인지 구분 가능하면 기록한다.
 
 필수 관찰:
 1. realized event
@@ -52,6 +67,7 @@ Hypothesis: H2
 - EX-01에서 형성된 서로 다른 과거 관계구조를 이후에도 계속 진행한다.
 - 가능한 외생조건은 통제하되 이미 달라진 현실을 강제로 동일상태로 되돌리지 않는다.
 - `과거 구조 변화`와 `이후 현실과의 관계`를 별도 독립실험으로 쪼개지 않는다.
+- 관련되는 경우 자기개입, 선택축, 책임축, 개성 차이를 보조적으로 함께 기록한다.
 
 필수 관찰:
 - 전체 과거 관계구조의 구성 차이
@@ -63,6 +79,7 @@ Hypothesis: H2
 
 보조 관측:
 - divergence delay는 기록 가능하나 인과강도로 해석하지 않는다.
+- 자기개입·선택축·책임축·개성은 핵심축을 대체하지 않는다.
 
 ## EX-03 — 인연의 자연적 재출현 검증 / Natural Relational Reappearance
 Status: PLANNED AFTER EX-02
@@ -122,6 +139,7 @@ Status: AFTER EX-01~04
 - stronger controls
 - falsification conditions
 - implementation-specific artifact removal
+- 자기개입·개성 등 보조 구성요소가 결과 해석을 과도하게 설명하지 않는지 확인
 
 결과 등급:
 - OBSERVED
@@ -146,8 +164,11 @@ Legacy axes:
 비교질문:
 - v1이 포착하는 결과·구간 정보는 무엇인가?
 - v2가 추가로 포착하는 과거 관계구조 편입·전체 구조와 현실의 관계·인연 재출현 정보는 무엇인가?
+- 동일한 OASIS 현실흐름을 v1 관측틀로 보았을 때 누락되거나 다른 의미로 해석되는 관계정보가 있는가?
 
 Legacy 결과를 v2 핵심증거로 혼합하지 않는다.
+
+이 비교는 `v2의 우월성`을 자동으로 증명하지 않는다. 관측틀에 따라 포착되는 인과정보가 달라지는지를 확인하는 비교다.
 
 ## EX-07 — 인과율 수학화 검토 / Causal-Rate Formalization Review
 Status: LAST
@@ -160,6 +181,10 @@ Status: LAST
 
 단일 인과율 값은 사전에 가정하지 않는다.
 
+인과율이 특정 상수로 표현되는지, 다른 형태로 나타나는지, 또는 단일 상수로 두는 것이 부적합한지를 실험 결과에 따라 판단한다.
+
+상수화 실패 역시 연구결과로 보존한다.
+
 ## Current order
 
-`EX-00 internal prior-work gate -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> EX-05 replication/falsification -> EX-06 Legacy comparison -> EX-07 mathematical formalization review`
+`EX-00 internal prior-work gate -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> EX-05 replication/falsification -> EX-06 Legacy observer comparison -> EX-07 causal-rate form review`
