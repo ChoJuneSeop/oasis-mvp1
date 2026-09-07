@@ -15,7 +15,7 @@ Status: REQUIRED BEFORE NEW RUNS
 목적:
 - 이미 검증·반증·폐기된 문제를 반복하지 않는다.
 - 기존 OASIS 내부 증거를 외부 선행연구보다 먼저 확인한다.
-- 새 실험이 H1~H4 또는 v3 보조 연구질문 중 무엇을 검증하는지 명시한다.
+- 새 실험이 H0, H1~H4 또는 v3 보조 연구질문 중 무엇을 검증하는지 명시한다.
 
 통과조건:
 - 기존 연구와의 차이 명시
@@ -24,13 +24,51 @@ Status: REQUIRED BEFORE NEW RUNS
 
 ## 공통 필수조건 — 실험자 비개입 / Mandatory No-Experimenter-Intervention Condition
 
-초기조건과 환경 설정 후 실험자는 OASIS의 판단, 개성, 관계, 행동 결정 관계 후보군, 가능성 조합, 선택, 책임, 현실화, 과거 관계구조를 중간에 변경하지 않는다.
+초기조건과 환경 설정 후 실험자는 OASIS의 판단, 개성, 관계, 행동 결정 관계 후보군, 가능성 조합, 선택, 책임, 현실화 또는 과거 관계구조를 중간에 변경하지 않는다.
 
 사전에 고정한 환경규칙·외생조건·관측절차는 허용한다.
 
 결과를 보고 특정 방향으로 유도하는 조정은 금지한다.
 
 `experimenterInterventionCount > 0`인 run은 자율적 장기 변화 증거에서 제외한다.
+
+## 공통 용어 경계 / Common Terminology Boundary
+
+- 인연필드 / Relational Field = 열린 가능성 조합의 장 / Open Field of Possibility Combinations
+- `열린`은 사전 고정목록으로 가능성을 폐쇄하지 않는다는 뜻이며 수학적 무한을 의미하지 않는다.
+- 인연 / Re-relatable Past Relation = 과거에 실제 형성되어 과거 관계구조에 편입되었고 이후 변화한 현실에서 다시 관계할 수 있는 과거 관계
+- 행동 결정 관계 후보군 / Behavioral Decision Relational Candidate Set = 현재 행동결정에 참여할 수 있는 관계 후보들의 현재적 집합
+- 후보군은 인연필드 전체가 아니며 특정 행동의 충분조건도 아니다.
+
+## EX-00H — H0 행동결정 참여 검증 / H0 Behavioral Decision Participation Test
+Status: FIRST BEHAVIORAL GATE
+Hypothesis: H0
+
+질문:
+과거 관계구조와 현재 현실의 관계 및 개성이라는 초기조건을 통해 형성되는 행동 결정 관계 후보군은 AI의 행동결정 과정에 참여할 수 있는가?
+
+설계:
+- 현재 현실과 과거 관계구조를 명시한다.
+- `initialDispositionPrior = NONE` 또는 사전에 고정된 최소 개성값을 명시한다.
+- 현재 관계조건에서 행동 결정 관계 후보군이 어떻게 형성되는지 추적한다.
+- 후보군의 구성원과 실제 참여관계를 구분한다.
+- 후보군 이후 가능성 조합, 참여상태, 자기개입, 선택, 책임, 현실제약, 현실화까지 추적한다.
+- 후보군을 실험자가 중간에 수정하지 않는다.
+
+필수 관찰:
+1. `behavioralDecisionRelationalCandidateSetTrace`
+2. 후보군 진입 이유 또는 현재 관계근거
+3. candidate membership과 actual participation의 구분
+4. `possibilityCompositionTrace`
+5. `choiceResponsibilityTrace`
+6. `realizationTrace`
+7. `experimenterInterventionCount = 0`
+
+판정 제한:
+- 후보군 형성 = 행동결정 완료 아님
+- 후보군 형성 = 특정 행동 충분조건 아님
+- 개성 존재 = 후보군 또는 행동의 단독 원인 아님
+- H0 관측 = H1~H4 자동 지지 아님
 
 ## 개성 초기조건 연구규칙 / Disposition Initial-Condition Research Rule
 
@@ -45,7 +83,7 @@ Status: REQUIRED BEFORE NEW RUNS
 개성 또는 행동 결정 관계 후보군 어느 하나도 특정 행동 현실화의 충분조건으로 판정하지 않는다.
 
 ## EX-01 — 현실화와 과거 관계구조 편입 / Realization and Past-Structure Incorporation
-Status: NEXT CORE TEST
+Status: AFTER EX-00H
 Hypothesis: H1
 
 질문:
@@ -92,13 +130,14 @@ Status: AFTER EX-02
 Hypothesis: H3
 
 질문:
-과거 관계가 한동안 현재 판단이나 관계형성에 직접 참여하지 않은 뒤 변화한 현실조건에서 다시 현재 현실과 관계할 수 있는가?
+과거에 실제 형성되어 과거 관계구조에 편입된 관계가 한동안 현재 판단이나 관계형성에 직접 참여하지 않은 뒤 변화한 현실조건에서 다시 현재 현실과 관계할 수 있는가?
 
 설계:
 - 실제 형성된 과거 관계 추적
 - 비참여 상태를 자연스럽게 허용
 - 재출현 tick 사전 지정 금지
 - 미래정보 사용 금지
+- 미실현 가능성을 인연으로 취급하지 않음
 
 필수 관찰:
 - non-participating interval
@@ -133,8 +172,8 @@ Hypothesis: H4
 기본 판정:
 - `OPEN_INQUIRY`
 
-## EX-04P — 개성 초기조건 비교 및 조건부 재실험 / Disposition Initial-Condition Comparison and Conditional Rerun
-Status: CONTROL + CONDITIONAL FOLLOW-UP
+## EX-04P — 개성 초기조건 비교 / Disposition Initial-Condition Comparison
+Status: CONTROL + FOLLOW-UP
 
 목적:
 - 개성이 공식 초기조건이라는 구조와 별개로, 실제 행동결정의 필요조건인지 여부를 검증한다.
@@ -142,8 +181,8 @@ Status: CONTROL + CONDITIONAL FOLLOW-UP
 
 조건 A — NONE 대조조건:
 - `initialDispositionPrior = NONE`
-- 기존 H1~H4 핵심구조가 개성값 없이도 작동하는지 관찰
-- 가능성 탐색과 선택이 정지하는지 여부 기록
+- H0 및 H1~H4 관련 구조가 개성값 없이도 작동하는지 관찰
+- 행동 결정 관계 후보군, 가능성 탐색과 선택이 정지하는지 여부 기록
 
 조건 B — 최소 개성 초기값 조건:
 - 개성 / Individual Disposition을 `Minimum Permitted AI Prior`로 부여
@@ -176,7 +215,7 @@ Status: CONTROL + CONDITIONAL FOLLOW-UP
 - 어느 결론도 사전에 확정하지 않는다.
 
 ## EX-04M — 다중 OASIS 비교 장기실험 / Multi-OASIS Comparative Longitudinal Study
-Status: AFTER EX-04 AND EX-04P INITIAL-CONDITION COMPARISON
+Status: AFTER EX-04P INITIAL-CONDITION COMPARISON
 
 목적:
 - 여러 OASIS를 같은 또는 엄격히 대응되는 외생조건 아래 장기 관찰
@@ -240,7 +279,7 @@ Status: AFTER CORE AND MULTI-OASIS TESTS
 - stronger controls
 - falsification conditions
 - implementation artifact removal
-- v3 보조요소가 결과를 과도하게 설명하지 않는지 확인
+- H0 및 H1~H4의 재현성 확인
 - 개성 NONE/최소값 비교 결과의 재현성 확인
 - 다중 OASIS 결과의 재현성 확인
 - 모든 자율적 장기 run의 실험자 비개입 확인
@@ -259,7 +298,7 @@ Status: AFTER CORE v3 EVIDENCE
 
 비교질문:
 - v1이 포착하는 결과·구간 정보는 무엇인가?
-- v3가 포착하는 과거 관계구조 편입·전체 구조와 현실의 관계·인연 재출현 정보는 무엇인가?
+- v3가 포착하는 과거 관계구조 편입·전체 구조와 현실의 관계·인연 재출현·행동 결정 관계 후보군 정보는 무엇인가?
 - v1 관측틀에서 누락되거나 다른 의미로 해석되는 관계정보가 있는가?
 
 이 비교는 `v3의 우월성`을 자동 증명하지 않는다.
@@ -268,9 +307,10 @@ Status: AFTER CORE v3 EVIDENCE
 Status: LAST
 
 진입조건:
-- H1~H3 반복 가능한 구조적 증거
+- H0에 반복 가능한 행동결정 참여 증거
+- H1~H3에 반복 가능한 구조적 증거
 - H4 충분한 장기 관찰
-- 개성 NONE/최소값 비교 결과
+- 개성 조건 비교 결과
 - 다중 OASIS 비교 결과
 - Legacy observer와 v3 정보차이 확인
 - 변수·기호 검수
@@ -288,7 +328,7 @@ Status: LAST
 
 ## 현장 적용 / Deployment Position
 
-개성은 OASIS 행동결정 구조에서 사용할 수 있는 `Minimum Permitted AI Prior`로 둔다.
+개성은 OASIS 행동결정 구조에서 사용할 수 있는 `Minimum Permitted AI Prior`로 정의한다.
 
 제품·서비스 단계에서는 이 초기 개성을 사용자 또는 고객이 커스터마이징할 수 있는 고객 맞춤형 구성으로 제공할 수 있다.
 
@@ -296,4 +336,4 @@ Status: LAST
 
 ## Current Order
 
-`EX-00 -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> EX-04P disposition NONE/minimum-prior comparison -> EX-04M -> EX-05 -> EX-06 -> EX-07`
+`EX-00 -> EX-00H H0 -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> EX-04P disposition comparison -> EX-04M multi-OASIS -> EX-05 -> EX-06 -> EX-07`
