@@ -57,67 +57,103 @@ function compositionalDepth(possibility) {
   return Array.isArray(possibility.sigma) ? possibility.sigma.length : 0;
 }
 
-function chooseUniqueExtreme(admissible, metric, direction) {
+function hashUnit(text) {
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0) / 4294967296;
+}
+
+function distributionMap(distribution) {
+  return new Map((distribution ?? []).map(row => [row.possibilityId, Number(row.probability) || 0]));
+}
+
+function weightedSample(candidates, distribution, randomUnit) {
+  if (!candidates.length) return null;
+  if (candidates.length === 1) return candidates[0].id;
+
+  const weights = distributionMap(distribution);
+  const rows = candidates.map(candidate => ({
+    candidate,
+    weight: Math.max(0, weights.get(candidate.id) ?? 0)
+  }));
+  const total = rows.reduce((sum, row) => sum + row.weight, 0);
+  if (!(total > 0)) {
+    return rows[Math.min(rows.length - 1, Math.floor(randomUnit * rows.length))].candidate.id;
+  }
+
+  let target = randomUnit * total;
+  for (const row of rows) {
+    target -= row.weight;
+    if (target <= 0) return row.candidate.id;
+  }
+  return rows.at(-1).candidate.id;
+}
+
+function extremePool(admissible, metric, direction) {
   const rows = admissible.map(possibility => ({ possibility, value: Number(metric(possibility)) || 0 }));
   const extreme = direction === 'min'
     ? Math.min(...rows.map(row => row.value))
     : Math.max(...rows.map(row => row.value));
-  const winners = rows.filter(row => row.value === extreme);
-  return winners.length === 1 ? winners[0].possibility.id : null;
+  return rows.filter(row => row.value === extreme).map(row => row.possibility);
 }
 
 /**
- * Experiment-specific Choice-Axis disposition.
- * This is not a universal OASIS decision law and never converts personality into reward.
- * If the declared disposition does not uniquely distinguish one admissible possibility,
- * the policy returns null so the canonical kernel remains fail-closed.
+ * Experiment-specific Choice-Axis policy.
+ *
+ * Common neutral layer:
+ * - closes one already-constructed admissible possibility by stochastic sampling from P_t;
+ * - never uses argmax P_t;
+ * - never imports reward, success criteria, or a target action.
+ *
+ * Personality layer:
+ * - changes only the admissible candidate pool according to an explicit structural disposition;
+ * - sampling within that pool still uses P_t;
+ * - personality is an experimental independent variable, not a universal OASIS law.
  */
-export function createPrehistoricPersonalityChoicePolicy(agentSpec) {
+export function createPrehistoricChoicePolicy(agentSpec, runSeed = 'prehistoric-run-0') {
   if (!agentSpec || !agentSpec.id || !agentSpec.disposition) {
     throw new TypeError('valid prehistoric agentSpec is required');
   }
 
-  return ({ admissible, activeRelations }) => {
-    if (!Array.isArray(admissible) || admissible.length <= 1) {
-      return admissible?.[0]?.id ?? null;
-    }
+  return ({ admissible, activeRelations, distribution, observation, round }) => {
+    if (!Array.isArray(admissible) || admissible.length === 0) return null;
+    if (admissible.length === 1) return admissible[0].id;
 
+    let pool = admissible;
     switch (agentSpec.disposition) {
       case 'neutral':
-        return null;
+        break;
       case 'explorer':
-        return chooseUniqueExtreme(
-          admissible,
-          possibility => relationExpansionCount(possibility, activeRelations),
-          'max'
-        );
+        pool = extremePool(admissible, p => relationExpansionCount(p, activeRelations), 'max');
+        break;
       case 'cooperative':
-        return chooseUniqueExtreme(
-          admissible,
-          possibility => otherParticipantCount(possibility, agentSpec.id),
-          'max'
-        );
+        pool = extremePool(admissible, p => otherParticipantCount(p, agentSpec.id), 'max');
+        break;
       case 'self-reliant':
-        return chooseUniqueExtreme(
-          admissible,
-          possibility => otherParticipantCount(possibility, agentSpec.id),
-          'min'
-        );
+        pool = extremePool(admissible, p => otherParticipantCount(p, agentSpec.id), 'min');
+        break;
       case 'continuity':
-        return chooseUniqueExtreme(
-          admissible,
-          possibility => activeRelationUseCount(possibility, activeRelations),
-          'max'
-        );
+        pool = extremePool(admissible, p => activeRelationUseCount(p, activeRelations), 'max');
+        break;
       case 'compositional':
-        return chooseUniqueExtreme(admissible, compositionalDepth, 'max');
+        pool = extremePool(admissible, compositionalDepth, 'max');
+        break;
       default:
         throw new Error(`unknown prehistoric disposition: ${agentSpec.disposition}`);
     }
+
+    const randomUnit = hashUnit(`${runSeed}|${agentSpec.id}|${observation?.id ?? 'no-observation'}|${round ?? 0}`);
+    return weightedSample(pool, distribution, randomUnit);
   };
 }
 
-export function buildPrehistoricAgentSpecsV1() {
+// Backward-compatible name for the experiment-specific disposition factory.
+export const createPrehistoricPersonalityChoicePolicy = createPrehistoricChoicePolicy;
+
+export function buildPrehistoricAgentSpecsV1(runSeed = 'prehistoric-run-0') {
   return PREHISTORIC_COHORT_V1.map(agent => ({
     ...agent,
     capabilities: [...PREHISTORIC_CAPABILITY_GROUP_V1],
@@ -132,6 +168,6 @@ export function buildPrehistoricAgentSpecsV1() {
       importedFutureStream: false,
       importedTargetAction: false
     },
-    choicePolicy: createPrehistoricPersonalityChoicePolicy(agent)
+    choicePolicy: createPrehistoricChoicePolicy(agent, runSeed)
   }));
 }
