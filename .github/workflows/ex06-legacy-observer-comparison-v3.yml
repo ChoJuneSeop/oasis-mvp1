@@ -1,0 +1,47 @@
+name: OASIS EX-06 Legacy Observer Comparison v3
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "tools/ex06-legacy-observer-comparison-v3.mjs"
+      - "tools/ex04m-multi-oasis-longitudinal-v3.mjs"
+      - "tools/causal-trace-ledger-v1.mjs"
+      - "docs/causal/CAUSAL_EXPERIMENT_INDEX_v1.2.md"
+      - "relation-field.js"
+      - "index.html"
+      - "tools/validation-compatibility-guard.mjs"
+      - ".github/workflows/ex06-legacy-observer-comparison-v3.yml"
+
+concurrency:
+  group: oasis-ex06-legacy-observer-comparison-v3
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run EX-06 legacy observer comparison
+        run: node tools/ex06-legacy-observer-comparison-v3.mjs
+      - name: Upload EX-06 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-ex06-legacy-observer-comparison-v3
+          path: ex06-legacy-observer-comparison-v3-report.json
+          if-no-files-found: ignore
