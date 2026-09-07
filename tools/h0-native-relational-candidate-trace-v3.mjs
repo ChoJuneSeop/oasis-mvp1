@@ -99,25 +99,26 @@ try{
       if(h.links?.length)return h.links.some(n=>ep.key===pairKey(h.npc,n));
       return ep.a===h.npc||ep.b===h.npc;
     }
-    function relationPresenceSummary(P,npc){
-      const events=P.relationHistory.filter(e=>e.npc===npc);
+    function relationPresenceSummary(P,npc=null){
+      const events=npc===null?P.relationHistory:P.relationHistory.filter(e=>e.npc===npc);
       const ticks=events.map(e=>e.t).filter(Number.isFinite);
       return {
         eventCount:events.length,
         firstObservedTick:ticks.length?Math.min(...ticks):null,
         lastObservedTick:ticks.length?Math.max(...ticks):null,
+        npcs:[...new Set(events.map(e=>e.npc).filter(Boolean))].sort(),
         places:[...new Set(events.map(e=>e.place).filter(Boolean))].sort()
       };
     }
     function primitiveCandidates(P,rows){
       const out=new Map();
-      const add=(npc,reason,possibilityId)=>{
-        if(!npc)return;
+      const addNpc=(npc,reason,possibilityId)=>{
+        if(!npc||!P.relationHistory.some(e=>e.npc===npc))return;
         const id=`relation-presence:${npc}`;
         if(!out.has(id))out.set(id,{
           id,
           type:'primitive_relation_presence',
-          predicate:'relationExists',
+          predicate:'relationExists(P,npc)',
           npc,
           provenance:relationPresenceSummary(P,npc),
           reasons:[],
@@ -128,14 +129,33 @@ try{
         if(!q.reasons.includes(reason))q.reasons.push(reason);
         if(possibilityId&&!q.supportedPossibilities.includes(possibilityId))q.supportedPossibilities.push(possibilityId);
       };
+      if(P.relationHistory.length){
+        out.set('relation-presence:any',{
+          id:'relation-presence:any',
+          type:'primitive_relation_presence',
+          predicate:'P.relationHistory.length > 0',
+          npc:null,
+          provenance:relationPresenceSummary(P),
+          reasons:['base-participation:mage-enabled'],
+          supportedPossibilities:[],
+          collectiveParticipation:true
+        });
+      }
       for(const row of rows){
         if(row.id.startsWith('hidden:')){
           const h=hiddenDefs.find(x=>x.id===row.id.slice(7));
-          if(h&&!h.links?.length&&P.relationHistory.some(e=>e.npc===h.npc))add(h.npc,`hidden-anchor:${h.id}`,row.id);
+          if(h){
+            for(const n of h.links||[])addNpc(n,`hidden-link-presence:${h.id}`,row.id);
+            for(const placeId of h.places||[]){
+              const gate=places[placeId]?.gate;
+              if(gate)addNpc(gate,`hidden-place-access:${h.id}:${placeId}`,row.id);
+            }
+          }
           continue;
         }
         const gate=places[row.id]?.gate;
-        if(gate&&P.relationHistory.some(e=>e.npc===gate))add(gate,`gate-access:${row.id}`,row.id);
+        if(gate)addNpc(gate,`gate-access:${row.id}`,row.id);
+        for(const [npc,placeId] of npcs)if(placeId===row.id)addNpc(npc,`base-rank-relation-fit:${row.id}`,row.id);
       }
       return [...out.values()];
     }
@@ -148,18 +168,18 @@ try{
       }
       return [...grouped.entries()].map(([key,xs])=>{
         const supported=[];
-        const reasons=['collective-participation-presence'];
+        const reasons=['relation-field-collective-participation-presence'];
         for(const {ep} of xs)for(const r of relevantReasons(S,P,ep))reasons.push(`current-relevance:${r}`);
         for(const row of rows){
           if(row.id.startsWith('hidden:')){
             const h=hiddenDefs.find(x=>x.id===row.id.slice(7));
             if(xs.some(x=>episodeSupportsHidden(x.ep,h))){
               supported.push(row.id);
-              reasons.push(`hidden-link:${h?.id||row.id}`);
+              reasons.push(`relation-field-hidden-link:${h?.id||row.id}`);
             }
           }else if(xs.some(x=>episodeSupportsAction(x.ep,row.id))){
             supported.push(row.id);
-            reasons.push(`rank-support:${row.id}`);
+            reasons.push(`relation-field-rank-support:${row.id}`);
           }
         }
         const ids=xs.map(x=>x.id);
@@ -248,12 +268,12 @@ try{
       if(rec.candidates.some(c=>c.collectiveParticipation))summary.decisionsWhereRelationalSetParticipatesCollectively++;
       for(const c of rec.candidates){
         uniqueCandidateIds.add(c.id);
-        if(c.type==='primitive_relation_presence'){
-          summary.primitiveRelationPresenceCandidateItems++;
-          uniquePresenceIds.add(c.id);
-        }else{
+        if(c.type==='active_relation_key'){
           summary.activeRelationKeyCandidateItems++;
           uniqueKeyIds.add(c.id);
+        }else{
+          summary.primitiveRelationPresenceCandidateItems++;
+          uniquePresenceIds.add(c.id);
         }
         const links=(c.supportedPossibilities||[]).length;
         summary.candidateToPossibilityLinks+=links;
@@ -307,8 +327,8 @@ try{
         summary.decisionsWithNativeRelationalCandidateSet>0&&summary.realizedSelectedDecisions>0&&valid
           ?'OBSERVED_WITHIN_CANONICAL_HARNESS; SUFFICIENCY_AND_NECESSITY_NOT_ESTABLISHED'
           :'UNVALIDATED',
-      primitivePastRelationGranularity:'NPC_RELATION_PRESENCE_PREDICATE_WITH_EVENT_PROVENANCE; INDIVIDUAL_EVENT_CAUSALITY_NOT_ASSERTED',
-      activeComposedRelationGranularity:'RELATION_KEY_DECISION_UNIT_WITH_EXACT_EPISODE_PROVENANCE; INDIVIDUAL_EPISODE_NECESSITY_NOT_ASSERTED',
+      primitivePastRelationGranularity:'RELATION-PRESENCE PREDICATES WITH EVENT PROVENANCE; INDIVIDUAL EVENT CAUSALITY NOT ASSERTED',
+      activeComposedRelationGranularity:'RELATION_KEY DECISION UNIT WITH EXACT EPISODE PROVENANCE; INDIVIDUAL EPISODE NECESSITY NOT ASSERTED',
       theoreticalPossibilityCompositionFullyValidated:false,
       individualDispositionValidated:false,
       universalGeneralization:false
@@ -323,8 +343,8 @@ try{
         experimenterInterventionCount:0,
         nonAnticipatory:true,
         dispositionCondition:'NONE',
-        nativeRelationalCandidateDefinition:'Current implementation-level relational predicates actually read by decision construction: NPC-level past-relation presence predicates that enable gated/anchor possibilities, plus currently active composed relation keys that can affect collective participation, ranking, or hidden-relation readiness.',
-        primitiveGranularityBoundary:'relationHistory provides provenance, but production relationExists compresses repeated primitive events to NPC-level relation presence. Individual primitive event identities are not claimed as independent decision causes.',
+        nativeRelationalCandidateDefinition:'Current implementation-level relational predicates actually read by decision construction: global past-relation presence used by participation, NPC-level relation-presence predicates used by gate/ranking/hidden conditions, plus currently active composed relation keys used by relational-field participation, ranking, or hidden readiness.',
+        primitiveGranularityBoundary:'relationHistory provides provenance, but production predicates compress repeated primitive events to relation-presence tests (global or NPC-level). Individual primitive event identities are not claimed as independent decision causes.',
         composedGranularityBoundary:'The production relational field exposes active relation keys to decision predicates. Exact episode identities are retained as provenance, but individual episode necessity/sufficiency is not inferred from candidate membership.',
         candidateMembershipVsParticipation:'Membership means a relation predicate is eligible/currently read by decision construction. Direct supportedPossibilities record action-specific support; collectiveParticipation records participation-state influence that need not target a single possibility.',
         possibilityCompositionBoundary:'The recorded rows are the implemented current decision possibility projection (id, votes, voices, direct relational support, collective relational participation). They are not asserted to exhaust the theoretical Open Field of Possibility Combinations.',
