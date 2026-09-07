@@ -1,13 +1,14 @@
 {
   "system": {"name":"OASIS Integrated Paper System","version":"1.1","stage":"F1"},
-  "workflowRun": 34157084254,
-  "horizon": 120000,
+  "workflowRuns": [34157084254, 34157550004],
+  "replication": "2/2 identical classification and key trajectory values",
+  "horizonPerRun": 120000,
   "classification": "NULL_WITHIN_HORIZON_FOR_BEHAVIOR_AFTER_FLOW_PRESERVED_INCORPORATION_BLOCK",
   "gate": {
     "triggerObserved": true,
     "triggerBaselineMatch": true,
-    "beforeTriggerMismatchTicks": 0,
-    "fullTwinMismatchTicks": 0,
+    "beforeTriggerMismatch": 0,
+    "baselineTwinMismatch": 0,
     "nonTargetFlowPreserved": true,
     "postTriggerChoices": 890,
     "postTriggerOutcomes": 890,
@@ -42,5 +43,5 @@
     "provesExternalValidity": false,
     "validNegativeIfNoBehaviorDivergence": true
   },
-  "oasisInterpretation": "A single realized relational-experience incorporation changed relational structure immediately but was not necessary for downstream behavioral divergence within 120,000 ticks. The same relation naturally regenerated from tick 5,786, indicating redundancy/reconstruction in the continuing flow."
+  "oasisInterpretation": "Across two 120,000-tick runs, blocking one naturally occurring realized relational-experience incorporation changed relational structure immediately but did not produce downstream behavioral divergence. The same relation naturally regenerated at tick 5,786, consistent with redundancy/reconstruction in the continuing flow rather than a fixed one-event-one-future-effect rule."
 }
