@@ -4,7 +4,7 @@ import {
   PREHISTORIC_CAPABILITY_GROUP_V1,
   PREHISTORIC_COHORT_V1,
   buildPrehistoricAgentSpecsV1,
-  createPrehistoricPersonalityChoicePolicy
+  createPrehistoricChoicePolicy
 } from '../src/prehistoric-cohort-v1.mjs';
 
 test('cohort contains one neutral OASIS and five distinct personality OASIS agents', () => {
@@ -14,14 +14,14 @@ test('cohort contains one neutral OASIS and five distinct personality OASIS agen
 });
 
 test('all six agents receive the same capability group', () => {
-  const agents = buildPrehistoricAgentSpecsV1();
+  const agents = buildPrehistoricAgentSpecsV1('seed-a');
   for (const agent of agents) {
     assert.deepEqual(agent.capabilities, [...PREHISTORIC_CAPABILITY_GROUP_V1]);
   }
 });
 
 test('clean initialization imports no legacy memory, reward, Q, relation episodes, future stream, or target action', () => {
-  const agents = buildPrehistoricAgentSpecsV1();
+  const agents = buildPrehistoricAgentSpecsV1('seed-a');
   for (const agent of agents) {
     assert.deepEqual(agent.initialState.history, []);
     assert.deepEqual(agent.initialState.historyRelations, []);
@@ -35,28 +35,62 @@ test('clean initialization imports no legacy memory, reward, Q, relation episode
   }
 });
 
-test('neutral personality does not invent a semantic winner when multiple possibilities remain', () => {
-  const policy = createPrehistoricPersonalityChoicePolicy(PREHISTORIC_COHORT_V1[0]);
-  const result = policy({
-    admissible: [
-      { id: 'a', A_c: ['OASIS-N0'], R_c: [], sigma: [{}] },
-      { id: 'b', A_c: ['OASIS-N0'], R_c: [], sigma: [{}] }
+test('neutral OASIS closes among already admissible possibilities without argmax', () => {
+  const spec = PREHISTORIC_COHORT_V1[0];
+  const policy = createPrehistoricChoicePolicy(spec, 'seed-a');
+  const admissible = [
+    { id: 'a', A_c: [spec.id], R_c: [], sigma: [{}] },
+    { id: 'b', A_c: [spec.id], R_c: [], sigma: [{}] }
+  ];
+  const chosen = policy({
+    admissible,
+    activeRelations: [],
+    distribution: [
+      { possibilityId: 'a', probability: 0.99 },
+      { possibilityId: 'b', probability: 0.01 }
     ],
-    activeRelations: []
+    observation: { id: 'obs-0' },
+    round: 0
   });
-  assert.equal(result, null);
+  assert.ok(['a', 'b'].includes(chosen));
 });
 
-test('personality policies remain fail-closed when their own disposition cannot uniquely distinguish candidates', () => {
-  for (const spec of PREHISTORIC_COHORT_V1.slice(1)) {
-    const policy = createPrehistoricPersonalityChoicePolicy(spec);
-    const result = policy({
-      admissible: [
-        { id: 'a', A_c: [spec.id], R_c: [], sigma: [{}] },
-        { id: 'b', A_c: [spec.id], R_c: [], sigma: [{}] }
-      ],
-      activeRelations: []
-    });
-    assert.equal(result, null, spec.id);
-  }
+test('choice is reproducible for the same run seed and observation', () => {
+  const spec = PREHISTORIC_COHORT_V1[0];
+  const context = {
+    admissible: [
+      { id: 'a', A_c: [spec.id], R_c: [], sigma: [{}] },
+      { id: 'b', A_c: [spec.id], R_c: [], sigma: [{}] }
+    ],
+    activeRelations: [],
+    distribution: [
+      { possibilityId: 'a', probability: 0.5 },
+      { possibilityId: 'b', probability: 0.5 }
+    ],
+    observation: { id: 'obs-1' },
+    round: 0
+  };
+  assert.equal(
+    createPrehistoricChoicePolicy(spec, 'same-seed')(context),
+    createPrehistoricChoicePolicy(spec, 'same-seed')(context)
+  );
+});
+
+test('compositional personality restricts choice to the deepest valid composition', () => {
+  const spec = PREHISTORIC_COHORT_V1.find(x => x.disposition === 'compositional');
+  const policy = createPrehistoricChoicePolicy(spec, 'seed-c');
+  const chosen = policy({
+    admissible: [
+      { id: 'one', A_c: [spec.id], R_c: [], sigma: [{}] },
+      { id: 'two', A_c: [spec.id], R_c: [], sigma: [{}, {}] }
+    ],
+    activeRelations: [],
+    distribution: [
+      { possibilityId: 'one', probability: 0.9 },
+      { possibilityId: 'two', probability: 0.1 }
+    ],
+    observation: { id: 'obs-c' },
+    round: 0
+  });
+  assert.equal(chosen, 'two');
 });
