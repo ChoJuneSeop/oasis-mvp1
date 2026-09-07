@@ -1,0 +1,29 @@
+name: OASIS Prehistoric Memory-Safe Equivalence v1.2
+
+on:
+  push:
+    branches:
+      - storage/oasis-integrated-research-system-v1.0
+    paths:
+      - '.github/workflows/oasis-prehistoric-memory-safe-equivalence-v1-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  equivalence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax audit memory-safe execution files
+        run: |
+          node --check integrated-research-system-storage/prehistoric/src/oasis-math-kernel-v1.2-memory-safe.mjs
+          node --check integrated-research-system-storage/prehistoric/src/prehistoric-continuous-runner-v1.2-memory-safe.mjs
+          node --check integrated-research-system-storage/prehistoric/tests/prehistoric-memory-safe-equivalence-v1.2.mjs
+      - name: Verify deterministic trajectory equivalence
+        run: node integrated-research-system-storage/prehistoric/tests/prehistoric-memory-safe-equivalence-v1.2.mjs
