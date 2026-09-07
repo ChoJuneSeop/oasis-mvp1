@@ -187,8 +187,69 @@ Status: CONDITIONAL ONLY
 - 동일한 초기 개성값에서도 경험과 과거 관계구조에 따라 장기 행동경향이 달라진다면, 그 차이를 OASIS의 관계과정과 함께 분석한다.
 - 그 가능성을 사전에 확정하지 않는다.
 
+## EX-04M — 다중 OASIS 비교 장기실험 / Multi-OASIS Comparative Longitudinal Study
+Status: AFTER EX-04, AND AFTER EX-04P IF THE DISPOSITION CONDITION IS USED
+
+목적:
+- 여러 OASIS를 같은 또는 엄격히 대응되는 외생조건 아래 장기간 관찰한다.
+- 동일한 OASIS 코어가 서로 어떤 과거 관계구조, 가능성 조합, 선택, 자기개입, 책임 배분, 현실화, 장기 행동경향을 형성하는지 비교한다.
+- 차이가 나타나는 경우 그 차이가 단순 최종결과 차이인지, 서로 다른 관계과정에서 비롯된 것인지 구분한다.
+
+비교조건:
+
+### A. 동일 초기조건 비교 / Same-Initial-Condition Comparison
+- 두 개 이상의 OASIS에 가능한 한 동일한 초기 과거 관계구조, 현재 현실, 환경규칙을 제공한다.
+- 개성 조건을 사용하지 않는 1차 연구에서는 개성값을 별도로 부여하지 않는다.
+- 동일 조건에서 장기 현실흐름이 같게 유지되는지 또는 달라지는지를 그대로 관찰한다.
+- 차이가 없더라도 실패로 간주하지 않는다. 동일조건에서 동일한 흐름이 재현된다는 결과로 기록한다.
+
+### B. 동일 최소 개성조건 비교 / Same-Minimum-Disposition Comparison
+- EX-04P가 사용된 경우에만 실시한다.
+- 여러 OASIS에 동일한 `initialDispositionPrior`를 부여한다.
+- 초기 개성값을 실험 중 변경하지 않는다.
+- 동일 초기 개성값을 가진 OASIS들이 경험과 과거 관계구조의 차이 속에서 장기적으로 같은 또는 다른 행동경향을 형성하는지 관찰한다.
+
+### C. 서로 다른 최소 개성조건 비교 / Different-Minimum-Disposition Comparison
+- EX-04P가 사용된 경우에만 실시한다.
+- OASIS 코어와 외생조건은 대응시키고 `initialDispositionPrior`만 다르게 설정한다.
+- 각 초기 개성값은 특정 결과를 강제하지 않는 최소 허용 초기조건이어야 한다.
+- 서로 다른 초기 개성이 가능성 탐색과 선택의 방향 차이와 함께 나타나는지 장기적으로 관찰한다.
+
+공통 필수조건:
+- 초기조건 설정 이후 실험자 개입 금지
+- 각 OASIS의 `experimenterInterventionCount = 0`
+- 결과를 본 뒤 개성값, 환경규칙, 관계상태, 가능성 조합, 선택조건을 수정하지 않음
+- 비교를 위해 이미 달라진 각 OASIS의 현실흐름을 강제로 동일상태로 되돌리지 않음
+
+필수 비교기록:
+1. `oasisId`
+2. `initialDispositionPrior` — 사용하지 않은 경우 `NONE`
+3. 초기 과거 관계구조 / Initial Past Relational Structure
+4. 외생조건 식별정보 / Exogenous Condition Identifier
+5. `possibilityCompositionTrace`
+6. `selfInterventionTrace`
+7. `choiceResponsibilityTrace`
+8. `realizationTrace`
+9. `pastRelationalStructureChangeTrace`
+10. `relationalReappearanceTrace`
+11. `observedDispositionPatternTrace`
+12. `experimenterInterventionCount`
+
+비교질문:
+- 동일 초기조건의 OASIS들이 장기적으로 동일한 관계과정을 형성하는가, 다른 관계과정을 형성하는가?
+- 동일한 초기 개성값을 가진 OASIS들이 서로 다른 경험을 거친 뒤 실제 행동경향에서 차이를 보이는가?
+- 서로 다른 최소 개성값이 가능성 탐색과 선택의 방향 차이와 함께 나타나는가?
+- 최종 현실화가 같더라도 그에 이르는 과거 관계구조와 참여 관계과정은 서로 다른가?
+- 한 시점의 유사성 또는 차이가 장기적으로 유지되는가, 다시 달라지는가?
+
+해석 제한:
+- OASIS 간 차이 = 개성의 인과효과라고 자동 판정하지 않는다.
+- OASIS 간 유사성 = 동일한 인과과정이라고 자동 판정하지 않는다.
+- 한 OASIS의 결과가 더 좋다고 해서 해당 개성이 우월하다고 판정하지 않는다.
+- 이 실험은 개성 자체를 핵심 인과축으로 승격시키지 않는다.
+
 ## EX-05 — 반복·반증 / Replication and Falsification
-Status: AFTER EX-01~04 AND CONDITIONAL EX-04P IF USED
+Status: AFTER EX-01~04, EX-04M, AND CONDITIONAL EX-04P IF USED
 
 목적:
 - alternative seeds/worlds
@@ -198,6 +259,7 @@ Status: AFTER EX-01~04 AND CONDITIONAL EX-04P IF USED
 - implementation-specific artifact removal
 - 자기개입·개성 등 보조 구성요소가 결과 해석을 과도하게 설명하지 않는지 확인
 - 초기 개성조건이 같아도 서로 다른 현실흐름에서 다른 장기 행동경향이 재현되는지 확인
+- 다중 OASIS 비교에서 관측된 유사성·차이가 다른 환경과 장기 horizon에서도 재현되는지 확인
 - 모든 장기 변화 run에서 실험자 비개입 조건 유지 확인
 
 결과 등급:
@@ -256,4 +318,4 @@ Status: LAST
 
 ## Current order
 
-`EX-00 internal prior-work gate -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> [if needed: EX-04P minimum-disposition longitudinal rerun] -> EX-05 replication/falsification -> EX-06 Legacy observer comparison -> EX-07 causal-rate form review`
+`EX-00 internal prior-work gate -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> [if needed: EX-04P minimum-disposition longitudinal rerun] -> EX-04M multi-OASIS longitudinal comparison -> EX-05 replication/falsification -> EX-06 Legacy observer comparison -> EX-07 causal-rate form review`
