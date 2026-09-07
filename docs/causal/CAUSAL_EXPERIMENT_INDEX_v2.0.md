@@ -150,13 +150,30 @@ Status: CONDITIONAL ONLY
 - 1차 실험과 가능한 한 동일한 환경·관측조건을 유지한다.
 - 어떤 개성 초기조건을 사용했는지 명시한다.
 
+지속 관찰:
+- 개성 조건을 넣은 직후의 결과만 비교하지 않는다.
+- 동일한 초기 개성값을 유지한 채 현실흐름을 계속 진행한다.
+- 초기 개성값과 이후 실제 행동경향을 구분하여 기록한다.
+- 시간이 지나며 과거 관계구조가 달라질 때 가능성 탐색, 자기개입, 선택, 책임 배분, 관계형성, 현실화가 어떻게 달라지는지 추적한다.
+
+필수 추가 기록:
+1. `initialDispositionPrior` — 시작 시 허용한 최소 개성 초기조건
+2. `possibilityCompositionTrace` — 시점별 가능성 조합
+3. `selfInterventionTrace` — 자기개입 여부와 방향
+4. `choiceResponsibilityTrace` — 선택축·책임축의 관측 가능한 작동
+5. `realizationTrace` — 실제 현실화
+6. `pastRelationalStructureChangeTrace` — 현실화 경험 편입 후 과거 관계구조의 변화
+7. `observedDispositionPatternTrace` — 실제 선택·관계·탐색에서 반복적으로 나타나는 행동경향
+
 판정원칙:
 - 2차 결과는 1차 결과와 분리하여 보고한다.
 - 2차 성공을 1차 성공으로 소급하지 않는다.
 - 1차에서 명확한 반증이 있었다면 그 반증을 유지한 채 `개성 조건에서는 다른 결과가 관측되었는가`만 별도로 판단한다.
+- 초기 개성값과 이후 행동경향이 달라졌다고 해서 내부 개성 파라미터가 학습되었다고 자동 결론내리지 않는다.
 
 연구해석:
 - 개성 조건에서만 구조가 활성화된다면, 개성이 OASIS 작동에 필요한 최소 초기조건일 가능성을 후속 연구문제로 제시할 수 있다.
+- 동일한 초기 개성값에서도 경험과 과거 관계구조에 따라 장기 행동경향이 달라진다면, 그 차이를 OASIS의 관계과정과 함께 분석한다.
 - 그 가능성을 사전에 확정하지 않는다.
 
 ## EX-05 — 반복·반증 / Replication and Falsification
@@ -169,6 +186,7 @@ Status: AFTER EX-01~04 AND CONDITIONAL EX-04P IF USED
 - falsification conditions
 - implementation-specific artifact removal
 - 자기개입·개성 등 보조 구성요소가 결과 해석을 과도하게 설명하지 않는지 확인
+- 초기 개성조건이 같아도 서로 다른 현실흐름에서 다른 장기 행동경향이 재현되는지 확인
 
 결과 등급:
 - OBSERVED
@@ -222,6 +240,8 @@ Status: LAST
 
 이는 OASIS 핵심 인과축을 변경하는 것이 아니라, 동일한 OASIS 코어가 서로 다른 초기조건에서 다양한 가능성 흐름을 형성하도록 하는 적용 방식이다.
 
+실험에서는 고객 커스터마이징 기능 자체의 가치보다, 동일한 초기값을 가진 OASIS가 장기 현실흐름 속에서 어떻게 서로 다른 경험·관계·선택 경향을 형성하는지를 우선 보여준다.
+
 ## Current order
 
-`EX-00 internal prior-work gate -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> [if needed: EX-04P minimum-disposition rerun] -> EX-05 replication/falsification -> EX-06 Legacy observer comparison -> EX-07 causal-rate form review`
+`EX-00 internal prior-work gate -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> [if needed: EX-04P minimum-disposition longitudinal rerun] -> EX-05 replication/falsification -> EX-06 Legacy observer comparison -> EX-07 causal-rate form review`
