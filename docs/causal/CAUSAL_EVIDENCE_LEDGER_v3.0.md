@@ -1,306 +1,279 @@
 # OASIS Causal Evidence Ledger v3.0
 
-상태 / Status: current evidence interpretation
-기준일 / Date: 2026-09-07
-상위 기준 / Governing protocol: `../../OASIS_RESEARCH_PROTOCOL.md`
-정의 기준 / Canonical semantics: `../OASIS_CAUSAL_RESEARCH_SYSTEM_v3.0_ko.md`
-Predecessor evidence: `CAUSAL_EVIDENCE_LEDGER_v2.0.md`
+상태 / Status: current evidence interpretation  
+기준일 / Date: 2026-09-07  
+상위 기준 / Governing protocol: `../../OASIS_RESEARCH_PROTOCOL.md`  
+정의 기준 / Canonical semantics: `../OASIS_CAUSAL_RESEARCH_SYSTEM_v3.0_ko.md`  
+Predecessor evidence: `CAUSAL_EVIDENCE_LEDGER_v2.0.md`  
 Legacy evidence: `CAUSAL_EVIDENCE_LEDGER_v1.5.md`
 
 ## 1. Evidence Migration Rule
 
-v3는 v2의 증거등급을 성공결과로 재작성하지 않는다.
+v3는 v2의 증거를 성공결과로 재작성하지 않는다. v2/Legacy의 관측·반증·미검증 상태를 보존하고, v3에서 새로 직접 계측한 결과만 v3 증거등급으로 승격한다.
 
-v2에서 관측된 사실은 그대로 보존하고, v3에서 새로 추가된 인연필드·H0·자기개입·개성·행동 결정 관계 후보군·실험자 비개입·다중 OASIS·인과율 존재형태 관련 항목은 별도 증거가 확보되기 전까지 자동 승격하지 않는다.
+특허성, 과학적 타당성, 산업적 가치, 투자 가치는 서로 다른 판정축이다.
 
-## 2. Inherited Internal Evidence
+## 2. Canonical Terminology Boundary
 
-현재 유지되는 OASIS 내부 증거:
+- 과거 관계구조 / Past Relational Structure: 현재까지 현실화된 경험과 관계가 편입되어 형성된 과거의 관계구조.
+- 인연필드 / Relational Field: **열린 가능성 조합의 장 / Open Field of Possibility Combinations**.
+- `열린`은 가능성을 사전 고정목록으로 폐쇄하지 않는다는 의미이며 수학적 무한이나 물리적 장을 주장하지 않는다.
+- 인연 / Re-relatable Past Relation: 과거에 실제 형성·편입되었고 이후 변화한 현실에서 다시 현재와 관계할 수 있는 과거 관계.
+- 행동 결정 관계 후보군 / Behavioral Decision Relational Candidate Set: 현재 행동결정에 참여할 수 있는 관계 후보들의 현재적 집합. 인연필드 전체와 동일하지 않다.
+- 구현 필드 `relationHistory`는 계측용 구현 흔적이며 이론적 존재론 용어가 아니다.
+- 구현 필드 `cands`는 행동/목적지 후보목록이며 이론적 Behavioral Decision Relational Candidate Set과 동일시하지 않는다.
 
-- 관계과정과 순서정보가 tested scope에서 판단에 영향을 줄 수 있음: RETAINED INTERNAL EVIDENCE
-- 과거 관계가 현재 판단/관계형성에 직접 참여하지 않는 상태와 이후 맥락적 재활성 구현: OBSERVED IMPLEMENTATION
-- process identity를 formation → reactivation → participation → outcome까지 추적 가능: OBSERVED IMPLEMENTATION
-- same-current target이 같아도 causal process가 동일하다는 뜻은 아님: RETAINED
-- 개별 원인의 필요성/충분성과 joint-set attribution은 구분 필요: RETAINED
-- full production noncommutativity: UNVALIDATED
-- unrealized possibility direct causal force: UNVALIDATED
-- danger = responsibility: NOT ASSUMED / UNVALIDATED
-- longer memory = better OASIS spiral: previously REFUTED in tested form
+## 3. Canonical v3 Validation Run
 
-## 3. Relational Field Status
+검증 run: **OASIS Causal Research System v3 Validation #15**  
+GitHub Actions run id: `34097168183`  
+Head commit: `90a902cb7576a621bea310bc4a4b6c9f7ac972c3`  
+Result: **SUCCESS**
 
-Current definitional status: **FORMAL UPPER RELATIONAL CONCEPT**
+통과 단계:
+1. canonical validation guard
+2. fixed 120,000-tick longitudinal audit
+3. scale-safe inherited v2 causal trace assembly
+4. H1 exact structural incorporation genealogy
+5. H2 integrated downstream structural genealogy
+6. v3 behavioral causal evidence assembly
 
-Current empirical status: **NOT A SEPARATELY VALIDATED PHYSICAL OR MATHEMATICAL FIELD**
+Methodological invariants:
+- `experimenterInterventionCount = 0`
+- non-anticipatory analysis
+- diagnostic counterfactual does not write unrealized paths into production Past Relational Structure
+- whole-structure overwrite not assumed
+- persistent parallel unrealized realities not assumed
 
-v3 defines `인연필드 / Relational Field` as `열린 가능성 조합의 장 / Open Field of Possibility Combinations`.
+## 4. H0 — Behavioral Decision Participation
 
-This means that possibility combinations are not assumed to be a permanently closed, pre-enumerated list. It does not establish:
-- mathematical infinity
-- a physical field
-- persistent parallel realities
-- an actually enumerated infinite state space
+Current status: **PARTIALLY SUPPORTED WITHIN CANONICAL HARNESS FOR THE RELATIONAL COMPONENT**
 
-The Behavioral Decision Relational Candidate Set is narrower than the Relational Field and represents current candidate relations for behavioral decision participation.
+Same-current-state relational ablation rows: **297**
 
-## 4. H0 Behavioral Decision Participation Status
-
-Current status: **FORMALLY DEFINED / EMPIRICALLY UNVALIDATED**
-
-H0 asks whether relations formed through the relation among Past Relational Structure, Current Reality, and an Individual Disposition initial condition can enter the behavioral decision process through a Behavioral Decision Relational Candidate Set.
-
-Not established:
-- candidate-set formation necessarily changes action
-- candidate-set formation is sufficient for action realization
-- Individual Disposition is necessary for candidate-set formation
-- Individual Disposition alone causes a candidate-set difference
-
-Required next evidence:
-- explicit candidate-set formation and participation trace
-- distinction between candidate relation and actually participating relation
-- connection from candidate set to possibility composition and later decision stages
-- `NONE` versus minimum-disposition comparison for disposition necessity/effect
-
-## 5. H1 Status
-
-Current status: **UNVALIDATED AT STRUCTURAL LEVEL**
-
-Available evidence:
-- outcomes are observed in current audit harness.
-- implementation may show `relationHistory` field growth after outcome.
+Observed:
+- reactivated relational layer present: **297/297**
+- action/destination candidate-list differences: **0/297**
+- participation-leader differences: **284/297**
+- selected-action differences: **204/297**
+- both leader and selected action changed: **191/297**
+- leader only changed: **93/297**
+- selected action only changed: **13/297**
 
 Interpretation:
-- field growth is only `IMPLEMENTATION_CANDIDATE_INCORPORATION_SIGNAL`.
-- structural incorporation requires additional evidence of relation with existing past relations or later structural participation.
+- reactivated past relations contributed to participation and/or selected action under a fixed current state in this harness.
+- this does **not** show that the implementation destination list `cands` is the theoretical Behavioral Decision Relational Candidate Set.
+- H0 as a full hypothesis remains incomplete because native candidate-set formation, possibility composition, Individual Disposition, and full factor interaction are not yet directly identified.
 
-Required next evidence:
-- EX-01.
+Evidence grades:
+- Past Relational Structure contribution through reactivated past relations: **OBSERVED_WITHIN_CANONICAL_HARNESS**
+- selected-action contribution: **OBSERVED_WITHIN_CANONICAL_HARNESS**
+- Behavioral Decision Relational Candidate Set native trace: **UNVALIDATED / DIRECT TRACE REQUIRED**
+- Individual Disposition contribution: **UNVALIDATED**
+- any single component as sufficient cause: **NOT ESTABLISHED**
 
-## 6. H2 Status
+## 5. H1 — Realization and Incorporation into Past Relational Structure
 
-Current status: **UNVALIDATED AS INTEGRATED HYPOTHESIS**
+Current status: **SUPPORTED WITHIN CANONICAL HARNESS FOR EXACT STRUCTURAL LINEAGE**
 
-Available inherited evidence:
-- some post-outcome judgment-condition changes were instrumented in narrower prior runs.
-- same-current structural channel differences and overdetermination were observed.
+The validating genealogy is not storage growth. It is:
 
-Why insufficient:
-- H2 requires the newly formed whole past relational structure to be followed into subsequent reality relations as one continuous process.
+**realized outcome → current realized relation incorporated in implementation trace → compose with prior relation → exact episode formation → non-current/latent interval → exact reactivation → the same exact episode participates in selection → the same exact episode reaches a later outcome**
 
-Required next evidence:
-- EX-02 after EX-01.
-
-## 7. H3 Status
-
-Current status: **IMPLEMENTATION-OBSERVED / CAUSAL HYPOTHESIS NOT YET FULLY VALIDATED**
-
-Available evidence:
-- `latentize/noncurrent` and contextual `reactivate` events are present in the canonical harness.
-- reactivation can be linked to current-context reasons.
+Run #15 results:
+- qualifying structural formation links: **10,045**
+- exact episodes later becoming latent/non-current within horizon: **9,805**
+- exact episodes later reactivated: **9,781**
+- exact episodes later participating in selection: **9,752**
+- exact episodes reaching a later outcome: **9,705**
+- exact ordered reactivation → participation → outcome chains: **9,705**
+- distinct participating parties in qualifying H1 genealogy: **3**
+- distinct composed relation keys: **19**
 
 Interpretation:
-- this supports implementation-level relational reappearance tracing.
-- it does not by itself establish the full H3 causal hypothesis across environments.
+- H1 is no longer supported merely by `relationHistory` count growth.
+- exact structural lineage is directly observed inside the canonical harness.
+- this does not establish universal causality, real-world generalization, or whole-structure overwrite.
 
-Required next evidence:
-- EX-03 with long-gap and repeated-reappearance tracking.
+## 6. H2 — New Past Relational Structure and Subsequent Reality Relation
 
-## 8. H4 Status
+Current status: **PARTIALLY SUPPORTED WITHIN CANONICAL HARNESS; INTEGRATED CLAIM REQUIRES JOINT-STRUCTURE TEST**
+
+Observed downstream chain:
+
+**past relational participation → realized outcome → incorporation → same-tick formation of new relational episode(s)**
+
+Run #15 results:
+- outcomes carrying past-relational participation: **1,958**
+- those outcomes with incorporation signal: **874**
+- those outcomes producing new relational structure: **874**
+- source episode links across those structural outcomes: **1,152,200**
+- unique source exact episodes: **9,694**
+- distinct source relation keys: **19**
+- structural outcomes involving more than one source relation key: **864/874**
+- newly composed episodes: **9,906**
+- distinct newly composed relation keys: **19**
+- participating parties: **3**
+- source-episode age range: **596 to 119,551 ticks**; median **34,980 ticks**
+- distinct source relation keys per structural outcome: median **4**, maximum **7**
+
+Interpretation:
+- relationally participated outcomes can feed forward into new relational structure formation over long horizons in this harness.
+- multi-key participation shows that the observed process is not restricted to a single relation key.
+- however, the claim that the **entire newly formed Past Relational Structure as a joint structure** is causally necessary or uniquely sufficient is not yet established.
+- the theoretical `Possibility Composition` object is not yet directly instrumented.
+
+Therefore:
+- downstream structural process: **OBSERVED_WITHIN_CANONICAL_HARNESS**
+- H2 integrated process: **PARTIALLY SUPPORTED**
+- whole Past Relational Structure joint causal necessity: **UNVALIDATED**
+- direct Possibility Composition instrumentation: **UNVALIDATED**
+
+## 7. H3 — Relational Reappearance
+
+Current status: **OBSERVED IMPLEMENTATION / CAUSAL GENERALIZATION UNVALIDATED**
+
+Canonical harness contains natural `latentize/noncurrent` and contextual `reactivate` events without researcher intervention after initialization.
+
+Current long-horizon re-analysis additionally observes repeated reappearance. This supports the existence of reappearance behavior inside the harness but does not establish universal environmental generalization.
+
+## 8. H4 — Relational Persistence-Limit Inquiry
 
 Current status: **OPEN_INQUIRY**
 
-No claim is made that relational persistence has a fixed limit or no limit.
+Observed non-current → reappearance gaps in the current 120k dataset reach up to **4,089 ticks**, and **9,587** exact relations were observed reappearing more than once in the re-analysis.
 
-Current implementation storage windows or tick thresholds are not theoretical limits.
+These observations do not establish that no temporal or structural limit exists.
 
-A relation not reobserved by horizon is only:
+A relation not reobserved by the horizon is only:
 - `NOT_REOBSERVED_WITHIN_HORIZON`
 
-Required next evidence:
-- EX-04.
+Never infer extinction from horizon non-observation.
 
-## 9. Re-relatable Past Relation Status
+## 9. Individual Disposition
 
-Current definitional status: **FORMAL OPERATIONAL DEFINITION**
+Definitional status: **FORMAL BEHAVIORAL INITIAL CONDITION**  
+Empirical status: **NECESSITY AND EFFECT UNVALIDATED**
 
-`인연 / Re-relatable Past Relation` means a past relation that was actually formed and incorporated through realized experience into Past Relational Structure and may later relate to current reality again under changed conditions.
+`NONE` remains a valid control condition for testing necessity/effect. The canonical H0-H2 run used `NONE`; its success therefore cannot be used to claim that disposition caused those results.
 
-Not established:
-- every past relation will reappear
-- non-reappearance means extinction
-- affinity or preference score equals `인연`
-- unrealized possibilities are stored as `인연`
+Required follow-up:
+- EX-04P NONE vs minimum-disposition prior
+- fixed initial prior
+- observed disposition pattern separated from initial prior
+- no mid-run researcher adjustment
 
-## 10. Self-Intervention Status
+## 10. Behavioral Decision Relational Candidate Set
 
-Current status: **CONCEPTUALLY ADMITTED / EMPIRICALLY UNVALIDATED AS A DISTINCT CAUSAL FORM**
-
-Self-intervention is allowed as a possible origin of intervention.
-
-Not established:
-- that self-intervention is always beneficial
-- that self-intervention has stronger causality
-- that strong will implies higher causal rate
+Definitional status: **FORMAL BEHAVIORAL INTERMEDIATE**  
+Empirical status: **NATIVE TRACE NOT YET VALIDATED**
 
 Required evidence:
-- explicit self-intervention trace under no-experimenter-intervention conditions.
+1. explicit candidate-set formation trace
+2. reason/current relational basis for entry
+3. candidate membership vs actual participation
+4. connection to Possibility Composition
+5. connection to Participation, Choice, Responsibility and Realization
 
-## 11. Choice and Responsibility Status
+Do not infer candidate-set validation from destination-list equality/difference.
+
+## 11. Self-Intervention
+
+Current status: **CONCEPTUALLY ADMITTED / DISTINCT CAUSAL FORM UNVALIDATED**
+
+Correct interpretation:
+- will does not directly create an outcome.
+- self-intervention may alter later possibility/decision conditions through the OASIS process.
+
+Strong will ≠ stronger causal rate.
+
+## 12. Choice and Responsibility
 
 Current status: **RETAINED OASIS COMPONENTS / NOT CAUSAL-RATE EQUIVALENTS**
 
-Choice Axis and Responsibility Axis may be traced where relevant.
-
 Not established:
 - responsibility = danger
-- responsibility is itself causal strength
-- responsibility automatically defines an intervention
+- responsibility = causal strength
+- responsibility alone constitutes an intervention
 
-## 12. Individual Disposition Status
+## 13. No-Experimenter-Intervention
 
-Current definitional status: **FORMAL BEHAVIORAL INITIAL CONDITION**
+Current status: **MANDATORY METHODOLOGICAL INVARIANT**
 
-Current empirical status: **NECESSITY AND EFFECT UNVALIDATED**
+After initialization, researcher intervention into judgment, disposition, relations, candidate set, possibility composition, choice, responsibility, realization or Past Relational Structure invalidates that run as autonomous longitudinal evidence.
 
-v3 defines Individual Disposition as a `Minimum Permitted AI Prior` that can be used as an official behavioral initial condition.
+Run #15 satisfies this condition with `experimenterInterventionCount = 0`.
 
-This definitional position does not establish that disposition is necessary or sufficient for OASIS behavior.
+## 14. Multi-OASIS and Longitudinal Disposition
 
-A `NONE` condition remains valid as an experimental control/ablation for testing necessity and effect.
+Current status: **PLANNED / NO v3 INTEGRATED RESULT YET**
 
-Not established:
-- that disposition is required for OASIS to function
-- that disposition alone determines a behavioral decision relational candidate set
-- that disposition directly determines a realized action
-- that disposition is a fixed personality constant
-- that observed behavior change equals internal disposition-parameter learning
-
-Required evidence:
-- EX-04P NONE versus minimum-prior comparison.
-
-## 13. Behavioral Decision Relational Candidate Set Status
-
-Current status: **FORMAL BEHAVIORAL INTERMEDIATE / EMPIRICAL ROLE UNVALIDATED**
-
-The Behavioral Decision Relational Candidate Set is defined as the current candidate set of relations that can participate in behavioral decision formation.
-
-It is not treated as a sufficient condition for a realized action.
-
-Required evidence:
-- trace candidate-set formation from current relational conditions
-- distinguish candidate membership from actual participation
-- trace connection to possibility composition, choice/responsibility, and realization
-- test whether different disposition conditions are accompanied by candidate-set differences without assuming disposition-only causation
-
-Do not infer:
-- candidate-set formation = action determination
-- candidate-set difference = disposition-only causation
-
-## 14. No-Experimenter-Intervention Status
-
-Current status: **MANDATORY METHODOLOGICAL INVARIANT FOR AUTONOMOUS LONGITUDINAL EVIDENCE**
-
-After initial conditions and environment are fixed, researcher intervention into judgment, disposition, relations, behavioral decision relational candidate set, possibility composition, choice, responsibility, realization, or past relational structure invalidates that run as autonomous longitudinal evidence.
-
-This is a methodological validity condition, not itself evidence for H0 or H1-H4.
-
-## 15. Longitudinal Disposition Change Status
-
-Current status: **PLANNED OBSERVATION / NO v3 RESULT YET**
-
-v3 distinguishes:
-- `Initial Disposition Prior`
-- `Observed Disposition Pattern`
-
-The research target is the divergence or persistence of observed behavior patterns through accumulated experience and past relational structure, not automatic modification of the initial prior itself.
-
-## 16. Multi-OASIS Comparison Status
-
-Current status: **PLANNED / NO v3 RESULT YET**
-
-Planned conditions:
-1. multiple OASIS with identical `NONE` control conditions
+Planned conditions remain:
+1. multiple OASIS with identical `NONE` controls
 2. multiple OASIS with identical minimum disposition prior
 3. multiple OASIS with different minimum disposition priors
 
-Interpretive limits:
-- difference does not automatically prove disposition causation
-- no outcome difference does not prove identical causal process
-- same realization may still arise through different relational structures and processes
-- candidate-set differences do not by themselves establish a sufficient cause of action
+Difference does not automatically prove disposition causation; same realization does not imply the same causal process.
 
-Required evidence:
-- EX-04M.
-
-## 17. Legacy v1 Observer Comparison Status
+## 15. Legacy v1 Observer Comparison
 
 Current status: **PRESERVED AS OBSERVATIONAL-FRAME COMPARATOR**
 
-v1 axes remain:
-- divergence delay
-- realized change
-- persistence
-- reconvergence
-- accumulated relational effect
-- downstream long-horizon effect
+Legacy axes remain available for comparison but do not define OASIS internally and do not automatically establish v3 superiority.
 
-Purpose:
-- determine which information the segmented observer captures
-- determine which relational information is lost or differently interpreted compared with v3
-
-This comparison does not automatically prove v3 superiority.
-
-## 18. Causal-Rate Form Status
+## 16. Causal-Rate Form
 
 Current status: **OPEN_INQUIRY**
 
-No single scalar is assumed.
+No scalar is assumed. Permitted empirical outcomes include scalar, function, distribution, multiple components, or evidence that a single-scalar representation is unsuitable.
 
-Permitted candidate outcomes:
-- scalar
-- function
-- distribution
-- multiple components
-- evidence that single-scalar representation is unsuitable
+## 17. Current Implementation Status
 
-Failure to identify a stable scalar is preserved as a valid research result.
+v3-specific reproducible instrumentation now exists:
+- `tools/causal-trace-ledger-v2-safe.mjs`
+- `tools/h1-structural-incorporation-v3.mjs`
+- `tools/h2-integrated-structure-v3.mjs`
+- `tools/causal-trace-ledger-v3.mjs`
+- `.github/workflows/causal-trace-ledger.yml`
 
-## 19. Current Implementation Gap
+Therefore the prior statement that v3 had only definitions and no v3-specific evidence implementation is retired.
 
-Current v3 documents define the research and instrumentation requirements, but the active causal trace implementation remains based on `tools/causal-trace-ledger-v2.mjs`.
+Remaining implementation gaps:
+- native Behavioral Decision Relational Candidate Set trace
+- direct Possibility Composition trace
+- Individual Disposition comparison instrumentation
+- whole-Past-Relational-Structure joint causal test for H2
+- explicit self-intervention trace
+- multi-OASIS longitudinal comparison
 
-Therefore the existence of v3 definitions does not establish H0, disposition, Relational Field, or Multi-OASIS empirical results.
+## 18. Current Evidence Priorities
 
-A v3-specific trace/instrumentation implementation must be completed or equivalent reproducible instrumentation must be provided before those claims can receive empirical support.
+1. H2 joint-structure causal test
+2. native Behavioral Decision Relational Candidate Set + Possibility Composition instrumentation for H0
+3. EX-03/H3 causal replication across conditions
+4. EX-04 long-horizon persistence-limit inquiry
+5. EX-04P disposition comparison
+6. EX-04M multi-OASIS longitudinal comparison
+7. replication/falsification
+8. Legacy observer comparison
+9. causal-rate form review
 
-## 20. Current Evidence Priorities
-
-1. H0 behavioral decision participation trace
-2. EX-01 structural incorporation
-3. EX-02 whole new past relational structure and subsequent reality relation
-4. EX-03 natural relational reappearance
-5. EX-04 persistence-limit inquiry
-6. EX-04P NONE versus minimum-disposition comparison, including candidate-set tracing
-7. EX-04M multi-OASIS longitudinal comparison
-8. EX-05 replication/falsification
-9. EX-06 Legacy observer comparison
-10. EX-07 causal-form review
-
-## 21. Evidence Discipline
+## 19. Evidence Discipline
 
 Do not claim:
 - whole-structure overwrite
+- every past relation is active at every moment
+- mathematical infinity or physical-field status from Relational Field
 - persistent unrealized parallel paths
-- mathematical infinity or physical-field status from the Relational Field concept
 - extinction from horizon non-observation
-- structural incorporation from count growth alone
+- H1 from count growth alone
+- full H2 from the current partial structural chain alone
+- full Past Relational Structure joint necessity without joint-structure testing
+- Behavioral Decision Relational Candidate Set from implementation destination `cands`
+- disposition necessity/sufficiency before comparison evidence
 - causal strength from divergence delay
-- H2 from one-step post-outcome difference alone
+- responsibility = danger
 - self-intervention superiority
 - strong will = strong causality
-- disposition necessity or sufficiency before evidence
-- behavioral decision relational candidate set as a sufficient cause of realized action
-- H0 support from definition alone
-- autonomous change when experimenter intervention occurred
-- disposition causality from multi-OASIS difference alone
+- universal/general real-world validity from one canonical harness
 - scalar causal rate before evidence supports it
