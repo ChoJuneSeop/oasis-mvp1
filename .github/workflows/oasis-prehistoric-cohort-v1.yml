@@ -1,0 +1,28 @@
+name: OASIS Prehistoric Cohort v1 Audit
+
+on:
+  push:
+    branches:
+      - storage/oasis-integrated-research-system-v1.0
+    paths:
+      - 'integrated-research-system-storage/prehistoric/**'
+      - '.github/workflows/oasis-prehistoric-cohort-v1.yml'
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax audit
+        run: |
+          node --check integrated-research-system-storage/prehistoric/src/prehistoric-cohort-v1.mjs
+          node --check integrated-research-system-storage/prehistoric/src/prehistoric-continuous-runner-v1.mjs
+      - name: Cohort and continuous observation tests
+        run: |
+          node --test \
+            integrated-research-system-storage/prehistoric/tests/prehistoric-cohort-v1.test.mjs \
+            integrated-research-system-storage/prehistoric/tests/prehistoric-continuous-runner-v1.test.mjs
