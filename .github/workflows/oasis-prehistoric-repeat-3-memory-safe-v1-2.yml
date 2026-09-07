@@ -1,0 +1,49 @@
+name: OASIS Prehistoric Repeat 3 Memory-Safe v1.2
+
+on:
+  push:
+    branches:
+      - storage/oasis-integrated-research-system-v1.0
+    paths:
+      - '.github/workflows/oasis-prehistoric-repeat-3-memory-safe-v1-2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repeat3:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
+      OASIS_RUN_SEED: prehistoric-civilization-v1-repeat-3
+      OASIS_MAX_CYCLES: '600'
+      OASIS_TRACE_PATH: prehistoric-repeat-3-v1.2-trace.ndjson
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax audit memory-safe experiment
+        run: |
+          node --check integrated-research-system-storage/prehistoric/src/oasis-math-kernel-v1.2-memory-safe.mjs
+          node --check integrated-research-system-storage/prehistoric/src/prehistoric-continuous-runner-v1.2-memory-safe.mjs
+          node --check integrated-research-system-storage/prehistoric/src/prehistoric-experiment-v1.2-memory-safe.mjs
+      - name: Run identical repeat 3 with memory-safe representation
+        run: node integrated-research-system-storage/prehistoric/src/prehistoric-experiment-v1.2-memory-safe.mjs
+      - name: Preserve result
+        if: always()
+        run: |
+          if [ -f prehistoric-experiment-v1.2-result.json ]; then
+            cp prehistoric-experiment-v1.2-result.json prehistoric-experiment-repeat-3-v1.2-result.json
+          fi
+      - name: Upload result and streamed trajectory digest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-prehistoric-repeat-3-v1-2
+          path: |
+            prehistoric-experiment-repeat-3-v1.2-result.json
+            prehistoric-repeat-3-v1.2-trace.ndjson
+          if-no-files-found: warn
