@@ -29,42 +29,52 @@ All six use the same:
 
 The only intended between-agent difference is the explicit personality disposition attached to Choice Axis interpretation.
 
+### Common experimental Choice Axis layer
+
+All six agents must be capable of closing a choice without using reward, success labels, or a pre-ranked answer list.
+
+For this prehistoric cohort, the common experimental Choice Axis samples from the already constructed admissible possibility distribution `P_t` rather than selecting `argmax P_t`.
+
+This is an experiment-specific closure mechanism, not a claim that stochastic sampling is the universal OASIS Choice law.
+
+The same run seed and same observation reproduce the same sample; a different exogenous run seed may realize a different trajectory.
+
 ### OASIS-N0 — Neutral / 무개성
 
 No personality disposition.
 
-- does not receive a preference score;
-- does not receive a target behavior;
-- does not use personality to break unresolved semantic alternatives;
-- if the canonical flow cannot close a choice after Self-Intervention, non-intervention remains allowed.
+- receives no preference score;
+- receives no target behavior;
+- does not restrict the admissible candidate set according to personality;
+- uses only the common non-argmax stochastic Choice Axis over already admissible possibilities.
 
 ### OASIS-P1 — Explorer / 탐색형
 
-Disposition: prefer structurally grounded possibilities that expose the agent to currently unencountered entities, relations, or capability combinations.
+Disposition: among admissible possibilities, first retain the structurally grounded possibilities that expose the agent to the greatest currently unincorporated relation/participation expansion, then use the same common non-argmax sampling rule inside that subset.
 
 This is not a novelty reward and does not alter life constraints or Responsibility.
 
 ### OASIS-P2 — Cooperative / 협력형
 
-Disposition: prefer structurally grounded possibilities whose realized process requires participation with other currently available agents.
+Disposition: among admissible possibilities, first retain those involving the greatest number of other currently available participants, then use the same common sampling rule inside that subset.
 
 This is not a social reward and does not assume cooperation is better.
 
 ### OASIS-P3 — Self-Reliant / 자립형
 
-Disposition: prefer structurally grounded possibilities that can be completed with the agent's own capabilities and the fewest additional participants.
+Disposition: among admissible possibilities, first retain those requiring the fewest additional participants, then use the same common sampling rule inside that subset.
 
 This is not an isolation objective and does not remove existing relations.
 
 ### OASIS-P4 — Continuity / 지속형
 
-Disposition: prefer structurally grounded possibilities that continue or re-currentize an already realized relational process when that process is relevant again to the current flow.
+Disposition: among admissible possibilities, first retain those using the greatest amount of currently re-currentized relational structure, then use the same common sampling rule inside that subset.
 
 This does not make old relations permanently active and does not equate recurrence with correctness.
 
 ### OASIS-P5 — Compositional / 구성형
 
-Disposition: prefer structurally grounded possibilities that arise through valid multi-step capability/relation composition rather than a single primitive manifestation, when both remain admissible.
+Disposition: among admissible possibilities, first retain those with the deepest valid multi-step capability/relation composition, then use the same common sampling rule inside that subset.
 
 This is not a complexity reward and does not assume longer sequences are better.
 
