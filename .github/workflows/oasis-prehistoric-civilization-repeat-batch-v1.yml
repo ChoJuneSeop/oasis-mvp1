@@ -1,0 +1,50 @@
+name: OASIS Prehistoric Civilization Repeat Batch v1
+
+on:
+  push:
+    branches:
+      - storage/oasis-integrated-research-system-v1.0
+    paths:
+      - '.github/workflows/oasis-prehistoric-civilization-repeat-batch-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repeat:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        run_index: [1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax audit corrected experiment
+        run: |
+          node --check integrated-research-system-storage/prehistoric/src/prehistoric-clean-world-v1.1.mjs
+          node --check integrated-research-system-storage/prehistoric/src/prehistoric-experiment-v1.1.mjs
+          node --check integrated-research-system-storage/prehistoric/src/prehistoric-civilization-observer-v1.mjs
+      - name: Run independent corrected repeat
+        env:
+          OASIS_RUN_SEED: prehistoric-civilization-v1-repeat-${{ matrix.run_index }}
+          OASIS_MAX_CYCLES: '240'
+        run: node integrated-research-system-storage/prehistoric/src/prehistoric-experiment-v1.1.mjs
+      - name: Preserve compact repeat result
+        if: always()
+        run: |
+          if [ -f prehistoric-experiment-v1.1-result.json ]; then
+            cp prehistoric-experiment-v1.1-result.json prehistoric-experiment-repeat-${{ matrix.run_index }}.json
+          fi
+      - name: Upload repeat result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-prehistoric-repeat-${{ matrix.run_index }}
+          path: prehistoric-experiment-repeat-${{ matrix.run_index }}.json
+          if-no-files-found: warn
