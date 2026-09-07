@@ -1,12 +1,9 @@
-name: OASIS Prehistoric Civilization Experiment v1
+name: OASIS Prehistoric Civilization Experiment v1 [SUPERSEDED]
 
+# v1 is retained only for audit reproducibility.
+# It is not automatically re-run because the first execution exposed
+# ordered maxPrimitive truncation that starved later capability families.
 on:
-  push:
-    branches:
-      - storage/oasis-integrated-research-system-v1.0
-    paths:
-      - 'integrated-research-system-storage/prehistoric/**'
-      - '.github/workflows/oasis-prehistoric-civilization-experiment-v1.yml'
   workflow_dispatch:
 
 permissions:
@@ -26,15 +23,8 @@ jobs:
           node --check integrated-research-system-storage/prehistoric/src/prehistoric-clean-world-v1.mjs
           node --check integrated-research-system-storage/prehistoric/src/prehistoric-civilization-observer-v1.mjs
           node --check integrated-research-system-storage/prehistoric/src/prehistoric-experiment-v1.mjs
-      - name: Run continuous prehistoric experiment segment
+      - name: Reproduce superseded v1 only on explicit dispatch
         env:
           OASIS_RUN_SEED: prehistoric-civilization-v1-run0
           OASIS_MAX_CYCLES: '800'
         run: node integrated-research-system-storage/prehistoric/src/prehistoric-experiment-v1.mjs
-      - name: Upload compact result
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: oasis-prehistoric-civilization-v1-result
-          path: prehistoric-experiment-v1-result.json
-          if-no-files-found: warn
