@@ -1,5 +1,10 @@
 # Current causal research baseline
 
+Governing protocol:
+- `../OASIS_RESEARCH_PROTOCOL.md`
+
+The governing protocol has precedence over this causal research baseline and over all causal experiment documents. If a causal metric, term, workflow, or interpretation conflicts with the master protocol, it must not be treated as an OASIS core principle. Historical conflicting material is preserved as Legacy/comparator evidence until explicitly revised.
+
 Current baseline: OASIS Causal Research System v1.0 (2026-09-07)
 
 Canonical definition:
@@ -22,4 +27,7 @@ Historical baseline retained for traceability:
 - `OASIS_CAUSAL_RESEARCH_SYSTEM_v0.1_ko.md`
 - `OASIS_CAUSAL_RESEARCH_SYSTEM_v0.1.md`
 
-v1.0 supersedes v0.1 for all new causal experiments, interpretation, naming, and evidence grading. Historical experimental records are preserved and reinterpreted only where explicitly documented; they are not rewritten to manufacture success.
+Important transition note:
+The current v1.0 measurement-axis block contains terms now under review, including divergence delay, realized change, persistence, reconvergence, accumulated relational effect, and downstream long-horizon effect. These terms are not elevated above the master protocol. They are candidates for revision or Legacy/comparator status. The causal-process backbone remains subject to the master continuous-reality and internal-prior-work principles.
+
+Historical experimental records are preserved and are not rewritten to manufacture success.
