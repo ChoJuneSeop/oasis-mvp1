@@ -1,6 +1,7 @@
 import { readFile, writeFile, unlink } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 
+// Diagnostic wrapper: preserve invalid-run output before enforcing the validity gate.
 const SOURCE='tools/h2-noncurrent-footprint-future-effect-v3.mjs';
 const TEMP='tools/.h2-noncurrent-footprint-diagnostic-run.mjs';
 let src=await readFile(SOURCE,'utf8');
