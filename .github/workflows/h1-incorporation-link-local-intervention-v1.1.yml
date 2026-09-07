@@ -1,0 +1,45 @@
+name: OASIS H1 Incorporation Link Local Intervention v1.1
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "validation/integrated-work-system-v1.1-2026-09-08"
+    paths:
+      - "tools/h1-incorporation-link-local-intervention-v1.1.mjs"
+      - "relation-field.js"
+      - "index.html"
+      - "tools/validation-compatibility-guard.mjs"
+      - ".github/workflows/h1-incorporation-link-local-intervention-v1.1.yml"
+
+concurrency:
+  group: oasis-h1-incorporation-link-local-intervention-v1-1
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run flow-preserved H1 incorporation-link intervention
+        run: node tools/h1-incorporation-link-local-intervention-v1.1.mjs
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-h1-incorporation-link-local-intervention-v1-1
+          path: h1-incorporation-link-local-intervention-v1.1-report.json
+          if-no-files-found: ignore
