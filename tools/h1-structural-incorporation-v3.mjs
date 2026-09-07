@@ -5,92 +5,142 @@ import readline from 'node:readline';
 const AUDIT_FILE='latent-relation-store-audit.jsonl';
 const REPORT_FILE='h1-structural-incorporation-v3-report.json';
 
-const outcomes=new Map();
-const compositions=[];
-const participations=[];
-let rows=0;
+const outcomesByPartyTick=new Map();
+const episodes=new Map();
+let auditRows=0;
+let outcomeCount=0;
+let compositionCount=0;
+let participationCount=0;
+let interventionMarkers=0;
 
-const keyOf=(party,tick)=>`${party}|${tick}`;
+const pt=(party,tick)=>`${party}||${tick}`;
+const epk=(party,id)=>`${party}||${id}`;
+
 const rl=readline.createInterface({input:createReadStream(AUDIT_FILE),crlfDelay:Infinity});
 for await(const line of rl){
-  if(!line.trim())continue;
-  const e=JSON.parse(line); rows++;
+  if(!line.trim()) continue;
+  const e=JSON.parse(line);
+  auditRows++;
+  const party=e.party;
+  const tick=e.tick;
+
+  if(e.type==='experimenter-intervention') interventionMarkers++;
+
   if(e.type==='outcome'){
+    outcomeCount++;
     const delta=(e.relationHistoryAfter??0)-(e.relationHistoryBefore??0);
-    outcomes.set(keyOf(e.party,e.tick),{...e,delta});
-  } else if(e.type==='compose'){
-    compositions.push(e);
-  } else if(e.type==='select-participation'){
-    participations.push(e);
+    outcomesByPartyTick.set(pt(party,tick),{delta,choice:e.choice});
+    for(const id of e.latentEpisodeIds||[]){
+      const q=episodes.get(epk(party,id));
+      if(q&&tick>q.formationTick){
+        q.exactOutcomeCount++;
+        if(q.firstExactOutcomeTick==null) q.firstExactOutcomeTick=tick;
+      }
+    }
+  }else if(e.type==='compose'){
+    compositionCount++;
+    const o=outcomesByPartyTick.get(pt(party,tick));
+    const from=Array.isArray(e.from)?e.from:[];
+    if(o&&o.delta>0&&from.length>=2&&from[1]===tick&&e.episodeId){
+      episodes.set(epk(party,e.episodeId),{
+        party,
+        episodeId:e.episodeId,
+        key:e.key??null,
+        formationTick:tick,
+        realizedChoice:o.choice,
+        relationHistoryDelta:o.delta,
+        from:[...from],
+        places:[...(e.places||[])],
+        latentized:false,
+        firstLatentTick:null,
+        reactivationCount:0,
+        firstReactivationTick:null,
+        exactParticipationCount:0,
+        firstExactParticipationTick:null,
+        exactOutcomeCount:0,
+        firstExactOutcomeTick:null
+      });
+    }
+  }else if(e.type==='latentize'||e.type==='noncurrent'){
+    if(!e.episodeId) continue;
+    const q=episodes.get(epk(party,e.episodeId));
+    if(q&&tick>=q.formationTick){
+      q.latentized=true;
+      if(q.firstLatentTick==null) q.firstLatentTick=tick;
+    }
+  }else if(e.type==='reactivate'){
+    if(!e.episodeId) continue;
+    const q=episodes.get(epk(party,e.episodeId));
+    if(q&&tick>q.formationTick){
+      q.reactivationCount++;
+      if(q.firstReactivationTick==null) q.firstReactivationTick=tick;
+    }
+  }else if(e.type==='select-participation'){
+    participationCount++;
+    for(const id of e.latentEpisodeIds||[]){
+      const q=episodes.get(epk(party,id));
+      if(q&&tick>q.formationTick){
+        q.exactParticipationCount++;
+        if(q.firstExactParticipationTick==null) q.firstExactParticipationTick=tick;
+      }
+    }
   }
 }
 
-const linked=[];
-let outcomeWithNewRealizedRelation=0;
-for(const o of outcomes.values()) if(o.delta>0) outcomeWithNewRealizedRelation++;
+const formed=[...episodes.values()];
+let latentized=0,reactivated=0,participated=0,reachedOutcome=0,exactChain=0;
+const parties=new Set();
+const keys=new Set();
+const examples=[];
 
-for(const c of compositions){
-  const o=outcomes.get(keyOf(c.party,c.tick));
-  const currentRealizedTick=Array.isArray(c.from)?c.from[1]:null;
-  const formedFromCurrentRealization=!!o&&o.delta>0&&currentRealizedTick===c.tick;
-  if(!formedFromCurrentRealization) continue;
-
-  const later=participations.find(p=>
-    p.party===c.party &&
-    p.tick>c.tick &&
-    Array.isArray(p.activeKeys) &&
-    p.activeKeys.includes(c.key)
-  );
-
-  linked.push({
-    party:c.party,
-    realizationTick:c.tick,
-    realizedChoice:o.choice,
-    relationHistoryDelta:o.delta,
-    composedRelationKey:c.key,
-    sourceRelationTicks:c.from,
-    formationPlaces:c.places||[],
-    laterStructuralParticipation:!!later,
-    laterParticipationTick:later?.tick??null,
-    laterChoice:later?.choice??null,
-    laterLatentEpisodeIds:later?.latentEpisodeIds??[]
-  });
+for(const q of formed){
+  parties.add(q.party);
+  if(q.key) keys.add(q.key);
+  if(q.latentized) latentized++;
+  if(q.reactivationCount>0) reactivated++;
+  if(q.exactParticipationCount>0) participated++;
+  if(q.exactOutcomeCount>0) reachedOutcome++;
+  const ordered=q.firstReactivationTick!=null&&q.firstExactParticipationTick!=null&&q.firstExactOutcomeTick!=null&&
+    q.firstReactivationTick<=q.firstExactParticipationTick&&q.firstExactParticipationTick<=q.firstExactOutcomeTick;
+  if(ordered){
+    exactChain++;
+    if(examples.length<30) examples.push(q);
+  }
 }
 
-const formationLinks=linked.length;
-const laterParticipationLinks=linked.filter(x=>x.laterStructuralParticipation).length;
-const distinctParties=[...new Set(linked.map(x=>x.party))];
-const distinctComposedKeys=[...new Set(linked.map(x=>x.composedRelationKey))];
-
 let grade='UNVALIDATED_AT_STRUCTURAL_LEVEL';
-if(formationLinks>0) grade='STRUCTURAL_FORMATION_OBSERVED_WITHIN_HARNESS';
-if(laterParticipationLinks>0) grade='SUPPORTED_WITHIN_HARNESS_FOR_FORMATION_AND_LATER_PARTICIPATION';
+if(formed.length>0) grade='STRUCTURAL_FORMATION_OBSERVED_WITHIN_CANONICAL_HARNESS';
+if(exactChain>0&&interventionMarkers===0) grade='SUPPORTED_WITHIN_CANONICAL_HARNESS_FOR_EXACT_STRUCTURAL_LINEAGE';
 
 const report={
   system:{name:'OASIS',version:'3.0',hypothesis:'H1'},
-  question:'Does a realized experience enter the existing Past Relational Structure and participate with prior relations in forming a new Past Relational Structure that later participates structurally?',
+  question:'Does a realized experience enter the existing Past Relational Structure, participate with prior relations in forming a new Past Relational Structure, and can that exact formed relation later re-enter decision and outcome?',
   method:{
-    genealogy:'outcome -> realized relation-history delta -> compose(current realized relation with prior relation) -> later select-participation using the composed relation key',
-    interpretationBoundary:'relationHistory field growth alone is not evidence. A qualifying H1 genealogy requires a compose event tied to the realization tick; the strongest within-harness grade additionally requires later actual decision participation.',
+    exactGenealogy:'outcome with relational-history increase -> compose using current realization tick -> exact episode becomes non-current/latent -> exact episode reactivates -> same exact episode appears in select-participation -> same exact episode appears in later outcome',
+    relationHistoryOntology:false,
+    interpretationBoundary:'relationHistory is an implementation trace only. H1 evidence requires an exact episode genealogy, not storage growth alone.',
     noExperimenterInterventionRequired:true,
     nonAnticipationRequired:true
   },
-  input:{auditRows:rows,outcomes:outcomes.size,compositions:compositions.length,participations:participations.length},
+  input:{auditRows,outcomeCount,compositionCount,participationCount,interventionMarkers},
   summary:{
-    outcomeWithNewRealizedRelation,
-    formationLinks,
-    laterParticipationLinks,
-    distinctParties:distinctParties.length,
-    distinctComposedKeys:distinctComposedKeys.length,
+    qualifyingFormationLinks:formed.length,
+    exactEpisodesLatentized:latentized,
+    exactEpisodesReactivated:reactivated,
+    exactEpisodesLaterParticipating:participated,
+    exactEpisodesReachingLaterOutcome:reachedOutcome,
+    exactReactivationParticipationOutcomeChains:exactChain,
+    distinctParties:parties.size,
+    distinctComposedKeys:keys.size,
     h1EvidenceGrade:grade
   },
   interpretation:{
+    structuralLineageObservedWithinCanonicalHarness:exactChain>0,
     sufficientForUniversalCausality:false,
     sufficientForRealWorldGeneralization:false,
-    sufficientForWholeStructureRewrite:false,
-    supportsOnlyTestedHarness:laterParticipationLinks>0
+    sufficientForWholeStructureRewrite:false
   },
-  examples:linked.filter(x=>x.laterStructuralParticipation).slice(0,50)
+  examples
 };
 
 await writeFile(REPORT_FILE,JSON.stringify(report,null,2));
