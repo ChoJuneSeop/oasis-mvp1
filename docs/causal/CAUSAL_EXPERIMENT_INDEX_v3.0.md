@@ -24,13 +24,25 @@ Status: REQUIRED BEFORE NEW RUNS
 
 ## 공통 필수조건 — 실험자 비개입 / Mandatory No-Experimenter-Intervention Condition
 
-초기조건과 환경 설정 후 실험자는 OASIS의 판단, 개성, 관계, 가능성 조합, 선택, 책임, 현실화, 과거 관계구조를 중간에 변경하지 않는다.
+초기조건과 환경 설정 후 실험자는 OASIS의 판단, 개성, 관계, 행동 결정 관계 후보군, 가능성 조합, 선택, 책임, 현실화, 과거 관계구조를 중간에 변경하지 않는다.
 
 사전에 고정한 환경규칙·외생조건·관측절차는 허용한다.
 
 결과를 보고 특정 방향으로 유도하는 조정은 금지한다.
 
 `experimenterInterventionCount > 0`인 run은 자율적 장기 변화 증거에서 제외한다.
+
+## 개성 초기조건 연구규칙 / Disposition Initial-Condition Research Rule
+
+개성 / Individual Disposition은 v3 행동결정 구조의 공식 초기조건으로 둔다.
+
+그러나 개성이 행동결정의 필요조건인지 여부는 사전에 확정하지 않는다.
+
+따라서 `initialDispositionPrior = NONE` 조건은 개성의 공식 위치를 부정하는 것이 아니라 필요성·효과를 검증하기 위한 대조조건으로 사용한다.
+
+최소 개성 조건에서는 개성이 행동 결정 관계 후보군과 가능성 탐색 방향에 어떤 차이와 함께 나타나는지를 추적한다.
+
+개성 또는 행동 결정 관계 후보군 어느 하나도 특정 행동 현실화의 충분조건으로 판정하지 않는다.
 
 ## EX-01 — 현실화와 과거 관계구조 편입 / Realization and Past-Structure Incorporation
 Status: NEXT CORE TEST
@@ -121,68 +133,74 @@ Hypothesis: H4
 기본 판정:
 - `OPEN_INQUIRY`
 
-## EX-04P — 조건부 개성 재실험 / Conditional Disposition Rerun
-Status: CONDITIONAL ONLY
+## EX-04P — 개성 초기조건 비교 및 조건부 재실험 / Disposition Initial-Condition Comparison and Conditional Rerun
+Status: CONTROL + CONDITIONAL FOLLOW-UP
 
-진입조건:
-- EX-01~04의 1차 조건에서 충분한 구조적 성과가 관측되지 않음, 또는
-- 가능성 탐색과 선택이 사실상 정지하여 핵심구조를 충분히 시험하기 어려움
+목적:
+- 개성이 공식 초기조건이라는 구조와 별개로, 실제 행동결정의 필요조건인지 여부를 검증한다.
+- `NONE` 대조조건과 최소 개성 초기값 조건을 분리 비교한다.
 
-설계:
-- H1~H4는 변경하지 않음
-- 개성 / Individual Disposition을 `Minimum Permitted AI Prior`로만 추가
+조건 A — NONE 대조조건:
+- `initialDispositionPrior = NONE`
+- 기존 H1~H4 핵심구조가 개성값 없이도 작동하는지 관찰
+- 가능성 탐색과 선택이 정지하는지 여부 기록
+
+조건 B — 최소 개성 초기값 조건:
+- 개성 / Individual Disposition을 `Minimum Permitted AI Prior`로 부여
 - 특정 결과나 행동을 강제하지 않음
-- 가능한 한 동일한 환경·관측조건 유지
+- 가능한 한 조건 A와 동일한 환경·관측조건 유지
 - 초기 개성값 명시
 - 실험 시작 이후 초기 개성값 변경 금지
 
 필수 추가 기록:
 1. `initialDispositionPrior`
-2. `possibilityCompositionTrace`
-3. `selfInterventionTrace`
-4. `choiceResponsibilityTrace`
-5. `realizationTrace`
-6. `pastRelationalStructureChangeTrace`
-7. `observedDispositionPatternTrace`
-8. `experimenterInterventionCount`
+2. `behavioralDecisionRelationalCandidateSetTrace`
+3. `possibilityCompositionTrace`
+4. `selfInterventionTrace`
+5. `choiceResponsibilityTrace`
+6. `realizationTrace`
+7. `pastRelationalStructureChangeTrace`
+8. `observedDispositionPatternTrace`
+9. `experimenterInterventionCount`
 
 판정원칙:
-- 1차와 2차 결과 분리 보고
-- 2차 성공을 1차 성공으로 소급하지 않음
+- NONE 조건과 최소 개성 조건 결과를 분리 보고
+- 최소 개성 조건의 성공을 NONE 조건의 성공으로 소급하지 않음
+- 개성 조건에서만 구조가 활성화되더라도 즉시 보편적 필요조건으로 일반화하지 않음
 - 초기값과 이후 행동경향 차이를 내부 개성 파라미터 학습으로 자동 해석하지 않음
+- 개성이 행동 결정 관계 후보군 또는 가능성 탐색과 차이를 보이더라도 특정 행동의 단독 원인으로 자동 판정하지 않음
 
 연구해석:
-- 개성 조건에서만 구조가 활성화된다면, 개성이 최소 초기조건일 가능성을 후속 연구문제로 제시할 수 있음
-- 사전에 필요조건으로 확정하지 않음
+- 개성 조건에서만 구조가 반복적으로 활성화된다면 개성이 OASIS 행동결정에 필요한 최소 초기조건일 가능성을 후속 검증한다.
+- NONE 조건에서도 구조가 충분히 작동한다면 개성은 필요조건이 아니라 행동결정의 방향과 다양성에 영향을 줄 수 있는 초기조건으로 해석할 가능성을 검토한다.
+- 어느 결론도 사전에 확정하지 않는다.
 
 ## EX-04M — 다중 OASIS 비교 장기실험 / Multi-OASIS Comparative Longitudinal Study
-Status: AFTER EX-04; EX-04P가 사용되면 그 이후
+Status: AFTER EX-04 AND EX-04P INITIAL-CONDITION COMPARISON
 
 목적:
 - 여러 OASIS를 같은 또는 엄격히 대응되는 외생조건 아래 장기 관찰
-- 서로 다른 과거 관계구조, 가능성 조합, 자기개입, 선택·책임, 현실화, 인연 재출현, 장기 행동경향 형성 비교
+- 서로 다른 과거 관계구조, 행동 결정 관계 후보군, 가능성 조합, 자기개입, 선택·책임, 현실화, 인연 재출현, 장기 행동경향 형성 비교
 
 비교조건:
 
-### A. 동일 초기조건 비교 / Same Initial Conditions
+### A. 동일 NONE 대조조건 / Same NONE Control
 - 두 개 이상의 OASIS에 가능한 한 동일한 초기 과거 관계구조·현재 현실·환경규칙 제공
-- 1차 연구에서는 별도 개성값을 주지 않음
+- `initialDispositionPrior = NONE`
 - 동일 또는 다른 장기 현실흐름을 그대로 관찰
 
 ### B. 동일 최소 개성조건 비교 / Same Minimum Disposition Prior
-- EX-04P를 사용한 경우
 - 여러 OASIS에 동일한 `initialDispositionPrior` 부여
-- 경험과 과거 관계구조가 달라질 때 장기 행동경향의 유사성·차이 관찰
+- 경험과 과거 관계구조가 달라질 때 장기 행동경향과 행동 결정 관계 후보군의 유사성·차이 관찰
 
 ### C. 서로 다른 최소 개성조건 비교 / Different Minimum Disposition Priors
-- EX-04P를 사용한 경우
 - OASIS 코어와 외생조건은 대응시키고 `initialDispositionPrior`만 다르게 설정
-- 초기 개성이 가능성 탐색과 선택의 방향 차이와 함께 나타나는지 장기 관찰
+- 초기 개성이 행동 결정 관계 후보군, 가능성 탐색과 선택 방향의 차이와 함께 나타나는지 장기 관찰
 
 공통 필수조건:
 - 초기 설정 이후 실험자 개입 금지
 - 각 OASIS의 `experimenterInterventionCount = 0`
-- 결과를 보고 초기조건·개성·환경규칙·관계·가능성·선택조건 수정 금지
+- 결과를 보고 초기조건·개성·환경규칙·관계·행동 결정 관계 후보군·가능성·선택조건 수정 금지
 - 이미 달라진 현실흐름을 강제로 동일상태로 되돌리지 않음
 
 필수 비교기록:
@@ -191,25 +209,27 @@ Status: AFTER EX-04; EX-04P가 사용되면 그 이후
 3. `initialDispositionPrior` 또는 `NONE`
 4. 초기 과거 관계구조
 5. 외생조건 식별정보
-6. `possibilityCompositionTrace`
-7. `selfInterventionTrace`
-8. `choiceResponsibilityTrace`
-9. `realizationTrace`
-10. `pastRelationalStructureChangeTrace`
-11. `relationalReappearanceTrace`
-12. `observedDispositionPatternTrace`
-13. `experimenterInterventionCount`
+6. `behavioralDecisionRelationalCandidateSetTrace`
+7. `possibilityCompositionTrace`
+8. `selfInterventionTrace`
+9. `choiceResponsibilityTrace`
+10. `realizationTrace`
+11. `pastRelationalStructureChangeTrace`
+12. `relationalReappearanceTrace`
+13. `observedDispositionPatternTrace`
+14. `experimenterInterventionCount`
 
 비교질문:
 - 동일 초기조건의 OASIS들이 장기적으로 같은 또는 다른 관계과정을 형성하는가?
-- 동일 최소 개성값에서도 경험 차이에 따라 장기 행동경향이 달라지는가?
-- 서로 다른 최소 개성값이 가능성 탐색과 선택의 방향 차이와 함께 나타나는가?
+- 동일 최소 개성값에서도 경험 차이에 따라 행동 결정 관계 후보군과 장기 행동경향이 달라지는가?
+- 서로 다른 최소 개성값이 행동 결정 관계 후보군, 가능성 탐색과 선택의 방향 차이와 함께 나타나는가?
 - 최종 현실화가 같더라도 과거 관계구조와 참여 관계과정은 다른가?
 
 해석 제한:
 - OASIS 간 차이 = 개성의 단독 인과효과 아님
 - OASIS 간 유사성 = 동일한 인과과정 아님
 - 더 좋은 결과 = 특정 개성의 우월성 아님
+- 개성 또는 행동 결정 관계 후보군 = 특정 행동 현실화의 충분조건 아님
 
 ## EX-05 — 반복·반증 / Replication and Falsification
 Status: AFTER CORE AND MULTI-OASIS TESTS
@@ -221,6 +241,7 @@ Status: AFTER CORE AND MULTI-OASIS TESTS
 - falsification conditions
 - implementation artifact removal
 - v3 보조요소가 결과를 과도하게 설명하지 않는지 확인
+- 개성 NONE/최소값 비교 결과의 재현성 확인
 - 다중 OASIS 결과의 재현성 확인
 - 모든 자율적 장기 run의 실험자 비개입 확인
 
@@ -249,7 +270,7 @@ Status: LAST
 진입조건:
 - H1~H3 반복 가능한 구조적 증거
 - H4 충분한 장기 관찰
-- 필요한 경우 개성 조건 결과
+- 개성 NONE/최소값 비교 결과
 - 다중 OASIS 비교 결과
 - Legacy observer와 v3 정보차이 확인
 - 변수·기호 검수
@@ -267,7 +288,7 @@ Status: LAST
 
 ## 현장 적용 / Deployment Position
 
-개성이 실제 구현에서 필요하다고 판단되면 `Minimum Permitted AI Prior`로 정의한다.
+개성은 OASIS 행동결정 구조에서 사용할 수 있는 `Minimum Permitted AI Prior`로 둔다.
 
 제품·서비스 단계에서는 이 초기 개성을 사용자 또는 고객이 커스터마이징할 수 있는 고객 맞춤형 구성으로 제공할 수 있다.
 
@@ -275,4 +296,4 @@ Status: LAST
 
 ## Current Order
 
-`EX-00 -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> [if needed EX-04P] -> EX-04M -> EX-05 -> EX-06 -> EX-07`
+`EX-00 -> EX-01 H1 -> EX-02 H2 -> EX-03 H3 -> EX-04 H4 -> EX-04P disposition NONE/minimum-prior comparison -> EX-04M -> EX-05 -> EX-06 -> EX-07`
