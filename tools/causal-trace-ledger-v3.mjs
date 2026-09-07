@@ -4,10 +4,14 @@ import readline from 'node:readline';
 
 const CF_FILE='latent-relation-store-counterfactual.jsonl';
 const V2_FILE='causal-trace-ledger-v2-report.json';
+const H1_FILE='h1-structural-incorporation-v3-report.json';
+const H2_FILE='h2-integrated-structure-v3-report.json';
 const VALIDATION_FILE='latent-relation-store-validation-report.json';
 const REPORT_FILE='causal-trace-ledger-v3-report.json';
 
 const v2=JSON.parse(await readFile(V2_FILE,'utf8'));
+const h1=JSON.parse(await readFile(H1_FILE,'utf8'));
+const h2=JSON.parse(await readFile(H2_FILE,'utf8'));
 const validation=JSON.parse(await readFile(VALIDATION_FILE,'utf8'));
 
 let counterfactualRows=0;
@@ -52,6 +56,8 @@ for await(const line of rl){
 const hardInvariantAnomalies=v2.summary?.hardInvariantAnomalies??null;
 const relationalDecisionContributionObserved=(participationLeaderDifferences>0||selectedActionDifferences>0||actionCandidateSetDifferences>0)&&hardInvariantAnomalies===0;
 const selectedActionContributionObserved=selectedActionDifferences>0&&hardInvariantAnomalies===0;
+const h1Grade=h1.summary?.h1EvidenceGrade??'UNVALIDATED';
+const h2Grade=h2.evidence?.H2_grade??'UNVALIDATED';
 
 const report={
   system:{
@@ -73,7 +79,7 @@ const report={
     dispositionEffectTested:false,
     relationalAblation:'The same current production state is evaluated with the reactivated past-relation layer present and temporarily disabled in shadow analysis.',
     terminologyGuard:'The implementation field `cands` is an action/destination candidate list. It is NOT identical to the theoretical Behavioral Decision Relational Candidate Set. Reactivated past relations are the relational layer being ablated.',
-    interpretationLimit:'This run can identify a contribution of reactivated past relations to participation, action-candidate signatures, or selected action under fixed current state. It cannot validate Individual Disposition, universal H0, or sufficiency/necessity of the full v3 factor set.'
+    interpretationLimit:'This run can identify contributions of reactivated past relations and trace exact structural lineage inside the canonical harness. It cannot validate Individual Disposition, universal H0/H1/H2, full Past Relational Structure joint necessity, or sufficiency/necessity of the full v3 factor set.'
   },
   input:{
     completedTick:validation.summary?.completedTick??null,
@@ -89,6 +95,9 @@ const report={
     sameChoiceDespiteActionCandidateDifference,
     relationalDecisionContributionObserved,
     selectedActionContributionObserved,
+    H1_exactStructuralChains:h1.summary?.exactReactivationParticipationOutcomeChains??null,
+    H2_relationallyParticipatedOutcomesFormingNewStructure:h2.summary?.outcomesWithNewRelationalStructure??null,
+    H2_multiKeyStructureOutcomes:h2.summary?.multiKeyStructureOutcomes??null,
     experimenterInterventionCount:0
   },
   v3EvidenceGrades:{
@@ -99,13 +108,17 @@ const report={
     H0_individualDisposition:'UNVALIDATED',
     H0_behavioralDecisionRelationalCandidateSet:'THEORETICAL_INTERMEDIATE_NOT_DIRECTLY_IDENTIFIED_BY_ACTION_CANDIDATE_LIST; NATIVE_RELATIONAL-CANDIDATE TRACE STILL REQUIRED',
     H0_sufficiency:'NO_SINGLE_COMPONENT_ASSUMED_OR_ESTABLISHED_AS_SUFFICIENT',
-    H1_realizationAndPastStructureIncorporation:v2.v2EvidenceGrades?.H1_realizationAndPastStructureIncorporation??'UNVALIDATED',
-    H2_newPastStructureAndSubsequentRealityRelation:v2.v2EvidenceGrades?.H2_newPastStructureAndSubsequentRealityRelation??'UNVALIDATED',
+    H1_realizationAndPastStructureIncorporation:h1Grade,
+    H2_newPastStructureAndSubsequentRealityRelation:h2Grade,
+    H2_fullPastRelationalStructureJointNecessity:'UNVALIDATED',
+    H2_possibilityCompositionDirectInstrumentation:'UNVALIDATED',
     H3_relationalReappearance:v2.v2EvidenceGrades?.H3_relationalReappearance??'UNVALIDATED',
     H4_relationalPersistenceLimit:v2.v2EvidenceGrades?.H4_relationalPersistenceLimit??'OPEN_INQUIRY',
     generalization:'UNVALIDATED'
   },
   inheritedV2Summary:v2.summary,
+  H1:h1.summary,
+  H2:h2.summary,
   examples
 };
 
@@ -115,3 +128,5 @@ console.log('V3-EVIDENCE '+JSON.stringify(report.v3EvidenceGrades));
 
 if((validation.summary?.completedTick??0)!==120000)throw new Error('v3 analysis requires completed 120k canonical run');
 if(hardInvariantAnomalies!==0)throw new Error(`v3 inherited hard invariant anomalies: ${hardInvariantAnomalies}`);
+if((h1.input?.interventionMarkers??0)!==0)throw new Error('H1 experimenter-intervention marker detected');
+if((h2.input?.interventionMarkers??0)!==0)throw new Error('H2 experimenter-intervention marker detected');
