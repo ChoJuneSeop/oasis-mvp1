@@ -1,5 +1,30 @@
 # Causal Research Changelog
 
+## v3.0 evidence completion / v3.1 evidence-index revision — 2026-09-07
+
+- Promoted **OASIS Causal Research System v3.0** as the current theoretical causal baseline while preserving `OASIS_RESEARCH_PROTOCOL.md` as the governing root protocol.
+- Fixed the paper title as **AI의 행동은 무엇으로 결정되는가? — 과거 관계구조, 현재 현실, 개성과 행동 결정 관계 후보군의 OASIS 연구**.
+- Added H0 behavioral-decision participation research without replacing the four v2 causal axes.
+- Fixed `인연필드 / Relational Field` as **열린 가능성 조합의 장 / Open Field of Possibility Combinations**, without asserting mathematical infinity, a physical field, or persistent parallel realities.
+- Fixed `개성 / Individual Disposition` as a formal behavioral initial condition while retaining `NONE` as an empirical control and refusing to assume necessity or sufficiency.
+- Directly instrumented the native implementation-level Behavioral Decision Relational Candidate Set and its links to implemented possibility projection, selection and later realization.
+- Promoted H1 to **SUPPORTED WITHIN CANONICAL HARNESS FOR EXACT STRUCTURAL LINEAGE** after exact realized-experience → incorporation → episode formation → latency → reactivation → participation → later-outcome genealogy was observed.
+- Narrowed H2 to **PARTIALLY SUPPORTED**: active relational subsets and cross-key routes contribute, while whole-Past-Relational-Structure joint necessity/sufficiency remain unvalidated.
+- Preserved negative H2 evidence that relational reappearance alone did not cause behavioral divergence in tested horizons and that finer within-key footprint testing is blocked by the current compressed representation.
+- Completed EX-04P disposition sequence A/B/C/D/DL. Conditional matched effects were observed, but disposition remained unnecessary and insufficient.
+- Completed EX-04M multi-OASIS study: same-prior/different-Past-Relational-Structure contrasts diverged in **3/3** canonical pairs; different-prior/same-PRS matched-prestate effects occurred in **2/3** canonical pairs.
+- Completed EX-05 replication/falsification across predeclared E137/E977/E4099 exogenous streams. Past Relational Structure effects replicated in **9/9** shifted pairs; disposition-prior matched-prestate effects replicated in **0/9**, a preserved negative result.
+- Repeatedly observed that branches can return to the same current output while retaining different Past Relational Structures: same current output does not identify one causal process.
+- Completed EX-06 Legacy v1 observer comparison. Legacy axes remain useful for divergence/reconvergence/accumulated-effect measurement; v3 explicitly retains condition identity, matched-prestate lineage and same-output/different-PRS process state. Universal v3 superiority was not established.
+- Completed EX-07 causal-form review. Within one matched intervention class, effect rates varied by condition (34.19%, 68.81%, 50.16%); conditioned BIC **6296.4593** beat scalar BIC **6673.0464** by `Delta BIC = 376.5871`.
+- Current causal-form verdict: a **single context-free scalar is not supported as a sufficient empirical representation within tested scope**. Minimum supported abstraction is a context-conditioned effect function/family `theta_I(z; Q)`; exact function/distribution/operator law remains open.
+- Added current integrated evidence documents:
+  - `causal/CAUSAL_EVIDENCE_LEDGER_v3.1.md`
+  - `causal/CAUSAL_EXPERIMENT_INDEX_v3.1.md`
+  - `causal/OASIS_CAUSAL_INTEGRATED_RESULT_v3.0.md`
+- Preserved v3.0 detailed evidence/index as predecessor audit material rather than deleting or rewriting them.
+- Preserved all v1/v2 documents, tools and negative results as Legacy/predecessor material.
+
 ## v2.0 — 2026-09-07
 
 - Promoted the continuous-relational causal framework to the official OASIS Causal Research System v2.0.
