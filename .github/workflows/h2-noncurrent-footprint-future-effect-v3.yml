@@ -6,6 +6,7 @@ on:
     branches: ["main"]
     paths:
       - "tools/h2-noncurrent-footprint-future-effect-v3.mjs"
+      - "tools/h2-noncurrent-footprint-diagnostic-v3.mjs"
       - "tools/validation-compatibility-guard.mjs"
       - ".github/workflows/h2-noncurrent-footprint-future-effect-v3.yml"
 
@@ -31,8 +32,8 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Guard canonical validation conditions
         run: node tools/validation-compatibility-guard.mjs
-      - name: Run H2 noncurrent relational-footprint future-effect analysis
-        run: node tools/h2-noncurrent-footprint-future-effect-v3.mjs
+      - name: Run H2 noncurrent relational-footprint diagnostic analysis
+        run: node tools/h2-noncurrent-footprint-diagnostic-v3.mjs
       - name: Upload H2 noncurrent footprint evidence
         if: always()
         uses: actions/upload-artifact@v4
