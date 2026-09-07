@@ -5,6 +5,14 @@
 상위 기준 / Governing protocol: `../OASIS_RESEARCH_PROTOCOL.md`
 선행 기준 / Predecessor: OASIS Causal Research System v2.0
 
+## 논문 제목 / Paper Title
+
+**AI의 행동은 무엇으로 결정되는가? — 과거 관계구조, 현재 현실, 개성과 행동 결정 관계 후보군의 OASIS 연구**
+
+**What Determines AI Behavior? — An OASIS Study of Past Relational Structure, Current Reality, Individual Disposition, and Behavioral Decision Relational Candidate Sets**
+
+이 제목을 v3.0 기준 논문의 공식 제목으로 고정한다.
+
 ## 1. v3 승계 원칙 / v3 Continuity Rule
 
 v3.0은 v2.0의 핵심 인과 정의와 네 개 핵심 연구축을 변경하지 않는다.
