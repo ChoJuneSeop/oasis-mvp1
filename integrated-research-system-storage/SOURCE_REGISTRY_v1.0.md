@@ -54,29 +54,31 @@ Current retained boundaries:
 - relation reappearance alone does not guarantee behavioral divergence;
 - same current output does not imply same causal process;
 - one universal context-free causal scalar is not supported as sufficient;
-- full theoretical Possibility Composition remains unvalidated;
-- Responsibility Axis and Self-Intervention remain unisolated in production.
+- full theoretical Possibility Composition remained unvalidated in the legacy production harness;
+- Responsibility Axis and Self-Intervention remained unisolated in the legacy production harness.
+
+These are prior empirical/implementation boundaries. They are not automatically transferred as expected outcomes into new experiments.
 
 ## D. Current integrated validation closure
 
-Source branch:
+Historical source branch:
 - `validation/integrated-work-system-v1.1-2026-09-08`
 
-Key source:
+Key historical source:
 - `docs/validation/OASIS_UNIFIED_WORK_SYSTEM_V1_1_CLOSURE_2026-09-08.md`
 
-Current closure:
+Retained closure boundary:
 - validation cycle closed;
 - full integrated claim not confirmed;
-- F0~F5 remain partial at different evidence/implementation boundaries;
-- next validation cycle requires changed prerequisites rather than repetition.
+- F0~F5 remained partial at different evidence/implementation boundaries;
+- repetition without changed prerequisites is not warranted.
 
 ## E. GitHub full genealogy and reclassification
 
-Source branch:
+Historical source branch:
 - `validation/integrated-work-system-v1.1-2026-09-08`
 
-Source path:
+Historical source path:
 - `docs/validation/OASIS_GITHUB_MASTER_GENEALOGY_RECLASSIFICATION_v1.0_2026-09-08.md`
 
 Source commit:
@@ -94,13 +96,39 @@ Storage-local canonical snapshot:
 - `integrated-research-system-storage/MATHEMATICAL_OPERATOR_MODEL_v1.0_CLOSED_BASELINE.md`
 
 Role:
-- current conceptual-operator mathematical semantics before production implementation.
+- current conceptual-operator mathematical semantics.
 
 Important boundary:
 - mathematically closed at conceptual-operator level;
-- not equivalent to full production implementation or empirical confirmation.
+- not equivalent to empirical confirmation.
 
-## G. External recurrence-prevention storage
+## G. Mathematical reference executable kernel
+
+Storage-local implementation:
+- `integrated-research-system-storage/executable/src/oasis-math-kernel-v1.mjs`
+- `integrated-research-system-storage/executable/EXECUTABLE_SPEC_v1.0.md`
+- `integrated-research-system-storage/executable/tests/oasis-math-kernel-v1.test.mjs`
+- `integrated-research-system-storage/executable/IMPLEMENTATION_STATUS_v0.1.md`
+- `.github/workflows/oasis-math-kernel-v1.yml`
+
+Role:
+- executable translation of the current mathematical operator contracts;
+- code-level reference for O_t/Y_t, Γ, Ω, κ, Ψ/P trace, χ contract, ρ vector contract, A_resource reference policy, S re-observation/recomputation, life-value gate, D single realization/non-intervention, and W append-only incorporation.
+
+Explicit boundaries:
+- no universal Ψ formula is claimed;
+- no universal Choice Axis law is invented;
+- no generic `danger` field is mapped to Responsibility;
+- external pre-ranked action menus are not treated as native Ω;
+- unresolved multiple admissible possibilities fail closed to self-intervention and ultimately non-intervention rather than hidden argmax/tie-break;
+- the resource-allocation formula is a reference runtime policy, not a theoretical invariant;
+- this is a reference executable kernel, not yet a domain-complete production system or empirical proof.
+
+Local creation audit:
+- syntax: PASS;
+- reference tests: 11/11 PASS before commit.
+
+## H. External recurrence-prevention storage
 
 Separate branch:
 - `storage/oasis-research-governance-v1.0`
@@ -113,11 +141,12 @@ Separation rule:
 - it must not determine experimental outcomes;
 - it is not conceptually merged into this integrated research system storage.
 
-## H. Update rule
+## I. Update rule
 
-When a new canonical research principle is accepted:
+When a new canonical research principle or executable contract is accepted:
 1. preserve the previous source and status;
 2. add the new source and date;
 3. classify the change as retained, supplementary update, structural change, retired, or comparator conversion;
 4. do not rewrite historical negative evidence as success;
-5. do not allow the registry itself to become an experimental input.
+5. do not allow the registry itself to become an experimental input;
+6. distinguish mathematical semantics, reference implementation, domain production implementation, and empirical evidence.
