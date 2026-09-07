@@ -97,9 +97,11 @@ Interpretation:
 
 ## 6. H2 — New Past Relational Structure and Subsequent Reality Relation
 
-Current status: **PARTIALLY SUPPORTED WITHIN CANONICAL HARNESS; INTEGRATED CLAIM REQUIRES JOINT-STRUCTURE TEST**
+Current status: **PARTIALLY SUPPORTED WITHIN CANONICAL HARNESS FOR LONGITUDINAL STRUCTURAL CONTINUITY AND JOINT ACTIVE-RELATIONAL CONTRIBUTION; WHOLE PAST RELATIONAL STRUCTURE CLAIM REMAINS UNVALIDATED**
 
-Observed downstream chain:
+### 6.1 Longitudinal downstream structural chain
+
+Observed chain:
 
 **past relational participation → realized outcome → incorporation → same-tick formation of new relational episode(s)**
 
@@ -120,13 +122,97 @@ Run #15 results:
 Interpretation:
 - relationally participated outcomes can feed forward into new relational structure formation over long horizons in this harness.
 - multi-key participation shows that the observed process is not restricted to a single relation key.
-- however, the claim that the **entire newly formed Past Relational Structure as a joint structure** is causally necessary or uniquely sufficient is not yet established.
-- the theoretical `Possibility Composition` object is not yet directly instrumented.
+
+### 6.2 Joint active-relational-set contribution
+
+Validation run: **OASIS H2 Joint Active Relational Set v3**  
+GitHub Actions run id: `34098060582`  
+Head commit: `6fafe08c585704ce008fc1f0e59f6849363259f2`  
+Result: **SUCCESS**
+
+Method:
+- same-current production replay
+- shadow-only counterfactual analysis
+- current jointly active reactivated past-relation episode identities compared with no-reactivated-relation and component-removal shadows
+- no experimenter intervention after initialization
+- non-anticipatory
+
+Validity:
+- replay mismatch: **0**
+- full-choice mismatch: **0**
+- duplicate-footprint violations: **0**
+
+Observed:
+- decisions with active reactivated relations: **1,967**
+- joint decision-effect moments: **297**
+- joint resolved-target-effect moments: **204**
+- mean active episode identities at joint-effect moments: **692.6229**
+- decision moments with an individually necessary episode identity: **1/297**
+- decision moments with an individually sufficient episode identity: **297/297**
+- decision moments with no individually necessary identity but redundant/overdetermined contribution: **296/297**
+- resolved-target moments with an individually necessary episode identity: **0/204**
+- resolved-target moments with an individually sufficient episode identity: **204/204**
+- resolved-target moments with redundant/overdetermined contribution and no individually necessary identity: **204/204**
+
+Interpretation:
+- the currently active reactivated relational subset can contribute jointly to decision and resolved target under the tested same-current state.
+- the observed joint effect is not generally reducible to one uniquely necessary episode identity.
+- this supports **joint active-relational contribution**, not whole-Past-Relational-Structure necessity or sufficiency.
+
+Evidence grade:
+- joint active relational set: **SUPPORTED_WITHIN_CANONICAL_HARNESS_FOR_JOINT_ACTIVE_RELATIONAL_SET_WITH_COMPONENT_NONTRIVIALITY**
+
+### 6.3 Cross-key alternative sufficient relational routes
+
+Validation run: **OASIS H2 Cross-Key Overdetermination v3**  
+GitHub Actions run id: `34098153324`  
+Head commit: `131c2939cda406086b41981fcc34764fca8f4196`  
+Result: **SUCCESS**
+
+Validity:
+- replay mismatch: **0**
+- full-shadow target mismatch: **0**
+- representative-compression mismatch: **0**
+
+Observed:
+- joint decision effects: **297**
+- joint resolved-target effects: **204**
+- cross-key overdetermined decision effects: **165/297 = 55.56%**
+- cross-key overdetermined resolved-target effects: **77/204 = 37.75%**
+- moments with 2+ sufficient relation keys: decision **165**, resolved target **77**
+- maximum number of sufficient relation keys observed at one moment: **7** for both decision and resolved target
+- moments with duplicate episode identities: **297**
+- moments with multiple distinct footprints inside one relation key: **0**
+
+Interpretation:
+- distinct relation keys can provide alternative sufficient relational routes for the same-current decision effect and, in a substantial subset, for the resolved target effect.
+- this directly supports nontrivial relational structure among the **currently active** past relations.
+- it does not establish one universal cause, whole-Past-Relational-Structure necessity/sufficiency, or simultaneous activity of all past relations.
+
+Evidence grade:
+- cross-key alternative relational contribution: **SUPPORTED_WITHIN_CANONICAL_HARNESS_FOR_CROSS_KEY_ALTERNATIVE_RELATIONAL_CONTRIBUTION**
+
+### 6.4 H2 integrated interpretation and remaining boundary
+
+The combined H2 evidence now supports:
+1. long-horizon feed-forward from past relational participation into realized outcome and new relational structure formation;
+2. joint contribution of the currently active reactivated relational subset;
+3. alternative sufficient routes across distinct relation keys in the same-current active structure.
+
+Still not established:
+- that every element of Past Relational Structure is active at a given moment;
+- that the **entire newly formed Past Relational Structure**, including currently inactive/nonparticipating relations, is jointly necessary;
+- that the entire Past Relational Structure is jointly sufficient;
+- direct instrumentation of the theoretical `Possibility Composition` object;
+- universal actual-causation or real-world generalization.
 
 Therefore:
 - downstream structural process: **OBSERVED_WITHIN_CANONICAL_HARNESS**
-- H2 integrated process: **PARTIALLY SUPPORTED**
+- joint active-relational contribution: **SUPPORTED_WITHIN_CANONICAL_HARNESS**
+- cross-key alternative sufficient routes: **SUPPORTED_WITHIN_CANONICAL_HARNESS**
+- H2 integrated hypothesis: **PARTIALLY SUPPORTED / STRONGLY NARROWED REMAINING GAP**
 - whole Past Relational Structure joint causal necessity: **UNVALIDATED**
+- whole Past Relational Structure joint causal sufficiency: **UNVALIDATED**
 - direct Possibility Composition instrumentation: **UNVALIDATED**
 
 ## 7. H3 — Relational Reappearance
@@ -202,7 +288,7 @@ Current status: **MANDATORY METHODOLOGICAL INVARIANT**
 
 After initialization, researcher intervention into judgment, disposition, relations, candidate set, possibility composition, choice, responsibility, realization or Past Relational Structure invalidates that run as autonomous longitudinal evidence.
 
-Run #15 satisfies this condition with `experimenterInterventionCount = 0`.
+Run #15 and the two H2 same-current shadow validations preserve the production reality and satisfy the no-mid-run-intervention boundary for evidence interpretation.
 
 ## 14. Multi-OASIS and Longitudinal Disposition
 
@@ -234,7 +320,11 @@ v3-specific reproducible instrumentation now exists:
 - `tools/h1-structural-incorporation-v3.mjs`
 - `tools/h2-integrated-structure-v3.mjs`
 - `tools/causal-trace-ledger-v3.mjs`
+- `tools/h2-joint-active-relational-set-v3.mjs`
+- `tools/h2-cross-key-overdetermination-v3.mjs`
 - `.github/workflows/causal-trace-ledger.yml`
+- `.github/workflows/h2-joint-active-relational-set-v3.yml`
+- `.github/workflows/h2-cross-key-overdetermination-v3.yml`
 
 Therefore the prior statement that v3 had only definitions and no v3-specific evidence implementation is retired.
 
@@ -242,13 +332,13 @@ Remaining implementation gaps:
 - native Behavioral Decision Relational Candidate Set trace
 - direct Possibility Composition trace
 - Individual Disposition comparison instrumentation
-- whole-Past-Relational-Structure joint causal test for H2
+- whole-Past-Relational-Structure test that explicitly distinguishes currently active and inactive/nonparticipating relations
 - explicit self-intervention trace
 - multi-OASIS longitudinal comparison
 
 ## 18. Current Evidence Priorities
 
-1. H2 joint-structure causal test
+1. H2 whole-Past-Relational-Structure test including inactive/nonparticipating past relations, without collapsing it into the active-set result
 2. native Behavioral Decision Relational Candidate Set + Possibility Composition instrumentation for H0
 3. EX-03/H3 causal replication across conditions
 4. EX-04 long-horizon persistence-limit inquiry
@@ -267,8 +357,8 @@ Do not claim:
 - persistent unrealized parallel paths
 - extinction from horizon non-observation
 - H1 from count growth alone
-- full H2 from the current partial structural chain alone
-- full Past Relational Structure joint necessity without joint-structure testing
+- full H2 from longitudinal lineage, joint-active-set, or cross-key evidence alone
+- full Past Relational Structure joint necessity/sufficiency from the active relational subset
 - Behavioral Decision Relational Candidate Set from implementation destination `cands`
 - disposition necessity/sufficiency before comparison evidence
 - causal strength from divergence delay
