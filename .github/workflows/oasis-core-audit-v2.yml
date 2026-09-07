@@ -1,0 +1,29 @@
+name: oasis-core-audit-v2
+on:
+  push:
+    branches: [experiment/prehistoric-personality-lab]
+    paths:
+      - 'experiments/oasis-core-v2.js'
+      - 'experiments/oasis-core-audit-v2.mjs'
+      - '.github/workflows/oasis-core-audit-v2.yml'
+  workflow_dispatch:
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run frozen six-check OASIS v2 audit
+        shell: bash
+        run: |
+          set +e
+          node experiments/oasis-core-audit-v2.mjs | tee oasis-core-audit-v2-result.json
+          code=${PIPESTATUS[0]}
+          echo "audit_exit_code=$code"
+          exit 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oasis-core-audit-v2-result
+          path: oasis-core-audit-v2-result.json

@@ -1,0 +1,9 @@
+[
+  {"key":"stone_tools","label":"현재 알려진 매우 이른 석기 증거","years_before_present":3300000,"type":"evidence_anchor","note":"Lomekwi 3. 최초 행위 시점 자체를 뜻하지 않음."},
+  {"key":"fire_interaction","label":"이른 불 사용/접촉 증거","years_before_present":1000000,"type":"evidence_anchor","note":"Wonderwerk 등. 자연불 채취와 통제의 경계는 불확실함."},
+  {"key":"cooking","label":"조리의 직접 고고학적 증거","years_before_present":780000,"type":"evidence_anchor","note":"Gesher Benot Ya’aqov의 어류 조리 증거."},
+  {"key":"bone_tools","label":"체계적 뼈 도구 생산 증거","years_before_present":1500000,"type":"evidence_anchor","note":"초기 Acheulean 맥락의 체계적 뼈 도구 생산 보고. 석기 이후 불보다 앞설 수 있음."},
+  {"key":"fire_making","label":"직접 불 피우기 증거","years_before_present":400000,"type":"evidence_anchor","note":"Barnham의 약 40만 년 전 점화 증거. 불 사용과 불 만들기를 구분."},
+  {"key":"cooperative_hunting","label":"협동적 근접 사냥의 고고학적 참조 구간","years_before_present_range":[200000,120000],"type":"reference_range","note":"무기·상처 자료가 보여주는 협동 사냥의 참조 구간이며 최초 시점을 뜻하지 않음."},
+  {"key":"persistent_marks","label":"추상적 지속 표식/그림의 참조 증거","years_before_present":73000,"type":"evidence_anchor","note":"Blombos Cave의 약 7.3만 년 전 오커 드로잉. 의미는 알 수 없음."}
+]
