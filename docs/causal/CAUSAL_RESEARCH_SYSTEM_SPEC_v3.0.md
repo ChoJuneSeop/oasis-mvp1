@@ -13,7 +13,13 @@ v3 구현은 v2의 연속관계 인과과정을 유지한다.
 
 `Past Relational Structure + Current Reality -> Possibility Composition -> Single Realization -> Realized Experience -> Incorporation into Existing Past Relational Structure -> New Past Relational Structure -> Relation with Subsequent Reality -> New Relational Structure / Possibility Composition`
 
-v3는 여기에 실험자 비개입, 조건부 최소 개성 초기값, 초기값과 장기 행동경향의 분리, 다중 OASIS 비교, 인과율 존재형태 개방성을 구현·보고 수준에서 추가한다.
+v3는 여기에 실험자 비개입, 공식 개성 초기조건, 행동 결정 관계 후보군, 초기값과 장기 행동경향의 분리, 다중 OASIS 비교, 인과율 존재형태 개방성을 구현·보고 수준에서 추가한다.
+
+행동결정 관점의 구현 흐름은 다음과 같다.
+
+`Past Relational Structure + Current Reality + Individual Disposition (Initial Condition) -> Behavioral Decision Relational Candidate Set -> Possibility Composition -> Participation / Choice / Responsibility / Reality Constraints -> Single Behavioral Realization`
+
+개성 또는 행동 결정 관계 후보군 어느 하나도 행동 현실화의 충분조건으로 구현하지 않는다.
 
 ## 2. 핵심 구현 모듈 / Core Implementation Modules
 
@@ -31,11 +37,12 @@ v3는 여기에 실험자 비개입, 조건부 최소 개성 초기값, 초기�
 12. Falsification and Evidence Grader / 반증·증거등급기
 13. Experimenter Intervention Guard / 실험자 개입 검증기
 14. Disposition Prior Recorder / 초기 개성값 기록기
-15. Observed Disposition Pattern Trace / 관찰 행동경향 추적기
-16. Self-Intervention Trace / 자기개입 추적기
-17. Choice-Responsibility Trace / 선택·책임 추적기
-18. Multi-OASIS Comparator / 다중 OASIS 비교기
-19. Causal-Form Inquiry Report / 인과율 존재형태 탐색 보고기
+15. Behavioral Decision Relational Candidate Set Trace / 행동 결정 관계 후보군 추적기
+16. Observed Disposition Pattern Trace / 관찰 행동경향 추적기
+17. Self-Intervention Trace / 자기개입 추적기
+18. Choice-Responsibility Trace / 선택·책임 추적기
+19. Multi-OASIS Comparator / 다중 OASIS 비교기
+20. Causal-Form Inquiry Report / 인과율 존재형태 탐색 보고기
 
 `episodeId`, `tick`, `event ID`는 감사와 추적을 위한 표식일 뿐 현실 자체의 존재론적 분절단위가 아니다.
 
@@ -74,7 +81,8 @@ v3는 여기에 실험자 비개입, 조건부 최소 개성 초기값, 초기�
 핵심 H1~H4와 별도로 다음을 기록할 수 있다.
 
 - `interventionOrigin`: external / self / unknown
-- `initialDispositionPrior`: 시작 시 허용한 최소 개성 초기조건 또는 null
+- `initialDispositionPrior`: 시작 시 허용한 최소 개성 초기조건 또는 `NONE`
+- `behavioralDecisionRelationalCandidateSetTrace`: 현재 행동결정에 참여할 수 있는 관계 후보군의 변화
 - `observedDispositionPatternTrace`: 실제 선택·관계·탐색에서 반복적으로 나타난 경향
 - `selfInterventionTrace`: 자기개입 여부와 방향
 - `choiceResponsibilityTrace`: 선택축·책임축의 관측 가능한 작동
@@ -86,22 +94,40 @@ v3는 여기에 실험자 비개입, 조건부 최소 개성 초기값, 초기�
 
 ## 5. 개성 조건 / Disposition Condition
 
-1차 실험에서는 개성을 필수값으로 넣지 않는다.
+개성 / Individual Disposition은 v3 행동결정 구조의 공식 초기조건으로 취급한다.
 
-조건부 2차 실험에서 개성을 사용할 경우:
+그러나 개성이 행동결정의 필요조건인지 여부는 사전에 확정하지 않는다.
+
+따라서 1차 대조실험에서는 `initialDispositionPrior = NONE` 조건을 사용할 수 있다.
+
+이는 개성의 공식 위치를 폐기하는 것이 아니라 개성의 필요성과 효과를 분리 검증하기 위한 ablation/control 조건이다.
+
+최소 개성 조건을 사용할 경우:
 - `initialDispositionPrior`는 실험 시작 전에 기록한다.
 - 실험 시작 후 실험자가 이를 변경하지 않는다.
 - 특정 결과를 강제하는 정책값으로 사용하지 않는다.
+- 행동 결정 관계 후보군과 가능성 탐색 방향에 어떤 차이와 함께 나타나는지 기록한다.
 - 이후 행동경향은 `observedDispositionPatternTrace`로 별도 기록한다.
 - 초기값과 관찰된 행동경향의 차이를 곧바로 내부 개성 파라미터 학습으로 해석하지 않는다.
 
-## 6. 실험자 비개입 불변조건 / No-Experimenter-Intervention Invariant
+## 6. 행동 결정 관계 후보군 / Behavioral Decision Relational Candidate Set
+
+행동 결정 관계 후보군은 현재 행동결정에 참여할 수 있는 관계들의 후보집합으로 기록한다.
+
+후보군 형성 자체는 특정 행동 현실화의 충분조건이 아니다.
+
+후보군 이후에도 가능성 조합, 참여상태, 선택, 책임, 현재 현실의 제약조건이 함께 작동해야 한다.
+
+개성이 후보군 형성 또는 탐색 방향과 어떤 차이를 함께 보이는지는 관찰대상이며, 개성의 단독 인과효과로 자동 귀속하지 않는다.
+
+## 7. 실험자 비개입 불변조건 / No-Experimenter-Intervention Invariant
 
 초기조건과 실험환경 설정 후 다음에 대한 실험자의 중간변경을 금지한다.
 
 - 판단
 - 개성
 - 관계
+- 행동 결정 관계 후보군
 - 가능성 조합
 - 선택
 - 책임
@@ -112,7 +138,7 @@ v3는 여기에 실험자 비개입, 조건부 최소 개성 초기값, 초기�
 
 `experimenterInterventionCount > 0`인 run은 자율적 장기 변화 증거에서 제외한다.
 
-## 7. 다중 OASIS 비교규칙 / Multi-OASIS Comparison Rules
+## 8. 다중 OASIS 비교규칙 / Multi-OASIS Comparison Rules
 
 가능한 비교조건:
 
@@ -123,6 +149,7 @@ C. 서로 다른 최소 개성 초기값의 여러 OASIS
 가능한 한 동일한 외생조건을 공유한다.
 
 각 OASIS별로 다음을 독립 추적한다.
+- behavioral decision relational candidate set
 - possibility composition
 - self-intervention
 - choice and responsibility
@@ -135,7 +162,7 @@ C. 서로 다른 최소 개성 초기값의 여러 OASIS
 
 차이가 없어도 동일한 인과과정을 거쳤다고 자동 판정하지 않는다.
 
-## 8. Legacy v1 관측기 비교 / Legacy v1 Observer Comparison
+## 9. Legacy v1 관측기 비교 / Legacy v1 Observer Comparison
 
 v1 축은 동일 자료에 별도로 적용할 수 있다.
 
@@ -148,7 +175,7 @@ v1 축은 동일 자료에 별도로 적용할 수 있다.
 
 목적은 v3 우월성의 자동 입증이 아니라, 분절형 관측틀과 연속관계 관측틀이 동일 OASIS 흐름에서 포착하는 정보의 차이를 확인하는 것이다.
 
-## 9. 비예견·검증 불변조건 / Hard Validation Invariants
+## 10. 비예견·검증 불변조건 / Hard Validation Invariants
 
 다음은 hard invalidation 조건이다.
 
@@ -161,11 +188,13 @@ v1 축은 동일 자료에 별도로 적용할 수 있다.
 7. episodeId/tick을 독립 현실의 존재론적 단위로 해석함
 8. whole-structure rewrite를 현실화의 기본규칙으로 복원함
 9. 미실현 가능성을 실제 평행 미래경로로 처리함
-10. 실험 시작 후 실험자가 개성·판단·관계·가능성·선택·책임·현실화·과거 관계구조를 중간조정하고 해당 run을 자율적 장기 변화 증거로 사용함
-11. 개성 조건 2차 실험 성공을 1차 조건의 성공으로 소급함
+10. 실험 시작 후 실험자가 개성·판단·관계·행동 결정 관계 후보군·가능성·선택·책임·현실화·과거 관계구조를 중간조정하고 해당 run을 자율적 장기 변화 증거로 사용함
+11. 개성 조건 2차 실험 성공을 `NONE` 대조조건의 성공으로 소급함
 12. 다중 OASIS 간 차이를 개성의 단독 인과효과로 자동 귀속함
+13. 개성을 필요조건 또는 충분조건으로 실험 전에 확정함
+14. 행동 결정 관계 후보군 자체를 특정 행동 현실화의 충분조건으로 처리함
 
-## 10. 증거 등급 / Evidence Grading
+## 11. 증거 등급 / Evidence Grading
 
 - `IMPLEMENTATION_SIGNAL`
 - `OBSERVED`
@@ -174,9 +203,9 @@ v1 축은 동일 자료에 별도로 적용할 수 있다.
 - `UNVALIDATED`
 - `OPEN_INQUIRY`
 
-개성, 자기개입, 장기 행동경향, 다중 OASIS 비교는 별도 증거축으로 보고하고 H1~H4와 혼합하지 않는다.
+개성, 행동 결정 관계 후보군, 자기개입, 장기 행동경향, 다중 OASIS 비교는 별도 증거축으로 보고하고 H1~H4와 혼합하지 않는다.
 
-## 11. 인과율 존재형태 검토 / Causal-Form Inquiry
+## 12. 인과율 존재형태 검토 / Causal-Form Inquiry
 
 단일 causal-rate scalar는 사전에 도입하지 않는다.
 
@@ -190,13 +219,14 @@ v1 축은 동일 자료에 별도로 적용할 수 있다.
 
 어느 형태도 사전에 정답으로 고정하지 않는다.
 
-## 12. 실험 순서 / Experiment Order
+## 13. 실험 순서 / Experiment Order
 
 내부 선행연구 확인
 → H1
 → H2
 → H3
 → H4
+→ 개성 `NONE` 대조조건과 최소 개성 조건의 필요성·효과 비교
 → 필요 시 최소 개성 조건 재실험
 → 다중 OASIS 장기 비교
 → 반복·반증
