@@ -1,0 +1,53 @@
+name: OASIS Causal Trace Ledger Validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "relation-field.js"
+      - "tools/latent-relation-store-validation.mjs"
+      - "tools/causal-trace-ledger.mjs"
+      - "tools/validation-compatibility-guard.mjs"
+      - ".github/workflows/causal-trace-ledger.yml"
+
+concurrency:
+  group: oasis-causal-trace-ledger
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Produce fixed 120k latent audit
+        run: node tools/latent-relation-store-validation.mjs
+      - name: Assemble process-identity causal traces and audit invariants
+        run: node tools/causal-trace-ledger.mjs
+      - name: Upload causal research artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-causal-trace-ledger
+          path: |
+            latent-relation-store-validation-report.json
+            latent-relation-store-audit.jsonl
+            latent-relation-store-counterfactual.jsonl
+            causal-trace-ledger-report.json
+            causal-traces.jsonl
+          if-no-files-found: ignore
