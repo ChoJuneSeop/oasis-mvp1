@@ -20,6 +20,14 @@ Status: REQUIRED BEFORE NEW RUNS
 - 기존 v1/v1.5 evidence와 중복 여부 확인
 - 미해결 질문을 H1~H4 중 하나에 연결
 
+## 공통 필수조건 — 실험자 비개입 / Mandatory No-Experimenter-Intervention Condition
+
+초기조건과 실험환경이 설정된 뒤에는 실험자가 OASIS의 판단, 개성, 관계, 가능성 조합, 선택, 책임, 현실화 또는 과거 관계구조를 중간에 변경하지 않는다.
+
+사전에 고정한 환경규칙, 외생조건, 관측절차는 허용한다. 결과를 본 뒤 특정 방향으로 유도하기 위한 중간 조정은 금지한다.
+
+이 조건을 위반한 run은 OASIS의 자율적 장기 변화 증거로 사용하지 않는다.
+
 ## 공통 보조 관측 / Common Auxiliary Observations
 
 핵심 H1~H4 판정과 별도로, 실험과 직접 관련되는 경우 다음을 보조적으로 기록할 수 있다.
@@ -149,6 +157,7 @@ Status: CONDITIONAL ONLY
 - 개성은 특정 결과나 행동을 강제하지 않는다.
 - 1차 실험과 가능한 한 동일한 환경·관측조건을 유지한다.
 - 어떤 개성 초기조건을 사용했는지 명시한다.
+- 실험 시작 이후 실험자는 초기 개성값 또는 판단조건을 변경하지 않는다.
 
 지속 관찰:
 - 개성 조건을 넣은 직후의 결과만 비교하지 않는다.
@@ -164,12 +173,14 @@ Status: CONDITIONAL ONLY
 5. `realizationTrace` — 실제 현실화
 6. `pastRelationalStructureChangeTrace` — 현실화 경험 편입 후 과거 관계구조의 변화
 7. `observedDispositionPatternTrace` — 실제 선택·관계·탐색에서 반복적으로 나타나는 행동경향
+8. `experimenterInterventionCount` — 시작 이후 0이어야 함
 
 판정원칙:
 - 2차 결과는 1차 결과와 분리하여 보고한다.
 - 2차 성공을 1차 성공으로 소급하지 않는다.
 - 1차에서 명확한 반증이 있었다면 그 반증을 유지한 채 `개성 조건에서는 다른 결과가 관측되었는가`만 별도로 판단한다.
 - 초기 개성값과 이후 행동경향이 달라졌다고 해서 내부 개성 파라미터가 학습되었다고 자동 결론내리지 않는다.
+- `experimenterInterventionCount > 0`이면 해당 run은 자율적 장기 변화 증거에서 제외한다.
 
 연구해석:
 - 개성 조건에서만 구조가 활성화된다면, 개성이 OASIS 작동에 필요한 최소 초기조건일 가능성을 후속 연구문제로 제시할 수 있다.
@@ -187,6 +198,7 @@ Status: AFTER EX-01~04 AND CONDITIONAL EX-04P IF USED
 - implementation-specific artifact removal
 - 자기개입·개성 등 보조 구성요소가 결과 해석을 과도하게 설명하지 않는지 확인
 - 초기 개성조건이 같아도 서로 다른 현실흐름에서 다른 장기 행동경향이 재현되는지 확인
+- 모든 장기 변화 run에서 실험자 비개입 조건 유지 확인
 
 결과 등급:
 - OBSERVED
