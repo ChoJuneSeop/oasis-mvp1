@@ -2,6 +2,22 @@
 
 OASIS is implemented here as a 2D autonomous RPG observation laboratory, not as a score-maximizing game bot.
 
+## Current causal research baseline
+
+The active causal research baseline is **OASIS Causal Research System v1.0 (2026-09-07)**.
+
+Canonical definition: `docs/OASIS_CAUSAL_RESEARCH_SYSTEM_v1.0_ko.md`
+Implementation spec: `docs/causal/CAUSAL_RESEARCH_SYSTEM_SPEC_v1.0.md`
+Active trace assembler: `tools/causal-trace-ledger-v1.mjs`
+
+The v1.0 causal process is:
+
+`past relational structure + current reality -> possibility composition -> single realization -> new realized relational experience -> incorporation into accumulated past relational structure -> formation of a new relational structure -> new possibility composition`
+
+A realization does not overwrite the whole relational structure. Only realized possibilities enter actual relational history. Unrealized possibilities are not treated as persistent parallel future paths.
+
+The primary empirical layer is observed realized flow. Internal possibility composition, reactivation, participation, and responsibility are explanatory layers used after or alongside observed-flow comparison.
+
 ## Current validation structure
 
 The world now contains 10 places, 8 NPCs, and 3 distinct hero parties. Each party moves together by default. Individual members contribute differently to one party decision according to current danger, role, health, curiosity, care, courage, accumulated experience, and — in OASIS-Full — relationship history.
@@ -39,11 +55,13 @@ The previous single spiral count was not sufficient to explain why OASIS-Full an
 
 A higher number is not treated as proof of superiority. The important observation is whether the structure and realized path diverge, and why.
 
+For causal v1.0, long-horizon interpretation additionally separates divergence delay, realized change, persistence, reconvergence, accumulated relational effect, and downstream effect rather than prematurely collapsing them into one causal scalar.
+
 ## Same-state counterfactual replay
 
 The `동일상황 재시험` control evaluates the selected OASIS-Full party twice without advancing the world: once with relationship participation and once with relationship participation removed. It records whether the available candidate set or selected destination changes.
 
-This is intended as an internal structural falsification aid, not as proof of real-world causality.
+This is intended as an internal structural falsification aid, not as proof of real-world causality. Shadow/counterfactual states are analysis-only and do not enter the actual relational history.
 
 ## Multiple party histories
 
