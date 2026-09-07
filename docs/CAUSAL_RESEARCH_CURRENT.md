@@ -3,31 +3,53 @@
 Governing protocol:
 - `../OASIS_RESEARCH_PROTOCOL.md`
 
-The governing protocol has precedence over this causal research baseline and over all causal experiment documents. If a causal metric, term, workflow, or interpretation conflicts with the master protocol, it must not be treated as an OASIS core principle. Historical conflicting material is preserved as Legacy/comparator evidence until explicitly revised.
+The governing protocol has precedence over this causal research baseline and over all causal experiment documents.
 
-Current baseline: OASIS Causal Research System v1.0 (2026-09-07)
+Current baseline: **OASIS Causal Research System v2.0 (2026-09-07)**
 
 Canonical definition:
-- `OASIS_CAUSAL_RESEARCH_SYSTEM_v1.0_ko.md`
+- `OASIS_CAUSAL_RESEARCH_SYSTEM_v2.0_ko.md`
 
 Research implementation specification:
-- `causal/CAUSAL_RESEARCH_SYSTEM_SPEC_v1.0.md`
+- `causal/CAUSAL_RESEARCH_SYSTEM_SPEC_v2.0.md`
 
 Current evidence interpretation:
-- `causal/CAUSAL_EVIDENCE_LEDGER_v1.5.md`
+- `causal/CAUSAL_EVIDENCE_LEDGER_v2.0.md`
 
 Current experiment sequence:
-- `causal/CAUSAL_EXPERIMENT_INDEX_v1.2.md`
+- `causal/CAUSAL_EXPERIMENT_INDEX_v2.0.md`
 
 Active causal trace implementation:
-- `../tools/causal-trace-ledger-v1.mjs`
+- `../tools/causal-trace-ledger-v2.mjs`
 - `../.github/workflows/causal-trace-ledger.yml`
 
-Historical baseline retained for traceability:
-- `OASIS_CAUSAL_RESEARCH_SYSTEM_v0.1_ko.md`
-- `OASIS_CAUSAL_RESEARCH_SYSTEM_v0.1.md`
+## v2 core axes
 
-Important transition note:
-The current v1.0 measurement-axis block contains terms now under review, including divergence delay, realized change, persistence, reconvergence, accumulated relational effect, and downstream long-horizon effect. These terms are not elevated above the master protocol. They are candidates for revision or Legacy/comparator status. The causal-process backbone remains subject to the master continuous-reality and internal-prior-work principles.
+1. 현실화와 과거 관계구조 편입 / Realization and Incorporation into Past Relational Structure
+2. 새로운 과거 관계구조 형성과 이후 현실관계 / Formation of New Past Relational Structure and Subsequent Reality Relation
+3. 인연의 재출현 가능성 / Possibility of Relational Reappearance
+4. 인연 지속의 제한 여부 / Whether Relational Persistence Has Limits
+
+Divergence delay is auxiliary time information only and is not causal strength.
+
+## Terminology
+
+Theoretical and research interpretation uses `과거 관계구조 / Past Relational Structure` rather than `관계이력 / relation history` as a core concept.
+
+Existing implementation field names such as `relationHistory` may remain for compatibility but do not define the theory.
+
+## Legacy comparator
+
+OASIS Causal Research System v1.0 is preserved unchanged as Legacy/comparator material.
+
+Legacy v1 axes include:
+- divergence delay
+- realized change
+- persistence
+- reconvergence
+- accumulated relational effect
+- downstream long-horizon effect
+
+v1 remains available for future head-to-head comparison with the v2 continuous-relational analysis. It is no longer the active OASIS causal baseline.
 
 Historical experimental records are preserved and are not rewritten to manufacture success.
