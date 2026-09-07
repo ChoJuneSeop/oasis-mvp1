@@ -378,7 +378,7 @@ try {
         conditionB: PRIOR,
         sameExogenousEnvironment: true,
         priorFixedBeforeRun: true,
-        priorMayOnlyReorderTop-vote tiesWhenRelationalContextExists: true,
+        priorMayOnlyReorderTopVoteTiesWhenRelationalContextExists: true,
         noRiskRewardOrOutcomeTargetEncoded: true,
         noCandidateMembershipInjection: true,
         noMidRunPriorMutation: true,
