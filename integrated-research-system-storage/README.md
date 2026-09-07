@@ -38,8 +38,10 @@ It must not inject:
 - `MATHEMATICAL_OPERATOR_MODEL_v1.0_CLOSED_BASELINE.md`
 - `SOURCE_REGISTRY_v1.0.md`
 - `executable/EXECUTABLE_SPEC_v1.0.md`
-- `executable/src/oasis-math-kernel-v1.mjs`
+- `executable/src/oasis-math-kernel-v1-canonical.mjs` — canonical executable entrypoint
+- `executable/src/oasis-math-kernel-v1.mjs` — base operator infrastructure
 - `executable/tests/oasis-math-kernel-v1.test.mjs`
+- `executable/tests/oasis-math-kernel-v1-canonical.test.mjs`
 - `executable/IMPLEMENTATION_STATUS_v0.1.md`
 
 ## Executable boundary
@@ -49,6 +51,10 @@ English — **Reference executable kernel**: the runnable implementation of the 
 한글 설명 — **참조 실행 커널**: 현재 수학적 연산자 계약을 코드 수준에서 실행·감사할 수 있게 만든 구현이다. 이것만으로 게임·로봇·차량·현실환경의 완성형 production이나 이론의 실증 완료를 의미하지 않는다.
 
 The kernel intentionally fails closed where the mathematical model does not yet specify a universal law. For example, a probability distribution does not silently become argmax choice, and unresolved multiple admissible possibilities do not receive an arbitrary winner.
+
+The canonical entrypoint additionally blocks recurrence of two legacy failure modes:
+- shared actor/endpoint overlap alone cannot activate Γ;
+- a primitive with unsatisfied prerequisites cannot enter Ω as an independently executable atomic possibility.
 
 ## Governing idea
 
