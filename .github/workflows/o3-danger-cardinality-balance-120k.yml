@@ -1,0 +1,47 @@
+name: OASIS O3 Danger Cardinality Balance 120k
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'tools/o3-danger-balance-export-120k.mjs'
+      - 'tools/o3-danger-cardinality-balance-120k.py'
+      - 'tools/validation-compatibility-guard.mjs'
+      - '.github/workflows/o3-danger-cardinality-balance-120k.yml'
+
+concurrency:
+  group: oasis-o3-danger-cardinality-balance-120k
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Playwright and optimizer dependencies
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          python -m pip install --upgrade pip
+          python -m pip install numpy scipy
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Export fixed 120k production structural records
+        run: node tools/o3-danger-balance-export-120k.mjs
+      - name: Run balance-constrained cardinality matching
+        run: python tools/o3-danger-cardinality-balance-120k.py
+      - name: Upload balance report
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-o3-danger-cardinality-balance-120k
+          path: |
+            o3-danger-cardinality-balance-120k-report.json
+            o3-danger-balance-records-120k.json
+          if-no-files-found: error
