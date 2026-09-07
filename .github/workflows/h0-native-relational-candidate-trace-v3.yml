@@ -1,0 +1,44 @@
+name: OASIS H0 Native Relational Candidate Trace v3
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "tools/h0-native-relational-candidate-trace-v3.mjs"
+      - "relation-field.js"
+      - "index.html"
+      - "tools/validation-compatibility-guard.mjs"
+      - ".github/workflows/h0-native-relational-candidate-trace-v3.yml"
+
+concurrency:
+  group: oasis-h0-native-relational-candidate-trace-v3
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run H0 native relational candidate trace
+        run: node tools/h0-native-relational-candidate-trace-v3.mjs
+      - name: Upload H0 native relational candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-h0-native-relational-candidate-trace-v3
+          path: h0-native-relational-candidate-trace-v3-report.json
+          if-no-files-found: ignore
