@@ -1,0 +1,46 @@
+{
+  "system": {"name":"OASIS Integrated Paper System","version":"1.1","stage":"F1"},
+  "workflowRun": 34157084254,
+  "horizon": 120000,
+  "classification": "NULL_WITHIN_HORIZON_FOR_BEHAVIOR_AFTER_FLOW_PRESERVED_INCORPORATION_BLOCK",
+  "gate": {
+    "triggerObserved": true,
+    "triggerBaselineMatch": true,
+    "beforeTriggerMismatchTicks": 0,
+    "fullTwinMismatchTicks": 0,
+    "nonTargetFlowPreserved": true,
+    "postTriggerChoices": 890,
+    "postTriggerOutcomes": 890,
+    "postTriggerRelationEvents": 539,
+    "valid": true
+  },
+  "trigger": {
+    "tick": 5038,
+    "party": "dawn",
+    "realizedChoice": "forest",
+    "blockedRelationRecord": {"t":5038,"npc":"엘리","place":"forest"},
+    "baselineMatch": true,
+    "relationHistoryLengthAfterBlock": 17,
+    "baselineRelationHistoryLengthAtTrigger": 18,
+    "interventionRelationEpisodesAtTrigger": 39,
+    "baselineRelationEpisodesAtTrigger": 45,
+    "firstRegenerationTick": 5786
+  },
+  "outcome": {
+    "firstStructuralDivergenceTick": 5038,
+    "firstBehaviorDivergenceTick": null,
+    "postTriggerBehaviorDivergenceTicks": 0,
+    "finalBaselineRelationHistoryLength": 557,
+    "finalInterventionRelationHistoryLength": 556,
+    "finalBaselineRelationEpisodeCount": 80,
+    "finalInterventionRelationEpisodeCount": 80,
+    "finalBehaviorSame": true
+  },
+  "interpretationBoundary": {
+    "provesUniversalNecessityOfAllIncorporation": false,
+    "provesWholePastStructureNecessity": false,
+    "provesExternalValidity": false,
+    "validNegativeIfNoBehaviorDivergence": true
+  },
+  "oasisInterpretation": "A single realized relational-experience incorporation changed relational structure immediately but was not necessary for downstream behavioral divergence within 120,000 ticks. The same relation naturally regenerated from tick 5,786, indicating redundancy/reconstruction in the continuing flow."
+}
