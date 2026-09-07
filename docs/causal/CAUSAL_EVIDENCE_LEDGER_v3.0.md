@@ -11,7 +11,7 @@ Legacy evidence: `CAUSAL_EVIDENCE_LEDGER_v1.5.md`
 
 v3는 v2의 증거등급을 성공결과로 재작성하지 않는다.
 
-v2에서 관측된 사실은 그대로 보존하고, v3에서 새로 추가된 자기개입·개성·실험자 비개입·다중 OASIS·인과율 존재형태 관련 항목은 별도 증거가 확보되기 전까지 자동 승격하지 않는다.
+v2에서 관측된 사실은 그대로 보존하고, v3에서 새로 추가된 자기개입·개성·행동 결정 관계 후보군·실험자 비개입·다중 OASIS·인과율 존재형태 관련 항목은 별도 증거가 확보되기 전까지 자동 승격하지 않는다.
 
 ## 2. Inherited Internal Evidence
 
@@ -108,29 +108,50 @@ Not established:
 
 ## 9. Individual Disposition Status
 
-Current status: **CONDITIONAL EXPERIMENTAL PRIOR / NOT YET SHOWN NECESSARY**
+Current definitional status: **FORMAL BEHAVIORAL INITIAL CONDITION**
 
-Primary research does not require disposition as an initial value.
+Current empirical status: **NECESSITY AND EFFECT UNVALIDATED**
 
-If primary runs fail to activate sufficient possibility exploration or structural behavior, a separate conditional rerun may add disposition as `Minimum Permitted AI Prior`.
+v3 defines Individual Disposition as a `Minimum Permitted AI Prior` that can be used as an official behavioral initial condition.
+
+This definitional position does not establish that disposition is necessary or sufficient for OASIS behavior.
+
+A `NONE` condition remains valid as an experimental control/ablation for testing necessity and effect.
 
 Not established:
 - that disposition is required for OASIS to function
+- that disposition alone determines a behavioral decision relational candidate set
+- that disposition directly determines a realized action
 - that disposition is a fixed personality constant
 - that observed behavior change equals internal disposition-parameter learning
 
 Required evidence:
-- EX-04P if trigger conditions are met.
+- EX-04P NONE versus minimum-prior comparison.
 
-## 10. No-Experimenter-Intervention Status
+## 10. Behavioral Decision Relational Candidate Set Status
+
+Current status: **FORMAL BEHAVIORAL INTERMEDIATE / EMPIRICAL ROLE UNVALIDATED**
+
+The Behavioral Decision Relational Candidate Set is defined as the current candidate set of relations that can participate in behavioral decision formation.
+
+It is not treated as a sufficient condition for a realized action.
+
+Required evidence:
+- trace whether different disposition initial conditions are accompanied by differences in candidate-set formation, possibility composition, later selection, and realization.
+
+Do not infer:
+- candidate-set formation = action determination
+- candidate-set difference = disposition-only causation
+
+## 11. No-Experimenter-Intervention Status
 
 Current status: **MANDATORY METHODOLOGICAL INVARIANT FOR AUTONOMOUS LONGITUDINAL EVIDENCE**
 
-After initial conditions and environment are fixed, researcher intervention into judgment, disposition, relations, possibility composition, choice, responsibility, realization, or past relational structure invalidates that run as autonomous longitudinal evidence.
+After initial conditions and environment are fixed, researcher intervention into judgment, disposition, relations, behavioral decision relational candidate set, possibility composition, choice, responsibility, realization, or past relational structure invalidates that run as autonomous longitudinal evidence.
 
 This is a methodological validity condition, not itself evidence for H1-H4.
 
-## 11. Longitudinal Disposition Change Status
+## 12. Longitudinal Disposition Change Status
 
 Current status: **PLANNED OBSERVATION / NO v3 RESULT YET**
 
@@ -140,12 +161,12 @@ v3 distinguishes:
 
 The research target is the divergence or persistence of observed behavior patterns through accumulated experience and past relational structure, not automatic modification of the initial prior itself.
 
-## 12. Multi-OASIS Comparison Status
+## 13. Multi-OASIS Comparison Status
 
 Current status: **PLANNED / NO v3 RESULT YET**
 
 Planned conditions:
-1. multiple OASIS with identical initial conditions
+1. multiple OASIS with identical `NONE` control conditions
 2. multiple OASIS with identical minimum disposition prior
 3. multiple OASIS with different minimum disposition priors
 
@@ -153,11 +174,12 @@ Interpretive limits:
 - difference does not automatically prove disposition causation
 - no outcome difference does not prove identical causal process
 - same realization may still arise through different relational structures and processes
+- candidate-set differences do not by themselves establish a sufficient cause of action
 
 Required evidence:
 - EX-04M.
 
-## 13. Legacy v1 Observer Comparison Status
+## 14. Legacy v1 Observer Comparison Status
 
 Current status: **PRESERVED AS OBSERVATIONAL-FRAME COMPARATOR**
 
@@ -175,7 +197,7 @@ Purpose:
 
 This comparison does not automatically prove v3 superiority.
 
-## 14. Causal-Rate Form Status
+## 15. Causal-Rate Form Status
 
 Current status: **OPEN_INQUIRY**
 
@@ -190,19 +212,19 @@ Permitted candidate outcomes:
 
 Failure to identify a stable scalar is preserved as a valid research result.
 
-## 15. Current Evidence Priorities
+## 16. Current Evidence Priorities
 
 1. EX-01 structural incorporation
 2. EX-02 whole new past relational structure and subsequent reality relation
 3. EX-03 natural relational reappearance
 4. EX-04 persistence-limit inquiry
-5. if needed, EX-04P minimum-disposition rerun
+5. EX-04P NONE versus minimum-disposition comparison, including candidate-set tracing
 6. EX-04M multi-OASIS longitudinal comparison
 7. EX-05 replication/falsification
 8. EX-06 Legacy observer comparison
 9. EX-07 causal-form review
 
-## 16. Evidence Discipline
+## 17. Evidence Discipline
 
 Do not claim:
 - whole-structure overwrite
@@ -213,7 +235,8 @@ Do not claim:
 - H2 from one-step post-outcome difference alone
 - self-intervention superiority
 - strong will = strong causality
-- disposition necessity before conditional evidence
+- disposition necessity or sufficiency before evidence
+- behavioral decision relational candidate set as a sufficient cause of realized action
 - autonomous change when experimenter intervention occurred
 - disposition causality from multi-OASIS difference alone
 - scalar causal rate before evidence supports it
