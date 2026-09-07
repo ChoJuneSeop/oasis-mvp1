@@ -20,15 +20,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Replay deterministic first 30 cycles of Run 0
+      - name: Replay deterministic first 100 cycles of Run 0
         env:
           OASIS_RUN_SEED: prehistoric-civilization-v1-run0
-          OASIS_MAX_CYCLES: '30'
+          OASIS_MAX_CYCLES: '100'
         run: node integrated-research-system-storage/prehistoric/src/prehistoric-experiment-v1.mjs
       - name: Upload prefix result
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: oasis-prehistoric-run0-prefix-30
+          name: oasis-prehistoric-run0-prefix-100
           path: prehistoric-experiment-v1-result.json
           if-no-files-found: warn
