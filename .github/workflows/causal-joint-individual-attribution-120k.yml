@@ -1,0 +1,42 @@
+name: OASIS CR-02 Joint Individual Causal Attribution 120k
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "tools/causal-joint-individual-attribution-120k.mjs"
+      - "tools/validation-compatibility-guard.mjs"
+      - ".github/workflows/causal-joint-individual-attribution-120k.yml"
+
+concurrency:
+  group: oasis-cr02-joint-individual-120k
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run CR-02 same-current joint/individual attribution
+        run: node tools/causal-joint-individual-attribution-120k.mjs
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-cr02-joint-individual-attribution-120k
+          path: causal-joint-individual-attribution-120k-report.json
+          if-no-files-found: ignore
