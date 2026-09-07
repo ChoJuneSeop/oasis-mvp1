@@ -1,4 +1,4 @@
-name: OASIS Causal Research System v2 Validation
+name: OASIS Causal Research System v3 Validation
 
 on:
   workflow_dispatch:
@@ -8,16 +8,18 @@ on:
       - "relation-field.js"
       - "tools/latent-relation-store-validation.mjs"
       - "tools/causal-trace-ledger-v2.mjs"
+      - "tools/causal-trace-ledger-v3.mjs"
       - "tools/validation-compatibility-guard.mjs"
       - "OASIS_RESEARCH_PROTOCOL.md"
-      - "docs/OASIS_CAUSAL_RESEARCH_SYSTEM_v2.0_ko.md"
-      - "docs/causal/CAUSAL_RESEARCH_SYSTEM_SPEC_v2.0.md"
-      - "docs/causal/CAUSAL_EVIDENCE_LEDGER_v2.0.md"
-      - "docs/causal/CAUSAL_EXPERIMENT_INDEX_v2.0.md"
+      - "docs/OASIS_CAUSAL_RESEARCH_SYSTEM_v3.0_ko.md"
+      - "docs/causal/CAUSAL_RESEARCH_SYSTEM_SPEC_v3.0.md"
+      - "docs/causal/CAUSAL_EVIDENCE_LEDGER_v3.0.md"
+      - "docs/causal/CAUSAL_EXPERIMENT_INDEX_v3.0.md"
+      - "docs/CAUSAL_RESEARCH_CURRENT.md"
       - ".github/workflows/causal-trace-ledger.yml"
 
 concurrency:
-  group: oasis-causal-research-v2
+  group: oasis-causal-research-v3
   cancel-in-progress: true
 
 permissions:
@@ -42,17 +44,20 @@ jobs:
         run: node tools/validation-compatibility-guard.mjs
       - name: Produce fixed 120k latent audit
         run: node tools/latent-relation-store-validation.mjs
-      - name: Assemble OASIS v2 causal traces
+      - name: Assemble inherited v2 causal traces
         run: node tools/causal-trace-ledger-v2.mjs
-      - name: Upload causal v2 research artifacts
+      - name: Assemble v3 behavioral causal evidence
+        run: node tools/causal-trace-ledger-v3.mjs
+      - name: Upload causal v3 research artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: oasis-causal-research-v2
+          name: oasis-causal-research-v3
           path: |
             latent-relation-store-validation-report.json
             latent-relation-store-audit.jsonl
             latent-relation-store-counterfactual.jsonl
             causal-trace-ledger-v2-report.json
             causal-v2-traces.jsonl
+            causal-trace-ledger-v3-report.json
           if-no-files-found: ignore
