@@ -1,0 +1,34 @@
+name: OASIS Prehistoric Run0 Prefix Replay v1
+
+on:
+  push:
+    branches:
+      - storage/oasis-integrated-research-system-v1.0
+    paths:
+      - '.github/workflows/oasis-prehistoric-prefix-smoke-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prefix:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Replay deterministic first 30 cycles of Run 0
+        env:
+          OASIS_RUN_SEED: prehistoric-civilization-v1-run0
+          OASIS_MAX_CYCLES: '30'
+        run: node integrated-research-system-storage/prehistoric/src/prehistoric-experiment-v1.mjs
+      - name: Upload prefix result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-prehistoric-run0-prefix-30
+          path: prehistoric-experiment-v1-result.json
+          if-no-files-found: warn
