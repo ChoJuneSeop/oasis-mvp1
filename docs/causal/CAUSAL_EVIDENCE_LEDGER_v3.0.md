@@ -4,6 +4,8 @@
 기준일 / Date: 2026-09-07  
 상위 기준 / Governing protocol: `../../OASIS_RESEARCH_PROTOCOL.md`  
 정의 기준 / Canonical semantics: `../OASIS_CAUSAL_RESEARCH_SYSTEM_v3.0_ko.md`  
+EX-04P 상세 증거 / Disposition evidence: `EX04P_DISPOSITION_EVIDENCE_v3.0.md`  
+EX-04P lineage: `EX04P_DISPOSITION_LINEAGE_v3.0.md`  
 Predecessor evidence: `CAUSAL_EVIDENCE_LEDGER_v2.0.md`  
 Legacy evidence: `CAUSAL_EVIDENCE_LEDGER_v1.5.md`
 
@@ -130,7 +132,7 @@ Interpretation boundary:
 - the observation does not establish candidate-set sufficiency or necessity for every AI behavior.
 - primitive relation event identity is not declared an independent cause when production uses only relation-presence predicates.
 - exact composed episode identity is not declared individually necessary when production exposes relation-key-level active structure.
-- Individual Disposition remains unvalidated because the run used `NONE`.
+- Individual Disposition was not tested by these H0 native-trace runs because they used `NONE`; disposition evidence is recorded separately in Section 9.
 - Responsibility Axis and Self-Intervention are not fully isolated by this run.
 
 Evidence grades:
@@ -139,7 +141,6 @@ Evidence grades:
 - implemented Possibility Composition projection: **DIRECTLY_INSTRUMENTED_IMPLEMENTATION_PROJECTION_WITHIN_CANONICAL_HARNESS**
 - candidate → participation/selection → realization chain: **OBSERVED_WITHIN_CANONICAL_HARNESS; SUFFICIENCY_AND NECESSITY NOT ESTABLISHED**
 - theoretical Possibility Composition as a complete abstract object: **UNVALIDATED**
-- Individual Disposition contribution: **UNVALIDATED**
 - full H0 including disposition, responsibility, self-intervention and complete factor interaction: **PARTIALLY SUPPORTED / OPEN COMPONENTS REMAIN**
 - any single component as universal sufficient cause: **NOT ESTABLISHED**
 
@@ -347,15 +348,158 @@ Never infer extinction from horizon non-observation.
 ## 9. Individual Disposition
 
 Definitional status: **FORMAL BEHAVIORAL INITIAL CONDITION**  
-Empirical status: **NECESSITY AND EFFECT UNVALIDATED**
+Empirical status: **MINIMUM RELATIONAL-ATTENTION OPERATIONALIZATION SHOWS CONDITIONAL CAUSAL CONTRIBUTION WITHIN MATCHED CANONICAL HARNESS; NOT NECESSARY FOR BEHAVIOR/REALIZATION IN THE CURRENT HARNESS; FULL CONSTRUCT REMAINS OPEN**
 
-`NONE` remains a valid control condition for testing necessity/effect. The canonical H0-H2 runs used `NONE`; their success therefore cannot be used to claim that disposition caused those results.
+`NONE` remains a valid control condition. The canonical H0-H2 runs used `NONE`; their success cannot be attributed to disposition. EX-04P separately tests necessity, effect, relation-identity specificity and longitudinal consequence.
 
-Required follow-up:
-- EX-04P NONE vs minimum-disposition prior
-- fixed initial prior
-- observed disposition pattern separated from initial prior
-- no mid-run researcher adjustment
+### 9.1 EX-04P-A — NONE vs minimum prior
+
+Run id: `34119083697`  
+Head commit: `9813aa439647320c6bbc08e6bd9becb73d123b80`  
+Result: **SUCCESS**
+
+Observed:
+- 120,000 ticks
+- NONE decisions/outcomes: **1,997 / 1,997**
+- relational-context top ties: **11**
+- same-current shadow choice changes under the minimum prior: **4/11**
+- first longitudinal divergence: **tick 1,439**
+- choice-distribution TV distance: **0.21125765955666664**
+- candidate membership changes: **0**
+- deterministic twin mismatch ticks: **0**
+- `experimenterInterventionCount`: **0**
+
+Interpretation:
+- behavior and realization remain active under `NONE`; therefore the tested minimum prior is **not necessary** for behavior/realization in this harness.
+- A is retained as exploratory effect evidence because relational-context hashing did not isolate relation identity from generic deterministic tie-breaking.
+
+### 9.2 EX-04P-B — natural specificity gate
+
+Run id: `34120121323`  
+Head commit: `79edf25800f5a5aa97bb751720219be23db5009d`  
+Result: **SUCCESS / INCONCLUSIVE FOR EFFECT**
+
+Observed:
+- 1,997 decisions
+- 11 top-vote ties
+- eligible top ties with nonempty, distinct direct relational support: **0**
+- deterministic twin mismatch: **0**
+- `experimenterInterventionCount`: **0**
+
+Classification:
+- **INCONCLUSIVE_NO_ELIGIBLE_DISTINCT_SUPPORT_TIES**
+
+This is not a negative effect result. It shows that the unmodified canonical 120k trajectory did not instantiate the required specificity condition.
+
+### 9.3 EX-04P-C — matched specificity battery
+
+Run id: `34121040185`  
+Head commit: `ac81c834264544811520ac42320fc33f9562b395`  
+Artifact id: `10018217336`  
+Artifact digest: `sha256:a3bb61b412f02b98c9e5baabe24e10cf2456844c7df1651dd282d4fd17362669`  
+Result: **SUCCESS**
+
+Observed across the complete predeclared factorial scan:
+- evaluated scenarios: **76,680 / 76,680**
+- top-vote ties: **6,348**
+- eligible distinct-direct-support scenarios: **4,809**
+- relational vs candidate-only placebo choice disagreements: **2,455 / 4,809 = 51.05%**
+- support-identity permutation choice changes: **4,797 / 4,809 = 99.75%**
+- candidate membership changes: **0**
+- `experimenterInterventionCount`: **0**
+
+Interpretation:
+- matched-condition testability and relation-identity-specific operationalization are supported.
+- because the prior is deliberately defined as a function of support identity, C is **construct/specificity validation**, not by itself evidence of naturally emerging personality or longitudinal causal effect.
+
+### 9.4 EX-04P-D — longitudinal matched branch test
+
+Run id: `34121565845`  
+Head commit: `be0c7b8d019d7faa90a85c0bd6b6310929498ea7`  
+Artifact id: `10018430879`  
+Artifact digest: `sha256:549a29020397eac93ea4cc6f7c8896115c379bf2a9d008239780f88962e798d4`  
+Result: **SUCCESS**
+
+Six scenarios were selected by **eligibility only**: the first two eligible configurations per party in the same predeclared lexicographic factorial order used by EX-04P-C. Outcomes were not used for selection.
+
+Conditions:
+- `NONE`
+- `RELATIONAL`
+- `PLACEBO`
+- `SUPPORT_PERMUTED`
+- deterministic twin for each condition
+- horizon: **12,000 ticks**
+
+Observed:
+- initial RELATIONAL vs PLACEBO choice differences: **0/6**
+- RELATIONAL vs PLACEBO longitudinal divergence: **3/6**
+- final Past Relational Structure difference RELATIONAL vs PLACEBO: **3/6**
+- choice-distribution difference RELATIONAL vs PLACEBO: **3/6**
+- total twin mismatch ticks: **0**
+- `experimenterInterventionCount`: **0**
+
+Positive matched scenarios 1, 3, 5:
+- RELATIONAL prior applied decisions: **4** in each scenario
+- first RELATIONAL vs PLACEBO divergence: tick **703**, **390**, **390** respectively
+- choice-distribution TV distance: **0.19355766465343688**, **0.11839708561020035**, **0.17061323618700666**
+- final Past Relational Structure difference: **true / true / true**
+
+Negative matched scenarios 2, 4, 6:
+- RELATIONAL prior applied decisions: **0 / 0 / 0**
+- longitudinal divergence: **none / none / none**
+- choice-distribution TV distance: **0 / 0 / 0**
+- final Past Relational Structure difference: **false / false / false**
+
+### 9.5 EX-04P-DL — matched-pre-state lineage replay
+
+Run id: `34122198661`  
+Head commit: `fe150380f7b6955c821bb624a04f87109d868d4e`  
+Artifact id: `10018653804`  
+Artifact digest: `sha256:94fce9a284e972c1a4b0359a72867f1b18ec8a16ff2abd6742870f34e7726dcd`  
+Result: **SUCCESS**
+
+Validity:
+- divergent scenarios: **3**
+- divergent scenarios with matched-pre-state policy difference: **3/3**
+- divergent scenarios with matched-pre-state actual-choice difference: **3/3**
+- twin mismatch ticks: **0**
+- `experimenterInterventionCount`: **0**
+
+Direct branch points:
+- scenario 1 / dawn / tick **703**: RELATIONAL `canyon` vs PLACEBO `ruin`
+- scenario 3 / star / tick **390**: RELATIONAL `canyon` vs PLACEBO `tower`
+- scenario 5 / blue / tick **390**: RELATIONAL `canyon` vs PLACEBO `tower`
+
+At each direct branch point the pre-decision party-state matched. Therefore the longitudinal D result is not inferred solely from final trajectory difference: the first causal branch is directly traced to a different policy/actual target under the same pre-decision state.
+
+The three nondivergent scenarios had:
+- prior applied count **0**
+- matched-pre-state policy difference **0**
+- actual-choice difference **0**
+- twin mismatch **0**
+
+### 9.6 Integrated evidence grade
+
+Supported:
+- formal initial-condition role: **RETAINED**
+- behavior/realization without minimum prior: **OBSERVED**
+- necessity of the tested minimum prior: **NOT SUPPORTED / NOT NECESSARY WITHIN CURRENT HARNESS**
+- relation-identity specificity for the predeclared minimum relational-attention operationalization under matched eligible conditions: **SUPPORTED**
+- matched-pre-state conditional choice contribution: **DIRECTLY OBSERVED IN ALL 3 DIVERGENT MATCHED SCENARIOS**
+- conditional longitudinal contribution: **SUPPORTED WITHIN MATCHED CANONICAL HARNESS**
+- downstream Past Relational Structure difference after conditional participation: **OBSERVED WITHIN MATCHED CANONICAL HARNESS**
+- no effect when the eligibility condition never occurs: **OBSERVED IN 3/3 ZERO-APPLICATION MATCHED CONTROLS**
+
+Still open:
+- natural prevalence of eligible distinct-support ties in broader unmodified trajectories
+- sufficiency of disposition for any specific behavior
+- generalization across environments/models
+- the full theoretical Individual Disposition construct beyond this minimum relation-attention operationalization
+- Individual Disposition components involving Self-Intervention and Responsibility allocation
+
+Therefore the correct current statement is:
+
+**A predeclared minimum relation-identity-conditioned attention prior can contribute causally to choice under matched current conditions and can lead, through different realized experience and incorporation into Past Relational Structure, to different later relational/behavioral trajectories. It is not required for behavior or realization in the current harness, and it is not established as sufficient or universal.**
 
 ## 10. Behavioral Decision Relational Candidate Set
 
@@ -368,14 +512,15 @@ Direct evidence now exists for:
 3. candidate membership vs direct possibility support vs collective participation;
 4. connection to an implemented current Possibility Composition projection;
 5. connection through participation/selection to later realization;
-6. semantic-twin equality and `experimenterInterventionCount = 0`.
+6. semantic-twin equality and `experimenterInterventionCount = 0`;
+7. a matched EX-04P operationalization in which relation-identity-conditioned prior and candidate-only placebo can be separated without changing candidate membership.
 
 Still required before full construct closure:
-- disposition comparison;
 - explicit Responsibility Axis isolation;
 - explicit Self-Intervention isolation where applicable;
 - validation that the implemented possibility projection sufficiently represents the intended theoretical Possibility Composition across broader conditions;
-- replication across additional environments/harnesses.
+- replication across additional environments/harnesses;
+- broader Individual Disposition operationalizations beyond the current minimum relation-attention form.
 
 Do not infer candidate-set validation from destination-list equality/difference alone. The direct v3 trace is the current evidence basis.
 
@@ -398,7 +543,7 @@ Not established:
 - responsibility = causal strength
 - responsibility alone constitutes an intervention
 
-The H0 direct trace observes implemented selection and realization but does not by itself isolate Responsibility Axis necessity or sufficiency.
+The H0 direct trace and EX-04P runs observe implemented selection and realization but do not by themselves isolate Responsibility Axis necessity or sufficiency.
 
 ## 13. No-Experimenter-Intervention
 
@@ -406,16 +551,18 @@ Current status: **MANDATORY METHODOLOGICAL INVARIANT**
 
 After initialization, researcher intervention into judgment, disposition, relations, candidate set, possibility composition, choice, responsibility, realization or Past Relational Structure invalidates that run as autonomous longitudinal evidence.
 
-Run #15, the H2 shadow validations, the H2 future-effect tests, H0 direct candidate trace and H0 lineage replay preserve the no-mid-run-intervention boundary for evidence interpretation.
+Run #15, the H2 shadow validations, H2 future-effect tests, H0 direct candidate trace, H0 lineage replay, and EX-04P A/B/C/D/DL preserve the no-mid-run-intervention boundary for their stated evidence interpretation.
 
 ## 14. Multi-OASIS and Longitudinal Disposition
 
-Current status: **PLANNED / NO v3 INTEGRATED RESULT YET**
+Current status: **NEXT MAJOR GATE / NO v3 INTEGRATED MULTI-OASIS RESULT YET**
 
-Planned conditions remain:
+Planned conditions:
 1. multiple OASIS with identical `NONE` controls
 2. multiple OASIS with identical minimum disposition prior
 3. multiple OASIS with different minimum disposition priors
+
+EX-04P now provides a tested minimum prior for the matched-condition branch, but EX-04M must not assume that its effects generalize automatically.
 
 Difference does not automatically prove disposition causation; same realization does not imply the same causal process.
 
@@ -443,27 +590,32 @@ v3-specific reproducible instrumentation now exists:
 - H2 dormant/noncurrent future-effect analyzers
 - `tools/h0-native-relational-candidate-trace-v3.mjs`
 - `tools/h0-native-relational-candidate-lineage-v3.mjs`
+- `tools/ex04p-minimum-disposition-comparison-v3.mjs`
+- `tools/ex04p-relational-support-specificity-v3.mjs`
+- `tools/ex04p-matched-initialization-specificity-v3.mjs`
+- `tools/ex04p-longitudinal-relational-disposition-v3.mjs`
+- `tools/ex04p-longitudinal-relational-disposition-lineage-v3.mjs`
 - corresponding GitHub Actions validation workflows
 
 Therefore the prior statement that v3 had only definitions and no v3-specific evidence implementation is retired.
 
 Remaining implementation gaps:
-- Individual Disposition comparison instrumentation
 - whole-Past-Relational-Structure test beyond the current runtime's compressed inactive/nonparticipating representation
 - explicit Self-Intervention trace
 - explicit Responsibility Axis isolation
-- multi-OASIS longitudinal comparison
+- EX-04M multi-OASIS longitudinal comparison
 - broader replication of the native candidate/Possibility Composition projection outside the canonical harness
+- broader disposition operationalizations and natural-frequency replication outside matched initialization
 
 ## 18. Current Evidence Priorities
 
-1. EX-04P disposition comparison: `NONE` vs fixed minimum-disposition prior
+1. EX-04M multi-OASIS longitudinal comparison using separated `NONE`, same-minimum-prior, and different-minimum-prior conditions
 2. explicit Responsibility Axis / Self-Intervention isolation within the behavioral chain
 3. EX-03/H3 causal replication across conditions
 4. EX-04 long-horizon persistence-limit inquiry
-5. EX-04M multi-OASIS longitudinal comparison
-6. H2 whole-Past-Relational-Structure test if a runtime representation capable of preserving the required inactive relational structure is available
-7. replication/falsification across environments
+5. H2 whole-Past-Relational-Structure test if a runtime representation capable of preserving the required inactive relational structure is available
+6. EX-04P replication in additional worlds/environments and natural-frequency tests for eligible relation-specific decision moments
+7. general replication/falsification across environments
 8. Legacy observer comparison
 9. causal-rate form review
 
@@ -482,7 +634,11 @@ Do not claim:
 - individual causal identity for primitive events or exact episodes when production has compressed them to presence/key-level predicates
 - theoretical Behavioral Decision Relational Candidate Set from implementation destination `cands`
 - full theoretical Possibility Composition from the current implementation projection
-- disposition necessity/sufficiency before comparison evidence
+- disposition necessity from the formal initial-condition role
+- disposition sufficiency from EX-04P
+- full or universal Individual Disposition from one minimum relation-attention operationalization
+- natural prevalence of relation-specific disposition effects from matched initialization
+- all post-divergence differences as direct prior effects; only the first matched-state branch is direct, later differences are accumulated through realized experience and Past Relational Structure
 - causal strength from divergence delay
 - responsibility = danger
 - self-intervention superiority
