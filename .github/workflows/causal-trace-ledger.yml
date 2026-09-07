@@ -1,4 +1,4 @@
-name: OASIS Causal Research System v1 Validation
+name: OASIS Causal Research System v2 Validation
 
 on:
   workflow_dispatch:
@@ -7,14 +7,17 @@ on:
     paths:
       - "relation-field.js"
       - "tools/latent-relation-store-validation.mjs"
-      - "tools/causal-trace-ledger-v1.mjs"
+      - "tools/causal-trace-ledger-v2.mjs"
       - "tools/validation-compatibility-guard.mjs"
-      - "docs/OASIS_CAUSAL_RESEARCH_SYSTEM_v1.0_ko.md"
-      - "docs/causal/CAUSAL_RESEARCH_SYSTEM_SPEC_v1.0.md"
+      - "OASIS_RESEARCH_PROTOCOL.md"
+      - "docs/OASIS_CAUSAL_RESEARCH_SYSTEM_v2.0_ko.md"
+      - "docs/causal/CAUSAL_RESEARCH_SYSTEM_SPEC_v2.0.md"
+      - "docs/causal/CAUSAL_EVIDENCE_LEDGER_v2.0.md"
+      - "docs/causal/CAUSAL_EXPERIMENT_INDEX_v2.0.md"
       - ".github/workflows/causal-trace-ledger.yml"
 
 concurrency:
-  group: oasis-causal-research-v1
+  group: oasis-causal-research-v2
   cancel-in-progress: true
 
 permissions:
@@ -39,17 +42,17 @@ jobs:
         run: node tools/validation-compatibility-guard.mjs
       - name: Produce fixed 120k latent audit
         run: node tools/latent-relation-store-validation.mjs
-      - name: Assemble OASIS v1 causal traces
-        run: node tools/causal-trace-ledger-v1.mjs
-      - name: Upload causal v1 research artifacts
+      - name: Assemble OASIS v2 causal traces
+        run: node tools/causal-trace-ledger-v2.mjs
+      - name: Upload causal v2 research artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: oasis-causal-research-v1
+          name: oasis-causal-research-v2
           path: |
             latent-relation-store-validation-report.json
             latent-relation-store-audit.jsonl
             latent-relation-store-counterfactual.jsonl
-            causal-trace-ledger-v1-report.json
-            causal-v1-traces.jsonl
+            causal-trace-ledger-v2-report.json
+            causal-v2-traces.jsonl
           if-no-files-found: ignore
