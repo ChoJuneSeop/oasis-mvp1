@@ -1,0 +1,90 @@
+name: OASIS Native-Memory Main v1 Blind Aggregate
+
+on:
+  push:
+    branches:
+      - storage/oasis-integrated-research-system-v1.0
+    paths:
+      - .github/workflows/oasis-prehistoric-native-memory-main-v1-aggregate.yml
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  aggregate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TARGET_RUN_ID: '34176881146'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait for fixed main run to finish
+        run: gh run watch "$TARGET_RUN_ID" -R ChoJuneSeop/oasis-mvp1 --exit-status --interval 10
+      - name: Download all main evidence artifacts
+        run: |
+          mkdir -p main-artifacts
+          gh run download "$TARGET_RUN_ID" -R ChoJuneSeop/oasis-mvp1 -D main-artifacts
+      - name: Blind aggregate without model-ranking labels
+        run: |
+          python - <<'PY'
+          import json, glob, statistics, re, collections
+          files=glob.glob('main-artifacts/**/prehistoric-native-memory-main-*-seed-*.json', recursive=True)
+          rows=[]
+          for f in files:
+              with open(f, encoding='utf-8') as h: r=json.load(h)
+              rows.append({
+                  'groupId':r['groupId'],'seedIndex':r['seedIndex'],'status':r['status'],
+                  'cyclesExecuted':r['cyclesExecuted'],'substantiveResearchResult':r['substantiveResearchResult'],
+                  'contaminationClean':r['contaminationClean'],'flowPreservingProbeSeed':r['flowPreservingProbeSeed'],
+                  'terminationType':(r.get('researchTermination') or {}).get('type'),
+                  'civilizationType':((r.get('researchTermination') or {}).get('observation') or {}).get('type'),
+                  'finalCheckpoint':r['checkpoints'][-1] if r.get('checkpoints') else None,
+                  'structures':len(r.get('structures',[])),
+                  'totalWorldEvents':r.get('totalWorldEvents'),
+                  'trajectoryWindows30':r.get('trajectoryWindows30',[])
+              })
+          rows.sort(key=lambda x:(x['groupId'],x['seedIndex']))
+          expected={(f'A{i}',s) for i in range(6) for s in range(30)}
+          seen={(r['groupId'],r['seedIndex']) for r in rows}
+          missing=sorted(expected-seen)
+          dup=[k for k,v in collections.Counter((r['groupId'],r['seedIndex']) for r in rows).items() if v>1]
+          by={}
+          for g in [f'A{i}' for i in range(6)]:
+              rr=[r for r in rows if r['groupId']==g]
+              complete=[r for r in rr if r['substantiveResearchResult']]
+              guards=[r for r in rr if r['status']=='main-software-guard-reached']
+              civ=[r for r in rr if r['status']=='civilization-observer-confirmed']
+              natural=[r for r in rr if r['status']=='natural-terminal']
+              by[g]={
+                  'n':len(rr),'substantiveComplete':len(complete),'civilizationConfirmed':len(civ),
+                  'naturalTerminal':len(natural),'softwareGuard':len(guards),
+                  'allContaminationClean':all(r['contaminationClean'] for r in rr),
+                  'cycles':{
+                      'min':min((r['cyclesExecuted'] for r in rr),default=None),
+                      'median':statistics.median([r['cyclesExecuted'] for r in rr]) if rr else None,
+                      'max':max((r['cyclesExecuted'] for r in rr),default=None)
+                  },
+                  'civilizationTypes':dict(collections.Counter(r['civilizationType'] for r in civ)),
+                  'guardContinuations':[{'seedIndex':r['seedIndex'],'cycle':r['finalCheckpoint']['cycle'],'sha256':r['finalCheckpoint']['sha256']} for r in guards]
+              }
+          aggregate={
+              'protocol':'OASIS Native-Memory Main v1 Blind Aggregate',
+              'targetRunId':int(__import__('os').environ['TARGET_RUN_ID']),
+              'artifactCount':len(rows),'expectedArtifactCount':180,'missing':missing,'duplicates':dup,
+              'allPairsPresent':not missing and not dup and len(rows)==180,
+              'allContaminationClean':all(r['contaminationClean'] for r in rows),
+              'groups':by,'rows':rows,
+              'interpretationGuard':'Aggregation reports distributions only. Earlier civilization is not defined as superiority.'
+          }
+          with open('main-v1-blind-aggregate.json','w',encoding='utf-8') as h: json.dump(aggregate,h,ensure_ascii=False,indent=2)
+          print('OASIS_MAIN_V1_BLIND_AGGREGATE='+json.dumps({k:v for k,v in aggregate.items() if k!='rows'},ensure_ascii=False,separators=(',',':')))
+          if not aggregate['allPairsPresent']: raise SystemExit(2)
+          if not aggregate['allContaminationClean']: raise SystemExit(3)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oasis-native-memory-main-v1-blind-aggregate
+          path: main-v1-blind-aggregate.json
+          retention-days: 90
