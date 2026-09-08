@@ -1,0 +1,59 @@
+name: OASIS Prehistoric Native-Memory Main v1
+
+on:
+  push:
+    branches:
+      - storage/oasis-integrated-research-system-v1.0
+    paths:
+      - .github/workflows/oasis-prehistoric-native-memory-main-v1.yml
+
+permissions:
+  contents: read
+
+jobs:
+  parity-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax audit main runner
+        run: node --check integrated-research-system-storage/prehistoric/src/prehistoric-native-memory-main-v1.mjs
+      - name: Re-run strict parity audit
+        run: node integrated-research-system-storage/prehistoric/tests/prehistoric-native-memory-parity-audit-v1.mjs
+
+  main:
+    needs: parity-audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 12
+      matrix:
+        group: [A0, A1, A2, A3, A4, A5]
+        seed: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+    env:
+      OASIS_COMPARE_GROUP: ${{ matrix.group }}
+      OASIS_MAIN_SEED_INDEX: ${{ matrix.seed }}
+      OASIS_MAIN_MAX_TOTAL_CYCLES: '180'
+      OASIS_MAIN_CHECKPOINT_EVERY: '60'
+      NODE_OPTIONS: --max-old-space-size=7168
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run primary main trajectory
+        run: node integrated-research-system-storage/prehistoric/src/prehistoric-native-memory-main-v1.mjs
+      - name: Verify main artifact integrity
+        run: |
+          FILE="prehistoric-native-memory-main-${OASIS_COMPARE_GROUP}-seed-${OASIS_MAIN_SEED_INDEX}.json"
+          node -e "const r=require('./'+process.argv[1]); if(!r.implementationChecks.contaminationClean) process.exit(2); if(!r.implementationChecks.observerBlindToGroupIdentity) process.exit(3); if(r.pilotOnly!==false) process.exit(4); if(r.seedIndex!==Number(process.env.OASIS_MAIN_SEED_INDEX)) process.exit(5); if(r.groupId!==process.env.OASIS_COMPARE_GROUP) process.exit(6);" "$FILE"
+      - name: Upload main evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-native-memory-main-${{ matrix.group }}-seed-${{ matrix.seed }}
+          path: prehistoric-native-memory-main-${{ matrix.group }}-seed-${{ matrix.seed }}.json
+          retention-days: 90
