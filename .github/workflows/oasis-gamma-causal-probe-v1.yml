@@ -1,0 +1,86 @@
+name: OASIS Gamma Flow-Preserving Causal Probe v1
+
+on:
+  push:
+    branches:
+      - storage/oasis-integrated-research-system-v1.0
+    paths:
+      - .github/workflows/oasis-gamma-causal-probe-v1.yml
+
+permissions:
+  contents: read
+
+env:
+  OASIS_CAUSAL_PROBE_MODE: G
+  OASIS_CAUSAL_ELIGIBILITY_MAX_CYCLES: '300'
+  OASIS_CAUSAL_POST_MAX_CYCLES: '300'
+  NODE_OPTIONS: --max-old-space-size=7168
+
+jobs:
+  contamination-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax audit causal implementation
+        run: |
+          node --check integrated-research-system-storage/prehistoric/src/oasis-gamma-omega-intervention-kernels-v1.mjs
+          node --check integrated-research-system-storage/prehistoric/src/oasis-gamma-omega-causal-probe-v1.mjs
+          node --check integrated-research-system-storage/prehistoric/src/oasis-gamma-omega-causal-aggregate-v1.mjs
+          node --check integrated-research-system-storage/prehistoric/tests/oasis-gamma-omega-contamination-audit-v1.mjs
+      - name: Run fail-closed contamination audit before outcomes
+        run: node integrated-research-system-storage/prehistoric/tests/oasis-gamma-omega-contamination-audit-v1.mjs
+
+  gamma-probe:
+    needs: contamination-audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        seed-slot: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39]
+    env:
+      OASIS_CAUSAL_SEED_SLOT: ${{ matrix.seed-slot }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Execute Gamma paired causal fork
+        run: node integrated-research-system-storage/prehistoric/src/oasis-gamma-omega-causal-probe-v1.mjs
+      - name: Upload one preregistered seed-family result
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-gamma-causal-probe-v1-seed-slot-${{ matrix.seed-slot }}
+          path: oasis-gamma-causal-probe-v1-seed-slot-${{ matrix.seed-slot }}.json
+          retention-days: 90
+
+  blind-aggregate:
+    needs: gamma-probe
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download all 40 Gamma artifacts after decisions are complete
+        uses: actions/download-artifact@v4
+        with:
+          pattern: oasis-gamma-causal-probe-v1-seed-slot-*
+          path: gamma-results
+          merge-multiple: true
+      - name: Blind paired aggregate
+        env:
+          OASIS_CAUSAL_RESULTS_ROOT: gamma-results
+        run: node integrated-research-system-storage/prehistoric/src/oasis-gamma-omega-causal-aggregate-v1.mjs
+      - name: Upload aggregate
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-gamma-causal-probe-v1-aggregate
+          path: oasis-gamma-causal-probe-v1-aggregate.json
+          retention-days: 90
