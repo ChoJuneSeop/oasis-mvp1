@@ -1,0 +1,85 @@
+name: OASIS Gamma v2 Confirmatory Causal Probe
+
+on:
+  push:
+    branches:
+      - storage/oasis-gamma-v2-confirmatory
+    paths:
+      - .github/workflows/oasis-gamma-v2-confirmatory.yml
+
+permissions:
+  contents: read
+
+env:
+  OASIS_GAMMA_V2_ELIGIBILITY_MAX_CYCLES: '300'
+  OASIS_GAMMA_V2_POST_CYCLES: '100'
+  NODE_OPTIONS: --max-old-space-size=7168
+
+jobs:
+  contamination-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax audit Gamma v2 implementation
+        run: |
+          node --check integrated-research-system-storage/prehistoric/src/oasis-gamma-v2-kernel.mjs
+          node --check integrated-research-system-storage/prehistoric/src/oasis-gamma-v2-causal-probe.mjs
+          node --check integrated-research-system-storage/prehistoric/src/oasis-gamma-v2-causal-aggregate.mjs
+          node --check integrated-research-system-storage/prehistoric/tests/oasis-gamma-v2-contamination-audit.mjs
+      - name: Run fail-closed A-F conformance and contamination audit
+        run: node integrated-research-system-storage/prehistoric/tests/oasis-gamma-v2-contamination-audit.mjs
+
+  gamma-v2-probe:
+    needs: contamination-audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        seed-slot: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39]
+    env:
+      OASIS_GAMMA_V2_SEED_SLOT: ${{ matrix.seed-slot }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Execute one preregistered Gamma v2 seed family
+        run: node integrated-research-system-storage/prehistoric/src/oasis-gamma-v2-causal-probe.mjs
+      - name: Upload immutable per-seed result
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-gamma-v2-seed-slot-${{ matrix.seed-slot }}
+          path: oasis-gamma-v2-causal-probe-seed-slot-${{ matrix.seed-slot }}.json
+          retention-days: 90
+
+  blind-aggregate:
+    needs: gamma-v2-probe
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download all 40 results only after all decisions complete
+        uses: actions/download-artifact@v4
+        with:
+          pattern: oasis-gamma-v2-seed-slot-*
+          path: gamma-v2-results
+          merge-multiple: true
+      - name: Blind preregistered aggregate
+        env:
+          OASIS_GAMMA_V2_RESULTS_ROOT: gamma-v2-results
+        run: node integrated-research-system-storage/prehistoric/src/oasis-gamma-v2-causal-aggregate.mjs
+      - name: Upload blind aggregate
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-gamma-v2-causal-aggregate
+          path: oasis-gamma-v2-causal-aggregate.json
+          retention-days: 90
