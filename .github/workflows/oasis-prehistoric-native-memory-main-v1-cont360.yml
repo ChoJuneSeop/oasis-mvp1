@@ -1,0 +1,87 @@
+name: OASIS Native-Memory Main v1 Continuation 360
+
+on:
+  push:
+    branches:
+      - storage/oasis-integrated-research-system-v1.0
+    paths:
+      - .github/workflows/oasis-prehistoric-native-memory-main-v1-cont360.yml
+
+permissions:
+  contents: read
+
+jobs:
+  parity-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax audit continuation runner
+        run: node --check integrated-research-system-storage/prehistoric/src/prehistoric-native-memory-main-v1.mjs
+      - name: Re-run strict parity audit
+        run: node integrated-research-system-storage/prehistoric/tests/prehistoric-native-memory-parity-audit-v1.mjs
+
+  continue:
+    needs: parity-audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 9
+      matrix:
+        include:
+          - { group: A0, seed: 2,  sha: fbc9958b3b340008d839f10ffb9c9060971923961882d7302b560304637eccb8 }
+          - { group: A0, seed: 24, sha: 1401ac2af5cacc81685aa6d5c2a2fc200248fde432a1cdbc96056be871209471 }
+          - { group: A0, seed: 27, sha: 91cd704696523ec9ff02dcdfdce19b1c6e2875cc5dd2a923a6450d5535c4ad58 }
+          - { group: A0, seed: 29, sha: d12be56b0e33abbfe064ff0986bc1139540c1a8a2f0762999efa39928657911d }
+          - { group: A1, seed: 9,  sha: dda5a49fc6ee534ca65552c9277e28b04540d8ee41952f19a66d8271e174a98a }
+          - { group: A1, seed: 24, sha: f3ffac8a728bbc237babebf364edb40da9242ab5fd53fc6329a2b036fe8457c0 }
+          - { group: A2, seed: 1,  sha: 25ed21c56a056be2775419758b503364efa469847a965916c50ddd3b4cb16e14 }
+          - { group: A2, seed: 10, sha: 17a50a29a11704ea3b0a7bff69a5d7e156b1b2c8b0ca75cfad128871b15c9ad2 }
+          - { group: A2, seed: 11, sha: 928281481299671655577475c4854bbf5c32b576623dec9cf863961353c16299 }
+          - { group: A2, seed: 14, sha: 061cc5b1968b4f58246fe48e55d36a378644adb65139962c95ff4e17ca4a5afb }
+          - { group: A2, seed: 16, sha: bf27287cc44c07b937bcbf7abbcc8f7e9954e5489931d08d672c8a72ee7a3b1a }
+          - { group: A2, seed: 25, sha: 094e4bd63de8059e1cab35d63037bdc4ee38adc3c455041eba93929bc1cc75db }
+          - { group: A3, seed: 4,  sha: 1d740e40af7cb2b96154713675532a23592cb87641b0245e005b4f36b27b77eb }
+          - { group: A3, seed: 6,  sha: 0b8da15cb5eeb76807fa176f34ff51a70d806ae2cd735ddb609cee81febb1dca }
+          - { group: A3, seed: 16, sha: 6c203eef24320a4eae86d038bfae7617026373618b312b2d46a4c0b892355833 }
+          - { group: A3, seed: 17, sha: 423141afa4015a447eee231246648cad862e7711dfa7a22eb951644f568253c6 }
+          - { group: A4, seed: 0,  sha: 521dfa530b47821ab6471617a2edea1785aeeaed605cab79955beda3b34b5f2a }
+          - { group: A4, seed: 5,  sha: d1f223bac06ea4ea600ee4b0ce74a32ee4ce8ffd5b8ad6f2ccddf4cc9e20d8f }
+          - { group: A4, seed: 10, sha: 200f3c92548d008c713115562b53b731b01c89c9dcac04a47b2e5d9f57492ad }
+          - { group: A4, seed: 11, sha: 904ade1d77e8d72f1b5a6e29bd01795892860c065779cc48dfed6623194ec129 }
+          - { group: A4, seed: 16, sha: a957ddf6b9e24865ef7bf8740cbce2c6e1d67e100affc1753304a815251edd6f }
+          - { group: A4, seed: 18, sha: 9b47cdd003b711fd7d3ae227445dbdc6c2d9b2cf2252d00c9f77f3d7a798dc4 }
+          - { group: A4, seed: 21, sha: a0736cb49614564b4393cb3aa41e4c2de07df0bb5e17c69282d690335512dc05 }
+          - { group: A5, seed: 8,  sha: 10ba771f275b3f86ca8f59474fcbac255401243185f7412325071705773bc1cc }
+          - { group: A5, seed: 17, sha: 2459481d58172070f66fa14013bab281612b5f89d8abf63ca313967408bcc78f }
+          - { group: A5, seed: 20, sha: dddcb15c8b2e819130cec18b459daca2bfa6d6152bf63b9db990c13ec9e3a679 }
+          - { group: A5, seed: 26, sha: 13512493d3253aaad06b963530f224575bb41f52a605ac51f07525473b175342 }
+    env:
+      OASIS_COMPARE_GROUP: ${{ matrix.group }}
+      OASIS_MAIN_SEED_INDEX: ${{ matrix.seed }}
+      OASIS_MAIN_MAX_TOTAL_CYCLES: '360'
+      OASIS_MAIN_CHECKPOINT_EVERY: '60'
+      OASIS_EXPECT_CHECKPOINT_CYCLE: '180'
+      OASIS_EXPECT_CHECKPOINT_SHA: ${{ matrix.sha }}
+      NODE_OPTIONS: --max-old-space-size=7168
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Deterministically replay cycle 0-180 and continue to 360 guard
+        run: node integrated-research-system-storage/prehistoric/src/prehistoric-native-memory-main-v1.mjs
+      - name: Verify replay checkpoint and artifact integrity
+        run: |
+          FILE="prehistoric-native-memory-main-${OASIS_COMPARE_GROUP}-seed-${OASIS_MAIN_SEED_INDEX}.json"
+          node -e "const r=require('./'+process.argv[1]); if(!r.implementationChecks.contaminationClean) process.exit(2); if(!r.replayCheckpointExpectation?.verified) process.exit(3); if(r.replayCheckpointExpectation.cycle!==180) process.exit(4); if(r.replayCheckpointExpectation.sha256!==process.env.OASIS_EXPECT_CHECKPOINT_SHA) process.exit(5); if(r.groupId!==process.env.OASIS_COMPARE_GROUP||r.seedIndex!==Number(process.env.OASIS_MAIN_SEED_INDEX)) process.exit(6);" "$FILE"
+      - name: Upload continuation evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-native-memory-main-cont360-${{ matrix.group }}-seed-${{ matrix.seed }}
+          path: prehistoric-native-memory-main-${{ matrix.group }}-seed-${{ matrix.seed }}.json
+          retention-days: 90
