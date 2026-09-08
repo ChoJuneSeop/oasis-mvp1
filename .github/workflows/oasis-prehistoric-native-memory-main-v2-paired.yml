@@ -1,0 +1,110 @@
+name: OASIS Prehistoric Native-Memory Main v2 Paired Repair
+
+on:
+  push:
+    branches:
+      - storage/oasis-integrated-research-system-v1.0
+    paths:
+      - .github/workflows/oasis-prehistoric-native-memory-main-v2-paired.yml
+
+permissions:
+  contents: read
+
+jobs:
+  parity-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax audit unchanged Main v1 runner used by v2
+        run: node --check integrated-research-system-storage/prehistoric/src/prehistoric-native-memory-main-v1.mjs
+      - name: Re-run strict architecture parity audit
+        run: node integrated-research-system-storage/prehistoric/tests/prehistoric-native-memory-parity-audit-v1.mjs
+
+  paired-seed:
+    needs: parity-audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        seed: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+    env:
+      OASIS_MAIN_SEED_INDEX: ${{ matrix.seed }}
+      OASIS_MAIN_MAX_TOTAL_CYCLES: '720'
+      OASIS_MAIN_CHECKPOINT_EVERY: '60'
+      NODE_OPTIONS: --max-old-space-size=7168
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify identical initial-world hash six times on this paired runner
+        run: |
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { writeFileSync } from 'node:fs';
+          import { createCleanPrehistoricSocietyV1_1 } from './integrated-research-system-storage/prehistoric/src/prehistoric-clean-world-v1.1.mjs';
+          import { NEUTRAL_COMPARISON_COHORT_V1 } from './integrated-research-system-storage/prehistoric/src/prehistoric-native-memory-reference-agents-v1.mjs';
+          const seedIndex = Number(process.env.OASIS_MAIN_SEED_INDEX);
+          const seed = `prehistoric-native-memory-main-v1-seed-${seedIndex}`;
+          const hashes=[];
+          for (let i=0;i<6;i++) {
+            const s=createCleanPrehistoricSocietyV1_1({seed,cohort:NEUTRAL_COMPARISON_COHORT_V1});
+            hashes.push(createHash('sha256').update(JSON.stringify(s.externalSnapshot())).digest('hex'));
+          }
+          const unique=[...new Set(hashes)];
+          const out={seedIndex,seed,hashes,identical:unique.length===1,initialWorldSha256:unique[0]};
+          writeFileSync(`main-v2-initial-parity-seed-${seedIndex}.json`,JSON.stringify(out,null,2));
+          console.log('OASIS_MAIN_V2_INITIAL_PARITY='+JSON.stringify(out));
+          if(!out.identical) process.exit(2);
+          NODE
+
+      - name: Run A0-A5 sequentially on the same paired runner
+        run: |
+          mkdir -p "main-v2-seed-${OASIS_MAIN_SEED_INDEX}"
+          for GROUP in A0 A1 A2 A3 A4 A5; do
+            echo "=== MAIN V2 seed=${OASIS_MAIN_SEED_INDEX} group=${GROUP} ==="
+            OASIS_COMPARE_GROUP="$GROUP" \
+            OASIS_MAIN_SEED_INDEX="$OASIS_MAIN_SEED_INDEX" \
+            OASIS_MAIN_MAX_TOTAL_CYCLES="$OASIS_MAIN_MAX_TOTAL_CYCLES" \
+            OASIS_MAIN_CHECKPOINT_EVERY="$OASIS_MAIN_CHECKPOINT_EVERY" \
+            node integrated-research-system-storage/prehistoric/src/prehistoric-native-memory-main-v1.mjs
+            mv "prehistoric-native-memory-main-${GROUP}-seed-${OASIS_MAIN_SEED_INDEX}.json" "main-v2-seed-${OASIS_MAIN_SEED_INDEX}/"
+          done
+          mv "main-v2-initial-parity-seed-${OASIS_MAIN_SEED_INDEX}.json" "main-v2-seed-${OASIS_MAIN_SEED_INDEX}/"
+
+      - name: Verify paired seed integrity without ranking groups
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          const seedIndex=Number(process.env.OASIS_MAIN_SEED_INDEX);
+          const dir=`main-v2-seed-${seedIndex}`;
+          const groups=['A0','A1','A2','A3','A4','A5'];
+          const rows=groups.map(group=>JSON.parse(readFileSync(`${dir}/prehistoric-native-memory-main-${group}-seed-${seedIndex}.json`,'utf8')));
+          const parity=JSON.parse(readFileSync(`${dir}/main-v2-initial-parity-seed-${seedIndex}.json`,'utf8'));
+          const ok=parity.identical && rows.every((r,i)=>r.groupId===groups[i] && r.seedIndex===seedIndex && r.implementationChecks.contaminationClean && r.pilotOnly===false);
+          const summary={
+            protocol:'OASIS Main v2 paired-seed technical repair',
+            seedIndex,
+            initialWorldSha256:parity.initialWorldSha256,
+            initialWorldParity:parity.identical,
+            groups:rows.map(r=>({groupId:r.groupId,status:r.status,cyclesExecuted:r.cyclesExecuted,substantiveResearchResult:r.substantiveResearchResult,contaminationClean:r.contaminationClean,finalCheckpoint:r.checkpoints?.at(-1)??null})),
+            interpretationGuard:'Status/cycle are recorded descriptively. Earlier observer confirmation is not defined as superiority.'
+          };
+          writeFileSync(`${dir}/main-v2-paired-summary-seed-${seedIndex}.json`,JSON.stringify(summary,null,2));
+          console.log('OASIS_MAIN_V2_PAIRED_SEED='+JSON.stringify(summary));
+          if(!ok) process.exit(3);
+          NODE
+
+      - name: Upload all six paired group results
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-native-memory-main-v2-paired-seed-${{ matrix.seed }}
+          path: main-v2-seed-${{ matrix.seed }}
+          retention-days: 90
