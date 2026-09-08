@@ -1,0 +1,122 @@
+name: OASIS Native-Memory Main v2 Blind Aggregate
+
+on:
+  push:
+    branches:
+      - storage/oasis-integrated-research-system-v1.0
+    paths:
+      - .github/workflows/oasis-prehistoric-native-memory-main-v2-aggregate.yml
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  aggregate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TARGET_RUN_ID: '34177911528'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait for fixed paired Main v2 run to finish
+        run: gh run watch "$TARGET_RUN_ID" -R ChoJuneSeop/oasis-mvp1 --exit-status --interval 10
+      - name: Download all paired Main v2 evidence artifacts
+        run: |
+          mkdir -p main-v2-artifacts
+          gh run download "$TARGET_RUN_ID" -R ChoJuneSeop/oasis-mvp1 -D main-v2-artifacts
+      - name: Blind aggregate paired results
+        run: |
+          python - <<'PY'
+          import json, glob, statistics, collections, os
+
+          def med(xs): return statistics.median(xs) if xs else None
+          def qtile(xs,q):
+              if not xs: return None
+              ys=sorted(xs)
+              if len(ys)==1: return ys[0]
+              p=(len(ys)-1)*q; lo=int(p); hi=min(lo+1,len(ys)-1); f=p-lo
+              return ys[lo]*(1-f)+ys[hi]*f
+
+          files=glob.glob('main-v2-artifacts/**/prehistoric-native-memory-main-*-seed-*.json',recursive=True)
+          rows=[]
+          for f in files:
+              with open(f,encoding='utf-8') as h:r=json.load(h)
+              w=(r.get('trajectoryWindows30') or [{}])[0] if (r.get('trajectoryWindows30') or []) else {}
+              rows.append({
+                  'groupId':r['groupId'],'seedIndex':r['seedIndex'],'status':r['status'],
+                  'cyclesExecuted':r['cyclesExecuted'],'substantiveResearchResult':r['substantiveResearchResult'],
+                  'contaminationClean':r['contaminationClean'],
+                  'civilizationType':((r.get('researchTermination') or {}).get('observation') or {}).get('type'),
+                  'structures':len(r.get('structures',[])),'totalWorldEvents':r.get('totalWorldEvents',0),
+                  'firstWindow':{k:w.get(k,0) for k in ['eventCount','actionDiversity','activeActors','interactionCount','repeatedDirectedRelationPairs','combineCount','transferCount','contactCount']}
+              })
+          rows.sort(key=lambda x:(x['seedIndex'],x['groupId']))
+          expected={(f'A{i}',s) for i in range(6) for s in range(30)}
+          seen={(r['groupId'],r['seedIndex']) for r in rows}
+          duplicates=[k for k,v in collections.Counter((r['groupId'],r['seedIndex']) for r in rows).items() if v>1]
+
+          parity_files=glob.glob('main-v2-artifacts/**/main-v2-initial-parity-seed-*.json',recursive=True)
+          parity=[]
+          for f in parity_files:
+              with open(f,encoding='utf-8') as h: parity.append(json.load(h))
+          parity.sort(key=lambda x:x['seedIndex'])
+
+          groups={}
+          metrics=['eventCount','actionDiversity','activeActors','interactionCount','repeatedDirectedRelationPairs','combineCount','transferCount','contactCount']
+          for g in [f'A{i}' for i in range(6)]:
+              rr=[r for r in rows if r['groupId']==g]
+              complete=[r for r in rr if r['substantiveResearchResult']]
+              guards=[r for r in rr if r['status']=='main-software-guard-reached']
+              cycles=[r['cyclesExecuted'] for r in complete]
+              groups[g]={
+                  'n':len(rr),'substantiveComplete':len(complete),'softwareGuard':len(guards),
+                  'allContaminationClean':all(r['contaminationClean'] for r in rr),
+                  'terminationCyclesComplete':{'min':min(cycles) if cycles else None,'q1':qtile(cycles,.25),'median':med(cycles),'q3':qtile(cycles,.75),'max':max(cycles) if cycles else None},
+                  'civilizationTypes':dict(collections.Counter(r['civilizationType'] for r in complete)),
+                  'medianStructuresAtTermination':med([r['structures'] for r in complete]),
+                  'medianTotalWorldEventsAtTermination':med([r['totalWorldEvents'] for r in complete]),
+                  'firstWindowMedians':{m:med([r['firstWindow'][m] for r in rr]) for m in metrics},
+                  'guardSeeds':[r['seedIndex'] for r in guards]
+              }
+
+          bypair={(r['seedIndex'],r['groupId']):r for r in rows}
+          paired={}
+          for ref in ['A0','A1','A2','A3','A4']:
+              ds=[]; detail=[]
+              for s in range(30):
+                  a=bypair.get((s,ref)); z=bypair.get((s,'A5'))
+                  if not a or not z or not a['substantiveResearchResult'] or not z['substantiveResearchResult']: continue
+                  d=z['cyclesExecuted']-a['cyclesExecuted']
+                  ds.append(d);detail.append({'seedIndex':s,'A5_minus_reference_cycle':d})
+              paired[ref]={
+                  'nCompletePairs':len(ds),'medianA5MinusReferenceCycle':med(ds),
+                  'A5EarlierCount':sum(d<0 for d in ds),'equalCount':sum(d==0 for d in ds),'A5LaterCount':sum(d>0 for d in ds),
+                  'note':'Descriptive paired timing only; earlier observer confirmation is not superiority.',
+                  'details':detail
+              }
+
+          aggregate={
+              'protocol':'OASIS Native-Memory Main v2 Blind Aggregate',
+              'targetRunId':int(os.environ['TARGET_RUN_ID']),
+              'artifactResultCount':len(rows),'expectedResultCount':180,
+              'missing':sorted(expected-seen),'duplicates':duplicates,
+              'pairedInitialParityCount':len(parity),'allInitialWorldParity':len(parity)==30 and all(p.get('identical') for p in parity),
+              'allPairsPresent':len(rows)==180 and not (expected-seen) and not duplicates,
+              'allContaminationClean':all(r['contaminationClean'] for r in rows),
+              'groups':groups,'pairedA5Timing':paired,
+              'rows':rows,
+              'interpretationGuard':'No group is ranked. Timing, observer pathway, and flow-window measures are descriptive evidence only.'
+          }
+          with open('main-v2-blind-aggregate.json','w',encoding='utf-8') as h:json.dump(aggregate,h,ensure_ascii=False,indent=2)
+          print('OASIS_MAIN_V2_BLIND_AGGREGATE='+json.dumps({k:v for k,v in aggregate.items() if k not in ['rows']},ensure_ascii=False,separators=(',',':')))
+          if not aggregate['allPairsPresent']: raise SystemExit(2)
+          if not aggregate['allInitialWorldParity']: raise SystemExit(3)
+          if not aggregate['allContaminationClean']: raise SystemExit(4)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oasis-native-memory-main-v2-blind-aggregate
+          path: main-v2-blind-aggregate.json
+          retention-days: 90
