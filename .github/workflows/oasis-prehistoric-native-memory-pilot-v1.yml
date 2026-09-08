@@ -1,0 +1,59 @@
+name: OASIS Prehistoric Native-Memory Pilot v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - storage/oasis-integrated-research-system-v1.0
+    paths:
+      - '.github/workflows/oasis-prehistoric-native-memory-pilot-v1.yml'
+      - 'integrated-research-system-storage/prehistoric/src/prehistoric-native-memory-reference-agents-v1.mjs'
+      - 'integrated-research-system-storage/prehistoric/src/prehistoric-native-memory-pilot-v1.mjs'
+      - 'integrated-research-system-storage/prehistoric/tests/prehistoric-native-memory-parity-audit-v1.mjs'
+
+jobs:
+  parity-audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax audit comparison implementation
+        run: |
+          node --check integrated-research-system-storage/prehistoric/src/prehistoric-native-memory-reference-agents-v1.mjs
+          node --check integrated-research-system-storage/prehistoric/src/prehistoric-native-memory-pilot-v1.mjs
+          node --check integrated-research-system-storage/prehistoric/tests/prehistoric-native-memory-parity-audit-v1.mjs
+      - name: Run strict parity audit
+        run: node integrated-research-system-storage/prehistoric/tests/prehistoric-native-memory-parity-audit-v1.mjs
+
+  pilot:
+    needs: parity-audit
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        group: [A0, A1, A2, A3, A4, A5]
+        seed: [0, 1, 2, 3, 4]
+    env:
+      OASIS_COMPARE_GROUP: ${{ matrix.group }}
+      OASIS_PILOT_SEED_INDEX: ${{ matrix.seed }}
+      OASIS_PILOT_SEGMENT_CYCLES: '24'
+      NODE_OPTIONS: --max-old-space-size=7168
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run pilot segment
+        run: node integrated-research-system-storage/prehistoric/src/prehistoric-native-memory-pilot-v1.mjs
+      - name: Verify pilot implementation checks
+        run: |
+          FILE="prehistoric-native-memory-pilot-${OASIS_COMPARE_GROUP}-seed-${OASIS_PILOT_SEED_INDEX}.json"
+          node -e "const r=require('./'+process.argv[1]); if(!r.pilotChecks.contaminationClean) process.exit(2); if(!r.pilotChecks.allCapabilityFamiliesSeen) process.exit(3); if(r.substantiveResearchResult!==false) process.exit(4);" "$FILE"
+      - name: Upload pilot artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-native-memory-pilot-${{ matrix.group }}-seed-${{ matrix.seed }}
+          path: prehistoric-native-memory-pilot-${{ matrix.group }}-seed-${{ matrix.seed }}.json
