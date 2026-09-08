@@ -1,0 +1,36 @@
+name: OASIS Native-Memory Pilot A5 Seed4 Recovery v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - storage/oasis-integrated-research-system-v1.0
+    paths:
+      - '.github/workflows/oasis-prehistoric-native-memory-pilot-a5-seed4-recovery-v1.yml'
+
+jobs:
+  recover-a5-seed4:
+    runs-on: ubuntu-24.04
+    env:
+      OASIS_COMPARE_GROUP: A5
+      OASIS_PILOT_SEED_INDEX: '4'
+      OASIS_PILOT_SEGMENT_CYCLES: '24'
+      NODE_OPTIONS: --max-old-space-size=7168
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Reconfirm registered capability parity
+        run: node integrated-research-system-storage/prehistoric/tests/prehistoric-native-memory-parity-audit-v1.mjs
+      - name: Rerun identical A5 seed4 pilot segment
+        run: node integrated-research-system-storage/prehistoric/src/prehistoric-native-memory-pilot-v1.mjs
+      - name: Verify corrected pilot criteria
+        run: |
+          FILE="prehistoric-native-memory-pilot-A5-seed-4.json"
+          node -e "const r=require('./'+process.argv[1]); if(!r.pilotChecks.contaminationClean) process.exit(2); if(r.substantiveResearchResult!==false) process.exit(4); if(r.groupId!=='A5'||r.seedIndex!==4) process.exit(5);" "$FILE"
+      - name: Upload recovery artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-native-memory-pilot-A5-seed-4-recovery
+          path: prehistoric-native-memory-pilot-A5-seed-4.json
