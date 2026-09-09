@@ -1,0 +1,26 @@
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {mkdtemp,writeFile,readFile,unlink} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+import {execFileSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
+const dir=await mkdtemp(path.join(tmpdir(),'gamma-v21-aggregate-fixture-'));
+const hash=x=>createHash('sha256').update(x).digest('hex');
+const seeds=Array.from({length:40},(_,i)=>`oasis-gamma-causal-v2.1:${String(i).padStart(3,'0')}`).sort((a,b)=>hash(a).localeCompare(hash(b))||a.localeCompare(b));
+const script=fileURLToPath(new URL('../src/oasis-gamma-v2.1-causal-aggregate.mjs',import.meta.url));
+const run=()=>execFileSync(process.execPath,[script],{cwd:dir,env:{...process.env,GITHUB_SHA:'',OASIS_GAMMA_V21_RESULTS_ROOT:dir},stdio:'pipe'});
+const file=i=>path.join(dir,`oasis-gamma-v2.1-causal-probe-seed-slot-${i}.json`);
+const row=i=>({protocol:'OASIS Gamma Causal Probe v2.1',status:'completed',codeSha:'0'.repeat(40),seedSlot:i,seed:seeds[i],seedHash:hash(seeds[i]),onset:{reached:false}});
+for(let i=0;i<39;i++)await writeFile(file(i),JSON.stringify(row(i)));
+assert.throws(run); // Cannot unblind incomplete batch.
+await writeFile(file(39),JSON.stringify(row(39)));run();
+let out=JSON.parse(await readFile(path.join(dir,'oasis-gamma-v2.1-causal-aggregate.json'),'utf8'));
+assert.equal(out.eligibility.notReached,40);assert.equal(out.eligibility.denominator,40);assert.equal(out.eligibility.lowReachUnderpowered,true);
+assert.equal(out.inferentialFamily.tests.length,13);assert(out.inferentialFamily.tests.every(t=>t.twoSidedSignFlipP===null));
+await writeFile(file(39),JSON.stringify({...row(39),seed:seeds[0]}));assert.throws(run);
+await writeFile(file(39),JSON.stringify({...row(39),codeSha:'1'.repeat(40)}));assert.throws(run);
+await writeFile(file(39),JSON.stringify({...row(39),status:'failed',error:{message:'SYNTHETIC_AUDIT_FAILURE'}}));run();
+out=JSON.parse(await readFile(path.join(dir,'oasis-gamma-v2.1-causal-aggregate.json'),'utf8'));
+assert.equal(out.runStatus,'INVALID_CONFIRMATORY_AUDIT_OR_EXECUTION_FAILURE');assert.equal(out.eligibility.failed,1);
+console.log('AGGREGATE_BARRIER_AUDIT_PASS: synthetic envelopes only; no confirmatory simulation');

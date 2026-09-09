@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import {readFile,writeFile} from 'node:fs/promises';
+const base='1ec3c3684d7004820bf998440039de84e53138e3';
+const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+const codeSha=git('rev-parse','HEAD');
+if(process.env.GITHUB_SHA)assert.equal(codeSha,process.env.GITHUB_SHA);
+const changes=git('diff','--name-status',base,'HEAD').split('\n').filter(Boolean);
+assert(changes.every(line=>line.startsWith('A\t')),'BASELINE_FILES_MUST_REMAIN_UNCHANGED');
+assert.equal(git('diff','HEAD','--name-only'),'','DIRTY_TRACKED_CODE');
+const files=git('ls-files').split('\n').filter(p=>p.startsWith('integrated-research-system-storage/')||p==='.github/workflows/oasis-gamma-v2.1-confirmatory.yml'||p==='build-gamma-v2.1.mjs');
+const manifest=[];
+for(const file of files)manifest.push({file,sha256:createHash('sha256').update(await readFile(file)).digest('hex')});
+const result={protocol:'OASIS Gamma v2.1 exact code audit',pass:true,codeSha,base,existingFilesUnchanged:true,addedFileCount:changes.length,manifestSha256:createHash('sha256').update(JSON.stringify(manifest)).digest('hex'),manifest};
+if(process.env.OASIS_GAMMA_V21_CODE_AUDIT_OUTPUT)await writeFile(process.env.OASIS_GAMMA_V21_CODE_AUDIT_OUTPUT,JSON.stringify(result,null,2));
+console.log(JSON.stringify({...result,manifest:undefined}));
