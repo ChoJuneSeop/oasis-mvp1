@@ -1,0 +1,86 @@
+name: OASIS Gamma 2.2-R v4.2 Flow Lineage
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["gamma-2.2-r-v4.2-run"]
+    paths:
+      - "tools/gamma-2.2-r-v4.2.mjs"
+      - ".github/workflows/gamma-2.2-r-v4.2.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: oasis-gamma-2-2-r-v4-2
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run instrumentation and footprint smoke test
+        env:
+          MODE: smoke
+          LABEL: smoke-canonical
+          OFFSET: '0'
+          DISCOVERY_MAX: '40000'
+          FOLLOW_HORIZON: '12000'
+        run: node tools/gamma-2.2-r-v4.2.mjs
+      - name: Upload smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gamma-2.2-r-v4.2-smoke
+          path: gamma-2.2-r-v4.2-smoke-canonical-report.json
+          if-no-files-found: ignore
+
+  longitudinal:
+    needs: smoke
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: canonical
+            offset: 0
+          - label: E137
+            offset: 137
+          - label: E977
+            offset: 977
+          - label: E4099
+            offset: 4099
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run flow-lineage validation
+        env:
+          MODE: full
+          LABEL: ${{ matrix.label }}
+          OFFSET: ${{ matrix.offset }}
+          DISCOVERY_MAX: '120000'
+          FOLLOW_HORIZON: '120000'
+        run: node tools/gamma-2.2-r-v4.2.mjs
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gamma-2.2-r-v4.2-${{ matrix.label }}
+          path: gamma-2.2-r-v4.2-${{ matrix.label }}-report.json
+          if-no-files-found: ignore
