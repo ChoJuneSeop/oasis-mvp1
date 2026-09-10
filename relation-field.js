@@ -105,6 +105,10 @@ function composeField(S,P,newEvents){
       const L=latentEnabled()?ensureLatent(P):null;
       const duplicate=P.relationField.episodes.some(x=>x.key===ep.key&&x.from[0]===ep.from[0]&&x.from[1]===ep.from[1])||(L&&L.byId.has(epId(ep)));
       if(!duplicate){
+        if(S.__OASIS_INCORPORATION_LINK_BLOCK===true){
+          audit(P,'incorporation-link-block',{episodeId:epId(ep),key:ep.key,from:[...ep.from],places:[...ep.places]});
+          continue;
+        }
         P.relationField.episodes.push(ep);
         P.relationField.recombinations++;
         S.c.relationRecombination++;
