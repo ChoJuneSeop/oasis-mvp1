@@ -114,12 +114,11 @@ function fullScanReference(S,P){
 
 function jointInputFrame(S,P){
   const recall=selectiveRecall(S,P);
-  const possibility=sig(evalP(S,P,1));
   const frame={
     realityVersion:E.tick,
     relationalKeys:[...recall.keys],
     recalledExperienceIds:recall.experiences.map(e=>e.id),
-    possibility:{choice:possibility.choice||null,candidates:possibility.cands||'',leader:possibility.leader||''},
+    possibility:{status:'NOT_OPERATIONALIZED_STAGE_A'},
     responsibility:{U:null,I:null,V:null,T:null,status:'NOT_OPERATIONALIZED_STAGE_A'},
     actionAuthority:'OBSERVE_ONLY_STAGE_A'
   };
@@ -157,6 +156,6 @@ globalThis.oasisFlowSelectiveV12={
   selectiveRecall,
   fullScanReference,
   jointInputFrame,
-  version:'1.2-r1-stageA'
+  version:'1.2-r2-stageA'
 };
 })();
