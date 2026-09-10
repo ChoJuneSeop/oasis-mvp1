@@ -1,0 +1,45 @@
+name: OASIS Flow-Selective Joint Response v1.2 r2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["flow-selective-joint-response-v1.2-r2"]
+    paths:
+      - "flow-selective-joint-response-v1.2.js"
+      - "past-relational-structure-v1.js"
+      - "tools/flow-selective-joint-response-v1.2-r2.mjs"
+      - ".github/workflows/flow-selective-joint-response-v1.2-r2.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: oasis-flow-selective-joint-response-v1-2-r2
+  cancel-in-progress: true
+
+jobs:
+  stage-a-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run r2 Stage A contract
+        env:
+          HORIZON: '12000'
+          OFFSET: '0'
+          REPORT: 'flow-selective-joint-response-v1.2-r2-report.json'
+        run: node tools/flow-selective-joint-response-v1.2-r2.mjs
+      - name: Upload r2 report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flow-selective-joint-response-v1.2-r2
+          path: flow-selective-joint-response-v1.2-r2-report.json
+          if-no-files-found: ignore
