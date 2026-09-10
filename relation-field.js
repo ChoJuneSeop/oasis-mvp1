@@ -63,10 +63,33 @@ function latentActive(S,P){
   moveAgedToLatent(P);
   const L=ensureLatent(P),cacheKey=`${E.tick}|${currentPlace(P)}|${P.target}|${Math.round(S.danger*1000)}|${L.byId.size}`;
   if(L.cacheKey===cacheKey)return L.cacheEpisodes;
-  const active=[];
+  const eligible=[];
   for(const [id,ep] of latentCandidates(S,P)){
     const reasons=relevantReasons(S,P,ep);
-    if(reasons.length)active.push({id,ep,reasons});
+    if(reasons.length)eligible.push({id,ep,reasons});
+  }
+  if(S.__OASIS_UNIQUE_REACTIVATION_TARGET===true&&P.__OASIS_UNIQUE_REACTIVATION_TARGET_ID==null){
+    for(const x of eligible){
+      const recentSame=P.relationField.episodes.some(ep=>ep.key===x.ep.key&&relevantReasons(S,P,ep).length>0);
+      const latentSame=eligible.some(y=>y.id!==x.id&&y.ep.key===x.ep.key);
+      if(!recentSame&&!latentSame){
+        P.__OASIS_UNIQUE_REACTIVATION_TARGET_ID=x.id;
+        audit(P,'reactivation-target-selected',{episodeId:x.id,key:x.ep.key,createdTick:x.ep.t,age:E.tick-x.ep.t,reasons:x.reasons,selectionRule:'first-currently-unique-relation-key'});
+        break;
+      }
+    }
+  }
+  const active=[];
+  for(const x of eligible){
+    if(S.__OASIS_UNIQUE_REACTIVATION_BLOCK===true&&P.__OASIS_UNIQUE_REACTIVATION_TARGET_ID===x.id){
+      const marker=`${E.tick}|${x.id}`;
+      if(P.__OASIS_LAST_UNIQUE_REACTIVATION_BLOCK_MARKER!==marker){
+        P.__OASIS_LAST_UNIQUE_REACTIVATION_BLOCK_MARKER=marker;
+        audit(P,'unique-reactivation-link-block',{episodeId:x.id,key:x.ep.key,createdTick:x.ep.t,age:E.tick-x.ep.t,reasons:x.reasons});
+      }
+      continue;
+    }
+    active.push(x);
   }
   const prev=new Set(L.activeIds||[]),now=new Set(active.map(x=>x.id));
   for(const x of active)if(!prev.has(x.id))audit(P,'reactivate',{episodeId:x.id,key:x.ep.key,createdTick:x.ep.t,age:E.tick-x.ep.t,reasons:x.reasons,from:[...(x.ep.from||[])],places:[...x.ep.places]});
@@ -84,6 +107,8 @@ mkP=function(d){
   P.relationField={episodes:[],active:[],activations:0,recombinations:0,spirals:0,lastActivationTick:null};
   P.pendingFieldChoice=null;
   P.pendingFieldLatentIds=[];
+  P.__OASIS_UNIQUE_REACTIVATION_TARGET_ID=null;
+  P.__OASIS_LAST_UNIQUE_REACTIVATION_BLOCK_MARKER=null;
   return P;
 };
 
