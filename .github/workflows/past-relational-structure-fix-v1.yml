@@ -1,0 +1,67 @@
+name: OASIS Past Relational Structure Fix v1 Validation
+
+on:
+  push:
+    branches:
+      - past-relational-structure-fix-v1-run
+  workflow_dispatch:
+
+jobs:
+  code-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Validate code contract
+        run: node tools/past-relational-structure-code-contract-v1.mjs
+      - name: Upload code contract report
+        uses: actions/upload-artifact@v4
+        with:
+          name: past-relational-structure-code-contract-v1
+          path: past-relational-structure-code-contract-v1.json
+          if-no-files-found: error
+
+  exhaustive-audit:
+    needs: code-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: canonical
+            offset: 0
+          - label: E137
+            offset: 137
+          - label: E977
+            offset: 977
+          - label: E4099
+            offset: 4099
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run exhaustive incorporation audit
+        env:
+          LABEL: ${{ matrix.label }}
+          OFFSET: ${{ matrix.offset }}
+          HORIZON: 120000
+        run: node tools/past-relational-structure-exhaustive-audit-v2.mjs
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: past-relational-structure-audit-v2-${{ matrix.label }}
+          path: past-relational-structure-audit-v2-${{ matrix.label }}.json
+          if-no-files-found: error
