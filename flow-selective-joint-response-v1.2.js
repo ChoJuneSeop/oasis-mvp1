@@ -19,7 +19,8 @@ function ensureFlowSelective(P){
       byId:new Map(),byPlace:new Map(),byChoice:new Map(),byLeader:new Map(),byNpc:new Map(),
       byPlaceTransition:new Map(),byChoiceTransition:new Map(),byLeaderTransition:new Map(),byDangerDirection:new Map()
     },
-    indexedExperienceIds:new Set(),indexedRelationFactKeys:new Set(),lastIndexedExperienceId:null,
+    indexedExperienceIds:new Set(),indexedRelationFactKeys:new Set(),
+    previousIndexedExperienceId:null,lastIndexedExperienceId:null,
     counters:{indexWrites:0,relationFactWrites:0,transitionWrites:0,lookupCalls:0,keyLookups:0,candidateIdsTouched:0},
     lastRecall:null,lastJointFrame:null
   };
@@ -29,7 +30,8 @@ function indexExperience(P,e){
   if(!e?.id)return;
   const F=ensureFlowSelective(P);
   if(F.indexedExperienceIds.has(e.id))return;
-  const prev=F.lastIndexedExperienceId?F.index.byId.get(F.lastIndexedExperienceId):null;
+  const prevId=F.lastIndexedExperienceId;
+  const prev=prevId?F.index.byId.get(prevId):null;
   F.indexedExperienceIds.add(e.id);
   F.index.byId.set(e.id,e);
   addSet(F.index.byPlace,e.place,e.id);
@@ -42,6 +44,7 @@ function indexExperience(P,e){
     const d=direction(prev.danger,e.danger);if(d)addSet(F.index.byDangerDirection,d,e.id);
     F.counters.transitionWrites++;
   }
+  F.previousIndexedExperienceId=prevId;
   F.lastIndexedExperienceId=e.id;
   F.counters.indexWrites++;
 }
@@ -56,19 +59,28 @@ function rebuildExisting(P){
   for(const e of PRS.realizedExperiences||[])indexExperience(P,e);
   for(const f of PRS.relationFacts||[])indexRelationFact(P,f);
 }
+function completedFlowPair(P){
+  const F=ensureFlowSelective(P);
+  const from=F.previousIndexedExperienceId?F.index.byId.get(F.previousIndexedExperienceId):null;
+  const to=F.lastIndexedExperienceId?F.index.byId.get(F.lastIndexedExperienceId):null;
+  return {from,to};
+}
 function currentRelationalKeys(S,P){
-  const F=ensureFlowSelective(P),here=currentPlace(P),target=P.target,keys=[];
+  const here=currentPlace(P),target=P.target,keys=[];
   if(here)keys.push(['place',here]);
   if(target){keys.push(['place',target]);keys.push(['choice',target]);}
   if(P.leader)keys.push(['leader',P.leader]);
   const gate=target?places[target]?.gate:null;if(gate)keys.push(['npc',gate]);
   for(const [npc,place] of npcs)if(place===here)keys.push(['npc',npc]);
-  const prev=F.lastIndexedExperienceId?F.index.byId.get(F.lastIndexedExperienceId):null;
-  if(prev){
-    if(prev.place&&here)keys.push(['placeTransition',`${prev.place}->${here}`]);
-    if(prev.choice&&target)keys.push(['choiceTransition',`${prev.choice}->${target}`]);
-    if(prev.leader&&P.leader)keys.push(['leaderTransition',`${prev.leader}->${P.leader}`]);
-    const d=direction(prev.danger,S.danger);if(d)keys.push(['dangerDirection',d]);
+
+  // Flow keys describe the most recently COMPLETED realized transition.
+  // They are not fabricated from the latest realized state to its unchanged current snapshot.
+  const {from,to}=completedFlowPair(P);
+  if(from&&to){
+    if(from.place&&to.place)keys.push(['placeTransition',`${from.place}->${to.place}`]);
+    if(from.choice&&to.choice)keys.push(['choiceTransition',`${from.choice}->${to.choice}`]);
+    if(from.leader&&to.leader)keys.push(['leaderTransition',`${from.leader}->${to.leader}`]);
+    const d=direction(from.danger,to.danger);if(d)keys.push(['dangerDirection',d]);
   }
   const seen=new Set();return keys.filter(([type,value])=>{const k=`${type}:${value}`;if(seen.has(k))return false;seen.add(k);return true;});
 }
@@ -115,5 +127,5 @@ outcome=function(S,P,id){
 };
 choose=function(S,P){if(MODELS[S.key].kind==='oasis'&&MODELS[S.key].fb)jointInputFrame(S,P);return oldChoose(S,P);};
 for(const S of Object.values(E?.worlds||{}))for(const P of S.parties||[]){ensureFlowSelective(P);rebuildExisting(P);}
-globalThis.oasisFlowSelectiveV12={ensureFlowSelective,currentRelationalKeys,selectiveRecall,fullScanReference,jointInputFrame,direction,version:'1.2-r3-stageA'};
+globalThis.oasisFlowSelectiveV12={ensureFlowSelective,currentRelationalKeys,selectiveRecall,fullScanReference,jointInputFrame,direction,completedFlowPair,version:'1.2-r6-stageA'};
 })();
