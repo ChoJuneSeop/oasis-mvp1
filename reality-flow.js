@@ -3,20 +3,24 @@ const realityOldMkP=mkP;
 const realityOldOutcome=outcome;
 
 function clonePlain(x){return x==null?x:JSON.parse(JSON.stringify(x));}
+function ensureRealityFields(P){
+  if(!Number.isInteger(P.realizationSeq))P.realizationSeq=0;
+  if(!Array.isArray(P.realizedExperienceHistory))P.realizedExperienceHistory=[];
+  if(!P.realityContinuity||typeof P.realityContinuity!=='object'){
+    P.realityContinuity={version:0,completedExperienceIds:[],lastExperienceId:null};
+  }
+  if(!Array.isArray(P.realityContinuity.completedExperienceIds))P.realityContinuity.completedExperienceIds=[];
+  if(!Number.isInteger(P.realityContinuity.version))P.realityContinuity.version=P.realityContinuity.completedExperienceIds.length;
+  if(!('lastExperienceId' in P.realityContinuity))P.realityContinuity.lastExperienceId=P.realityContinuity.completedExperienceIds.at(-1)||null;
+  return P;
+}
 
 mkP=function(d){
-  const P=realityOldMkP(d);
-  P.realizationSeq=0;
-  P.realizedExperienceHistory=[];
-  P.realityContinuity={
-    version:0,
-    completedExperienceIds:[],
-    lastExperienceId:null
-  };
-  return P;
+  return ensureRealityFields(realityOldMkP(d));
 };
 
 outcome=function(S,P,id){
+  ensureRealityFields(P);
   const beforeRelationLen=P.relationHistory?.length||0;
   const beforeDisc=P.disc?new Set(P.disc):new Set();
   const beforeSeen=P.seenNPC?new Set(P.seenNPC):new Set();
@@ -63,4 +67,8 @@ outcome=function(S,P,id){
   P.realityContinuity.completedExperienceIds.push(experienceId);
   P.realityContinuity.lastExperienceId=experienceId;
 };
+
+if(globalThis.E?.worlds){
+  for(const S of Object.values(E.worlds||{}))for(const P of S.parties||[])ensureRealityFields(P);
+}
 })();
