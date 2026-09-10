@@ -67,4 +67,13 @@ outcome=function(S,P,id){
 for(const S of Object.values(E?.worlds||{})){
   for(const P of S.parties||[])ensurePastRelationalStructure(P);
 }
+
+if(typeof document!=='undefined'&&!globalThis.__OASIS_FLOW_SELECTIVE_V12_LOADING__){
+  globalThis.__OASIS_FLOW_SELECTIVE_V12_LOADING__=true;
+  const s=document.createElement('script');
+  s.src='./flow-selective-joint-response-v1.2.js';
+  s.dataset.oasisModule='flow-selective-joint-response-v1.2';
+  s.onerror=()=>{globalThis.__OASIS_FLOW_SELECTIVE_V12_LOAD_ERROR__=true;};
+  document.body.appendChild(s);
+}
 })();
