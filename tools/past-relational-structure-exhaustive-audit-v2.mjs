@@ -24,7 +24,6 @@ try{
   await page.waitForFunction(()=>typeof tickW==='function'&&typeof mkW==='function'&&typeof outcome==='function',null,{timeout:60000});
   const toggle=page.locator('#toggle');
   if((await toggle.textContent())?.includes('일시정지'))await toggle.click();
-  await page.addScriptTag({url:`http://127.0.0.1:${PORT}/past-relational-structure-v1.js`});
 
   const result=await page.evaluate(({OFFSET,HORIZON,LABEL})=>{
     const savedE=E;
