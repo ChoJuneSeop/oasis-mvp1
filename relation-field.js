@@ -66,7 +66,17 @@ function latentActive(S,P){
   const active=[];
   for(const [id,ep] of latentCandidates(S,P)){
     const reasons=relevantReasons(S,P,ep);
-    if(reasons.length)active.push({id,ep,reasons});
+    if(reasons.length){
+      if(S.__OASIS_REACTIVATION_LINK_BLOCK===true&&P.__OASIS_FIRST_FORMED_EPISODE_ID===id){
+        const marker=`${E.tick}|${id}`;
+        if(P.__OASIS_LAST_REACTIVATION_BLOCK_MARKER!==marker){
+          P.__OASIS_LAST_REACTIVATION_BLOCK_MARKER=marker;
+          audit(P,'reactivation-link-block',{episodeId:id,key:ep.key,createdTick:ep.t,age:E.tick-ep.t,reasons,from:[...(ep.from||[])],places:[...ep.places]});
+        }
+        continue;
+      }
+      active.push({id,ep,reasons});
+    }
   }
   const prev=new Set(L.activeIds||[]),now=new Set(active.map(x=>x.id));
   for(const x of active)if(!prev.has(x.id))audit(P,'reactivate',{episodeId:x.id,key:x.ep.key,createdTick:x.ep.t,age:E.tick-x.ep.t,reasons:x.reasons,from:[...(x.ep.from||[])],places:[...x.ep.places]});
@@ -84,6 +94,8 @@ mkP=function(d){
   P.relationField={episodes:[],active:[],activations:0,recombinations:0,spirals:0,lastActivationTick:null};
   P.pendingFieldChoice=null;
   P.pendingFieldLatentIds=[];
+  P.__OASIS_FIRST_FORMED_EPISODE_ID=null;
+  P.__OASIS_LAST_REACTIVATION_BLOCK_MARKER=null;
   return P;
 };
 
@@ -105,6 +117,7 @@ function composeField(S,P,newEvents){
       const L=latentEnabled()?ensureLatent(P):null;
       const duplicate=P.relationField.episodes.some(x=>x.key===ep.key&&x.from[0]===ep.from[0]&&x.from[1]===ep.from[1])||(L&&L.byId.has(epId(ep)));
       if(!duplicate){
+        if(P.__OASIS_FIRST_FORMED_EPISODE_ID==null)P.__OASIS_FIRST_FORMED_EPISODE_ID=epId(ep);
         P.relationField.episodes.push(ep);
         P.relationField.recombinations++;
         S.c.relationRecombination++;
