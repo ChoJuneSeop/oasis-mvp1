@@ -1,0 +1,41 @@
+name: OASIS Gamma 2.2 Flow-Preserved Integrated v2
+
+on:
+  push:
+    branches: ["gamma-2.2-flow-v2-run"]
+    paths:
+      - "tools/gamma-2.2-flow-preserved-integrated-v2.mjs"
+      - ".github/workflows/gamma-2.2-flow-preserved-integrated-v2.yml"
+      - "relation-field.js"
+      - "index.html"
+  workflow_dispatch:
+
+concurrency:
+  group: oasis-gamma-2-2-flow-v2
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run Gamma 2.2 flow-preserved integrated trajectory experiment
+        run: node tools/gamma-2.2-flow-preserved-integrated-v2.mjs
+      - name: Upload Gamma 2.2 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasis-gamma-2.2-flow-preserved-integrated-v2
+          path: gamma-2.2-flow-preserved-integrated-v2-report.json
+          if-no-files-found: ignore
