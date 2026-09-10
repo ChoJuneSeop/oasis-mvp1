@@ -1,0 +1,45 @@
+name: OASIS Gamma 2.2-R v4.5 Unique-Relation Reactivation
+
+on:
+  push:
+    branches:
+      - "experiment/gamma-2.2-r-v4.5"
+    paths:
+      - "relation-field.js"
+      - "tools/gamma-2.2-r-v4.5-unique-relation-reactivation-intervention.mjs"
+      - ".github/workflows/gamma-2.2-r-v4.5-unique-relation-reactivation.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: oasis-gamma-2-2-r-v4-5-unique-reactivation
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  gamma-v4-5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout experiment branch
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Guard canonical validation conditions
+        run: node tools/validation-compatibility-guard.mjs
+      - name: Run Gamma 2.2-R v4.5
+        run: node tools/gamma-2.2-r-v4.5-unique-relation-reactivation-intervention.mjs
+      - name: Upload Gamma v4.5 report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gamma-2.2-r-v4.5-unique-relation-reactivation-report
+          path: gamma-2.2-r-v4.5-unique-relation-reactivation-intervention-report.json
+          if-no-files-found: ignore
