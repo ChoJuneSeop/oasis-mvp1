@@ -1,0 +1,45 @@
+name: OASIS Realization RelationHistory Exhaustive Audit v1
+
+on:
+  push:
+    branches:
+      - realization-relationhistory-audit-v1
+  workflow_dispatch:
+
+jobs:
+  audit:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: canonical
+            offset: 0
+          - label: E137
+            offset: 137
+          - label: E977
+            offset: 977
+          - label: E4099
+            offset: 4099
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run exhaustive audit
+        env:
+          LABEL: ${{ matrix.label }}
+          OFFSET: ${{ matrix.offset }}
+          HORIZON: 120000
+        run: node tools/realization-relationhistory-exhaustive-audit-v1.mjs
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: realization-relationhistory-audit-v1-${{ matrix.label }}
+          path: realization-relationhistory-audit-v1-${{ matrix.label }}.json
+          if-no-files-found: error
