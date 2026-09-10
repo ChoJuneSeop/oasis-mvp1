@@ -63,10 +63,18 @@ function latentActive(S,P){
   moveAgedToLatent(P);
   const L=ensureLatent(P),cacheKey=`${E.tick}|${currentPlace(P)}|${P.target}|${Math.round(S.danger*1000)}|${L.byId.size}`;
   if(L.cacheKey===cacheKey)return L.cacheEpisodes;
-  const active=[];
+  const eligible=[];
   for(const [id,ep] of latentCandidates(S,P)){
     const reasons=relevantReasons(S,P,ep);
-    if(reasons.length)active.push({id,ep,reasons});
+    if(reasons.length)eligible.push({id,ep,reasons});
+  }
+  let active=eligible;
+  if(S.__OASIS_PAST_REACTIVATION_PATH_BLOCK===true&&eligible.length){
+    if(P.__OASIS_LAST_PAST_REACTIVATION_BLOCK_TICK!==E.tick){
+      P.__OASIS_LAST_PAST_REACTIVATION_BLOCK_TICK=E.tick;
+      audit(P,'past-reactivation-path-block',{episodeIds:eligible.map(x=>x.id),keys:[...new Set(eligible.map(x=>x.ep.key))],reasonsByEpisode:eligible.map(x=>({episodeId:x.id,reasons:x.reasons}))});
+    }
+    active=[];
   }
   const prev=new Set(L.activeIds||[]),now=new Set(active.map(x=>x.id));
   for(const x of active)if(!prev.has(x.id))audit(P,'reactivate',{episodeId:x.id,key:x.ep.key,createdTick:x.ep.t,age:E.tick-x.ep.t,reasons:x.reasons,from:[...(x.ep.from||[])],places:[...x.ep.places]});
@@ -84,6 +92,7 @@ mkP=function(d){
   P.relationField={episodes:[],active:[],activations:0,recombinations:0,spirals:0,lastActivationTick:null};
   P.pendingFieldChoice=null;
   P.pendingFieldLatentIds=[];
+  P.__OASIS_LAST_PAST_REACTIVATION_BLOCK_TICK=null;
   return P;
 };
 
