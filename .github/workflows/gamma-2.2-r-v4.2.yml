@@ -1,4 +1,5 @@
 name: OASIS Gamma 2.2-R v4.2 Flow Lineage
+# lineage-binding-fix: run corrected decision-bound process lineage
 
 on:
   workflow_dispatch:
