@@ -1,0 +1,45 @@
+name: OASIS Flow-Selective Joint Response v1.2 r5 Profile
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["flow-selective-joint-response-v1.2-r5"]
+    paths:
+      - "tools/flow-selective-joint-response-v1.2-r5-recall-profile.mjs"
+      - ".github/workflows/flow-selective-joint-response-v1.2-r5-profile.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  profile:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {label: canonical, offset: 0}
+          - {label: E137, offset: 137}
+          - {label: E977, offset: 977}
+          - {label: E4099, offset: 4099}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24'}
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run recall profile
+        env:
+          LABEL: ${{ matrix.label }}
+          OFFSET: ${{ matrix.offset }}
+        run: node tools/flow-selective-joint-response-v1.2-r5-recall-profile.mjs
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fsjr-v1.2-r5-${{ matrix.label }}
+          path: flow-selective-joint-response-v1.2-r5-${{ matrix.label }}.json
+          if-no-files-found: ignore
