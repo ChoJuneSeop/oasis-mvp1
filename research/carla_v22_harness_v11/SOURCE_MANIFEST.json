@@ -1,0 +1,16 @@
+{
+  "protocol": "OASIS-CARLA Paper Validation Protocol v2.2",
+  "harness": "OASIS-CARLA Paper Validation Harness v1.1",
+  "lineage_base_recovery_commit": "20dbc9fba5e8a21d98adc1eb9cf59d505d19759b",
+  "recovery_original_core_sha256": "cbe905fbda1eba5c85a97aa5942f8aa06444f32d9348fc93f87d7ba3912719d7",
+  "recovery_reconstructed_harness_sha256": "2f235f91bef1b4e929955aa00f01ab2036dac8621f4aa472bec461a4a605c6c2",
+  "g32_source_branch": "experiment/g32-participation-reconstruction-provenance",
+  "g32_source_commit": "c6982b728dc391aa160ea0bcb46652634690a709",
+  "g32_sidecar_tree_sha": "7595131af0fd8a4a6b3d47a242be720edd5265c3",
+  "canonical_harness_sha256": "2549fd63c3aac03146c225ba4d32a86a9339acbdfce64f100f99a265d7147b4e",
+  "synthetic_dry_run_sha256": "7004a923ad4a4ea7dcbd8e096d87301195a18671195dee089a5f3be5ebfbad4b",
+  "test_canonical_harness_sha256": "97684792a85fa13a042f0edf697323fdeafe58623d77a1a6ce8531331c3134b0",
+  "fixed_delta_seconds": 0.05,
+  "status": "pre-CARLA canonical source snapshot; no G3.2 CARLA evidence yet",
+  "experimental_evidence": false
+}
