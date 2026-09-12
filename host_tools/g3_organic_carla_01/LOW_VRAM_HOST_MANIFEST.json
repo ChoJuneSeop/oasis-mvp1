@@ -1,0 +1,18 @@
+{
+  "profile_id": "G3-ORGANIC-CARLA-01-LOW-VRAM-HOST",
+  "profile_version": "1.0",
+  "scope": "HOST_INFRASTRUCTURE_ONLY",
+  "semantic_source_mutation": false,
+  "outcome_semantics_inspected": false,
+  "carla_launch_profile": {
+    "quality_level": "Low",
+    "render_offscreen": true,
+    "nosound": true,
+    "reason": "Pre-first-tick VRAM exhaustion occurred during A3 before empirical evidence; this profile reduces graphics load without changing OASIS semantics or preregistered flow conditions."
+  },
+  "source_sha256": {
+    "windows_orchestrator_low_vram.py": "f398bf8e3d4fbe9fed935a68ae4c2e28624fdac1a098fc8367d7e1b6f844ac13",
+    "run_of01_low_vram.bat": "81f26464b886b463533367bb2bfaa103d7fd657264d772dd72a8cd14a129ff13",
+    "test_low_vram_orchestrator.py": "7c26786a0e01658acf8efdbd23cc00a1b6277b07d3ca059d880a64472f3cbbbd"
+  }
+}
