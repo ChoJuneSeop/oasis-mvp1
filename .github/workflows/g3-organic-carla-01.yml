@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - experiment/g3-organic-carla-01
+      - feature/g3-realtime-split-v1
   pull_request:
     branches:
       - integration/oasis-g3-organic-flow-v1
@@ -63,6 +64,12 @@ jobs:
           research.g3_organic_flow_v1.test_shared_closure
           research.g3_organic_flow_v1.test_carla_atomic_port
           research.g3_organic_flow_v1.test_runtime_freeze
+          -v
+
+      - name: Realtime split candidate regression
+        run: >-
+          python -m unittest
+          research.g3_realtime_split_v1.test_split_runtime
           -v
 
       - name: Frozen G3.2 sidecar regression
