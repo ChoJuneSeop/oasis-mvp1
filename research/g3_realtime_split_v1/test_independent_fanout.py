@@ -60,13 +60,12 @@ class IndependentFanoutRegression(unittest.TestCase):
             deadline_tau=flow.tau + 5.0,
         )
         self.assertTrue(result.realized)
-        accepted = self.worker.submit_post(
+        return self.worker.submit_post(
             post_observation=flow.post_observation(front_present=False),
             post_tau=flow.tau + 0.1,
             tick_index=1,
             carla_frame=flow.epoch + 1,
         )
-        return accepted
 
     def _wait_for_relation_closure(self, seconds=1.5):
         deadline = time.monotonic() + seconds
@@ -89,12 +88,12 @@ class IndependentFanoutRegression(unittest.TestCase):
         self.assertEqual(
             health.closures_committed,
             1,
-            "Relation/Experience was gated by slow Observation/Validation",
+            f"Relation/Experience was gated by slow Observation/Validation: {health!r}",
         )
         self.assertLess(
             health.validation_processed_events,
             health.submitted_events,
-            "regression did not observe validation lag while relation advanced",
+            f"regression did not observe validation lag while relation advanced: {health!r}",
         )
 
     def test_dead_validation_cannot_gate_relation_closure(self):
@@ -102,12 +101,12 @@ class IndependentFanoutRegression(unittest.TestCase):
         self.worker._validation.terminate()
         self.worker._validation.join(2.0)
 
-        self._close_front_relation(harness, epoch=210, tau=11.0)
+        accepted = self._close_front_relation(harness, epoch=210, tau=11.0)
         health = self._wait_for_relation_closure()
         self.assertEqual(
             health.closures_committed,
             1,
-            "Relation/Experience stopped because Observation/Validation exited",
+            f"Relation/Experience stopped because Observation/Validation exited; accepted={accepted}, health={health!r}",
         )
         self.assertTrue(health.degraded)
 
