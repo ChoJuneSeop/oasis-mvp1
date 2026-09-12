@@ -12,7 +12,7 @@
   },
   "source_sha256": {
     "windows_orchestrator_low_vram.py": "f398bf8e3d4fbe9fed935a68ae4c2e28624fdac1a098fc8367d7e1b6f844ac13",
-    "run_of01_low_vram.bat": "81f26464b886b463533367bb2bfaa103d7fd657264d772dd72a8cd14a129ff13",
+    "run_of01_low_vram.bat": "582fb00760d1c981127e25bb002363063921fbdf1d10583cf71b6e986f6fcec4",
     "test_low_vram_orchestrator.py": "7c26786a0e01658acf8efdbd23cc00a1b6277b07d3ca059d880a64472f3cbbbd"
   }
 }
