@@ -38,7 +38,7 @@ class CanonicalHarnessTests(unittest.TestCase):
 
     def test_selected_possibility_must_exist_in_current_distribution(self):
         class BadCore(SyntheticCore):
-            def realize(self, observation):
+            def realize(self, observation, tau):
                 return Realization(
                     "not-in-distribution",
                     VehicleActuation(throttle=0.0, brake=0.1, steer=0.0),
@@ -49,10 +49,21 @@ class CanonicalHarnessTests(unittest.TestCase):
             CanonicalHarnessV11(BadCore()).execute_decision_epoch(flow)
         self.assertEqual(flow.apply_count, 0)
 
-    def test_present_observation_is_the_only_core_input_type(self):
+    def test_present_observation_is_the_only_core_observation_type(self):
         observation = PresentObservation.from_mapping(SyntheticFlow().present_observation())
-        view = SyntheticCore().open_epoch(observation)
+        view = SyntheticCore().open_epoch(observation, 10.0)
         self.assertIsInstance(view, CoreEpochView)
+
+    def test_authoritative_tau_is_not_inferred_from_epoch(self):
+        flow = SyntheticFlow()
+        flow.tau = 13.7
+        flow.fingerprint = "flow@13.70"
+        core = SyntheticCore()
+        execution = CanonicalHarnessV11(core).execute_decision_epoch(flow)
+        self.assertEqual(execution.tau, 13.7)
+        self.assertEqual(core.last_tau, 13.7)
+        self.assertEqual(execution.recorder.reconstruction[0].observed_at_tau, 13.7)
+        self.assertNotEqual(execution.tau, execution.observation.epoch * 0.05)
 
 
 if __name__ == "__main__":
