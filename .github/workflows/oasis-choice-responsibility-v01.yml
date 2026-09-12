@@ -1,0 +1,35 @@
+name: OASIS separate choice-responsibility integration v0.1
+on:
+  push:
+    branches:
+      - implementation/oasis-g3-supplement-v1.2
+  pull_request:
+    paths:
+      - 'research/choice_responsibility_v01/**'
+      - '.github/workflows/oasis-choice-responsibility-v01.yml'
+  workflow_dispatch:
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify separate-process source and preserved baseline
+        run: |
+          python -m research.oasis_core_v12.verify_manifest
+          python -m research.choice_responsibility_v01.verify_manifest
+      - name: Run preserved and integrated code checks
+        run: >-
+          python -m unittest
+          research.oasis_core_v11.test_current_relational_core
+          research.oasis_core_v11.test_history_admission
+          research.oasis_core_v11.test_carla_relational_domain
+          research.carla_v22_harness_v11.test_canonical_harness
+          research.g3_2_sidecar.test_runtime_extension
+          research.g3_2_sidecar.test_legacy_v1_compat
+          research.oasis_core_v12.test_supplement
+          research.choice_responsibility_v01.test_integration -v
+      - name: Run separate integration wiring example
+        run: python -m research.choice_responsibility_v01.example

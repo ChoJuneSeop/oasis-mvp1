@@ -1,0 +1,18 @@
+{
+  "process_id": "choice-responsibility-integration-v0.1",
+  "separate_process": true,
+  "date": "2026-09-12",
+  "tests": {
+    "preserved": 59,
+    "integration": 15,
+    "total": 74,
+    "failures": 0,
+    "errors": 0
+  },
+  "same_distribution_omega_changes_choice": "PASS",
+  "reconstruction_to_choice": "PASS",
+  "responsibility_through_completion_and_reentry": "PASS",
+  "delayed_observation_preserves_past": "PASS",
+  "experimental_evidence": false,
+  "real_carla_execution": "BLOCKED"
+}
