@@ -27,12 +27,7 @@ class EvaluatorRecord:
 
 
 class IndependentEvaluatorV1:
-    """Post-realization evaluator separated from OASIS Core and action selection.
-
-    It cannot alter the decision already realized. It does not create a Completed
-    Experience until relation-process Closure is observed. No fixed time/frame/distance
-    timeout converts an open relation into a closed one.
-    """
+    """Post-realization evaluator separated from OASIS Core and action selection."""
 
     def __init__(self, closure_evaluator: FrontInteractionClosureEvaluator):
         self.closure_evaluator = closure_evaluator
@@ -43,6 +38,8 @@ class IndependentEvaluatorV1:
             raise EvaluatorInvariantError("a relation process is already pending evaluation")
         if execution.recorder.tau != execution.tau:
             raise EvaluatorInvariantError("decision recorder tau mismatch")
+        if execution.realization_tau < execution.tau:
+            raise EvaluatorInvariantError("realization time precedes decision")
         if not execution.realization_ref:
             raise EvaluatorInvariantError("realization reference is required")
         pending = PendingRelationProcess(
@@ -53,17 +50,12 @@ class IndependentEvaluatorV1:
         self._pending = pending
         return pending
 
-    def observe_post(
-        self,
-        *,
-        post_observation: PresentObservation,
-        post_tau: float,
-    ) -> EvaluatorRecord:
+    def observe_post(self, *, post_observation: PresentObservation, post_tau: float) -> EvaluatorRecord:
         pending = self._pending
         if pending is None:
             raise EvaluatorInvariantError("no realized relation process is pending")
-        if float(post_tau) < pending.execution.tau:
-            raise EvaluatorInvariantError("post observation cannot precede the decision")
+        if float(post_tau) < pending.execution.realization_tau:
+            raise EvaluatorInvariantError("post observation cannot precede actual realization")
 
         closure = self.closure_evaluator.evaluate(
             realized_observation=pending.realized_observation,
@@ -83,15 +75,13 @@ class IndependentEvaluatorV1:
 
         history = pending.execution.recorder.complete_history_entry(
             entry_id=pending.entry_id,
-            realized_tau=pending.execution.tau,
+            realized_tau=pending.execution.realization_tau,
             outcome_tau=float(post_tau),
             relation_end_tau=float(post_tau),
             selected_possibility_id=pending.execution.realization.selected_possibility_id,
             realization_ref=pending.execution.realization_ref,
             realization_count=1,
-            outcome_description=(
-                "realized relation process reached symbolic closure under post-realization observation"
-            ),
+            outcome_description="realized relation process reached symbolic closure under post-realization observation",
             closure_method=closure.method,
             closure_evidence=closure.evidence,
         )
