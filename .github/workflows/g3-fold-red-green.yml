@@ -5,7 +5,7 @@ on:
     branches: [feature/g3-three-layer-fold-v1]
 
 jobs:
-  regression:
+  windows-regression:
     runs-on: windows-latest
     steps:
       - run: git config --global core.autocrlf false
@@ -13,4 +13,45 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: python -m unittest research.g3_realtime_split_v1.test_fold_operator -v
+      - name: Fold operator regression
+        run: python -m unittest research.g3_realtime_split_v1.test_fold_operator -v
+      - name: Independent fanout regression
+        run: python -m unittest research.g3_realtime_split_v1.test_independent_fanout -v
+      - name: Three-layer runtime regression
+        run: python -m unittest research.g3_realtime_split_v1.test_split_runtime research.g3_realtime_split_v1.test_three_layers -v
+      - name: Qualification protocol regression
+        run: python -m unittest research.g3_three_layer_carla_02.test_protocol -v
+
+  frozen-full-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fold operator regression
+        run: python -m unittest research.g3_realtime_split_v1.test_fold_operator -v
+      - name: Independent fanout regression
+        run: python -m unittest research.g3_realtime_split_v1.test_independent_fanout -v
+      - name: Three-layer runtime regression
+        run: python -m unittest research.g3_realtime_split_v1.test_split_runtime research.g3_realtime_split_v1.test_three_layers -v
+      - name: Organic integration regression
+        run: >-
+          python -m unittest
+          research.g3_organic_flow_v1.test_organic_flow
+          research.g3_organic_flow_v1.test_shared_closure
+          research.g3_organic_flow_v1.test_carla_atomic_port
+          research.g3_organic_flow_v1.test_runtime_freeze
+          -v
+      - name: Frozen G3.2 sidecar regression
+        run: python -m unittest discover -s research/g3_2_sidecar -p 'test_*.py' -v
+      - name: Frozen OASIS Core v1.1 regression
+        run: python -m unittest discover -s research/oasis_core_v11 -p 'test_*.py' -v
+      - name: Frozen OASIS Core v1.2 regression
+        run: python -m unittest research.oasis_core_v12.test_supplement -v
+      - name: Frozen choice responsibility regression
+        run: python -m unittest research.choice_responsibility_v01.test_integration -v
+      - name: Frozen final integration regression
+        run: python -m unittest research.integration_checkpoint.test_cross research.integration_checkpoint.test_harness_adapter -v
+      - name: Frozen canonical CARLA harness regression
+        run: python -m unittest discover -s research/carla_v22_harness_v11 -p 'test_*.py' -v
