@@ -8,7 +8,10 @@ from research.oasis_core_v11.current_relational_core import CoreV11InvariantErro
 
 PACKAGE = Path(__file__).resolve().parent
 PREREGISTRATION_PATH = PACKAGE / "G3_ORGANIC_CARLA_01_PREREGISTRATION.json"
-ORGANIC_MANIFEST_PATH = PACKAGE.parent / "g3_organic_flow_v1" / "ORGANIC_SOURCE_MANIFEST.json"
+EXPERIMENT_MANIFEST_PATH = PACKAGE / "EXPERIMENT_SOURCE_MANIFEST.json"
+ORGANIC_MANIFEST_PATH = (
+    PACKAGE.parent / "g3_organic_flow_v1" / "ORGANIC_SOURCE_MANIFEST.json"
+)
 
 
 def load_preregistration(path: str | Path = PREREGISTRATION_PATH) -> dict:
@@ -45,6 +48,10 @@ def preregistration_sha256(path: str | Path = PREREGISTRATION_PATH) -> str:
     return sha256(Path(path).read_bytes()).hexdigest()
 
 
+def experiment_manifest_sha256(path: str | Path = EXPERIMENT_MANIFEST_PATH) -> str:
+    return sha256(Path(path).read_bytes()).hexdigest()
+
+
 def flow_spec(protocol: dict, flow_id: str) -> dict:
     for item in protocol["flows"]:
         if item["flow_id"] == flow_id:
@@ -53,7 +60,6 @@ def flow_spec(protocol: dict, flow_id: str) -> dict:
 
 
 def verify_frozen_organic_sources(repo_root: str | Path) -> dict:
-    """Verify frozen organic execution sources without relying on a mutable branch whitelist."""
     root = Path(repo_root)
     manifest_path = root / "research/g3_organic_flow_v1/ORGANIC_SOURCE_MANIFEST.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
