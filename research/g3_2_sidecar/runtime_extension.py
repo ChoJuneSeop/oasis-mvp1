@@ -63,7 +63,6 @@ class G32EpochRecorder:
             raise G32InvariantError("probe relation is not in the epoch relation set")
         if before_fingerprint != self.flow_fingerprint or after_fingerprint != self.flow_fingerprint:
             raise G32InvariantError("internal probe changed or mismatched the real-flow fingerprint")
-
         probe = CounterfactualProbeResult(
             state_hash_before=before_fingerprint,
             state_hash_after=after_fingerprint,
@@ -166,6 +165,7 @@ class G32EpochRecorder:
             outcome_description=outcome_description,
             current_reality=dict(self.current_reality),
             participation=tuple(self.participation),
+            group_participation=tuple(self.group_participation),
             reconstruction=tuple(self.reconstruction),
             provenance=self._provenance(),
             closure_method=closure_method,
