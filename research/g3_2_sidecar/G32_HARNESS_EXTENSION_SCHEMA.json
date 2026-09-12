@@ -1,5 +1,5 @@
 {
-  "schema": "OASIS-CARLA G3.2 sidecar extension v0.1",
+  "schema": "OASIS-CARLA G3.2 sidecar extension v0.2",
   "preserve_existing_harness": true,
   "epoch_record": {
     "tau": "current decision epoch time",
@@ -20,8 +20,19 @@
         "before_hash": "real-flow fingerprint before internal probe",
         "after_hash": "real-flow fingerprint after internal probe",
         "relation_ablated_distribution": "same current decision with only this relation element withheld internally",
-        "role_trace": "dynamic role descriptors in the current judgment",
+        "distribution_effect": "epoch-local distribution change; not memory importance",
+        "role_trace": "dynamic structural role descriptors in the current judgment",
         "generated_possibilities": "possibilities whose construction used this relation element"
+      }
+    ],
+    "relation_group_probes": [
+      {
+        "source_relation_element_ids": "two or more relations used together",
+        "before_hash": "real-flow fingerprint before internal group probe",
+        "after_hash": "real-flow fingerprint after internal group probe",
+        "group_ablated_distribution": "same current decision with the relation set withheld internally",
+        "joint_distribution_effect": "joint epoch-local effect used to expose redundancy/synergy",
+        "generated_possibilities": "possibilities constructed with the relation set"
       }
     ],
     "reconstruction": [
@@ -47,6 +58,11 @@
       "provenance": "relation-element genealogy copied from decision-time participation and reconstruction"
     }
   },
+  "interpretation": [
+    "Participation Spectrum is vector-valued: structural role/construction trace plus counterfactual distribution effect.",
+    "Zero individual distribution effect does not imply non-participation when structural traces exist.",
+    "Joint probes are required for relation sets used together when redundancy or synergy can hide individual effects."
+  ],
   "forbidden": [
     "recency decay as relevance",
     "binary selected/rejected memory gate as primary evaluation",
@@ -55,6 +71,7 @@
     "fixed closure duration/distance/frame count",
     "future state or outcome leakage into decision-time calculation",
     "counterfactual probe that changes or advances the real flow",
-    "collapse of reconstruction axes into one memory score"
+    "collapse of reconstruction axes into one memory score",
+    "interpreting zero individual distribution effect as proof of non-participation"
   ]
 }
