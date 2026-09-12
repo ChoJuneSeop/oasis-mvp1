@@ -52,10 +52,8 @@ class RuntimeExtensionTests(unittest.TestCase):
         )
         self.assertGreater(p.distribution_effect, 0.0)
         self.assertTrue(p.has_structural_participation)
-
         r = self.make_reconstruction((self.make_link(rel, p.distribution_effect),))
         rec.record_reconstruction(r)
-
         entry = rec.complete_history_entry(
             entry_id="E-new",
             realized_tau=10.1,
@@ -102,7 +100,6 @@ class RuntimeExtensionTests(unittest.TestCase):
         self.assertEqual(p2.distribution_effect, 0.0)
         self.assertTrue(p1.has_structural_participation)
         self.assertTrue(p2.has_structural_participation)
-
         group = rec.record_group_probe(
             (rel1, rel2),
             before_fingerprint="flow-10",
@@ -112,7 +109,7 @@ class RuntimeExtensionTests(unittest.TestCase):
         )
         self.assertGreater(group.joint_distribution_effect, 0.0)
 
-    def test_multi_relation_reconstruction_requires_matching_joint_probe(self):
+    def test_multi_relation_reconstruction_requires_matching_joint_probe_and_preserves_it(self):
         rel1 = self.make_relation("E1-r1")
         rel2 = self.make_relation("E1-r2")
         rec = G32EpochRecorder(
@@ -134,7 +131,6 @@ class RuntimeExtensionTests(unittest.TestCase):
         reconstruction = self.make_reconstruction((self.make_link(rel1), self.make_link(rel2)))
         with self.assertRaises(G32InvariantError):
             rec.record_reconstruction(reconstruction)
-
         rec.record_group_probe(
             (rel1, rel2),
             before_fingerprint="flow-10",
@@ -143,7 +139,20 @@ class RuntimeExtensionTests(unittest.TestCase):
             generated_possibilities=("yield",),
         )
         rec.record_reconstruction(reconstruction)
-        self.assertEqual(len(rec.reconstruction), 1)
+        entry = rec.complete_history_entry(
+            entry_id="E-joint",
+            realized_tau=10.1,
+            outcome_tau=10.2,
+            relation_end_tau=10.3,
+            selected_possibility_id="yield",
+            realization_ref="epoch-10-action",
+            realization_count=1,
+            outcome_description="jointly reconstructed possibility realized",
+            closure_method="relation-process evidence",
+            closure_evidence={"closed": True},
+        )
+        self.assertEqual(len(entry.group_participation), 1)
+        self.assertGreater(entry.group_participation[0].joint_distribution_effect, 0.0)
 
     def test_probe_must_not_change_flow(self):
         rel = self.make_relation()
