@@ -56,6 +56,8 @@ jobs:
           python -m unittest research.choice_responsibility_v01.test_integration -v
           python -m unittest research.integration_checkpoint.test_cross -v
           python -m unittest research.integration_checkpoint.test_harness_adapter -v
+      - name: Verify frozen live source manifest
+        run: python research/g32_live_execution_v1/verify_manifest.py
       - name: Record live supplement source hashes
         run: |
           sha256sum \
@@ -69,4 +71,6 @@ jobs:
             research/g32_live_execution_v1/runner.py \
             research/g32_live_execution_v1/test_live_core.py \
             research/g32_live_execution_v1/test_live_history.py \
-            research/g32_live_execution_v1/test_runtime_freeze.py
+            research/g32_live_execution_v1/test_runtime_freeze.py \
+            research/g32_live_execution_v1/LIVE_SOURCE_MANIFEST.json \
+            research/g32_live_execution_v1/verify_manifest.py
