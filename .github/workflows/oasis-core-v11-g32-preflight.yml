@@ -1,0 +1,45 @@
+name: OASIS Core v1.1 G3.2 preflight
+
+on:
+  push:
+    branches:
+      - implementation/oasis-core-v1.1-g32-current
+  workflow_dispatch:
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile current Core, canonical harness and G3.2 sidecar
+        run: python -m compileall -q research/oasis_core_v11 research/carla_v22_harness_v11 research/g3_2_sidecar
+      - name: Run current Core regression tests
+        run: python -m unittest research.oasis_core_v11.test_current_relational_core -v
+      - name: Run canonical Harness v1.1 regression tests
+        run: python -m unittest research.carla_v22_harness_v11.test_canonical_harness -v
+      - name: Run G3.2 sidecar regression tests
+        run: |
+          python -m unittest research.g3_2_sidecar.test_runtime_extension -v
+          python -m unittest research.g3_2_sidecar.test_legacy_v1_compat -v
+      - name: Static recency-access boundary audit
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          path=Path('research/oasis_core_v11/current_relational_core.py')
+          tree=ast.parse(path.read_text())
+          calls=[]
+          for node in ast.walk(tree):
+              if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == 'relate':
+                  calls.append({kw.arg for kw in node.keywords})
+          assert calls, 'no relation-operator call found'
+          assert all(keys == {'current_relations','past','candidate_ids'} for keys in calls), calls
+          print('relation-operator-no-age-interface=PASS')
+          PY
+      - name: Record candidate source SHA-256
+        run: |
+          sha256sum research/oasis_core_v11/current_relational_core.py
+          sha256sum research/oasis_core_v11/test_current_relational_core.py
