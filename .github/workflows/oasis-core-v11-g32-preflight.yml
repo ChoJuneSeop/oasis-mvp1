@@ -21,7 +21,9 @@ jobs:
       - name: Compile current Core, canonical harness and G3.2 sidecar
         run: python -m compileall -q research/oasis_core_v11 research/carla_v22_harness_v11 research/g3_2_sidecar
       - name: Run current Core regression tests
-        run: python -m unittest research.oasis_core_v11.test_current_relational_core -v
+        run: |
+          python -m unittest research.oasis_core_v11.test_current_relational_core -v
+          python -m unittest research.oasis_core_v11.test_history_admission -v
       - name: Run canonical Harness v1.1 regression tests
         run: python -m unittest research.carla_v22_harness_v11.test_canonical_harness -v
       - name: Run G3.2 sidecar regression tests
@@ -55,3 +57,7 @@ jobs:
           assert m['real_carla_g32_execution']=='BLOCKED_UNTIL_DOMAIN_OPERATORS_ARE_FROZEN'
           print('source-manifest=PASS')
           PY
+      - name: Record history-admission source SHA-256
+        run: |
+          sha256sum research/oasis_core_v11/history_admission.py
+          sha256sum research/oasis_core_v11/test_history_admission.py
