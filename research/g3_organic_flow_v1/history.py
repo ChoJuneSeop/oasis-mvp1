@@ -3,7 +3,9 @@ from __future__ import annotations
 """Relation-episode Closure and provenance-preserving history admission."""
 
 from copy import deepcopy
-from dataclasses import dataclass, replace
+from dataclasses import asdict, dataclass, replace
+import hashlib
+import json
 
 from research.carla_v22_harness_v11.independent_evaluator_v1 import (
     EvaluatorRecord,
@@ -20,6 +22,8 @@ from research.oasis_core_v12.history_admission import HistoryAdmissionBridgeV12
 class CompletedOrganicEpisode:
     record: EvaluatorRecord
     decision_responsibility: dict
+    closure_occurrence_id: str
+    closure_scope_id: str
 
 
 @dataclass
@@ -29,10 +33,19 @@ class _PendingDecisionRelation:
 
 
 class FrontRelationEpisodeManager:
-    """Decision Epochs remain distinct from the continuing front Relation Episode."""
+    """Decision Epochs remain distinct from the continuing front Relation Episode.
 
-    def __init__(self, closure_evaluator):
+    Multiple decisions closed by one observed relation boundary share one occurrence
+    identity. This prevents one physical Closure observation from being counted as
+    several independent historical events merely because several Decision Epochs were
+    pending inside the same continuing relation.
+    """
+
+    def __init__(self, closure_evaluator, *, scope_id: str = "ego/front-interaction"):
         self.closure_evaluator = closure_evaluator
+        self.scope_id = str(scope_id).strip()
+        if not self.scope_id:
+            raise CoreV11InvariantError("relation episode scope_id is required")
         self._pending: list[_PendingDecisionRelation] = []
 
     @property
@@ -59,11 +72,30 @@ class FrontRelationEpisodeManager:
         )
         return True
 
+    def _closure_occurrence_id(self, *, post_observation, post_tau: float) -> str:
+        payload = json.dumps(
+            {
+                "scope_id": self.scope_id,
+                "post_tau": float(post_tau),
+                "post_observation": asdict(post_observation),
+                "observation_source": "independent-evaluator-v1",
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+        )
+        digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+        return f"closure-occurrence:{digest}"
+
     def observe_post(self, *, post_observation, post_tau: float):
         if not self._pending:
             return ()
         completed: list[CompletedOrganicEpisode] = []
         remaining: list[_PendingDecisionRelation] = []
+        shared_occurrence_id = self._closure_occurrence_id(
+            post_observation=post_observation, post_tau=float(post_tau)
+        )
         for pending in self._pending:
             record = pending.evaluator.observe_post(
                 post_observation=post_observation, post_tau=float(post_tau)
@@ -79,6 +111,8 @@ class FrontRelationEpisodeManager:
                         decision_responsibility=deepcopy(
                             pending.decision_responsibility
                         ),
+                        closure_occurrence_id=shared_occurrence_id,
+                        closure_scope_id=self.scope_id,
                     )
                 )
             else:
@@ -89,6 +123,7 @@ class FrontRelationEpisodeManager:
     def observation_horizon_snapshot(self) -> dict:
         """Report right-censoring without inventing a Closure event."""
         return {
+            "relation_scope_id": self.scope_id,
             "pending_relation_processes": len(self._pending),
             "forced_closure": False,
             "interpretation": "Observation horizon ended while these relation processes remained open; no timeout/frame threshold was applied.",
@@ -155,11 +190,14 @@ class OrganicHistoryCommitter:
         responsibility = deepcopy(completed_episode.decision_responsibility)
         unresolved = unresolved_from_responsibility(responsibility)
         occurrence = ObservedOccurrence(
-            occurrence_id=f"{entry.entry_id}:closure",
+            occurrence_id=completed_episode.closure_occurrence_id,
             occurred_at_tau=float(entry.relation_end_tau),
-            received_at_tau=known,
+            # The evaluator observed the occurrence at the relation boundary. A later
+            # archive/admission time belongs to CompletedProcess.known_at_tau and must
+            # not rewrite the original observation receipt time.
+            received_at_tau=float(entry.relation_end_tau),
             description="Independent evaluator observed the realized relation-process boundary.",
-            source_ref="independent-evaluator-v1",
+            source_ref=f"independent-evaluator-v1:{completed_episode.closure_scope_id}",
         )
 
         evidence = deepcopy(dict(entry.closure_evidence))
