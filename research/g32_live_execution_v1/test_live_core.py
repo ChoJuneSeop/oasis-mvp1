@@ -65,6 +65,12 @@ def build_core(available_work=None):
     )
 
 
+def demand_dominates(left, right):
+    return all(x >= y for x, y in zip(left, right)) and any(
+        x > y for x, y in zip(left, right)
+    )
+
+
 class LiveCoreTests(unittest.TestCase):
     def execute(self, core):
         flow = Flow()
@@ -87,6 +93,32 @@ class LiveCoreTests(unittest.TestCase):
             execution.realization.selected_possibility_id,
             execution.recorder.possibility_distribution,
         )
+
+    def test_pareto_higher_responsibility_gets_deeper_verification(self):
+        core = build_core()
+        self.execute(core)
+        context = core.responsibility_record()["context"]
+        responsibilities = context["inputs"]["evaluation"]["responsibilities"]
+        work = {
+            request["candidate_ids"][0]: request["estimated_work"]
+            for request in context["assessment"]["requests"]
+        }
+        vectors = {
+            candidate_id: (
+                value["uncertainty"],
+                value["impact"],
+                value["irreversibility"],
+                value["time_constraint"],
+            )
+            for candidate_id, value in responsibilities.items()
+        }
+        comparisons = 0
+        for left_id, left in vectors.items():
+            for right_id, right in vectors.items():
+                if left_id != right_id and demand_dominates(left, right):
+                    comparisons += 1
+                    self.assertGreater(work[left_id], work[right_id])
+        self.assertGreater(comparisons, 0)
 
     def test_limited_capacity_preserves_omega(self):
         core = build_core(available_work=1.0)
