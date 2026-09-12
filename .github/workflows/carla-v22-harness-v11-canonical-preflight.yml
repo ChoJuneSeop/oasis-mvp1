@@ -1,0 +1,52 @@
+name: CARLA v2.2 Harness v1.1 canonical preflight
+
+on:
+  push:
+    branches:
+      - implementation/carla-v22-harness-v1.1-canonical
+  workflow_dispatch:
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify frozen source SHA-256
+        run: |
+          echo '2549fd63c3aac03146c225ba4d32a86a9339acbdfce64f100f99a265d7147b4e  research/carla_v22_harness_v11/canonical_harness.py' | sha256sum -c -
+          echo '7004a923ad4a4ea7dcbd8e096d87301195a18671195dee089a5f3be5ebfbad4b  research/carla_v22_harness_v11/synthetic_dry_run.py' | sha256sum -c -
+          echo '97684792a85fa13a042f0edf697323fdeafe58623d77a1a6ce8531331c3134b0  research/carla_v22_harness_v11/test_canonical_harness.py' | sha256sum -c -
+      - name: Compile canonical harness and G3.2 sidecar
+        run: python -m compileall -q research/carla_v22_harness_v11 research/g3_2_sidecar
+      - name: Protocol boundary static audit
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          from research.carla_v22_harness_v11.canonical_harness import APPROVED_OBSERVATION_FIELDS, FIXED_DELTA_SECONDS
+          p = Path('research/carla_v22_harness_v11/canonical_harness.py')
+          tree = ast.parse(p.read_text())
+          bad_imports=[]
+          for n in ast.walk(tree):
+              if isinstance(n, ast.Import):
+                  bad_imports += [x.name for x in n.names if x.name == 'carla' or x.name.startswith('carla.')]
+              if isinstance(n, ast.ImportFrom) and n.module and (n.module == 'carla' or n.module.startswith('carla.')):
+                  bad_imports.append(n.module)
+          assert not bad_imports, bad_imports
+          assert FIXED_DELTA_SECONDS == 0.05
+          assert APPROVED_OBSERVATION_FIELDS == (
+              'epoch','ego_speed_mps','front_present','front_gap_m','front_closing_mps','front_kind','local_heading_error_deg','local_density'
+          )
+          print('protocol-boundary-audit=PASS')
+          PY
+      - name: Run G3.2 sidecar regression tests
+        run: |
+          python -m unittest research.g3_2_sidecar.test_runtime_extension -v
+          python -m unittest research.g3_2_sidecar.test_legacy_v1_compat -v
+      - name: Run Harness v1.1 regression tests
+        run: python -m unittest research.carla_v22_harness_v11.test_canonical_harness -v
+      - name: Run synthetic dry-run
+        run: python -m research.carla_v22_harness_v11.synthetic_dry_run
