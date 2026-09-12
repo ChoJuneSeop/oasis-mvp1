@@ -47,6 +47,16 @@ jobs:
       - name: Independent experiment tests
         run: python -m unittest research.g3_organic_carla_01.test_live_runner -v
 
+      - name: Compile host orchestrator
+        run: python -m compileall -q host_tools/g3_organic_carla_01
+
+      - name: Verify host orchestrator manifest
+        run: >-
+          python -c "from pathlib import Path; from host_tools.g3_organic_carla_01.windows_orchestrator import verify_host_manifest; verify_host_manifest(Path('host_tools/g3_organic_carla_01')); print('HOST_ORCHESTRATOR_MANIFEST_VERIFY=PASS')"
+
+      - name: Host orchestrator regression
+        run: python -m unittest host_tools.g3_organic_carla_01.test_windows_orchestrator -v
+
       - name: Organic integration regression
         run: >-
           python -m unittest
