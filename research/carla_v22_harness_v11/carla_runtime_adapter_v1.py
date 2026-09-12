@@ -301,18 +301,61 @@ class CARLAPresentFlowPort:
         return f"carla-frame:{frame}:single-actuation"
 
 
-def runtime_identity(world: Any) -> dict[str, object]:
-    """Capture environment identity before experiment; does not infer or invent version."""
+def runtime_identity(world: Any, client: Any | None = None) -> dict[str, object]:
+    """Capture live environment identity without inferring or inventing missing versions."""
     settings = world.get_settings()
     world_map = world.get_map()
     try:
         import carla  # type: ignore
-        client_version = getattr(carla, "__version__", None)
+        python_version = getattr(carla, "__version__", None)
     except Exception:
-        client_version = None
+        python_version = None
+
+    client_version = None
+    server_version = None
+    if client is not None:
+        try:
+            client_version = client.get_client_version()
+        except Exception:
+            client_version = None
+        try:
+            server_version = client.get_server_version()
+        except Exception:
+            server_version = None
+
     return {
-        "carla_python_version": client_version,
+        "carla_python_version": python_version,
+        "carla_client_version": client_version,
+        "carla_server_version": server_version,
         "map_name": str(getattr(world_map, "name", "")),
         "synchronous_mode": bool(getattr(settings, "synchronous_mode", False)),
         "fixed_delta_seconds": getattr(settings, "fixed_delta_seconds", None),
+        "no_rendering_mode": bool(getattr(settings, "no_rendering_mode", False)),
     }
+
+
+def validate_runtime_identity(identity: Mapping[str, object]) -> dict[str, object]:
+    """Fail closed before a real G3.2 run unless the frozen protocol runtime is present."""
+    client_version = str(identity.get("carla_client_version") or "").strip()
+    server_version = str(identity.get("carla_server_version") or "").strip()
+    if not client_version or not server_version:
+        raise CARLARuntimeInvariantError(
+            "live CARLA client/server versions must be captured before experimental execution"
+        )
+    if client_version != server_version:
+        raise CARLARuntimeInvariantError(
+            f"CARLA client/server version mismatch: {client_version!r} != {server_version!r}"
+        )
+
+    map_name = str(identity.get("map_name") or "")
+    if map_name.rsplit("/", 1)[-1] != "Town10HD_Opt":
+        raise CARLARuntimeInvariantError(f"unexpected CARLA map: {map_name!r}")
+    if identity.get("synchronous_mode") is not True:
+        raise CARLARuntimeInvariantError("CARLA synchronous_mode must be true")
+
+    delta = identity.get("fixed_delta_seconds")
+    if delta is None or abs(float(delta) - 0.05) > 1e-12:
+        raise CARLARuntimeInvariantError(
+            f"CARLA fixed_delta_seconds must equal protocol value 0.05, got {delta!r}"
+        )
+    return dict(identity)
