@@ -1,0 +1,30 @@
+{
+  "run_id": "G32-LIVE-001",
+  "phase": "PRE_FIRST_TICK",
+  "empirical_evidence": false,
+  "empirical_ticks": 0,
+  "map": "Town10HD_Opt",
+  "fixed_delta_seconds": 0.05,
+  "flow_seed": 9701,
+  "planned_horizon_ticks": 30000,
+  "reset_inside_flow": false,
+  "history_initial_state": "EMPTY",
+  "baseline_commit": "5ccccc1fe9e3b25305ab2f133fd8cb0e63d1c954",
+  "runtime_source_snapshot": "f65d9c6e5466807861474ac638df1ac40ffefc93",
+  "preflight_ci_commit": "b1d63a3e1de9fd3cd1b1c543bf2fa73d4ce9a2dd",
+  "status": "BLOCKED_BEFORE_FIRST_EMPIRICAL_TICK",
+  "blocker": "No live CARLA server/client execution path is reachable from the current ChatGPT/GitHub execution environment; live runtime identity cannot yet be captured, validated, and frozen.",
+  "required_before_tick_1": [
+    "capture live CARLA client version",
+    "capture live CARLA server version",
+    "verify client/server version equality",
+    "verify Town10HD_Opt",
+    "verify synchronous_mode=true",
+    "verify fixed_delta_seconds=0.05",
+    "capture and freeze no_rendering_mode",
+    "freeze runtime identity record before first Decision Epoch"
+  ],
+  "no_post_result_retuning": true,
+  "negative_results_must_be_preserved": true,
+  "note": "This record starts the registered run procedurally but is not CARLA empirical evidence. No experimental tick has been generated."
+}
