@@ -41,7 +41,7 @@ jobs:
         run: python -m compileall -q research/g3_organic_flow_v1
 
       - name: Organic integration tests
-        run: python -m unittest research.g3_organic_flow_v1.test_organic_flow -v
+        run: python -m unittest research.g3_organic_flow_v1.test_organic_flow research.g3_organic_flow_v1.test_shared_closure -v
 
       - name: Frozen G3.2 sidecar regression
         run: python -m unittest discover -s research/g3_2_sidecar -p 'test_*.py' -v
