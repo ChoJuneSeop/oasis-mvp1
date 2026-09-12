@@ -1,0 +1,195 @@
+{
+  "protocol_id": "G3-ORGANIC-CARLA-01",
+  "protocol_version": "1.0",
+  "status": "PREREGISTERED_BEFORE_FIRST_EXPERIMENTAL_TICK",
+  "purpose": "Test whether separately designed G3 mechanisms operate as one organic current-flow process in live CARLA, without optimizing a scalar driving score.",
+  "necessity_kill_search": {
+    "conclusion": "NECESSARY_AT_MECHANISM_LEVEL",
+    "reason": "Deterministic CARLA execution, memory, counterfactual probing, and responsibility accounting alone do not establish the conjunction of current-flow relational re-participation, Participation/Reconstruction non-collapse, pre-realization responsibility control, Closure-bounded experience admission, and later re-participation in one continuous live trajectory.",
+    "non_novelty_claims": [
+      "CARLA synchronous execution itself is not novel.",
+      "Counterfactual probing itself is not novel.",
+      "Responsibility attribution itself is not novel.",
+      "Memory re-use itself is not novel."
+    ]
+  },
+  "code_lineage": {
+    "repository": "ChoJuneSeop/oasis-mvp1",
+    "baseline_commit": "5ccccc1fe9e3b25305ab2f133fd8cb0e63d1c954",
+    "organic_source_snapshot_commit": "343dd3aa220537ad3dab2e8bb11c7a93a50378a5",
+    "organic_manifest_governance_commit": "950c8bfd7c7e1ce1ce6eb412665732e333996e22",
+    "organic_manifest_path": "research/g3_organic_flow_v1/ORGANIC_SOURCE_MANIFEST.json",
+    "post_result_retuning": false,
+    "recovery_lineage_runtime_merge": false
+  },
+  "scope": {
+    "domain": "CARLA front-interaction organic-flow validation",
+    "in_scope": [
+      "current reality capture",
+      "current relation construction",
+      "past Completed Experience relation-element re-participation",
+      "Participation",
+      "individual and joint probes",
+      "Reconstruction",
+      "current possibility construction/distribution",
+      "U/I/V/T responsibility vector",
+      "dynamic additional responsibility variables",
+      "Assessment",
+      "resource allocation after Assessment",
+      "Verification and unresolved Omega",
+      "Choice before realization",
+      "stale-current recheck",
+      "single actual realization per Decision Epoch",
+      "Independent Evaluator",
+      "Outcome and relation-process Closure",
+      "Completed Experience admission",
+      "later current-flow re-participation",
+      "full provenance chain"
+    ],
+    "out_of_scope": [
+      "claiming full P1-P8 validation",
+      "claiming full P6 structural expansion validation",
+      "claiming full P8 irregular spiral validation",
+      "global driving-score optimization",
+      "proving all possible CARLA relations",
+      "G4"
+    ]
+  },
+  "environment": {
+    "carla_client_version": "0.9.16",
+    "carla_server_version": "0.9.16",
+    "require_version_match": true,
+    "map": "Town10HD_Opt",
+    "synchronous_mode": true,
+    "fixed_delta_seconds": 0.05,
+    "no_rendering_mode": "CAPTURE_AND_FREEZE_CURRENT_BOOLEAN",
+    "traffic_manager_synchronous_mode": true,
+    "traffic_manager_port": 8000,
+    "npc_count": 12,
+    "history_initial_state": "EMPTY",
+    "reset_inside_flow": false,
+    "planned_horizon_ticks_per_flow": 30000,
+    "horizon_is_semantic_threshold": false,
+    "closure_by_timeout_distance_or_frame_threshold": false
+  },
+  "scene_generation": {
+    "algorithm": "deterministic_preplanned_spawn_v1",
+    "spawn_points": "CARLA map spawn points indexed in map-provided order, then shuffled with the flow seed",
+    "ego_blueprint_preference": [
+      "vehicle.tesla.model3",
+      "vehicle.lincoln.mkz_2020"
+    ],
+    "vehicle_blueprint_pool": "sorted four-wheel vehicle blueprints",
+    "npc_blueprint_selection": "flow-seeded deterministic selection from the sorted pool",
+    "substitution_after_spawn_failure": false,
+    "spawn_failure_before_tick_1": "PRE_FIRST_TICK_SCENE_FAIL",
+    "scene_manifest_forbidden_core_fields": [
+      "raw_actor_id",
+      "seed",
+      "spawn_index",
+      "map_topology"
+    ]
+  },
+  "flows": [
+    {"flow_id": "OF-01", "seed": 111268688},
+    {"flow_id": "OF-02", "seed": 1108629046},
+    {"flow_id": "OF-03", "seed": 1920591008},
+    {"flow_id": "OF-04", "seed": 1195057233},
+    {"flow_id": "OF-05", "seed": 376969124},
+    {"flow_id": "OF-06", "seed": 1164411670}
+  ],
+  "seed_policy": {
+    "selection": "PREDECLARED_LITERAL_COHORT_BEFORE_EXECUTION",
+    "result_based_selection": false,
+    "replacement_after_result_inspection": false,
+    "same_seed_repeat_interpretation": "REPRODUCIBILITY_ATTEMPT_NOT_INDEPENDENT_FLOW"
+  },
+  "core_information_barrier": {
+    "forbidden": [
+      "future_state",
+      "future_trajectory",
+      "scenario_label",
+      "trigger",
+      "seed",
+      "raw_actor_id",
+      "full_map_topology",
+      "post_outcome_information_before_choice"
+    ],
+    "counterfactual_probe_may_mutate_or_advance_real_flow": false
+  },
+  "semantic_constraints": {
+    "participation_is_single_memory_score": false,
+    "individual_effect_zero_means_nonparticipation": false,
+    "joint_probe_required_for_multi_relation_reconstruction": true,
+    "participation_and_reconstruction_are_independent_axes": true,
+    "uvit_scalarization": false,
+    "automatic_age_decay": false,
+    "recent_experience_priority": false,
+    "only_realized_and_closed_process_enters_reusable_history": true,
+    "unrealized_possibility_enters_parallel_history": false,
+    "observation_horizon_forces_closure": false
+  },
+  "primary_questions": [
+    "Does the same past relation participate differently under different current realities?",
+    "Can an old completed experience re-participate when a current relation forms without age/recency privilege?",
+    "Can individual effect be zero while joint effect is non-zero in live flow?",
+    "Do Participation and Reconstruction vary independently while remaining organically connected?",
+    "Do responsibility and verification affect the pre-realization decision process rather than acting only as post-hoc records?",
+    "Does unresolved Omega survive Completion provenance and later re-relate when current conditions make it relevant?",
+    "Is provenance preserved from source relation through participation, reconstruction, possibility, responsibility, choice, realization, outcome, closure, new experience, and later re-participation?"
+  ],
+  "negative_result_policy": {
+    "preserve_negative_results": true,
+    "extend_horizon_after_negative_result_inspection": false,
+    "retune_parameters_after_result_inspection": false,
+    "absence_of_joint_only_effect": "REPORT_AS_NOT_OBSERVED_IN_THIS_SCOPE",
+    "absence_of_old_experience_reparticipation": "REPORT_AS_NOT_OBSERVED_IN_THIS_SCOPE",
+    "absence_of_choice_difference": "REPORT_AS_NOT_OBSERVED_IN_THIS_SCOPE"
+  },
+  "attempt_policy": {
+    "resume_after_process_or_carla_interruption": false,
+    "partial_attempt_is_preserved": true,
+    "new_attempt_starts_from_empty_history": true,
+    "new_attempt_uses_same_flow_seed": true,
+    "new_attempt_requires_new_attempt_id": true,
+    "partial_results_must_not_be_inspected_to_retune_the_next_attempt": true
+  },
+  "pilot_separation": {
+    "G32-LIVE-001": "HISTORICAL_PILOT_ONLY",
+    "may_initialize_history": false,
+    "may_select_seed": false,
+    "may_enter_primary_analysis_before_protocol_completion": false
+  },
+  "required_before_tick_1": [
+    "verify frozen organic source manifest",
+    "verify exact preregistration file bytes",
+    "verify CARLA client version 0.9.16",
+    "verify CARLA server version 0.9.16",
+    "verify client/server version equality",
+    "verify Town10HD_Opt",
+    "verify synchronous_mode=true",
+    "verify fixed_delta_seconds=0.05",
+    "capture and freeze no_rendering_mode",
+    "verify Traffic Manager synchronous mode and seed",
+    "build deterministic 1 ego + 12 NPC scene",
+    "write scene_manifest.json before first experimental tick",
+    "freeze runtime_identity.json before first experimental tick",
+    "verify empty reusable history",
+    "verify empty experiment ledgers",
+    "establish one registered simulator tick owner"
+  ],
+  "completion_validation": [
+    "exactly 30000 completed simulator ticks in the attempt audit ledger",
+    "CARLA frame increments exactly one per registered tick",
+    "runtime identity at end equals frozen runtime identity",
+    "organic source manifest still verifies",
+    "no runner world reload/reset after experimental tick 1",
+    "no duplicate dispatch key",
+    "no second actual actuation in one CARLA frame",
+    "ledger databases are readable",
+    "observation horizon does not force Closure",
+    "open relation processes are reported as right-censored"
+  ],
+  "overall_completion": "All six independent flows must reach VALID_COMPLETE for protocol-level COMPLETE.",
+  "g4_status": "BLOCKED_UNTIL_G3_ORGANIC_CARLA_01_RESULTS_ARE_VALIDATED"
+}
