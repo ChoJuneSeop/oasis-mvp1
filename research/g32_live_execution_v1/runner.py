@@ -12,6 +12,7 @@ from research.carla_v22_harness_v11.carla_runtime_adapter_v1 import (
 )
 from research.g32_live_execution_v1.episode import FrontRelationEpisodeManager
 from research.g32_live_execution_v1.live_core import LIVE_SENTINEL_UNIT
+from research.g32_live_execution_v1.live_history import LiveHistoryCommitter
 from research.integration_checkpoint.harness_adapter import (
     CorePortAdapter,
     IntegratedHarness,
@@ -36,10 +37,11 @@ def inert_resource_sentinel() -> ResourcePlan:
 
 
 class G32LiveSession:
-    """Minimal live CARLA host session over the frozen canonical runtime boundary.
+    """Live CARLA host session preserving the full G3.2 realization-history chain.
 
     The session validates but never guesses or mutates CARLA runtime settings.
     Scenario spawning and Traffic Manager policy remain separately frozen host concerns.
+    A realized front-relation process is admitted to history only after evaluator Closure.
     """
 
     def __init__(
@@ -50,6 +52,7 @@ class G32LiveSession:
         ego_actor: Any,
         core: Any,
         closure_evaluator: Any,
+        archive: Any,
     ):
         identity = validate_runtime_identity(runtime_identity(world, client))
         self.runtime = FrozenLiveRuntimeIdentity(identity=dict(identity))
@@ -61,6 +64,7 @@ class G32LiveSession:
         self.harness = IntegratedHarness(CorePortAdapter(core))
         self.core = core
         self.episodes = FrontRelationEpisodeManager(closure_evaluator)
+        self.history = LiveHistoryCommitter(core=core, archive=archive)
 
     def current_observation(self) -> PresentObservation:
         return PresentObservation.from_mapping(self.flow.present_observation())
@@ -91,8 +95,12 @@ class G32LiveSession:
             post_observation=observation,
             post_tau=tau,
         )
+        admission = None
+        if completed is not None:
+            admission = self.history.admit(completed, known_at_tau=tau)
         return {
             "tau": tau,
             "observation": observation,
             "completed_episode": completed,
+            "history_admission": admission,
         }
