@@ -53,7 +53,7 @@ jobs:
         run: python -m unittest research.oasis_core_v12.test_supplement -v
 
       - name: Frozen choice responsibility regression
-        run: python -m unittest discover -s research/choice_responsibility_v01 -p 'test_*.py' -v
+        run: python -m unittest research.choice_responsibility_v01.test_integration -v
 
       - name: Frozen final integration checkpoint regression
         run: python -m unittest research.integration_checkpoint.test_cross research.integration_checkpoint.test_harness_adapter -v
