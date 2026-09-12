@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Any
 
 from research.carla_v22_harness_v11.canonical_harness import PresentObservation
@@ -8,22 +7,19 @@ from research.carla_v22_harness_v11.carla_runtime_adapter_v1 import (
     CARLAPresentFlowPort,
     ControlledOracleObservationGateway,
     runtime_identity,
-    validate_runtime_identity,
 )
 from research.g32_live_execution_v1.episode import FrontRelationEpisodeManager
 from research.g32_live_execution_v1.ledger import LiveEvidenceLedger
 from research.g32_live_execution_v1.live_core import LIVE_SENTINEL_UNIT
 from research.g32_live_execution_v1.live_history import LiveHistoryCommitter
+from research.g32_live_execution_v1.runtime_freeze import (
+    freeze_runtime_identity_record,
+)
 from research.integration_checkpoint.harness_adapter import (
     CorePortAdapter,
     IntegratedHarness,
 )
 from research.oasis_core_v12.contracts import ResourcePlan
-
-
-@dataclass(frozen=True)
-class FrozenLiveRuntimeIdentity:
-    identity: dict[str, object]
 
 
 def inert_resource_sentinel() -> ResourcePlan:
@@ -40,10 +36,10 @@ def inert_resource_sentinel() -> ResourcePlan:
 class G32LiveSession:
     """Live CARLA host session preserving the full G3.2 realization-history chain.
 
-    The session validates but never guesses or mutates CARLA runtime settings.
-    Scenario spawning and Traffic Manager policy remain separately frozen host concerns.
-    A realized front-relation process is admitted to history only after evaluator Closure.
-    The append-only ledger observes provenance but is never an input to OASIS Core.
+    Runtime identity is captured, validated and immutably frozen before this session
+    can execute a decision. Scenario spawning and Traffic Manager policy remain
+    separately frozen host concerns. The append-only ledger observes provenance but
+    is never an input to OASIS Core.
     """
 
     def __init__(
@@ -56,9 +52,13 @@ class G32LiveSession:
         closure_evaluator: Any,
         archive: Any,
         ledger: LiveEvidenceLedger,
+        runtime_identity_path: Any,
     ):
-        identity = validate_runtime_identity(runtime_identity(world, client))
-        self.runtime = FrozenLiveRuntimeIdentity(identity=dict(identity))
+        captured_identity = runtime_identity(world, client)
+        self.runtime = freeze_runtime_identity_record(
+            captured_identity,
+            runtime_identity_path,
+        )
         self.client = client
         self.world = world
         self.ego_actor = ego_actor
