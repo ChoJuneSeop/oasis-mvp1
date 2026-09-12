@@ -22,7 +22,9 @@ jobs:
           python -m unittest research.oasis_core_v11.test_history_admission -v
           python -m unittest research.oasis_core_v11.test_carla_relational_domain -v
       - name: Run CARLA domain-policy admission tests
-        run: python -m unittest research.oasis_core_v11.test_carla_domain_policy_v1 -v
+        run: |
+          python -m unittest research.oasis_core_v11.test_carla_domain_policy_v1 -v
+          python -m unittest research.oasis_core_v11.test_carla_domain_bundle_v1 -v
       - name: Run canonical Harness v1.1 regression tests
         run: python -m unittest research.carla_v22_harness_v11.test_canonical_harness -v
       - name: Run G3.2 sidecar regression tests
@@ -60,6 +62,8 @@ jobs:
           sha256sum research/oasis_core_v11/current_relational_core.py
           sha256sum research/g3_2_sidecar/reconstruction.py
           sha256sum research/oasis_core_v11/carla_domain_policy_v1.py
+          sha256sum research/oasis_core_v11/carla_domain_bundle_v1.py
           sha256sum research/oasis_core_v11/test_carla_domain_policy_v1.py
+          sha256sum research/oasis_core_v11/test_carla_domain_bundle_v1.py
           sha256sum research/oasis_core_v11/carla_relational_domain.py
           sha256sum research/oasis_core_v11/history_admission.py
