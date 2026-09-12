@@ -1,0 +1,20 @@
+name: CARLA v2.2 recovery verification
+
+on:
+  push:
+    branches:
+      - recovery/carla-v22-harness-v1-evidence-constrained
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile reconstruction
+        run: python -m compileall -q research/carla_v22_recovery
+      - name: Run reconstruction tests
+        run: python -m unittest research.carla_v22_recovery.test_reconstructed_harness -v
