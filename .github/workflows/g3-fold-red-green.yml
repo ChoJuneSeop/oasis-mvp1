@@ -1,0 +1,16 @@
+name: G3 Fold Operator Regression
+
+on:
+  push:
+    branches: [feature/g3-three-layer-fold-v1]
+
+jobs:
+  regression:
+    runs-on: windows-latest
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m unittest research.g3_realtime_split_v1.test_fold_operator -v
