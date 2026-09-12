@@ -1,0 +1,53 @@
+name: OASIS G3.2 domain-policy v1 preflight
+
+on:
+  push:
+    branches:
+      - implementation/oasis-g32-domain-policy-v1
+  workflow_dispatch:
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile current Core, canonical harness and G3.2 sidecar
+        run: python -m compileall -q research/oasis_core_v11 research/carla_v22_harness_v11 research/g3_2_sidecar
+      - name: Run current Core regression tests
+        run: |
+          python -m unittest research.oasis_core_v11.test_current_relational_core -v
+          python -m unittest research.oasis_core_v11.test_history_admission -v
+          python -m unittest research.oasis_core_v11.test_carla_relational_domain -v
+      - name: Run canonical Harness v1.1 regression tests
+        run: python -m unittest research.carla_v22_harness_v11.test_canonical_harness -v
+      - name: Run G3.2 sidecar regression tests
+        run: |
+          python -m unittest research.g3_2_sidecar.test_runtime_extension -v
+          python -m unittest research.g3_2_sidecar.test_legacy_v1_compat -v
+      - name: Run full synthetic continuous-flow wiring test
+        run: python -m research.oasis_core_v11.synthetic_integrated_flow
+      - name: Verify relation operator remains blind to time and age
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          tree=ast.parse(Path('research/oasis_core_v11/current_relational_core.py').read_text())
+          calls=[]
+          for node in ast.walk(tree):
+              if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == 'relate':
+                  calls.append({kw.arg for kw in node.keywords})
+          assert calls
+          assert all(keys == {'current_relations','past','candidate_ids'} for keys in calls), calls
+          print('relation-operator-time-blind=PASS')
+          PY
+      - name: Record source SHA-256 after tau API correction
+        run: |
+          sha256sum research/carla_v22_harness_v11/canonical_harness.py
+          sha256sum research/oasis_core_v11/current_relational_core.py
+          sha256sum research/oasis_core_v11/test_current_relational_core.py
+          sha256sum research/oasis_core_v11/test_history_admission.py
+          sha256sum research/carla_v22_harness_v11/synthetic_dry_run.py
+          sha256sum research/carla_v22_harness_v11/test_canonical_harness.py
