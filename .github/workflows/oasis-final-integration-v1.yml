@@ -64,6 +64,36 @@ jobs:
             assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==manifest['source_sha256'][key], key
           print('g32-frozen-baseline=PASS')
           PY
+      - name: Verify final integration manifest
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          manifest=json.loads(Path('research/integration_checkpoint/FINAL_MANIFEST.json').read_text())
+          expected={
+            'v12_current_relational_core':'research/oasis_core_v12/current_relational_core.py',
+            'choice_responsibility_integration':'research/choice_responsibility_v01/integration.py',
+            'current_frame_compatibility':'research/integration_checkpoint/frame.py',
+            'selection_compatibility':'research/integration_checkpoint/selection.py',
+            'canonical_harness_adapter':'research/integration_checkpoint/harness_adapter.py',
+            'cross_lineage_test':'research/integration_checkpoint/test_cross.py',
+            'harness_adapter_test':'research/integration_checkpoint/test_harness_adapter.py',
+            'canonical_harness':'research/carla_v22_harness_v11/canonical_harness.py',
+            'carla_runtime_adapter':'research/carla_v22_harness_v11/carla_runtime_adapter_v1.py',
+            'independent_evaluator':'research/carla_v22_harness_v11/independent_evaluator_v1.py',
+          }
+          for key,path in expected.items():
+            actual=hashlib.sha256(Path(path).read_bytes()).hexdigest()
+            assert actual == manifest['source_sha256'][key], (key, actual, manifest['source_sha256'][key])
+          assert manifest['verification_conclusion'] == 'success'
+          assert manifest['unit_tests_passed'] == 101
+          assert manifest['no_post_result_retuning'] is True
+          assert manifest['experimental_evidence'] is False
+          assert manifest['recovery_lineage'] == 'READ_ONLY_EXCLUDED_FROM_RUNTIME_MERGE'
+          assert manifest['real_carla_execution'] == 'BLOCKED_UNTIL_LIVE_RUNTIME_IDENTITY_IS_CAPTURED_VALIDATED_AND_FROZEN'
+          assert manifest['g4'] == 'BLOCKED_UNTIL_G32_REAL_EXPERIMENT_VALIDATED'
+          print('final-integration-manifest=PASS')
+          PY
       - name: Record integrated source hashes
         run: |
           sha256sum research/oasis_core_v12/current_relational_core.py
