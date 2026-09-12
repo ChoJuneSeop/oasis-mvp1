@@ -5,6 +5,8 @@
   "pre_freeze_verified_commit": "0f139105358de2722696099afd9b2692aee9ebea",
   "core_sha256": "1ce3cafdd4da1fae5b481499d07ec2d5b7ab1c1830b82b6c59b915e0eb595bdb",
   "test_sha256": "caba2f278a92b0fc2d09d8a180fa98a38871c7fde88f610b5e6bc7428869f0b8",
+  "history_admission_sha256": "ca2ff54aea7b920d0f25f42c82c3be2c530f071264502a74db32ddcaa105d433",
+  "history_admission_test_sha256": "c646e6cdd23daf3e2b91778a939a4905340af6d1a01dbae4f2830dd6072ae940",
   "canonical_harness_branch": "implementation/carla-v22-harness-v1.1-canonical",
   "canonical_harness_source_sha256": "2549fd63c3aac03146c225ba4d32a86a9339acbdfce64f100f99a265d7147b4e",
   "g32_sidecar_source_commit": "c6982b728dc391aa160ea0bcb46652634690a709",
@@ -17,9 +19,13 @@
     "past relation cannot resurrect a non-current candidate",
     "reconstruction-added possibility requires current evidence",
     "individual distribution effect may be zero while joint effect is nonzero",
-    "responsibility remains U/I/V/T vector plus optional domain variables, not one scalar score"
+    "responsibility remains U/I/V/T vector plus optional domain variables, not one scalar score",
+    "only closed realized HistoryEntry outputs can be admitted as new historical relations",
+    "new relation completion time equals evidenced relation-process closure time",
+    "no-change/persistence outcome may still become completed history after closure",
+    "recency or memory-importance semantics are rejected from historical semantic context"
   ],
-  "scope": "Core orchestration and anti-lock-in invariants only; CARLA domain semantics and controller policy are not yet admitted",
+  "scope": "Core orchestration, anti-lock-in invariants, and completed-history admission only; CARLA domain semantics and controller policy are not yet admitted",
   "experimental_evidence": false,
   "real_carla_g32_execution": "BLOCKED_UNTIL_DOMAIN_OPERATORS_ARE_FROZEN"
 }
