@@ -18,3 +18,5 @@ jobs:
         run: python -m compileall -q research/carla_v22_recovery
       - name: Run reconstruction tests
         run: python -m unittest research.carla_v22_recovery.test_reconstructed_harness -v
+      - name: Record reconstructed source SHA-256
+        run: sha256sum research/carla_v22_recovery/reconstructed_harness.py
