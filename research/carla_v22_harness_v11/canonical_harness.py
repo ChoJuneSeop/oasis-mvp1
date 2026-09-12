@@ -80,47 +80,24 @@ class Realization:
 
 
 class PresentFlowPort(Protocol):
-    """Host-side CARLA adapter. The Core never receives this object."""
-
     def current_tau(self) -> float: ...
     def present_observation(self) -> Mapping[str, Any]: ...
     def current_reality(self) -> Mapping[str, Any]: ...
     def flow_fingerprint(self) -> str: ...
-    def apply_single_actuation(self, actuation: VehicleActuation) -> str:
-        """Apply exactly one real VehicleControl-equivalent actuation and return a realization ref."""
-        ...
+    def apply_single_actuation(self, actuation: VehicleActuation) -> str: ...
 
 
 class CanonicalCorePort(Protocol):
-    """OASIS Core boundary under Protocol v2.2.
-
-    Current flow time `tau` is passed explicitly. It must never be reconstructed from
-    epoch number or simulator delta. No CARLA world, map, raw actor, seed, trigger,
-    future trajectory or scenario label is passed through this interface.
-    """
-
     def open_epoch(self, observation: PresentObservation, tau: float) -> CoreEpochView: ...
-
-    def ablate_relation(
-        self,
-        observation: PresentObservation,
-        relation: RelationElementRef,
-        tau: float,
-    ) -> Mapping[str, float]: ...
-
-    def ablate_relation_group(
-        self,
-        observation: PresentObservation,
-        relations: Sequence[RelationElementRef],
-        tau: float,
-    ) -> Mapping[str, float]: ...
-
+    def ablate_relation(self, observation: PresentObservation, relation: RelationElementRef, tau: float) -> Mapping[str, float]: ...
+    def ablate_relation_group(self, observation: PresentObservation, relations: Sequence[RelationElementRef], tau: float) -> Mapping[str, float]: ...
     def realize(self, observation: PresentObservation, tau: float) -> Realization: ...
 
 
 @dataclass(frozen=True)
 class DecisionExecution:
     tau: float
+    realization_tau: float
     observation: PresentObservation
     recorder: G32EpochRecorder
     realization: Realization
@@ -130,11 +107,7 @@ class DecisionExecution:
 
 
 class CanonicalHarnessV11:
-    """Canonical Protocol-v2.2 harness.
-
-    Decision-time counterfactual probes are read-only. The host port is authoritative
-    for the continuous real flow and receives exactly one real actuation per epoch.
-    """
+    """Canonical Protocol-v2.2 harness with read-only probes and one real realization."""
 
     def __init__(self, core: CanonicalCorePort):
         self.core = core
@@ -173,9 +146,7 @@ class CanonicalHarnessV11:
 
         for reconstruction in view.reconstructions:
             if float(reconstruction.observed_at_tau) != tau:
-                raise HarnessInvariantError(
-                    "reconstruction observed_at_tau must equal current host flow tau"
-                )
+                raise HarnessInvariantError("reconstruction observed_at_tau must equal current host flow tau")
             sources = tuple(link.source for link in reconstruction.source_links)
             if len(sources) > 1:
                 group_ablated = self.core.ablate_relation_group(observation, sources, tau)
@@ -206,14 +177,17 @@ class CanonicalHarnessV11:
         realization_ref = flow.apply_single_actuation(realization.actuation)
         if not realization_ref:
             raise HarnessInvariantError("real actuation did not return a realization reference")
+        realization_tau = float(flow.current_tau())
+        if realization_tau < tau:
+            raise HarnessInvariantError("realization time cannot precede decision time")
 
-        after_realization = flow.flow_fingerprint()
         return DecisionExecution(
             tau=tau,
+            realization_tau=realization_tau,
             observation=observation,
             recorder=recorder,
             realization=realization,
             realization_ref=realization_ref,
             before_fingerprint=before,
-            after_realization_fingerprint=after_realization,
+            after_realization_fingerprint=flow.flow_fingerprint(),
         )
