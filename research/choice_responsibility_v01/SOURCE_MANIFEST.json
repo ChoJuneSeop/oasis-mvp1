@@ -1,0 +1,33 @@
+{
+  "process_id": "choice-responsibility-integration-v0.1",
+  "separate_process": true,
+  "experimental_evidence": false,
+  "parent_commit": "91f33ece689808bf85aa3220e3d42cd55b468980",
+  "preserved_sources": {
+    "research/oasis_core_v12/DESIGN_SUPPLEMENT.md": "7827791c17af7c9a5864bd701001065323d7e9accf1581537bef60692d70835d",
+    "research/oasis_core_v12/runtime.py": "64b35ef083af52c436920f6d7ce2dfb1ee7de4e41b945e4a75e85190aba3b06a",
+    "research/oasis_core_v12/verify_manifest.py": "3a2f0f1a108451083619b90c3d95ef15564cea83bb7b53e15955ea2ee1b14752",
+    "research/oasis_core_v12/history_admission.py": "bb5170fb30e259fadc44196871b14e15d3d843440f825a6d05db0435919704b3",
+    "research/oasis_core_v12/current_relational_core.py": "f75b6aa9881525adcedb98c6244cac16ca055d5d21e56691755479d2440e6839",
+    "research/oasis_core_v12/process_archive.py": "483b6d6ea327e001bf4b718cbd8c3d1fba56343e6491fc9ce7985be3f274c643",
+    "research/oasis_core_v12/test_supplement.py": "c4ef6414feb7c1a14622b850b7c039ab24416b72f8a9511a69665dcc1c64755a",
+    "research/oasis_core_v12/__init__.py": "c4aff035a7c3c6a6d96f82fc1d065c7ed12d8e112ccefcff0e62b38599abfe4a",
+    "research/oasis_core_v12/synthetic_integrated_flow.py": "93f8077f26f989ef24ce737284f12c1c802d05336df59feec91ee868177d423d",
+    "research/oasis_core_v12/README.md": "1b10b7f2f12deec4c0033e9bf02cf39d44284b1e821ea66fdac75d795c2448be",
+    "research/oasis_core_v12/VALIDATION.json": "7c201716af6139aa5a0e5b7ad9bfedd51ecd2a51ad56664b5f7225f28615fecb",
+    "research/oasis_core_v12/SOURCE_MANIFEST.json": "5aa17eab5cf1508187e21adda239fdebc90c0fbca7123d081db6701a74bea4b0",
+    "research/oasis_core_v12/contracts.py": "caa9f12bf04e2e90af62118716bb85d19ed23b929d54b2ab2a27d52c5041a2ad"
+  },
+  "integration_sources": {
+    ".github/workflows/oasis-choice-responsibility-v01.yml": "5c014300e06296f5bfaaf414639f916b69e56366982ce31958c86651f431384d",
+    "research/choice_responsibility_v01/README.md": "a181b8a5717876dcf528c91bffafe71969f121641106846f39affda99521052a",
+    "research/choice_responsibility_v01/VALIDATION.json": "dabf4c3885028c3978d1e71d785d9e5101d1c30af94c592ab6affdf18220c144",
+    "research/choice_responsibility_v01/__init__.py": "9ca470523401ace483838df2a8977d3d0f9ede22192d924ef1270b53e3ab9689",
+    "research/choice_responsibility_v01/example.py": "ebaf4ebe7bf265bced264c5c80564e3e62d4e3305bd1099a6d2db4089df9c026",
+    "research/choice_responsibility_v01/integration.py": "fe2d089e9b08f0b94dac053654383726292abd03493b016a878ed795a480792e",
+    "research/choice_responsibility_v01/runtime.py": "75f6db19b811910f2fb211d767a36b4be01a8321c2786ec70374ab61879d57e3",
+    "research/choice_responsibility_v01/test_integration.py": "98288e6e3ff12e0d7ad0540a7df7ecaec9aa17d9c6d42f538ec7bc59d2d8d627",
+    "research/choice_responsibility_v01/trajectory.py": "25182f933e5d6226f367aa8acb7fd1b9d8df8e1d265fc44b5343f8e2f124d8fd",
+    "research/choice_responsibility_v01/verify_manifest.py": "055cbb6489ba36f0d5773245ca2f94e06e7738747c9e5c8a6deaadacbbe39e32"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "date": "2026-09-12",
+  "classification": "software_contract_regression_not_experimental_evidence",
+  "tests": {
+    "legacy": 33,
+    "supplementary": 26,
+    "total": 59,
+    "failures": 0,
+    "errors": 0
+  },
+  "synthetic_wiring": {
+    "legacy": "PASS",
+    "supplementary": "PASS",
+    "actual_application_acknowledgements": 2,
+    "admitted_experiences": 1,
+    "next_epoch_reparticipation": true,
+    "late_observation_preserves_past_view": true
+  },
+  "experimental_evidence": false,
+  "real_carla_execution": "BLOCKED_UNTIL_DOMAIN_POLICY_ADMISSION"
+}
