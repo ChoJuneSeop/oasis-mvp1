@@ -1,0 +1,40 @@
+{
+  "bundle": "OASIS-CARLA G3.2 Domain Policy Bundle v1",
+  "branch": "implementation/oasis-g32-domain-policy-v1",
+  "verified_commit": "7b49d04afead155f7fdf4f3484d5c8c5d9de9bd4",
+  "verification_run_id": 34679212800,
+  "verification_conclusion": "success",
+  "protocol": "OASIS-CARLA Paper Validation Protocol v2.2",
+  "no_post_result_retuning": true,
+  "experimental_evidence": false,
+  "source_sha256": {
+    "canonical_harness": "efa46b55d3400640dceeca4b1e7f0c787fe1d2eeb9bbfe6b0facaec35c385158",
+    "current_relational_core": "a7a021cd1515a4860706b460711c387b38afcd43750899170397f7977106715d",
+    "g32_reconstruction_schema": "a9c2d08a6204e4c1e87f867fb277893b271dcc173545bf1d64a1ca19f6db7261",
+    "carla_domain_policy": "c349f06afb0a689ab451fcc582408349586dd90f7a6668afd0c52940d17cbe36",
+    "carla_domain_bundle": "0c4c37e73b497d2e92e99048f8a1fd8b7be02732ba52e5a4372ba38c13862471",
+    "carla_domain_policy_tests": "a87648369daaad980319a90ed0399d243e5bd6b66625041dcd24293d77646aa6",
+    "carla_domain_bundle_tests": "985f50e5802b4f2ef2bc7faea7be6bc33e7a878b7405136a6f812eae8bd55ffe",
+    "carla_relational_domain": "f3ecb97a9b4c4dcfbfcd5a0ed8c664a2ea5b023ee08260f682c487cfa9d9b705",
+    "history_admission": "ca2ff54aea7b920d0f25f42c82c3be2c530f071264502a74db32ddcaa105d433"
+  },
+  "controller_implementation_values": {
+    "note": "low-level actuation coefficients only; they are not OASIS memory/participation/reconstruction semantic thresholds",
+    "continue_throttle": 0.18,
+    "align_throttle": 0.12,
+    "heading_gain": 0.04,
+    "yield_speed_gain": 0.35,
+    "yield_closing_gain": 0.55
+  },
+  "fixed_scientific_boundaries": [
+    "authoritative current tau is supplied by host flow and never inferred from epoch",
+    "relation participation operator receives no tau, age, recency or completion timestamp",
+    "unmeasured reconstruction distribution effect is null, not numeric zero",
+    "responsibility remains U/I/V/T vector and is not collapsed to one score",
+    "choice uses Pareto non-domination before current possibility distribution",
+    "actuation operator has no memory/provenance input",
+    "relation-process closure has no universal timeout/distance/frame threshold",
+    "multi-source reconstruction requires a matching joint ablation probe"
+  ],
+  "real_carla_execution": "BLOCKED_UNTIL_RUNTIME_ADAPTERS_AND_RUNTIME_IDENTITY_ARE_FROZEN"
+}
