@@ -38,10 +38,7 @@ class GoodExtractor:
                     entry.entry_id,
                     "rel-closed-approach",
                     entry.relation_end_tau,
-                    {
-                        "origin_entry_id": entry.entry_id,
-                        "closure_method": entry.closure_method,
-                    },
+                    {"origin_entry_id": entry.entry_id, "closure_method": entry.closure_method},
                 ),
                 semantic=PastRelationSemanticView(
                     subject_role="ego-role",
@@ -64,8 +61,7 @@ class HistoryAdmissionTests(unittest.TestCase):
         records = bridge.admit(closed_entry())
         self.assertEqual(len(records), 1)
         self.assertEqual(len(core.history_records()), 1)
-
-        next_view = core.open_epoch(observation())
+        next_view = core.open_epoch(observation(), 10.25)
         key = ("E-new", "rel-closed-approach")
         self.assertIn(key, next_view.role_trace_by_relation)
         self.assertIn("yield", next_view.generated_by_relation[key])
@@ -80,18 +76,7 @@ class HistoryAdmissionTests(unittest.TestCase):
         class WrongIdExtractor(GoodExtractor):
             def extract(self, entry):
                 record = super().extract(entry)[0]
-                return (
-                    HistoricalRelationRecord(
-                        source=RelationElementRef(
-                            "different-entry",
-                            record.source.relation_element_id,
-                            entry.relation_end_tau,
-                            {},
-                        ),
-                        semantic=record.semantic,
-                    ),
-                )
-
+                return (HistoricalRelationRecord(source=RelationElementRef("different-entry", record.source.relation_element_id, entry.relation_end_tau, {}), semantic=record.semantic),)
         with self.assertRaises(HistoryAdmissionError):
             HistoryAdmissionBridge(make_core(()), WrongIdExtractor()).admit(closed_entry())
 
@@ -99,18 +84,7 @@ class HistoryAdmissionTests(unittest.TestCase):
         class WrongTimeExtractor(GoodExtractor):
             def extract(self, entry):
                 record = super().extract(entry)[0]
-                return (
-                    HistoricalRelationRecord(
-                        source=RelationElementRef(
-                            entry.entry_id,
-                            record.source.relation_element_id,
-                            entry.relation_end_tau - 0.05,
-                            {},
-                        ),
-                        semantic=record.semantic,
-                    ),
-                )
-
+                return (HistoricalRelationRecord(source=RelationElementRef(entry.entry_id, record.source.relation_element_id, entry.relation_end_tau - 0.05, {}), semantic=record.semantic),)
         with self.assertRaises(HistoryAdmissionError):
             HistoryAdmissionBridge(make_core(()), WrongTimeExtractor()).admit(closed_entry())
 
@@ -133,15 +107,12 @@ class HistoryAdmissionTests(unittest.TestCase):
                         ),
                     ),
                 )
-
         with self.assertRaises(HistoryAdmissionError):
             HistoryAdmissionBridge(make_core(()), RecencyExtractor()).admit(closed_entry())
 
     def test_empty_relation_extraction_is_not_saved_as_fake_experience(self):
         class EmptyExtractor:
-            def extract(self, entry):
-                return ()
-
+            def extract(self, entry): return ()
         with self.assertRaises(HistoryAdmissionError):
             HistoryAdmissionBridge(make_core(()), EmptyExtractor()).admit(closed_entry())
 
