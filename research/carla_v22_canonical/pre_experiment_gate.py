@@ -12,11 +12,17 @@ HARNESS_PATH = Path(__file__).with_name("harness_v1_1.py")
 
 
 @dataclass(frozen=True)
+class SourceIdentity:
+    path: Optional[str] = None
+    sha256_hex: Optional[str] = None
+
+
+@dataclass(frozen=True)
 class RuntimeIdentity:
-    carla_host_source_sha256: Optional[str] = None
-    oasis_core_adapter_source_sha256: Optional[str] = None
-    observation_gateway_source_sha256: Optional[str] = None
-    evaluator_source_sha256: Optional[str] = None
+    carla_host: SourceIdentity = SourceIdentity()
+    oasis_core_adapter: SourceIdentity = SourceIdentity()
+    observation_gateway: SourceIdentity = SourceIdentity()
+    evaluator: SourceIdentity = SourceIdentity()
 
 
 @dataclass(frozen=True)
@@ -28,6 +34,20 @@ class GateReport:
 
 def _file_sha256(path: Path) -> str:
     return sha256(path.read_bytes()).hexdigest()
+
+
+def _verify_source(name: str, identity: SourceIdentity) -> tuple[bool, str]:
+    if not identity.path or not identity.sha256_hex:
+        return False, f"{name} source path/SHA-256 is not frozen"
+    if len(identity.sha256_hex) != 64:
+        return False, f"{name} SHA-256 is malformed"
+    path = Path(identity.path)
+    if not path.is_file():
+        return False, f"{name} source file does not exist: {identity.path}"
+    actual = _file_sha256(path)
+    if actual != identity.sha256_hex:
+        return False, f"{name} source drift: {actual} != {identity.sha256_hex}"
+    return True, f"{name} source file matches frozen SHA-256"
 
 
 def pre_experiment_gate(identity: RuntimeIdentity) -> GateReport:
@@ -47,19 +67,19 @@ def pre_experiment_gate(identity: RuntimeIdentity) -> GateReport:
     violations.extend(policy.violations)
 
     required = {
-        "CARLA host port": identity.carla_host_source_sha256,
-        "OASIS core adapter": identity.oasis_core_adapter_source_sha256,
-        "Observation Gateway": identity.observation_gateway_source_sha256,
-        "Independent Evaluator": identity.evaluator_source_sha256,
+        "CARLA host port": identity.carla_host,
+        "OASIS core adapter": identity.oasis_core_adapter,
+        "Observation Gateway": identity.observation_gateway,
+        "Independent Evaluator": identity.evaluator,
     }
-    for name, value in required.items():
-        if value and len(value) == 64:
-            checks.append(f"{name} source identity supplied")
-        else:
-            violations.append(f"{name} source SHA-256 is not frozen")
+    for name, source in required.items():
+        ok, message = _verify_source(name, source)
+        (checks if ok else violations).append(message)
 
     if violations:
-        violations.append("CARLA G3.2 execution is blocked until every runtime source identity is frozen")
+        violations.append(
+            "CARLA G3.2 execution is blocked until every runtime source file is present and hash-verified"
+        )
 
     return GateReport(not violations, tuple(checks), tuple(violations))
 
