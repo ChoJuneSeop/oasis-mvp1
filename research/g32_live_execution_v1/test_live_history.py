@@ -14,13 +14,64 @@ from research.oasis_core_v12.process_archive import ProcessArchive
 
 
 class LiveHistoryTests(unittest.TestCase):
-    def test_closure_admission_ledger_and_later_reparticipation(self):
-        core = build_core(available_work=1.0)
-        flow = Flow()
-        execution = IntegratedHarness(CorePortAdapter(core)).execute_decision_epoch(
+    def execute(self, core, flow):
+        return IntegratedHarness(CorePortAdapter(core)).execute_decision_epoch(
             flow,
             resources=inert_resource_sentinel(),
         )
+
+    def test_multiple_decision_epochs_can_remain_pending_until_one_relation_closure(self):
+        core = build_core()
+        manager = FrontRelationEpisodeManager(
+            build_domain_bundle().closure_evaluator
+        )
+        flow1 = Flow()
+        first = self.execute(core, flow1)
+        self.assertTrue(
+            manager.begin(first, decision_responsibility=core.responsibility_record())
+        )
+
+        flow2 = Flow()
+        flow2.tau = 10.05
+        second = self.execute(core, flow2)
+        self.assertTrue(
+            manager.begin(second, decision_responsibility=core.responsibility_record())
+        )
+        self.assertEqual(manager.pending_count, 2)
+
+        opened = manager.observe_post(
+            post_observation=second.observation,
+            post_tau=10.10,
+        )
+        self.assertEqual(opened, ())
+        self.assertEqual(manager.pending_count, 2)
+
+        o = second.observation
+        closed_observation = PresentObservation(
+            o.epoch + 1,
+            o.ego_speed_mps,
+            False,
+            0.0,
+            0.0,
+            "none",
+            o.local_heading_error_deg,
+            o.local_density,
+        )
+        completed = manager.observe_post(
+            post_observation=closed_observation,
+            post_tau=10.20,
+        )
+        self.assertEqual(len(completed), 2)
+        self.assertEqual(manager.pending_count, 0)
+        self.assertEqual(
+            {x.record.history_entry.realization_count for x in completed},
+            {1},
+        )
+
+    def test_closure_admission_ledger_and_later_reparticipation(self):
+        core = build_core(available_work=1.0)
+        flow = Flow()
+        execution = self.execute(core, flow)
         responsibility = core.responsibility_record()
         manager = FrontRelationEpisodeManager(
             build_domain_bundle().closure_evaluator
@@ -36,7 +87,7 @@ class LiveHistoryTests(unittest.TestCase):
             post_observation=execution.observation,
             post_tau=10.1,
         )
-        self.assertIsNone(opened)
+        self.assertEqual(opened, ())
         self.assertTrue(manager.active)
 
         o = execution.observation
@@ -54,8 +105,9 @@ class LiveHistoryTests(unittest.TestCase):
             post_observation=closed_observation,
             post_tau=10.2,
         )
-        self.assertIsNotNone(completed)
+        self.assertEqual(len(completed), 1)
         self.assertFalse(manager.active)
+        completed_episode = completed[0]
 
         with tempfile.TemporaryDirectory() as tmp:
             archive = ProcessArchive(f"{tmp}/process.sqlite")
@@ -73,10 +125,10 @@ class LiveHistoryTests(unittest.TestCase):
             ledger.record_decision(execution, responsibility)
 
             admission = LiveHistoryCommitter(core=core, archive=archive).admit(
-                completed,
+                completed_episode,
                 known_at_tau=10.2,
             )
-            ledger.record_closure_admission(completed, admission)
+            ledger.record_closure_admission(completed_episode, admission)
             self.assertEqual(len(admission.admitted_relation_keys), 1)
             self.assertGreater(len(admission.unresolved), 0)
             self.assertEqual(len(core.history_envelopes()), 1)
