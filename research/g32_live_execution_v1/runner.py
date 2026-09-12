@@ -11,6 +11,7 @@ from research.carla_v22_harness_v11.carla_runtime_adapter_v1 import (
     validate_runtime_identity,
 )
 from research.g32_live_execution_v1.episode import FrontRelationEpisodeManager
+from research.g32_live_execution_v1.ledger import LiveEvidenceLedger
 from research.g32_live_execution_v1.live_core import LIVE_SENTINEL_UNIT
 from research.g32_live_execution_v1.live_history import LiveHistoryCommitter
 from research.integration_checkpoint.harness_adapter import (
@@ -42,6 +43,7 @@ class G32LiveSession:
     The session validates but never guesses or mutates CARLA runtime settings.
     Scenario spawning and Traffic Manager policy remain separately frozen host concerns.
     A realized front-relation process is admitted to history only after evaluator Closure.
+    The append-only ledger observes provenance but is never an input to OASIS Core.
     """
 
     def __init__(
@@ -53,6 +55,7 @@ class G32LiveSession:
         core: Any,
         closure_evaluator: Any,
         archive: Any,
+        ledger: LiveEvidenceLedger,
     ):
         identity = validate_runtime_identity(runtime_identity(world, client))
         self.runtime = FrozenLiveRuntimeIdentity(identity=dict(identity))
@@ -65,6 +68,8 @@ class G32LiveSession:
         self.core = core
         self.episodes = FrontRelationEpisodeManager(closure_evaluator)
         self.history = LiveHistoryCommitter(core=core, archive=archive)
+        self.ledger = ledger
+        self.ledger.freeze_runtime_identity(self.runtime.identity)
 
     def current_observation(self) -> PresentObservation:
         return PresentObservation.from_mapping(self.flow.present_observation())
@@ -77,6 +82,7 @@ class G32LiveSession:
             resources=inert_resource_sentinel(),
         )
         responsibility = self.core.responsibility_record()
+        self.ledger.record_decision(execution, responsibility)
         started = self.episodes.begin(
             execution,
             decision_responsibility=responsibility,
@@ -98,6 +104,7 @@ class G32LiveSession:
         admission = None
         if completed is not None:
             admission = self.history.admit(completed, known_at_tau=tau)
+            self.ledger.record_closure_admission(completed, admission)
         return {
             "tau": tau,
             "observation": observation,
