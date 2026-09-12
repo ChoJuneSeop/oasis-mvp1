@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-"""Self-verifying entrypoint for G3-ORGANIC-CARLA-01.
+"""Self-verifying gated entrypoint for G3-ORGANIC-CARLA-01.
 
 Use this module for empirical execution. It verifies the frozen experiment source
-manifest before importing and delegating to the live runner.
+manifest before importing and delegating to the pre-first-tick gated runner.
 """
 
 from hashlib import sha256
@@ -27,6 +27,10 @@ def verify_experiment_manifest() -> dict:
         raise CoreV11InvariantError("experiment manifest lost no-retuning guard")
     if manifest.get("experimental_evidence") is not False:
         raise CoreV11InvariantError("source manifest must not be labeled empirical evidence")
+    if manifest.get("pre_first_tick_hold") is not True:
+        raise CoreV11InvariantError("experiment manifest lost pre-first-tick hold")
+    if manifest.get("tm_independent_readback_claimed") is not False:
+        raise CoreV11InvariantError("unsupported Traffic Manager readback claim")
     expected = {str(k): str(v) for k, v in manifest["source_sha256"].items()}
     for relative, expected_hash in sorted(expected.items()):
         path = REPO_ROOT / relative
@@ -46,8 +50,8 @@ def verify_experiment_manifest() -> dict:
 
 def main(argv: list[str] | None = None) -> int:
     verify_experiment_manifest()
-    from research.g3_organic_carla_01.live_runner import main as live_main
-    return live_main(argv)
+    from research.g3_organic_carla_01.gated_runner import main as gated_main
+    return gated_main(argv)
 
 
 if __name__ == "__main__":
