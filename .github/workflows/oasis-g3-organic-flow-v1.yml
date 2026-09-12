@@ -1,0 +1,62 @@
+name: OASIS G3 Organic Flow v1
+
+on:
+  push:
+    branches:
+      - integration/oasis-g3-organic-flow-v1
+  pull_request:
+    branches:
+      - integration/oasis-g32-choice-responsibility-final
+
+jobs:
+  organic-flow-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guard frozen baseline bytes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import subprocess
+          BASE = "5ccccc1fe9e3b25305ab2f133fd8cb0e63d1c954"
+          allowed_prefix = "research/g3_organic_flow_v1/"
+          allowed_exact = {".github/workflows/oasis-g3-organic-flow-v1.yml"}
+          changed = subprocess.check_output(
+              ["git", "diff", "--name-only", BASE, "HEAD"], text=True
+          ).splitlines()
+          forbidden = [
+              p for p in changed
+              if p not in allowed_exact and not p.startswith(allowed_prefix)
+          ]
+          if forbidden:
+              raise SystemExit("Frozen baseline path changed: " + ", ".join(forbidden))
+          print("baseline_guard=PASS")
+          print("changed_paths=", changed)
+          PY
+
+      - name: Compile organic integration
+        run: python -m compileall -q research/g3_organic_flow_v1
+
+      - name: Organic integration tests
+        run: python -m unittest research.g3_organic_flow_v1.test_organic_flow -v
+
+      - name: Frozen G3.2 sidecar regression
+        run: python -m unittest discover -s research/g3_2_sidecar -p 'test_*.py' -v
+
+      - name: Frozen OASIS Core v1.1 regression
+        run: python -m unittest discover -s research/oasis_core_v11 -p 'test_*.py' -v
+
+      - name: Frozen OASIS Core v1.2 regression
+        run: python -m unittest discover -s research/oasis_core_v12 -p 'test_*.py' -v
+
+      - name: Frozen choice responsibility regression
+        run: python -m unittest discover -s research/choice_responsibility_v01 -p 'test_*.py' -v
+
+      - name: Frozen final integration checkpoint regression
+        run: python -m unittest discover -s research/integration_checkpoint -p 'test_*.py' -v
+
+      - name: Frozen canonical CARLA harness regression
+        run: python -m unittest discover -s research/carla_v22_harness_v11 -p 'test_*.py' -v
