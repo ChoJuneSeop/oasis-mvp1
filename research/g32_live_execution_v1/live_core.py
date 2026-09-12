@@ -79,4 +79,4 @@ class LiveIntegratedChoiceCore(IntegratedChoiceCore):
     def live_resource_plan(self):
         if self._last_live_resource_plan is None:
             raise CoreV11InvariantError("no live resource plan has been constructed")
-        return deepcopy(self._last_live_resource_plan()
+        return deepcopy(self._last_live_resource_plan)
