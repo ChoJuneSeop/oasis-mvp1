@@ -3,10 +3,10 @@
   "baseline_commit": "5ccccc1fe9e3b25305ab2f133fd8cb0e63d1c954",
   "organic_source_snapshot_commit": "343dd3aa220537ad3dab2e8bb11c7a93a50378a5",
   "organic_governance_commit": "950c8bfd7c7e1ce1ce6eb412665732e333996e22",
-  "experiment_source_snapshot_commit": "d6d8e38ce747a62577e692cc1e4f5bd0de974127",
+  "experiment_source_snapshot_commit": "152b7673874320298ce30385fc24cb0d4a175139",
   "preregistration_sha256": "2bb2aeac8c649d9b4fd11f12269fc695bf89272d012f81079ac3fd0b817bd66f",
-  "source_snapshot_validation_run_id": 34696422529,
-  "source_snapshot_validation_conclusion": "success",
+  "source_snapshot_validation_run_id": null,
+  "source_snapshot_validation_conclusion": "PENDING_REFREEZE_CI",
   "no_post_result_retuning": true,
   "experimental_evidence": false,
   "pre_first_tick_hold": true,
@@ -23,6 +23,6 @@
     "research/g3_organic_carla_01/protocol.py": "005e9d07f0bacf3389bdfaf5973400f76364ac90e6c672a1d334b5fbe8934677",
     "research/g3_organic_carla_01/release_gate.py": "6253616dc03a9a0af0487bb02a5bf31eb73e6c424eb7adb81efd5d6da7f34c72",
     "research/g3_organic_carla_01/run_audit.py": "edfc1be48dd93774f9913b9cc919ccf2e542c364c78c6dc3f507af385363c032",
-    "research/g3_organic_carla_01/test_live_runner.py": "2bc28f2381870264b7c272e09bd57457ff434143127722c7ba1bf21e6d5728e3"
+    "research/g3_organic_carla_01/test_live_runner.py": "5897e3da933c87f0f90e08518d66f37ff2956431c730a7bddcd8a8af352cef5a"
   }
 }
