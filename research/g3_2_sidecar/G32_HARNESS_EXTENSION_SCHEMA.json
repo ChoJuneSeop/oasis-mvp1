@@ -1,0 +1,60 @@
+{
+  "schema": "OASIS-CARLA G3.2 sidecar extension v0.1",
+  "preserve_existing_harness": true,
+  "epoch_record": {
+    "tau": "current decision epoch time",
+    "flow_fingerprint": "hash covering real CARLA flow plus decision-core state",
+    "current_reality": "only observation fields already authorized by protocol v2.2",
+    "relation_elements": [
+      {
+        "experience_id": "completed experience identifier",
+        "relation_element_id": "element identifier inside the completed experience",
+        "completed_at_tau": "completion anchor time",
+        "relation_descriptor": "relational/process description, not absolute-coordinate identity"
+      }
+    ],
+    "possibility_distribution": "current possibility distribution before real realization",
+    "relation_element_probes": [
+      {
+        "relation_element_id": "one past relation element",
+        "before_hash": "real-flow fingerprint before internal probe",
+        "after_hash": "real-flow fingerprint after internal probe",
+        "relation_ablated_distribution": "same current decision with only this relation element withheld internally",
+        "role_trace": "dynamic role descriptors in the current judgment",
+        "generated_possibilities": "possibilities whose construction used this relation element"
+      }
+    ],
+    "reconstruction": [
+      {
+        "possibility_id": "current possibility identifier",
+        "source_relation_element_ids": "provenance links",
+        "recombination": {"value": "continuous observation", "method": "measurement method", "evidence": "structural evidence"},
+        "role_transformation": {"value": "continuous observation", "method": "measurement method", "evidence": "structural evidence"},
+        "structural_transformation": {"value": "continuous observation", "method": "measurement method", "evidence": "structural evidence"},
+        "relation_graph_before": "source relational structure",
+        "relation_graph_after": "current reconstructed relational structure"
+      }
+    ],
+    "post_realization": {
+      "selected_possibility_id": "the single selected possibility",
+      "realization_ref": "reference to the one real applied action for the epoch",
+      "realization_count": 1,
+      "outcome_tau": "time of observed post-realization outcome",
+      "outcome_description": "change, persistence, no-change, failure, or other observed result",
+      "relation_end_tau": "time relation-process closure is observed",
+      "closure_method": "evidence method for relation-process closure, not a fixed duration threshold",
+      "closure_evidence": "observed evidence",
+      "provenance": "relation-element genealogy copied from decision-time participation and reconstruction"
+    }
+  },
+  "forbidden": [
+    "recency decay as relevance",
+    "binary selected/rejected memory gate as primary evaluation",
+    "fixed participation threshold",
+    "fixed reconstruction threshold",
+    "fixed closure duration/distance/frame count",
+    "future state or outcome leakage into decision-time calculation",
+    "counterfactual probe that changes or advances the real flow",
+    "collapse of reconstruction axes into one memory score"
+  ]
+}
