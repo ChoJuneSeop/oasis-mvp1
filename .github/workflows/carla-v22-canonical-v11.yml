@@ -20,5 +20,12 @@ jobs:
         run: python -m unittest research.carla_v22_canonical.validation_v1_1 -v
       - name: Run G3.2 sidecar regression
         run: python -m unittest research.g3_2_sidecar.test_runtime_extension research.g3_2_sidecar.test_legacy_v1_compat -v
+      - name: Verify real-CARLA gate fails closed until runtime sources are frozen
+        run: |
+          set +e
+          python -m research.carla_v22_canonical.pre_experiment_gate
+          code=$?
+          set -e
+          test "$code" -eq 2
       - name: Record Harness v1.1 SHA-256
         run: sha256sum research/carla_v22_canonical/harness_v1_1.py
