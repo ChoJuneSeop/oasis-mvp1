@@ -103,7 +103,6 @@ class ThreeLayerTests(unittest.TestCase):
         self.assertIsInstance(actual.execution.recorder, DeferredProbes)
         self.assertEqual(actual.selected, expected.selected)
         self.assertEqual(actual.responsibility_record, expected.responsibility_record)
-        # Mutating the parent after submission must not alter the child recorder.
         actual.responsibility_record["after_submit_mutation"] = True
         self.post(flow)
         health = self.worker.drain(10)
@@ -144,7 +143,7 @@ class ThreeLayerTests(unittest.TestCase):
         self.assertGreater(health.validation_max_processing_seconds, 0.2)
         self.assertGreaterEqual(health.validation_max_backlog, 1)
 
-    def test_validation_failure_keeps_action_but_fails_completeness(self):
+    def test_validation_failure_keeps_action_and_relation_but_fails_completeness(self):
         seed_history(self.core, self.closure, self.root)
         self.core.relation_operator = ChildOnlyRelationOperator(self.core.relation_operator, fail=True)
         harness = self.start()
@@ -153,11 +152,13 @@ class ThreeLayerTests(unittest.TestCase):
         self.post(flow)
         with self.assertRaises(DeferredWorkerError):
             self.worker.drain(10)
-        flow.epoch, flow.tau = 201, 10.2
-        self.assertTrue(self.decide(harness, flow).realized)
         health = self.worker.health()
         self.assertTrue(health.degraded)
-        self.assertEqual(health.closures_committed, 0)
+        self.assertTrue(health.validation_degraded)
+        self.assertFalse(health.relation_degraded)
+        self.assertEqual(health.closures_committed, 1)
+        flow.epoch, flow.tau = 201, 10.2
+        self.assertTrue(self.decide(harness, flow).realized)
         self.assertFalse(harness.metrics["validation_submission_accepted"])
 
     def test_relation_failure_and_hard_exit_are_detected(self):
@@ -167,7 +168,11 @@ class ThreeLayerTests(unittest.TestCase):
         self.post(flow)
         with self.assertRaises(DeferredWorkerError):
             self.worker.drain(10)
-        self.assertTrue(self.worker.health().degraded)
+        health = self.worker.health()
+        self.assertTrue(health.degraded)
+        self.assertTrue(health.relation_degraded)
+        self.assertFalse(health.validation_degraded)
+        self.assertGreaterEqual(health.validation_processed_events, 2)
         self.worker.close()
         self.worker = None
         harness = self.start()
@@ -175,7 +180,10 @@ class ThreeLayerTests(unittest.TestCase):
         self.worker._validation.join(2)
         flow.epoch, flow.tau = 201, 10.2
         self.assertTrue(self.decide(harness, flow).realized)
-        self.assertTrue(self.worker.health().degraded)
+        health = self.worker.health()
+        self.assertTrue(health.degraded)
+        self.assertTrue(health.validation_degraded)
+        self.assertFalse(health.relation_degraded)
 
     def test_snapshot_corruption_rejected_before_history(self):
         harness = self.start()
@@ -205,8 +213,6 @@ class ThreeLayerTests(unittest.TestCase):
         self.worker.close(timeout=0.1)
         self.worker = None
         harness = self.start()
-        # Lambda is deliberately not transportable; the failure must be reported
-        # synchronously by submission bookkeeping, never silently by the feeder.
         self.assertFalse(self.worker.submit_begin(lambda: None))
         self.assertIn("serialization", self.worker.health().fatal_error)
         self.worker.close(timeout=0.1)
