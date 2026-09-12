@@ -1,0 +1,57 @@
+{
+  "recovery_status": "evidence_constrained_reconstruction",
+  "source_artifact": "integrity_report_20260911_014331.json",
+  "protocol": "OASIS-CARLA Paper Validation Protocol v2.2",
+  "harness": "OASIS-CARLA Paper Validation Harness v1.0",
+  "original_core_sha256": "cbe905fbda1eba5c85a97aa5942f8aa06444f32d9348fc93f87d7ba3912719d7",
+  "run": {
+    "started": "2026-09-11T01:43:31.481577",
+    "finished": "2026-09-11T01:43:59.743335",
+    "carla_map": "Town10HD_Opt",
+    "fixed_delta_seconds": 0.05,
+    "no_rendering_mode": true,
+    "replay_epochs": 220
+  },
+  "observation_fields": [
+    "epoch",
+    "ego_speed_mps",
+    "front_present",
+    "front_gap_m",
+    "front_closing_mps",
+    "front_kind",
+    "local_heading_error_deg",
+    "local_density"
+  ],
+  "interventions": [
+    "FULL",
+    "NO_REACTIVATION",
+    "TIME_CENSORED",
+    "FIXED_RESPONSIBILITY"
+  ],
+  "known_experience_keys": [
+    "E-old-neutral",
+    "E-mid-pedestrian",
+    "E-recent-opening",
+    "E-old-closing"
+  ],
+  "gates": {
+    "G1": {"pass": true, "epochs": 220, "violations": 0},
+    "G2": {"pass": true, "prohibited_hits": [], "approved_exact_match": true},
+    "G3": {"pass": true, "checks": 20, "violations": 0},
+    "G4": {
+      "pass": false,
+      "tolerances": {"trajectory_m": 0.03, "speed_mps": 0.03, "control": 1e-12},
+      "max_position_delta_m": 0.3633367528593651,
+      "max_speed_delta_mps": 0.3158935148856876,
+      "max_control_delta": 0.412489764764905
+    }
+  },
+  "identity_claim": "NOT byte-for-byte recovered",
+  "unknowns": [
+    "exact original decision-core source",
+    "exact responsibility formula",
+    "exact reactivation implementation",
+    "exact observation-to-control policy",
+    "unlogged CARLA spawning and replay details"
+  ]
+}
