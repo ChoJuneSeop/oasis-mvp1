@@ -1,0 +1,20 @@
+name: G3.2 sidecar tests
+
+on:
+  push:
+    branches:
+      - experiment/g32-participation-reconstruction-provenance
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile sidecar
+        run: python -m compileall -q research/g3_2_sidecar
+      - name: Run regression tests
+        run: python -m unittest discover -s research/g3_2_sidecar -p 'test_*.py' -v
