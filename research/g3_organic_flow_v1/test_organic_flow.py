@@ -45,18 +45,14 @@ class Flow:
         self.state = 0
         self.applied = 0
         self.keys = set()
-        self.mutate_on_second_observation = False
-        self.observation_reads = 0
+        self.capture_count = 0
+        self.mutate_on_capture_number = None
         self.fail_after_apply = False
 
     def current_tau(self):
         return self.tau
 
     def present_observation(self):
-        self.observation_reads += 1
-        if self.mutate_on_second_observation and self.observation_reads == 2:
-            self.state += 1
-            self.heading = -0.15
         return {
             "epoch": self.epoch,
             "ego_speed_mps": 4.0,
@@ -68,16 +64,27 @@ class Flow:
             "local_density": 2,
         }
 
-    def current_reality(self):
-        return {"fixture": "current", "state": self.state}
-
     def flow_fingerprint(self):
         raw = f"{self.epoch}:{self.tau}:{self.state}:{self.heading}:{self.front_present}"
         return hashlib.sha256(raw.encode()).hexdigest()
 
+    def capture(self):
+        self.capture_count += 1
+        if self.mutate_on_capture_number == self.capture_count:
+            self.state += 1
+            self.heading = -0.15
+        observation = PresentObservation.from_mapping(self.present_observation())
+        return current_frame_from_host(
+            observation,
+            tau=self.tau,
+            revision=self.flow_fingerprint(),
+        )
+
     def apply_if_current(self, realization, *, expected_revision, idempotency_key):
         if expected_revision != self.flow_fingerprint():
-            return ApplicationReceipt(False, self.tau, reason="premises changed at atomic apply")
+            return ApplicationReceipt(
+                False, self.tau, reason="premises changed at atomic apply"
+            )
         if idempotency_key in self.keys:
             raise AssertionError("duplicate atomic application")
         self.keys.add(idempotency_key)
@@ -160,7 +167,9 @@ class OrganicFlowTests(unittest.TestCase):
             candidate_provider=base.candidate_provider,
             relation_operator=base.relation_operator,
             reconstruction_operator=base.reconstruction_operator,
-            responsibility_operator=V12ResponsibilityEvidenceAdapter(base.responsibility_operator),
+            responsibility_operator=V12ResponsibilityEvidenceAdapter(
+                base.responsibility_operator
+            ),
             actuation_operator=base.actuation_operator,
         )
         journal = ExecutionJournal(":memory:")
@@ -171,41 +180,51 @@ class OrganicFlowTests(unittest.TestCase):
         self.assertLess(events.index("assessment"), events.index("allocation"))
         self.assertLess(events.index("allocation"), events.index("verification"))
         record = result.responsibility_record
-        self.assertEqual(record["organic_process_id"], "oasis-g3-organic-flow-v1")
+        self.assertEqual(
+            record["organic_process_id"], "oasis-g3-organic-flow-v1"
+        )
         self.assertTrue(record["possibility_scope"]["open_world_not_exhaustive"])
         journal.close()
+
+    def test_atomic_capture_binds_observation_tau_revision_and_evidence(self):
+        flow = Flow()
+        frame = flow.capture()
+        self.assertEqual(frame.tau, flow.tau)
+        self.assertEqual(frame.revision, flow.flow_fingerprint())
+        self.assertEqual(frame.observation.local_heading_error_deg, flow.heading)
+        self.assertTrue(frame.evidence)
 
     def test_pareto_demand_is_not_scalarized_and_dynamic_variable_enters_verification(self):
         core = build_core()
         flow = Flow()
-        frame = current_frame_from_host(
-            PresentObservation.from_mapping(flow.present_observation()),
-            tau=flow.tau,
-            revision=flow.flow_fingerprint(),
-        )
+        frame = flow.capture()
         core.open_current_epoch(frame)
         inputs = core._inputs(frame.observation)
         layers = pareto_demand_layers(inputs)
         self.assertGreaterEqual(len(layers), 1)
         assessment = core.assessment_operator.assess(inputs=inputs)
         dynamic = [
-            x for x in assessment.requests
+            x
+            for x in assessment.requests
             if x.request_id.startswith("verify-current-additional:")
         ]
         self.assertTrue(dynamic)
         core.realize(frame.observation)
         record = core.responsibility_record()
-        self.assertTrue(any(
-            x["event"] == "activated" and x["variable"] == "heading_magnitude"
-            for x in record["responsibility_variable_transitions"]
-        ))
+        self.assertTrue(
+            any(
+                x["event"] == "activated"
+                and x["variable"] == "heading_magnitude"
+                for x in record["responsibility_variable_transitions"]
+            )
+        )
         self.assertNotIn("risk_score", str(record).lower())
 
     def test_resource_shortfall_remains_explicit_omega(self):
         probe = build_core()
         flow = Flow()
-        obs = PresentObservation.from_mapping(flow.present_observation())
-        frame = current_frame_from_host(obs, tau=flow.tau, revision=flow.flow_fingerprint())
+        frame = flow.capture()
+        obs = frame.observation
         probe.open_current_epoch(frame)
         probe.realize(obs)
         required = probe.organic_resource_plan().required
@@ -221,15 +240,31 @@ class OrganicFlowTests(unittest.TestCase):
         verification = record["context"]["verification"]
         self.assertTrue(verification["omega"])
         self.assertTrue(verification["additional_unverified_scope"])
-        self.assertLess(record["resource_plan"]["allocated"], record["resource_plan"]["required"])
+        self.assertLess(
+            record["resource_plan"]["allocated"],
+            record["resource_plan"]["required"],
+        )
 
     def test_stale_current_reality_aborts_before_dispatch(self):
         core = build_core()
         journal = ExecutionJournal(":memory:")
         flow = Flow()
-        flow.mutate_on_second_observation = True
+        # Capture #1 is the decision premise; #2 is probe-preservation check;
+        # #3 is the final pre-dispatch recapture.
+        flow.mutate_on_capture_number = 3
         with self.assertRaises(StaleDecision):
             execute(core, flow, journal)
+        self.assertEqual(flow.applied, 0)
+        journal.close()
+
+    def test_probe_detects_reality_change_without_dispatch(self):
+        core = build_core()
+        journal = ExecutionJournal(":memory:")
+        flow = Flow()
+        flow.mutate_on_capture_number = 2
+        with self.assertRaises(Exception) as caught:
+            execute(core, flow, journal)
+        self.assertIn("counterfactual probing", str(caught.exception))
         self.assertEqual(flow.applied, 0)
         journal.close()
 
@@ -309,10 +344,7 @@ class OrganicFlowTests(unittest.TestCase):
             self.assertEqual(len(core.history_envelopes()), 1)
 
             later = Flow(epoch=201, tau=11.0, heading=0.0)
-            later_obs = PresentObservation.from_mapping(later.present_observation())
-            later_frame = current_frame_from_host(
-                later_obs, tau=later.tau, revision=later.flow_fingerprint()
-            )
+            later_frame = later.capture()
             view = core.open_current_epoch(later_frame)
             source = core.history_envelopes()[0].record.source
             key = (source.experience_id, source.relation_element_id)
@@ -330,15 +362,9 @@ class OrganicFlowTests(unittest.TestCase):
     def test_dynamic_responsibility_deactivation_is_recorded_without_deleting_history(self):
         core = build_core()
         first = Flow(epoch=1, tau=1.0, heading=0.2)
-        first_obs = PresentObservation.from_mapping(first.present_observation())
-        core.open_current_epoch(current_frame_from_host(
-            first_obs, tau=1.0, revision=first.flow_fingerprint()
-        ))
+        core.open_current_epoch(first.capture())
         second = Flow(epoch=2, tau=2.0, heading=0.0)
-        second_obs = PresentObservation.from_mapping(second.present_observation())
-        core.open_current_epoch(current_frame_from_host(
-            second_obs, tau=2.0, revision=second.flow_fingerprint()
-        ))
+        core.open_current_epoch(second.capture())
         events = core.variable_ledger.events()
         self.assertTrue(any(x.event == "deactivated" for x in events))
         self.assertTrue(any(x.event == "activated" for x in events))
