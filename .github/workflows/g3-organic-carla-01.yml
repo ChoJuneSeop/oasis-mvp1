@@ -31,6 +31,7 @@ jobs:
               Path('research/g3_organic_carla_01/protocol.py'),
               Path('research/g3_organic_carla_01/run_audit.py'),
               Path('research/g3_organic_carla_01/live_runner.py'),
+              Path('research/g3_organic_carla_01/frozen_runner.py'),
               Path('research/g3_organic_carla_01/test_live_runner.py'),
           ]
           print('EXPERIMENT_SHA256=' + json.dumps({
