@@ -39,6 +39,7 @@ jobs:
         run: |
           python -m unittest research.g32_live_execution_v1.test_live_core -v
           python -m unittest research.g32_live_execution_v1.test_live_history -v
+          python -m unittest research.g32_live_execution_v1.test_runtime_freeze -v
       - name: Re-run frozen G3.2 integration tests
         run: |
           python -m unittest research.oasis_core_v11.test_current_relational_core -v
@@ -64,6 +65,8 @@ jobs:
             research/g32_live_execution_v1/episode.py \
             research/g32_live_execution_v1/live_history.py \
             research/g32_live_execution_v1/ledger.py \
+            research/g32_live_execution_v1/runtime_freeze.py \
             research/g32_live_execution_v1/runner.py \
             research/g32_live_execution_v1/test_live_core.py \
-            research/g32_live_execution_v1/test_live_history.py
+            research/g32_live_execution_v1/test_live_history.py \
+            research/g32_live_execution_v1/test_runtime_freeze.py
