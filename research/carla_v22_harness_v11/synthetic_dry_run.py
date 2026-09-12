@@ -19,15 +19,12 @@ from research.g3_2_sidecar.reconstruction import (
 
 class SyntheticFlow:
     """Dry-run host only. This is not CARLA and is never paper evidence."""
-
     def __init__(self):
         self.tau = 10.0
         self.fingerprint = "flow@10.0"
         self.apply_count = 0
 
-    def current_tau(self) -> float:
-        return self.tau
-
+    def current_tau(self) -> float: return self.tau
     def present_observation(self):
         return {
             "epoch": 200,
@@ -39,39 +36,26 @@ class SyntheticFlow:
             "local_heading_error_deg": 0.2,
             "local_density": 2,
         }
-
-    def current_reality(self):
-        return {"flow_phase": "approach", "visibility": "clear"}
-
-    def flow_fingerprint(self) -> str:
-        return self.fingerprint
-
+    def current_reality(self): return {"flow_phase": "approach", "visibility": "clear"}
+    def flow_fingerprint(self) -> str: return self.fingerprint
     def apply_single_actuation(self, actuation: VehicleActuation) -> str:
         self.apply_count += 1
         if self.apply_count != 1:
             raise RuntimeError("more than one actuation in an epoch")
-        self.fingerprint = "flow@10.05"
+        self.tau += 0.05
+        self.fingerprint = f"flow@{self.tau:.2f}"
         return "synthetic-realization-1"
 
 
 class SyntheticCore:
     """Synthetic contract exerciser only; not the experimental OASIS Core."""
-
     def __init__(self):
-        self.r1 = RelationElementRef(
-            "E-old-yield",
-            "rel-approach-gap",
-            2.0,
-            {"process": "approach", "relation": "space-closing"},
-        )
-        self.r2 = RelationElementRef(
-            "E-mid-merge",
-            "rel-yield-opening",
-            6.0,
-            {"process": "merge", "relation": "yield-opening"},
-        )
+        self.r1 = RelationElementRef("E-old-yield", "rel-approach-gap", 2.0, {"process": "approach", "relation": "space-closing"})
+        self.r2 = RelationElementRef("E-mid-merge", "rel-yield-opening", 6.0, {"process": "merge", "relation": "yield-opening"})
+        self.last_tau = None
 
-    def open_epoch(self, observation: PresentObservation) -> CoreEpochView:
+    def open_epoch(self, observation: PresentObservation, tau: float) -> CoreEpochView:
+        self.last_tau = tau
         links = (
             ProvenanceLink(
                 source=self.r1,
@@ -90,17 +74,11 @@ class SyntheticCore:
         )
         reconstruction = ReconstructionMeasurement(
             possibility_id="yield",
-            observed_at_tau=10.0,
+            observed_at_tau=tau,
             source_links=links,
-            recombination=AxisObservation(
-                0.7, "trace-derived-edge-recombination", {"source_count": 2}
-            ),
-            role_transformation=AxisObservation(
-                0.4, "trace-derived-role-change", {"changed_roles": 1}
-            ),
-            structural_transformation=AxisObservation(
-                0.5, "trace-derived-graph-delta", {"added_edges": 1}
-            ),
+            recombination=AxisObservation(0.7, "trace-derived-edge-recombination", {"source_count": 2}),
+            role_transformation=AxisObservation(0.4, "trace-derived-role-change", {"changed_roles": 1}),
+            structural_transformation=AxisObservation(0.5, "trace-derived-graph-delta", {"added_edges": 1}),
             relation_graph_before={"sources": 2},
             relation_graph_after={"possibility": "yield"},
         )
@@ -118,27 +96,32 @@ class SyntheticCore:
             reconstructions=(reconstruction,),
         )
 
-    def ablate_relation(self, observation, relation):
+    def ablate_relation(self, observation, relation, tau):
+        assert tau == self.last_tau
         if relation == self.r1:
-            # Deliberate zero individual distribution effect despite structural participation.
             return {"proceed": 0.6, "yield": 0.4}
         return {"proceed": 0.45, "yield": 0.55}
 
-    def ablate_relation_group(self, observation, relations):
+    def ablate_relation_group(self, observation, relations, tau):
+        assert tau == self.last_tau
         return {"proceed": 0.2, "yield": 0.8}
 
-    def realize(self, observation):
+    def realize(self, observation, tau):
+        assert tau == self.last_tau
         return Realization("yield", VehicleActuation(throttle=0.15, brake=0.0, steer=0.01))
 
 
 def run_dry_run():
     flow = SyntheticFlow()
-    harness = CanonicalHarnessV11(SyntheticCore())
+    core = SyntheticCore()
+    harness = CanonicalHarnessV11(core)
     execution = harness.execute_decision_epoch(flow)
 
     assert flow.apply_count == 1
     assert execution.before_fingerprint == "flow@10.0"
     assert execution.after_realization_fingerprint == "flow@10.05"
+    assert core.last_tau == 10.0
+    assert execution.recorder.reconstruction[0].observed_at_tau == 10.0
     assert len(execution.recorder.participation) == 2
     assert len(execution.recorder.group_participation) == 1
     assert len(execution.recorder.reconstruction) == 1
