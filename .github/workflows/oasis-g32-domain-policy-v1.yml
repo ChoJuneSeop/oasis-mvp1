@@ -21,6 +21,8 @@ jobs:
           python -m unittest research.oasis_core_v11.test_current_relational_core -v
           python -m unittest research.oasis_core_v11.test_history_admission -v
           python -m unittest research.oasis_core_v11.test_carla_relational_domain -v
+      - name: Run CARLA domain-policy admission tests
+        run: python -m unittest research.oasis_core_v11.test_carla_domain_policy_v1 -v
       - name: Run canonical Harness v1.1 regression tests
         run: python -m unittest research.carla_v22_harness_v11.test_canonical_harness -v
       - name: Run G3.2 sidecar regression tests
@@ -43,11 +45,21 @@ jobs:
           assert all(keys == {'current_relations','past','candidate_ids'} for keys in calls), calls
           print('relation-operator-time-blind=PASS')
           PY
-      - name: Record source SHA-256 after tau API correction
+      - name: Verify actuation operator has no memory input
+        run: |
+          python - <<'PY'
+          import inspect
+          from research.oasis_core_v11.carla_domain_policy_v1 import MemoryIsolatedActuationOperator
+          params=set(inspect.signature(MemoryIsolatedActuationOperator.actuation).parameters)
+          assert params == {'self','observation','selected'}, params
+          print('actuation-memory-isolation=PASS')
+          PY
+      - name: Record source SHA-256
         run: |
           sha256sum research/carla_v22_harness_v11/canonical_harness.py
           sha256sum research/oasis_core_v11/current_relational_core.py
-          sha256sum research/oasis_core_v11/test_current_relational_core.py
-          sha256sum research/oasis_core_v11/test_history_admission.py
-          sha256sum research/carla_v22_harness_v11/synthetic_dry_run.py
-          sha256sum research/carla_v22_harness_v11/test_canonical_harness.py
+          sha256sum research/g3_2_sidecar/reconstruction.py
+          sha256sum research/oasis_core_v11/carla_domain_policy_v1.py
+          sha256sum research/oasis_core_v11/test_carla_domain_policy_v1.py
+          sha256sum research/oasis_core_v11/carla_relational_domain.py
+          sha256sum research/oasis_core_v11/history_admission.py
