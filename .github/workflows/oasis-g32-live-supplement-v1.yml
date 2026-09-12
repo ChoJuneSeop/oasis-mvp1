@@ -11,9 +11,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Verify frozen baseline remains untouched
+        run: |
+          python - <<'PY'
+          import subprocess
+          baseline='5ccccc1fe9e3b25305ab2f133fd8cb0e63d1c954'
+          changed=subprocess.check_output(['git','diff','--name-only',baseline,'HEAD'],text=True).splitlines()
+          allowed=[]
+          for path in changed:
+              if path == '.github/workflows/oasis-g32-live-supplement-v1.yml':
+                  allowed.append(path)
+              elif path.startswith('research/g32_live_execution_v1/'):
+                  allowed.append(path)
+              else:
+                  raise SystemExit(f'frozen baseline path changed: {path}')
+          print('baseline-diff-guard=PASS')
+          print('\n'.join(allowed))
+          PY
       - name: Compile live supplement
         run: python -m compileall -q research/g32_live_execution_v1
       - name: Run live supplement tests
@@ -36,3 +55,15 @@ jobs:
           python -m unittest research.choice_responsibility_v01.test_integration -v
           python -m unittest research.integration_checkpoint.test_cross -v
           python -m unittest research.integration_checkpoint.test_harness_adapter -v
+      - name: Record live supplement source hashes
+        run: |
+          sha256sum \
+            research/g32_live_execution_v1/__init__.py \
+            research/g32_live_execution_v1/operators.py \
+            research/g32_live_execution_v1/live_core.py \
+            research/g32_live_execution_v1/episode.py \
+            research/g32_live_execution_v1/live_history.py \
+            research/g32_live_execution_v1/ledger.py \
+            research/g32_live_execution_v1/runner.py \
+            research/g32_live_execution_v1/test_live_core.py \
+            research/g32_live_execution_v1/test_live_history.py
