@@ -9,7 +9,6 @@ from .operators import (
     ParetoResponsibilityResourceAllocator,
 )
 from .live_core import LiveIntegratedChoiceCore
-from .harness import LiveCorePortAdapter, LiveIntegratedHarness
 from .episode import FrontRelationEpisodeManager
 
 __all__ = [
@@ -17,7 +16,5 @@ __all__ = [
     "LiveCurrentVerifier",
     "ParetoResponsibilityResourceAllocator",
     "LiveIntegratedChoiceCore",
-    "LiveCorePortAdapter",
-    "LiveIntegratedHarness",
     "FrontRelationEpisodeManager",
 ]
