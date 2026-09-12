@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from math import isfinite
-from typing import Any, Mapping
+from typing import Any, Mapping, Optional
 from .common import G32InvariantError, RelationElementRef, require_tau
 
 
@@ -22,16 +22,18 @@ class AxisObservation:
 @dataclass(frozen=True)
 class ProvenanceLink:
     source: RelationElementRef
-    distribution_effect: float
+    distribution_effect: Optional[float]
     participation_roles: tuple[str, ...]
     generated_possibilities: tuple[str, ...] = ()
     contribution_trace: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
+        if self.distribution_effect is None:
+            return
         value = float(self.distribution_effect)
         object.__setattr__(self, "distribution_effect", value)
         if not isfinite(value) or not 0.0 <= value <= 1.0:
-            raise G32InvariantError("distribution_effect must be in [0,1]")
+            raise G32InvariantError("distribution_effect must be None (not yet measured) or in [0,1]")
 
 
 @dataclass(frozen=True)
