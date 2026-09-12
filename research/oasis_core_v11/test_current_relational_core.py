@@ -3,7 +3,6 @@ import unittest
 from research.carla_v22_harness_v11.canonical_harness import PresentObservation, VehicleActuation
 from research.g3_2_sidecar.common import RelationElementRef
 from research.oasis_core_v11.current_relational_core import (
-    BoundContribution,
     CoreV11InvariantError,
     CurrentRelation,
     CurrentRelationalCoreV11,
@@ -101,20 +100,47 @@ class MatchingRelationOperator:
         )
 
 
+class SymmetricRedundantRelationOperator:
+    """Synthetic redundancy: either historical relation can support the same current structure."""
+
+    def relate(self, *, current_relations, past, candidate_ids):
+        if not current_relations:
+            return ()
+        if not any(r.relation_type == past.relation_type for r in current_relations):
+            return ()
+        anchors = tuple(r.relation_id for r in current_relations)
+        return tuple(
+            RelationContribution(
+                possibility_id=pid,
+                current_relation_ids=anchors,
+                role_trace=("recognition", "generation"),
+                generated_possibilities=(pid,),
+                trace={"basis": "synthetic symmetric redundant support"},
+            )
+            for pid in candidate_ids
+        )
+
+
 class NoReconstruction:
     def reconstruct(self, **kwargs):
         return ReconstructionResult()
 
 
 class RedundancyReconstruction:
-    """Synthetic only: keeps normalized distribution invariant under either single ablation."""
+    """Synthetic only: single-source removal is compensated; joint removal is not."""
 
     def reconstruct(self, *, contributions, **kwargs):
-        n = len(contributions)
+        source_keys = {
+            (x.source.experience_id, x.source.relation_element_id)
+            for x in contributions
+        }
+        n = len(source_keys)
         if n == 0:
             return ReconstructionResult()
-        # yield mass = 1 current token + n historical tokens.
-        # Give reconstructed option the same number of independent current-evidence tokens.
+        # Each existing base possibility has 1 current token + n source tokens.
+        # Give the reconstructed possibility the same amount of current evidence,
+        # making either single-source ablation distributionally redundant while
+        # joint ablation removes the reconstructed possibility entirely.
         evidence = tuple(f"current:reconstruction:{i}" for i in range(n + 1))
         return ReconstructionResult(
             additional_candidates=(PossibilityCandidate("reconstructed-yield", evidence),)
@@ -232,7 +258,11 @@ class CoreV11Tests(unittest.TestCase):
     def test_redundancy_can_make_individual_effect_zero_but_joint_effect_nonzero(self):
         r1 = history_record("E-1", "r1", 1.0)
         r2 = history_record("E-2", "r2", 8.0)
-        core = make_core((r1, r2), reconstruction=RedundancyReconstruction())
+        core = make_core(
+            (r1, r2),
+            reconstruction=RedundancyReconstruction(),
+            relation_operator=SymmetricRedundantRelationOperator(),
+        )
         full = core.open_epoch(observation()).possibility_distribution
         one_out = core.ablate_relation(observation(), r1.source)
         other_out = core.ablate_relation(observation(), r2.source)
