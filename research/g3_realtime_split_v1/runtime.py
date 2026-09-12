@@ -18,12 +18,14 @@ class DeferredProbes:
     """One immutable decision-time source for two independent deferred layers.
 
     Observation/Validation (관측·검증) expands ``snapshot`` into the full G3.2
-    individual/joint probe record. Relation/Experience (관계·경험) never waits for
-    that expansion: it uses only the compact decision-time facts below to close and
-    admit a realized relation process. Empty G3.2 measurement fields in the relation
-    HistoryEntry mean "not an input to relation admission", not "measured as zero".
-    The full measurements remain in the independent validation ledger and are joined
-    by ``digest`` for later analysis; they never rewrite an already admitted history.
+    individual/joint probe record and independently checks Fold omissions.
+    Relation/Experience (관계·경험) never waits for either expansion: it uses only
+    compact decision-time facts to close and admit a realized relation process.
+
+    Empty G3.2 measurement fields in the relation HistoryEntry mean "not an input to
+    relation admission", not "measured as zero".  Full measurements and Fold omission
+    checks remain in the independent validation ledger and are joined by ``digest``;
+    they never rewrite an already admitted history.
     """
 
     snapshot: bytes
@@ -32,6 +34,12 @@ class DeferredProbes:
     tau: float
     current_reality: tuple
     relation_refs: tuple
+    fold_selection_basis: str
+    fold_omitted_semantics: str
+    fold_history_size: int
+    fold_active_count: int
+    fold_omitted_count: int
+    fold_current_signatures: tuple
 
     @property
     def possibility_distribution(self):
@@ -56,8 +64,8 @@ class DeferredProbes:
                 "realized possibility was absent from the immutable decision distribution"
             )
         evidence = deepcopy(dict(closure_evidence))
-        # Preserve genealogy without pretending the deferred ablation has already
-        # measured participation. These are decision-time available relation refs,
+        # Preserve genealogy without pretending deferred ablation/Fold validation has
+        # already completed. These are decision-time available active relation refs,
         # not causal/participation labels.
         evidence["decision_snapshot_digest"] = self.digest
         evidence["decision_relation_refs"] = tuple(
@@ -68,6 +76,15 @@ class DeferredProbes:
             }
             for experience_id, relation_element_id, completed_at_tau in self.relation_refs
         )
+        evidence["fold_action"] = {
+            "selection_basis": self.fold_selection_basis,
+            "omitted_semantics": self.fold_omitted_semantics,
+            "history_size": self.fold_history_size,
+            "active_count": self.fold_active_count,
+            "omitted_count": self.fold_omitted_count,
+            "current_signatures": [list(x) for x in self.fold_current_signatures],
+            "validation_status": "independent_deferred",
+        }
         evidence["observational_validation"] = "independent_deferred"
         return HistoryEntry(
             entry_id=entry_id,
@@ -109,9 +126,17 @@ def capture_probes(core, frame, view):
         "responsibility_operator",
     ):
         setattr(probe_core, name, getattr(core, name))
-    probe_core._frame = frame
+    probe_core.fold_operator = deepcopy(core.fold_operator)
+    probe_core._frame = deepcopy(frame)
     probe_core._history = core._history_view()
     probe_core._epoch_history_snapshot = probe_core._history
+    probe_core._epoch_identity = frame.observation.epoch
+    probe_core._epoch_frame = deepcopy(frame)
+    probe_core._epoch_fold_snapshot = deepcopy(core.fold_snapshot())
+    probe_core._publication_received_at = None
+    probe_core._publication_source_epoch = None
+    probe_core.publication_visibility = {}
+
     payload = pickle.dumps((probe_core, frame, view), protocol=pickle.HIGHEST_PROTOCOL)
     reality = tuple(sorted(asdict(frame.observation).items()))
     relation_refs = tuple(
@@ -122,6 +147,7 @@ def capture_probes(core, frame, view):
         )
         for relation in view.relation_elements
     )
+    fold = core.fold_snapshot()
     return DeferredProbes(
         snapshot=payload,
         digest=sha256(payload).hexdigest(),
@@ -129,11 +155,17 @@ def capture_probes(core, frame, view):
         tau=float(frame.tau),
         current_reality=reality,
         relation_refs=relation_refs,
+        fold_selection_basis=fold.selection_basis,
+        fold_omitted_semantics=fold.omitted_semantics,
+        fold_history_size=fold.history_size,
+        fold_active_count=fold.active_count,
+        fold_omitted_count=fold.omitted_count,
+        fold_current_signatures=tuple(fold.current_signatures),
     )
 
 
 def validate_result(result):
-    """Reproduce all frozen individual/joint probes with no live flow access."""
+    """Reproduce frozen probes and independently validate Fold omissions."""
     if result.execution is None:
         return result
     deferred = result.execution.recorder
@@ -162,6 +194,18 @@ def validate_result(result):
     )
     if expected_refs != deferred.relation_refs:
         raise ValueError("decision-time relation provenance binding mismatch")
+
+    fold = core.fold_snapshot()
+    if (
+        fold.selection_basis != deferred.fold_selection_basis
+        or fold.omitted_semantics != deferred.fold_omitted_semantics
+        or fold.history_size != deferred.fold_history_size
+        or fold.active_count != deferred.fold_active_count
+        or fold.omitted_count != deferred.fold_omitted_count
+        or tuple(fold.current_signatures) != deferred.fold_current_signatures
+    ):
+        raise ValueError("decision-time Fold provenance binding mismatch")
+
     if (
         core._evaluate(frame.observation).possibility_distribution
         != view.possibility_distribution
@@ -169,7 +213,14 @@ def validate_result(result):
         raise ValueError("snapshot evaluation does not reproduce decision distribution")
     harness = OrganicHarness(core, None, authorize=None)
     recorder = harness._record_probes(SnapshotFlow(frame), frame=frame, view=view)
-    return replace(result, execution=replace(execution, recorder=recorder))
+
+    responsibility = deepcopy(result.responsibility_record)
+    responsibility["fold_validation"] = core.fold_validation_audit(frame.observation)
+    return replace(
+        result,
+        execution=replace(execution, recorder=recorder),
+        responsibility_record=responsibility,
+    )
 
 
 class TimedFlow:
@@ -201,6 +252,9 @@ class RealtimeOrganicHarness(OrganicHarness):
         snapshot = capture_probes(self.core, frame, view)
         self.metrics["snapshot_latency_seconds"] = time.perf_counter() - started
         self.metrics["snapshot_bytes"] = len(snapshot.snapshot)
+        self.metrics["fold_history_size"] = snapshot.fold_history_size
+        self.metrics["fold_active_count"] = snapshot.fold_active_count
+        self.metrics["fold_omitted_count"] = snapshot.fold_omitted_count
         return snapshot
 
     def execute_decision_epoch(self, flow, **kwargs):
