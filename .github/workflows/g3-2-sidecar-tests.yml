@@ -17,4 +17,4 @@ jobs:
       - name: Compile sidecar
         run: python -m compileall -q research/g3_2_sidecar
       - name: Run regression tests
-        run: python -m unittest research.g3_2_sidecar.test_runtime_extension -v
+        run: python -m unittest discover -s research/g3_2_sidecar -p 'test_*.py' -v
