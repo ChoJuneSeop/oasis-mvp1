@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from hashlib import sha256
-from math import atan2, degrees, sqrt
+from math import sqrt
 from typing import Any, Iterable, Mapping, Optional
 
 from research.carla_v22_harness_v11.canonical_harness import VehicleActuation
@@ -38,6 +38,70 @@ def _kind(type_id: str) -> str:
     if text.startswith("walker."):
         return "pedestrian"
     return "other"
+
+
+def _xyz(obj: Any) -> tuple[float, float, float]:
+    return (float(obj.x), float(obj.y), float(obj.z))
+
+
+def _rotation(obj: Any) -> tuple[float, float, float]:
+    return (float(obj.pitch), float(obj.yaw), float(obj.roll))
+
+
+def _control_state(actor: Any) -> object:
+    try:
+        control = actor.get_control()
+    except Exception:
+        return None
+    fields = []
+    for name in (
+        "throttle",
+        "brake",
+        "steer",
+        "hand_brake",
+        "reverse",
+        "gear",
+        "manual_gear_shift",
+        "speed",
+        "direction",
+        "jump",
+    ):
+        if not hasattr(control, name):
+            continue
+        value = getattr(control, name)
+        if hasattr(value, "x") and hasattr(value, "y") and hasattr(value, "z"):
+            value = _xyz(value)
+        fields.append((name, value))
+    return tuple(fields)
+
+
+def _actor_state(actor: Any) -> tuple[object, ...]:
+    """Current host-internal actor state used only for purity fingerprinting."""
+    transform = actor.get_transform()
+    location = transform.location
+    rotation = transform.rotation
+    try:
+        velocity = _xyz(actor.get_velocity())
+    except Exception:
+        velocity = None
+    try:
+        angular_velocity = _xyz(actor.get_angular_velocity())
+    except Exception:
+        angular_velocity = None
+    try:
+        acceleration = _xyz(actor.get_acceleration())
+    except Exception:
+        acceleration = None
+    return (
+        int(getattr(actor, "id", -1)),
+        str(getattr(actor, "type_id", "")),
+        _xyz(location),
+        _rotation(rotation),
+        velocity,
+        angular_velocity,
+        acceleration,
+        _control_state(actor),
+    )
 
 
 @dataclass(frozen=True)
@@ -155,7 +219,9 @@ class CARLAPresentFlowPort:
     """Environment Actuator + current-flow host boundary.
 
     Exactly one real actuation may be applied per CARLA frame through this object.
-    Counterfactual Core probes receive no reference to this port.
+    Counterfactual Core probes receive no reference to this port. The purity
+    fingerprint may use raw current world state internally but never exposes it to
+    OASIS Core or to remembered relation semantics.
     """
 
     def __init__(self, world: Any, ego_actor: Any, gateway: ControlledOracleObservationGateway):
@@ -206,11 +272,14 @@ class CARLAPresentFlowPort:
 
     def flow_fingerprint(self) -> str:
         snapshot = self._snapshot()
-        obs = self._observation()
+        actor_states = sorted(
+            (_actor_state(actor) for actor in self.world.get_actors()),
+            key=lambda item: (item[0], item[1]),
+        )
         payload = (
             int(snapshot.frame),
             float(snapshot.timestamp.elapsed_seconds),
-            tuple(obs.as_mapping().items()),
+            tuple(actor_states),
         )
         return sha256(repr(payload).encode("utf-8")).hexdigest()
 
