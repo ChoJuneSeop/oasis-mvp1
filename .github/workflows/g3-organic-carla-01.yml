@@ -70,6 +70,7 @@ jobs:
         run: >-
           python -m unittest
           research.g3_realtime_split_v1.test_split_runtime
+          research.g3_realtime_split_v1.test_three_layers
           -v
 
       - name: Frozen G3.2 sidecar regression

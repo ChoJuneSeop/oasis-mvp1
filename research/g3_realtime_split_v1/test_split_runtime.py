@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import tempfile
-import threading
+import time
 import unittest
 from pathlib import Path
 
@@ -50,15 +50,13 @@ def execute(core, flow, journal, *, run_id="split-test"):
     )
 
 
-class GateClosureEvaluator:
-    def __init__(self, delegate, gate: threading.Event):
+class SlowClosureEvaluator:
+    def __init__(self, delegate, delay_seconds: float = 0.25):
         self.delegate = delegate
-        self.gate = gate
-        self.entered = threading.Event()
+        self.delay_seconds = float(delay_seconds)
 
     def evaluate(self, **kwargs):
-        self.entered.set()
-        self.gate.wait(5.0)
+        time.sleep(self.delay_seconds)
         return self.delegate.evaluate(**kwargs)
 
 
@@ -68,8 +66,7 @@ class RealtimeSplitTests(unittest.TestCase):
         journal = ExecutionJournal(":memory:")
         flow = Flow(epoch=500, tau=30.0)
         result = execute(core, flow, journal)
-        gate = threading.Event()
-        slow = GateClosureEvaluator(closure, gate)
+        slow = SlowClosureEvaluator(closure)
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -82,6 +79,7 @@ class RealtimeSplitTests(unittest.TestCase):
                 trace_path=root / "deferred_trace.jsonl",
             )
             worker.start()
+            started = time.perf_counter()
             self.assertTrue(worker.submit_begin(result))
             self.assertTrue(
                 worker.submit_post(
@@ -91,12 +89,11 @@ class RealtimeSplitTests(unittest.TestCase):
                     carla_frame=501,
                 )
             )
-            self.assertTrue(slow.entered.wait(1.0))
-            # Closure evaluation is deliberately blocked inside the worker. The caller
-            # has already returned from both submissions, so no Closure/history work is
-            # executing on the decision/actuation submitter path.
+            submit_seconds = time.perf_counter() - started
+            # Closure evaluation takes 0.25 s in the child process. Submission stays
+            # bounded and does not execute Closure/history on the action path.
+            self.assertLess(submit_seconds, 0.15)
             self.assertTrue(worker.health().alive)
-            gate.set()
             health = worker.drain(timeout=5.0)
             self.assertEqual(health.closures_committed, 1)
             worker.close(timeout=5.0)

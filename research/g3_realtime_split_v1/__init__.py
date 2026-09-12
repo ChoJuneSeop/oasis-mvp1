@@ -7,9 +7,11 @@ already-running preregistered flow.
 
 from .core import EpochSnapshotOrganicCore
 from .worker import DeferredRelationWorker, DeferredWorkerHealth
+from .runtime import RealtimeOrganicHarness
 
 __all__ = [
     "DeferredRelationWorker",
     "DeferredWorkerHealth",
     "EpochSnapshotOrganicCore",
+    "RealtimeOrganicHarness",
 ]

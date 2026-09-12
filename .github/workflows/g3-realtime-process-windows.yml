@@ -1,0 +1,21 @@
+name: G3 Realtime Process Windows Regression
+
+on:
+  push:
+    branches: [feature/g3-realtime-split-v1]
+  pull_request:
+    paths: ['research/g3_realtime_split_v1/**']
+
+jobs:
+  windows-spawn:
+    runs-on: windows-latest
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify preserved experiment and regression contracts
+        run: |
+          python -c "from research.g3_organic_carla_01.frozen_runner import verify_experiment_manifest; verify_experiment_manifest()"
+          python -m unittest research.g3_realtime_split_v1.test_split_runtime research.g3_realtime_split_v1.test_three_layers research.g3_organic_carla_01.test_live_runner -v

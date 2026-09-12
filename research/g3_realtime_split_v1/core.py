@@ -11,6 +11,7 @@ This is execution-path isolation only.  It is not a hard real-time or safety pro
 
 from copy import deepcopy
 from math import isfinite
+import time
 
 from research.g3_organic_flow_v1.core import OrganicIntegratedChoiceCore
 from research.oasis_core_v11.current_relational_core import CoreV11InvariantError
@@ -33,6 +34,11 @@ class EpochSnapshotOrganicCore(OrganicIntegratedChoiceCore):
 
     def __init__(self, **kwargs):
         self._epoch_history_snapshot = None
+        self._epoch_identity = None
+        self._epoch_frame = None
+        self._publication_received_at = None
+        self._publication_source_epoch = None
+        self.publication_visibility = {}
         super().__init__(**kwargs)
 
     def add_history_batch(self, envelopes):
@@ -43,10 +49,44 @@ class EpochSnapshotOrganicCore(OrganicIntegratedChoiceCore):
         # Decision Epoch, if any, keeps its previously captured dictionary reference.
         self._history = staged
 
+    def publish_validated_history_batch(self, envelopes):
+        """Publish a batch already validated by the relation process.
+
+        The relation process is the only producer of these envelopes.  The action
+        process deliberately does not redo archive, Closure, or admission work when
+        it observes a completed publication.  The replacement remains atomic and an
+        open epoch retains its old reference.
+        """
+        staged = dict(self._history)
+        for envelope in envelopes:
+            key = self._source_key(envelope.record.source)
+            prior = staged.get(key)
+            if prior is not None and prior != envelope:
+                raise CoreV11InvariantError("conflicting relation-process publication")
+            staged[key] = envelope
+        self._history = staged
+
     def open_current_epoch(self, frame):
         # Capture before evaluation. Background publication after this line belongs to a
         # later current reality and therefore cannot enter this epoch retroactively.
-        self._epoch_history_snapshot = self._history
+        identity = frame.observation.epoch
+        if self._epoch_identity is not None:
+            if identity < self._epoch_identity or frame.tau < self._epoch_frame.tau:
+                raise CoreV11InvariantError("Decision Epoch or current tau moved backwards")
+            if identity == self._epoch_identity and frame != self._epoch_frame:
+                raise CoreV11InvariantError("same Decision Epoch has conflicting current frame")
+        if identity != self._epoch_identity:
+            self._epoch_history_snapshot = self._history
+            self._epoch_identity = identity
+            self._epoch_frame = deepcopy(frame)
+            if self._publication_received_at is not None:
+                self.publication_visibility = {
+                    "visible_epoch": identity,
+                    "source_epoch": self._publication_source_epoch,
+                    "visibility_lag_epochs": max(0, identity - self._publication_source_epoch),
+                    "receipt_to_visibility_seconds": time.perf_counter() - self._publication_received_at,
+                }
+                self._publication_received_at = None
         return super().open_current_epoch(frame)
 
     def _history_view(self):
