@@ -27,6 +27,10 @@ jobs:
           python -m unittest research.oasis_core_v11.test_carla_domain_bundle_v1 -v
       - name: Run canonical Harness v1.1 regression tests
         run: python -m unittest research.carla_v22_harness_v11.test_canonical_harness -v
+      - name: Run CARLA runtime boundary regression tests
+        run: |
+          python -m unittest research.carla_v22_harness_v11.test_carla_runtime_adapter_v1 -v
+          python -m unittest research.carla_v22_harness_v11.test_independent_evaluator_v1 -v
       - name: Run G3.2 sidecar regression tests
         run: |
           python -m unittest research.g3_2_sidecar.test_runtime_extension -v
@@ -59,6 +63,10 @@ jobs:
       - name: Record source SHA-256
         run: |
           sha256sum research/carla_v22_harness_v11/canonical_harness.py
+          sha256sum research/carla_v22_harness_v11/carla_runtime_adapter_v1.py
+          sha256sum research/carla_v22_harness_v11/independent_evaluator_v1.py
+          sha256sum research/carla_v22_harness_v11/test_carla_runtime_adapter_v1.py
+          sha256sum research/carla_v22_harness_v11/test_independent_evaluator_v1.py
           sha256sum research/oasis_core_v11/current_relational_core.py
           sha256sum research/g3_2_sidecar/reconstruction.py
           sha256sum research/oasis_core_v11/carla_domain_policy_v1.py
