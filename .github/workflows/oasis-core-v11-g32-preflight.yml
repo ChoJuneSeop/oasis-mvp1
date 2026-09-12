@@ -26,6 +26,7 @@ jobs:
         run: |
           python -m unittest research.oasis_core_v11.test_current_relational_core -v
           python -m unittest research.oasis_core_v11.test_history_admission -v
+          python -m unittest research.oasis_core_v11.test_carla_relational_domain -v
       - name: Run canonical Harness v1.1 regression tests
         run: python -m unittest research.carla_v22_harness_v11.test_canonical_harness -v
       - name: Run G3.2 sidecar regression tests
@@ -63,5 +64,8 @@ jobs:
           assert m['real_carla_g32_execution']=='BLOCKED_UNTIL_DOMAIN_OPERATORS_ARE_FROZEN'
           print('source-manifest=PASS')
           PY
-      - name: Record integrated synthetic wiring source SHA-256
-        run: sha256sum research/oasis_core_v11/synthetic_integrated_flow.py
+      - name: Record new domain/wiring SHA-256
+        run: |
+          sha256sum research/oasis_core_v11/synthetic_integrated_flow.py
+          sha256sum research/oasis_core_v11/carla_relational_domain.py
+          sha256sum research/oasis_core_v11/test_carla_relational_domain.py
