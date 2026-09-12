@@ -8,6 +8,7 @@ from research.carla_v22_harness_v11.carla_runtime_adapter_v1 import (
     CARLARuntimeInvariantError,
     ControlledOracleObservationGateway,
     runtime_identity,
+    validate_runtime_identity,
 )
 
 
@@ -45,13 +46,17 @@ class Map:
             if a.t.location is loc: return WP(a.road,a.lane,0)
         return WP(1,1,0)
 class Settings:
-    synchronous_mode=True; fixed_delta_seconds=0.05
+    synchronous_mode=True; fixed_delta_seconds=0.05; no_rendering_mode=True
 class World:
     def __init__(self,actors): self.actors=actors; self.snap=Snap(); self.map=Map(actors)
     def get_snapshot(self): return self.snap
     def get_map(self): return self.map
     def get_actors(self): return list(self.actors)
     def get_settings(self): return Settings()
+class Client:
+    def __init__(self,client='0.9.x',server='0.9.x'): self.client=client; self.server=server
+    def get_client_version(self): return self.client
+    def get_server_version(self): return self.server
 
 class RuntimeAdapterTests(unittest.TestCase):
     def setUp(self):
@@ -103,7 +108,36 @@ class RuntimeAdapterTests(unittest.TestCase):
             self.assertEqual(ident['map_name'],'Town10HD_Opt')
             self.assertTrue(ident['synchronous_mode'])
             self.assertEqual(ident['fixed_delta_seconds'],0.05)
+            self.assertIsNone(ident['carla_client_version'])
+            self.assertIsNone(ident['carla_server_version'])
+            with self.assertRaises(CARLARuntimeInvariantError):
+                validate_runtime_identity(ident)
         finally:
             if old is not None: sys.modules['carla']=old
+
+    def test_live_identity_requires_matching_client_server_versions(self):
+        ident=runtime_identity(self.world,Client('0.9.x','0.9.y'))
+        with self.assertRaises(CARLARuntimeInvariantError):
+            validate_runtime_identity(ident)
+
+    def test_live_identity_accepts_protocol_runtime_without_inventing_version(self):
+        ident=runtime_identity(self.world,Client('0.9.x','0.9.x'))
+        checked=validate_runtime_identity(ident)
+        self.assertEqual(checked['carla_client_version'],'0.9.x')
+        self.assertEqual(checked['carla_server_version'],'0.9.x')
+        self.assertEqual(checked['map_name'],'Town10HD_Opt')
+        self.assertTrue(checked['synchronous_mode'])
+        self.assertEqual(checked['fixed_delta_seconds'],0.05)
+
+    def test_identity_rejects_wrong_map_or_async_or_wrong_delta(self):
+        good=runtime_identity(self.world,Client())
+        for patch in (
+            {'map_name':'Town04'},
+            {'synchronous_mode':False},
+            {'fixed_delta_seconds':0.1},
+        ):
+            bad=dict(good); bad.update(patch)
+            with self.assertRaises(CARLARuntimeInvariantError):
+                validate_runtime_identity(bad)
 
 if __name__=='__main__': unittest.main()
