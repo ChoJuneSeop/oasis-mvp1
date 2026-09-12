@@ -88,8 +88,8 @@ class ThreeLayerTests(unittest.TestCase):
         self.worker.submit_post(post_observation=flow.post_observation(front_present=front),
             post_tau=flow.tau + 0.1, tick_index=1, carla_frame=flow.epoch + 1)
 
-    def test_individual_joint_probes_and_completed_provenance_match_frozen(self):
-        history = seed_history(self.core, self.closure, self.root)
+    def test_validation_matches_frozen_and_relation_preserves_independent_provenance(self):
+        seed_history(self.core, self.closure, self.root)
         reference = deepcopy(self.core)
         reference_journal = ExecutionJournal(":memory:")
         expected = execute(reference, Flow(epoch=200, tau=10), reference_journal, run_id="three-layer")
@@ -100,7 +100,8 @@ class ThreeLayerTests(unittest.TestCase):
         with patch.object(self.core, "ablate_relation", side_effect=AssertionError("action ablation")), \
              patch.object(self.core, "ablate_relation_group", side_effect=AssertionError("action joint probe")):
             actual = self.decide(harness, flow)
-        self.assertIsInstance(actual.execution.recorder, DeferredProbes)
+        deferred = actual.execution.recorder
+        self.assertIsInstance(deferred, DeferredProbes)
         self.assertEqual(actual.selected, expected.selected)
         self.assertEqual(actual.responsibility_record, expected.responsibility_record)
         actual.responsibility_record["after_submit_mutation"] = True
@@ -110,20 +111,59 @@ class ThreeLayerTests(unittest.TestCase):
         self.assertNotEqual(health.validation_pid, os.getpid())
         self.assertNotEqual(health.relation_pid, os.getpid())
         self.assertNotEqual(health.validation_pid, health.relation_pid)
+
+        # Observation/Validation remains the full frozen G3.2 measurement record.
         ledger = OrganicEvidenceLedger(str(self.worker.validation_evidence_path))
         decision = ledger.events()[0]["payload"]
         ledger.close()
         self.assertNotIn("after_submit_mutation", decision["responsibility"])
-        self.assertEqual(decision["decision_record"], json.loads(json.dumps(expected.execution.recorder.decision_record())))
+        self.assertEqual(
+            decision["decision_record"],
+            json.loads(json.dumps(expected.execution.recorder.decision_record())),
+        )
+
+        # Relation/Experience must not wait for that measurement. It preserves the
+        # realized/Closure facts and decision-time relation genealogy, but does not
+        # mislabel unobserved deferred measurements as zero-valued participation.
         ledger = OrganicEvidenceLedger(str(self.worker.evidence_path))
         completed = ledger.events()[0]["payload"]["history_entry"]
         ledger.close()
         manager = FrontRelationEpisodeManager(self.closure, scope_id="three-layer")
         manager.begin(expected)
         from dataclasses import asdict
-        expected_entry = manager.observe_post(post_observation=flow.post_observation(front_present=False),
-                                             post_tau=10.1)[0].record.history_entry
-        self.assertEqual(completed, json.loads(json.dumps(asdict(expected_entry))))
+        expected_entry = manager.observe_post(
+            post_observation=flow.post_observation(front_present=False), post_tau=10.1
+        )[0].record.history_entry
+        expected_dict = json.loads(json.dumps(asdict(expected_entry)))
+        for key in (
+            "entry_id", "decision_tau", "realized_tau", "outcome_tau",
+            "relation_end_tau", "selected_possibility_id", "realization_ref",
+            "realization_count", "outcome_description", "current_reality",
+            "closure_method",
+        ):
+            self.assertEqual(completed[key], expected_dict[key], key)
+        for key, value in expected_dict["closure_evidence"].items():
+            self.assertEqual(completed["closure_evidence"][key], value, key)
+        self.assertEqual(completed["participation"], [])
+        self.assertEqual(completed["group_participation"], [])
+        self.assertEqual(completed["reconstruction"], [])
+        self.assertEqual(completed["provenance"], [])
+        self.assertEqual(
+            completed["closure_evidence"]["decision_snapshot_digest"], deferred.digest
+        )
+        self.assertEqual(
+            completed["closure_evidence"]["observational_validation"],
+            "independent_deferred",
+        )
+        relation_refs = tuple(
+            (
+                item["experience_id"],
+                item["relation_element_id"],
+                float(item["completed_at_tau"]),
+            )
+            for item in completed["closure_evidence"]["decision_relation_refs"]
+        )
+        self.assertEqual(relation_refs, deferred.relation_refs)
         self.assertEqual(health.queued_events, 0)
         self.assertEqual(health.validation_backlog, 0)
         self.assertGreaterEqual(health.publication_lag_seconds, 0)
