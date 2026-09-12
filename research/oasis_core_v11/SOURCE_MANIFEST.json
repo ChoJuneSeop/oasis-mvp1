@@ -1,0 +1,25 @@
+{
+  "model": "OASIS Core v1.1 G3.2 current-formalization scaffold",
+  "date": "2026-09-12",
+  "branch": "implementation/oasis-core-v1.1-g32-current",
+  "pre_freeze_verified_commit": "0f139105358de2722696099afd9b2692aee9ebea",
+  "core_sha256": "1ce3cafdd4da1fae5b481499d07ec2d5b7ab1c1830b82b6c59b915e0eb595bdb",
+  "test_sha256": "caba2f278a92b0fc2d09d8a180fa98a38871c7fde88f610b5e6bc7428869f0b8",
+  "canonical_harness_branch": "implementation/carla-v22-harness-v1.1-canonical",
+  "canonical_harness_source_sha256": "2549fd63c3aac03146c225ba4d32a86a9339acbdfce64f100f99a265d7147b4e",
+  "g32_sidecar_source_commit": "c6982b728dc391aa160ea0bcb46652634690a709",
+  "g32_sidecar_tree_sha": "7595131af0fd8a4a6b3d47a242be720edd5265c3",
+  "verified_invariants": [
+    "relation operator receives no age or completed timestamp",
+    "swapping old/recent timestamps does not change current distribution",
+    "history insertion order does not change current distribution",
+    "no current relation means no past participation",
+    "past relation cannot resurrect a non-current candidate",
+    "reconstruction-added possibility requires current evidence",
+    "individual distribution effect may be zero while joint effect is nonzero",
+    "responsibility remains U/I/V/T vector plus optional domain variables, not one scalar score"
+  ],
+  "scope": "Core orchestration and anti-lock-in invariants only; CARLA domain semantics and controller policy are not yet admitted",
+  "experimental_evidence": false,
+  "real_carla_g32_execution": "BLOCKED_UNTIL_DOMAIN_OPERATORS_ARE_FROZEN"
+}
