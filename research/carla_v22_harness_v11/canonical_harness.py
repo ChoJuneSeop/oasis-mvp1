@@ -42,9 +42,7 @@ class PresentObservation:
     @classmethod
     def from_mapping(cls, data: Mapping[str, Any]) -> "PresentObservation":
         if tuple(data.keys()) != APPROVED_OBSERVATION_FIELDS:
-            raise HarnessInvariantError(
-                f"observation schema mismatch: {tuple(data.keys())}"
-            )
+            raise HarnessInvariantError(f"observation schema mismatch: {tuple(data.keys())}")
         return cls(**data)
 
 
@@ -55,11 +53,7 @@ class VehicleActuation:
     steer: float
 
     def __post_init__(self) -> None:
-        for name, value in (
-            ("throttle", self.throttle),
-            ("brake", self.brake),
-            ("steer", self.steer),
-        ):
+        for name, value in (("throttle", self.throttle), ("brake", self.brake), ("steer", self.steer)):
             if not isinstance(value, (int, float)):
                 raise HarnessInvariantError(f"{name} must be numeric")
         if not 0.0 <= float(self.throttle) <= 1.0:
@@ -88,18 +82,10 @@ class Realization:
 class PresentFlowPort(Protocol):
     """Host-side CARLA adapter. The Core never receives this object."""
 
-    def current_tau(self) -> float:
-        ...
-
-    def present_observation(self) -> Mapping[str, Any]:
-        ...
-
-    def current_reality(self) -> Mapping[str, Any]:
-        ...
-
-    def flow_fingerprint(self) -> str:
-        ...
-
+    def current_tau(self) -> float: ...
+    def present_observation(self) -> Mapping[str, Any]: ...
+    def current_reality(self) -> Mapping[str, Any]: ...
+    def flow_fingerprint(self) -> str: ...
     def apply_single_actuation(self, actuation: VehicleActuation) -> str:
         """Apply exactly one real VehicleControl-equivalent actuation and return a realization ref."""
         ...
@@ -108,29 +94,28 @@ class PresentFlowPort(Protocol):
 class CanonicalCorePort(Protocol):
     """OASIS Core boundary under Protocol v2.2.
 
-    No CARLA world, map, raw actor, seed, trigger, future trajectory or scenario label
-    is passed through this interface.
+    Current flow time `tau` is passed explicitly. It must never be reconstructed from
+    epoch number or simulator delta. No CARLA world, map, raw actor, seed, trigger,
+    future trajectory or scenario label is passed through this interface.
     """
 
-    def open_epoch(self, observation: PresentObservation) -> CoreEpochView:
-        ...
+    def open_epoch(self, observation: PresentObservation, tau: float) -> CoreEpochView: ...
 
     def ablate_relation(
         self,
         observation: PresentObservation,
         relation: RelationElementRef,
-    ) -> Mapping[str, float]:
-        ...
+        tau: float,
+    ) -> Mapping[str, float]: ...
 
     def ablate_relation_group(
         self,
         observation: PresentObservation,
         relations: Sequence[RelationElementRef],
-    ) -> Mapping[str, float]:
-        ...
+        tau: float,
+    ) -> Mapping[str, float]: ...
 
-    def realize(self, observation: PresentObservation) -> Realization:
-        ...
+    def realize(self, observation: PresentObservation, tau: float) -> Realization: ...
 
 
 @dataclass(frozen=True)
@@ -164,7 +149,7 @@ class CanonicalHarnessV11:
         current_reality = dict(flow.current_reality())
         before = flow.flow_fingerprint()
 
-        view = self.core.open_epoch(observation)
+        view = self.core.open_epoch(observation, tau)
         recorder = G32EpochRecorder(
             tau=tau,
             flow_fingerprint=before,
@@ -173,9 +158,8 @@ class CanonicalHarnessV11:
             possibility_distribution=view.possibility_distribution,
         )
 
-        # Individual relation probes: pure, current-epoch measurements only.
         for relation in view.relation_elements:
-            ablated = self.core.ablate_relation(observation, relation)
+            ablated = self.core.ablate_relation(observation, relation, tau)
             after_probe = flow.flow_fingerprint()
             key = self._relation_key(relation)
             recorder.record_relation_probe(
@@ -187,11 +171,14 @@ class CanonicalHarnessV11:
                 generated_possibilities=view.generated_by_relation.get(key, ()),
             )
 
-        # Multi-source reconstructions require a matching joint probe.
         for reconstruction in view.reconstructions:
+            if float(reconstruction.observed_at_tau) != tau:
+                raise HarnessInvariantError(
+                    "reconstruction observed_at_tau must equal current host flow tau"
+                )
             sources = tuple(link.source for link in reconstruction.source_links)
             if len(sources) > 1:
-                group_ablated = self.core.ablate_relation_group(observation, sources)
+                group_ablated = self.core.ablate_relation_group(observation, sources, tau)
                 after_group_probe = flow.flow_fingerprint()
                 generated = tuple(
                     p
@@ -207,11 +194,12 @@ class CanonicalHarnessV11:
                 )
             recorder.record_reconstruction(reconstruction)
 
-        # The real world must still be unchanged before realization.
         if flow.flow_fingerprint() != before:
             raise HarnessInvariantError("decision-time probing mutated or advanced real flow")
+        if float(flow.current_tau()) != tau:
+            raise HarnessInvariantError("decision-time probing advanced or rewound real-flow tau")
 
-        realization = self.core.realize(observation)
+        realization = self.core.realize(observation, tau)
         if realization.selected_possibility_id not in recorder.possibility_distribution:
             raise HarnessInvariantError("selected possibility was absent from current distribution")
 
