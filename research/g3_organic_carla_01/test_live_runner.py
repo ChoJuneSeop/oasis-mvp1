@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -12,6 +13,12 @@ from research.g3_organic_carla_01.protocol import (
     flow_spec,
     load_preregistration,
     verify_frozen_organic_sources,
+)
+from research.g3_organic_carla_01.release_gate import (
+    REQUEST_NAME,
+    authorize_release,
+    build_release_request,
+    verify_release_token,
 )
 from research.g3_organic_carla_01.run_audit import RunAuditLedger
 from research.oasis_core_v11.current_relational_core import CoreV11InvariantError
@@ -80,6 +87,24 @@ class LoadClient:
         return self.world
     def get_world(self):
         return self.world
+
+
+def _write_ready_status(root: Path, request_sha: str, *, phase="PRE_FIRST_TICK_READY"):
+    (root / "status.json").write_text(
+        json.dumps(
+            {
+                "protocol_id": "G3-ORGANIC-CARLA-01",
+                "phase": phase,
+                "empirical_evidence": False,
+                "empirical_ticks": 0,
+                "release_request_sha256": request_sha,
+                "runtime_identity_sha256": "runtime-sha",
+                "scene_manifest_sha256": "scene-sha",
+            },
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
 
 
 class IndependentExperimentTests(unittest.TestCase):
@@ -161,6 +186,73 @@ class IndependentExperimentTests(unittest.TestCase):
             with self.assertRaises(CoreV11InvariantError):
                 audit.validate_tick_sequence(2)
             audit.close()
+
+    def test_release_requires_ready_zero_tick_status_and_explicit_approval(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _, request_sha = build_release_request(
+                run_dir=root,
+                flow_id="OF-01",
+                attempt=1,
+                preregistration_sha256="prereg-sha",
+                experiment_source_manifest_sha256="manifest-sha",
+                runtime_identity_sha256="runtime-sha",
+                scene_manifest_sha256="scene-sha",
+                pre_first_tick_carla_frame=100,
+                pre_first_tick_tau=5.0,
+                pre_first_tick_current_revision="revision-1",
+            )
+            _write_ready_status(root, request_sha)
+            with self.assertRaises(CoreV11InvariantError):
+                authorize_release(root, explicit_approval=False)
+            authorize_release(root, explicit_approval=True)
+            token = verify_release_token(root, expected_request_sha256=request_sha)
+            self.assertTrue(token["explicit_operator_action"])
+            self.assertFalse(token["empirical_evidence"])
+            self.assertFalse(token["outcome_data_included"])
+
+    def test_release_request_mutation_invalidates_token(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _, request_sha = build_release_request(
+                run_dir=root,
+                flow_id="OF-01",
+                attempt=1,
+                preregistration_sha256="prereg-sha",
+                experiment_source_manifest_sha256="manifest-sha",
+                runtime_identity_sha256="runtime-sha",
+                scene_manifest_sha256="scene-sha",
+                pre_first_tick_carla_frame=100,
+                pre_first_tick_tau=5.0,
+                pre_first_tick_current_revision="revision-1",
+            )
+            _write_ready_status(root, request_sha)
+            authorize_release(root, explicit_approval=True)
+            path = root / REQUEST_NAME
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload["pre_first_tick_current_revision"] = "mutated"
+            path.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+            with self.assertRaises(CoreV11InvariantError):
+                verify_release_token(root, expected_request_sha256=request_sha)
+
+    def test_release_rejected_if_ready_phase_is_lost(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _, request_sha = build_release_request(
+                run_dir=root,
+                flow_id="OF-01",
+                attempt=1,
+                preregistration_sha256="prereg-sha",
+                experiment_source_manifest_sha256="manifest-sha",
+                runtime_identity_sha256="runtime-sha",
+                scene_manifest_sha256="scene-sha",
+                pre_first_tick_carla_frame=100,
+                pre_first_tick_tau=5.0,
+                pre_first_tick_current_revision="revision-1",
+            )
+            _write_ready_status(root, request_sha, phase="LIVE_RUNNING")
+            with self.assertRaises(CoreV11InvariantError):
+                authorize_release(root, explicit_approval=True)
 
 
 if __name__ == "__main__":
