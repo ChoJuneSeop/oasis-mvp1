@@ -37,7 +37,7 @@ class ExternalCarlaRunnerTests(unittest.TestCase):
         world.apply_settings.assert_called_once_with(settings)
         tm.set_synchronous_mode.assert_called_once_with(True)
         tm.set_random_device_seed.assert_called_once_with(111268688)
-        self.assertFalse(hasattr(client, "load_world_called"))
+        client.load_world.assert_not_called()
 
     def test_wrong_map_fails_instead_of_reloading(self):
         client = mock.MagicMock()
@@ -56,6 +56,7 @@ class ExternalCarlaRunnerTests(unittest.TestCase):
 
         with self.assertRaises(Exception):
             external.prepare_existing_world(client, protocol, seed=111268688)
+        client.load_world.assert_not_called()
 
 
 if __name__ == "__main__":
