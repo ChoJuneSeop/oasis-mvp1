@@ -10,14 +10,12 @@ from typing import Protocol
 from research.carla_v22_harness_v11.canonical_harness import (
     DecisionExecution,
     HarnessInvariantError,
-    PresentObservation,
     Realization,
 )
 from research.g3_2_sidecar.common import RelationElementRef, require_tau
 from research.g3_2_sidecar.runtime_extension import G32EpochRecorder
-from research.integration_checkpoint.frame import current_frame_from_host
 from research.oasis_core_v11.current_relational_core import CoreV11InvariantError
-from research.oasis_core_v12.contracts import require_text
+from research.oasis_core_v12.contracts import CurrentFrame, require_text
 from research.oasis_core_v12.runtime import (
     ApplicationReceipt,
     DuplicateDispatch,
@@ -27,10 +25,10 @@ from research.oasis_core_v12.runtime import (
 
 
 class AtomicOrganicFlowPort(Protocol):
-    def current_tau(self) -> float: ...
-    def present_observation(self): ...
-    def current_reality(self): ...
-    def flow_fingerprint(self) -> str: ...
+    def capture(self) -> CurrentFrame:
+        """Atomically capture approved present observation, tau, revision and evidence."""
+        ...
+
     def apply_if_current(
         self,
         realization: Realization,
@@ -67,37 +65,62 @@ class OrganicHarness:
     def _relation_key(relation: RelationElementRef) -> tuple[str, str]:
         return (relation.experience_id, relation.relation_element_id)
 
-    def _record_probes(self, flow, *, tau, observation, before, view):
+    @staticmethod
+    def _same_current(left: CurrentFrame, right: CurrentFrame) -> bool:
+        return (
+            float(left.tau) == float(right.tau)
+            and left.revision == right.revision
+            and left.observation == right.observation
+            and left.evidence == right.evidence
+        )
+
+    def _assert_probe_preserved_flow(
+        self, flow: AtomicOrganicFlowPort, initial: CurrentFrame
+    ) -> CurrentFrame:
+        current = flow.capture()
+        if float(current.tau) < float(initial.tau):
+            raise HarnessInvariantError("gateway time moved backwards during a probe")
+        if not self._same_current(initial, current):
+            raise HarnessInvariantError(
+                "decision-time counterfactual probing changed or advanced the real flow"
+            )
+        return current
+
+    def _record_probes(self, flow, *, frame: CurrentFrame, view):
+        # current_reality is the approved present observation bound to this exact frame.
+        # Raw world state, actor ids, seed and map topology never enter this record.
         recorder = G32EpochRecorder(
-            tau=tau,
-            flow_fingerprint=before,
-            current_reality=dict(flow.current_reality()),
+            tau=float(frame.tau),
+            flow_fingerprint=frame.revision,
+            current_reality=asdict(frame.observation),
             relation_elements=tuple(view.relation_elements),
             possibility_distribution=view.possibility_distribution,
         )
 
         for relation in view.relation_elements:
-            ablated = self.core.ablate_relation(observation, relation)
-            after_probe = flow.flow_fingerprint()
+            ablated = self.core.ablate_relation(frame.observation, relation)
+            self._assert_probe_preserved_flow(flow, frame)
             key = self._relation_key(relation)
             recorder.record_relation_probe(
                 relation,
-                before_fingerprint=before,
-                after_fingerprint=after_probe,
+                before_fingerprint=frame.revision,
+                after_fingerprint=frame.revision,
                 relation_ablated_distribution=ablated,
                 role_trace=view.role_trace_by_relation.get(key, ()),
                 generated_possibilities=view.generated_by_relation.get(key, ()),
             )
 
         for reconstruction in view.reconstructions:
-            if float(reconstruction.observed_at_tau) != float(tau):
+            if float(reconstruction.observed_at_tau) != float(frame.tau):
                 raise HarnessInvariantError(
                     "reconstruction observed_at_tau must equal current host flow tau"
                 )
             sources = tuple(link.source for link in reconstruction.source_links)
             if len(sources) > 1:
-                group_ablated = self.core.ablate_relation_group(observation, sources)
-                after_group_probe = flow.flow_fingerprint()
+                group_ablated = self.core.ablate_relation_group(
+                    frame.observation, sources
+                )
+                self._assert_probe_preserved_flow(flow, frame)
                 generated = tuple(
                     possibility
                     for relation in sources
@@ -107,17 +130,14 @@ class OrganicHarness:
                 )
                 recorder.record_group_probe(
                     sources,
-                    before_fingerprint=before,
-                    after_fingerprint=after_group_probe,
+                    before_fingerprint=frame.revision,
+                    after_fingerprint=frame.revision,
                     group_ablated_distribution=group_ablated,
                     generated_possibilities=generated,
                 )
             recorder.record_reconstruction(reconstruction)
 
-        if flow.flow_fingerprint() != before or float(flow.current_tau()) != float(tau):
-            raise HarnessInvariantError(
-                "decision-time counterfactual probing changed or advanced the real flow"
-            )
+        self._assert_probe_preserved_flow(flow, frame)
         return recorder
 
     def execute_decision_epoch(
@@ -132,9 +152,11 @@ class OrganicHarness:
         require_text(subject_id, "subject_id")
         deadline = require_tau("deadline_tau", deadline_tau)
 
-        tau = float(flow.current_tau())
-        observation = PresentObservation.from_mapping(flow.present_observation())
-        before = flow.flow_fingerprint()
+        # One atomic frame is the sole premise for this Decision Epoch.
+        frame = flow.capture()
+        tau = float(frame.tau)
+        observation = frame.observation
+        before = frame.revision
         key = json.dumps(
             [run_id, subject_id, observation.epoch], separators=(",", ":")
         )
@@ -143,14 +165,13 @@ class OrganicHarness:
                 "this subject/decision epoch already has an actuation reservation"
             )
         if tau > deadline:
-            self.journal.event(key, "deferred", {"reason": "decision deadline already elapsed"})
+            self.journal.event(
+                key, "deferred", {"reason": "decision deadline already elapsed"}
+            )
             raise CoreV11InvariantError("decision deadline already elapsed")
 
-        frame = current_frame_from_host(observation, tau=tau, revision=before)
         view = self.core.open_current_epoch(frame)
-        recorder = self._record_probes(
-            flow, tau=tau, observation=observation, before=before, view=view
-        )
+        recorder = self._record_probes(flow, frame=frame, view=view)
 
         selected = self.core.realize(observation)
         if selected.selected_possibility_id not in recorder.possibility_distribution:
@@ -171,39 +192,42 @@ class OrganicHarness:
             },
         )
 
-        current_tau = float(flow.current_tau())
-        current_observation = PresentObservation.from_mapping(flow.present_observation())
-        current_revision = flow.flow_fingerprint()
-        if (
-            current_tau < tau
-            or current_revision != before
-            or current_observation != observation
-        ):
+        # Reality is not assumed frozen while reasoning. Re-capture atomically.
+        current = flow.capture()
+        if float(current.tau) < tau:
+            raise CoreV11InvariantError("gateway clock moved backwards")
+        if not self._same_current(frame, current):
             self.journal.event(
                 key,
                 "invalidated",
-                {"reason": "current premises changed before dispatch", "tau": current_tau},
+                {
+                    "reason": "current premises changed before dispatch",
+                    "tau": float(current.tau),
+                },
             )
             raise StaleDecision(
                 "current reality changed during reasoning; rebuild from the new current flow"
             )
-        if current_tau > deadline:
+        if float(current.tau) > deadline:
             self.journal.event(
                 key,
                 "deferred",
-                {"reason": "decision deadline elapsed before dispatch", "tau": current_tau},
+                {
+                    "reason": "decision deadline elapsed before dispatch",
+                    "tau": float(current.tau),
+                },
             )
             raise CoreV11InvariantError("decision deadline elapsed before dispatch")
-        if self.authorize(current_observation, selected) is not True:
-            self.journal.event(key, "not_authorized", {"tau": current_tau})
+        if self.authorize(current.observation, selected) is not True:
+            self.journal.event(key, "not_authorized", {"tau": float(current.tau)})
             raise CoreV11InvariantError("current proposal lacks execution authority")
 
         self.journal.reserve(
             key,
             {
                 "decision_tau": tau,
-                "attempt_tau": current_tau,
-                "revision": current_revision,
+                "attempt_tau": float(current.tau),
+                "revision": current.revision,
                 "proposal": asdict(selected),
                 "resources": resource_plan,
             },
@@ -211,12 +235,14 @@ class OrganicHarness:
         try:
             receipt = flow.apply_if_current(
                 selected,
-                expected_revision=current_revision,
+                expected_revision=current.revision,
                 idempotency_key=key,
             )
             if not isinstance(receipt, ApplicationReceipt):
-                raise CoreV11InvariantError("atomic flow port returned an invalid application receipt")
-            if receipt.observed_at_tau < current_tau:
+                raise CoreV11InvariantError(
+                    "atomic flow port returned an invalid application receipt"
+                )
+            if receipt.observed_at_tau < float(current.tau):
                 raise CoreV11InvariantError("application receipt is backdated")
         except Exception as exc:
             self.journal.event(
@@ -227,6 +253,9 @@ class OrganicHarness:
 
         execution = None
         if receipt.applied is True:
+            # Post-application capture is observational provenance only; it is not fed
+            # back into the just-completed decision.
+            after = flow.capture()
             execution = DecisionExecution(
                 tau=tau,
                 realization_tau=float(receipt.observed_at_tau),
@@ -235,7 +264,7 @@ class OrganicHarness:
                 realization=deepcopy(selected),
                 realization_ref=receipt.realization_ref,
                 before_fingerprint=before,
-                after_realization_fingerprint=flow.flow_fingerprint(),
+                after_realization_fingerprint=after.revision,
             )
 
         return OrganicDecisionResult(
