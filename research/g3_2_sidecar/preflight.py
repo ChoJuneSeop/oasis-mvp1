@@ -61,12 +61,16 @@ def runtime_preflight(port: FrozenFlowPort, policy: PolicyDeclaration) -> Prefli
         checks.append("counterfactual observation leaves flow fingerprint unchanged")
         checks.append("counterfactual observation does not advance tau")
         checks.append("all historical elements satisfy completed_at_tau <= current tau")
+        checks.append("reconstruction provenance contains no future relation")
         for measurement in observation.participation:
             if measurement.relation.completed_at_tau > observation.snapshot.tau:
                 violations.append("future relation element entered current participation")
         for rec in observation.reconstruction:
             if len(rec.vector) != 3:
                 violations.append("reconstruction axes were collapsed or malformed")
+            for link in rec.source_links:
+                if link.source.completed_at_tau > observation.snapshot.tau:
+                    violations.append("future relation entered reconstruction provenance")
     except (G32InvariantError, RuntimeError, ValueError) as exc:
         violations.append(str(exc))
 
