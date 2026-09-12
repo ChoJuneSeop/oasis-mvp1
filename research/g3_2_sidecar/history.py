@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any, Mapping
 
 from .common import G32InvariantError, require_tau
-from .participation import ParticipationMeasurement
+from .participation import GroupParticipationMeasurement, ParticipationMeasurement
 from .reconstruction import ProvenanceLink, ReconstructionMeasurement
 
 
@@ -19,6 +19,7 @@ class HistoryEntry:
     outcome_description: str
     current_reality: Mapping[str, Any] = field(default_factory=dict)
     participation: tuple[ParticipationMeasurement, ...] = ()
+    group_participation: tuple[GroupParticipationMeasurement, ...] = ()
     reconstruction: tuple[ReconstructionMeasurement, ...] = ()
     provenance: tuple[ProvenanceLink, ...] = ()
     closure_method: str = ""
@@ -42,6 +43,12 @@ class HistoryEntry:
         for item in self.participation:
             if item.observed_at_tau > d:
                 raise G32InvariantError("post-decision participation cannot enter provenance")
+        for item in self.group_participation:
+            if item.observed_at_tau > d:
+                raise G32InvariantError("post-decision group participation cannot enter provenance")
+            for relation in item.relations:
+                if relation.completed_at_tau > d:
+                    raise G32InvariantError("future relation entered group provenance")
         for item in self.reconstruction:
             if item.observed_at_tau > d:
                 raise G32InvariantError("post-decision reconstruction cannot enter provenance")
