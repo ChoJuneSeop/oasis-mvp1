@@ -1,0 +1,25 @@
+{
+  "profile_id": "G3-ORGANIC-CARLA-01-STAGED-5S-HOST",
+  "profile_version": "1.0",
+  "scope": "HOST_INFRASTRUCTURE_ONLY",
+  "semantic_source_mutation": false,
+  "outcome_semantics_inspected": false,
+  "stage_delay_seconds": 5.0,
+  "stage_policy": [
+    "after_carla_process_start",
+    "after_rpc_ready",
+    "after_no_rendering_mode_apply",
+    "after_client_server_version_check",
+    "after_target_map_reacquired",
+    "after_sync_fixed_delta_apply",
+    "after_traffic_manager_commands",
+    "after_scene_spawn"
+  ],
+  "empirical_boundary_unchanged": true,
+  "source_sha256": {
+    "staged_flow_runner.py": "41371a8fae8ec8d799122c83ae92bf6da4577d5b6e88816e78eac26d1e6e9658",
+    "windows_orchestrator_staged.py": "bc03262c596b8df0ce207bb989793b5b577d2cfcf81be088cc8e122f641c6e22",
+    "run_of01_staged.bat": "d3f5f92395f1845f322195815d3ebcd3ef3b7855ec0edce27fe7e429a863fe97",
+    "test_staged_orchestrator.py": "bd301d51ced9aa1ab11be8ed014afb1f31089cdce0457afcaabe54ee10b800e7"
+  }
+}
