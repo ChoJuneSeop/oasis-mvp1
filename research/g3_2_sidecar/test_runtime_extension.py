@@ -14,6 +14,25 @@ class RuntimeExtensionTests(unittest.TestCase):
             relation_descriptor={"process": "approach"},
         )
 
+    def make_link(self, rel, effect=0.0):
+        return ProvenanceLink(
+            source=rel,
+            distribution_effect=effect,
+            participation_roles=("possibility-generation",),
+            generated_possibilities=("yield",),
+            contribution_trace={"possibility": "yield"},
+        )
+
+    def make_reconstruction(self, links):
+        return ReconstructionMeasurement(
+            possibility_id="yield",
+            observed_at_tau=10.0,
+            source_links=tuple(links),
+            recombination=AxisObservation(0.2, "graph-delta", {"sources": len(links)}),
+            role_transformation=AxisObservation(0.4, "role-delta", {"changed": True}),
+            structural_transformation=AxisObservation(0.3, "structure-delta", {"new_edge": True}),
+        )
+
     def test_epoch_to_history_flow(self):
         rel = self.make_relation()
         rec = G32EpochRecorder(
@@ -34,21 +53,7 @@ class RuntimeExtensionTests(unittest.TestCase):
         self.assertGreater(p.distribution_effect, 0.0)
         self.assertTrue(p.has_structural_participation)
 
-        link = ProvenanceLink(
-            source=rel,
-            distribution_effect=p.distribution_effect,
-            participation_roles=p.role_trace,
-            generated_possibilities=p.generated_possibilities,
-            contribution_trace={"possibility": "yield"},
-        )
-        r = ReconstructionMeasurement(
-            possibility_id="yield",
-            observed_at_tau=10.0,
-            source_links=(link,),
-            recombination=AxisObservation(0.2, "graph-delta", {"sources": 1}),
-            role_transformation=AxisObservation(0.4, "role-delta", {"changed": True}),
-            structural_transformation=AxisObservation(0.3, "structure-delta", {"new_edge": True}),
-        )
+        r = self.make_reconstruction((self.make_link(rel, p.distribution_effect),))
         rec.record_reconstruction(r)
 
         entry = rec.complete_history_entry(
@@ -106,6 +111,39 @@ class RuntimeExtensionTests(unittest.TestCase):
             generated_possibilities=("a",),
         )
         self.assertGreater(group.joint_distribution_effect, 0.0)
+
+    def test_multi_relation_reconstruction_requires_matching_joint_probe(self):
+        rel1 = self.make_relation("E1-r1")
+        rel2 = self.make_relation("E1-r2")
+        rec = G32EpochRecorder(
+            tau=10.0,
+            flow_fingerprint="flow-10",
+            current_reality={},
+            relation_elements=(rel1, rel2),
+            possibility_distribution={"yield": 0.5, "continue": 0.5},
+        )
+        for rel in (rel1, rel2):
+            rec.record_relation_probe(
+                rel,
+                before_fingerprint="flow-10",
+                after_fingerprint="flow-10",
+                relation_ablated_distribution={"yield": 0.5, "continue": 0.5},
+                role_trace=("joint-source",),
+                generated_possibilities=("yield",),
+            )
+        reconstruction = self.make_reconstruction((self.make_link(rel1), self.make_link(rel2)))
+        with self.assertRaises(G32InvariantError):
+            rec.record_reconstruction(reconstruction)
+
+        rec.record_group_probe(
+            (rel1, rel2),
+            before_fingerprint="flow-10",
+            after_fingerprint="flow-10",
+            group_ablated_distribution={"yield": 0.2, "continue": 0.8},
+            generated_possibilities=("yield",),
+        )
+        rec.record_reconstruction(reconstruction)
+        self.assertEqual(len(rec.reconstruction), 1)
 
     def test_probe_must_not_change_flow(self):
         rel = self.make_relation()
