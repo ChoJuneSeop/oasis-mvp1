@@ -15,6 +15,8 @@ jobs:
           python-version: '3.11'
       - name: Fold operator regression
         run: python -m unittest research.g3_realtime_split_v1.test_fold_operator -v
+      - name: Fold counterexample qualification
+        run: python -m unittest research.g3_realtime_split_v1.test_fold_counterexamples -v
       - name: Independent fanout regression
         run: python -m unittest research.g3_realtime_split_v1.test_independent_fanout -v
       - name: Three-layer runtime regression
@@ -31,6 +33,8 @@ jobs:
           python-version: '3.11'
       - name: Fold operator regression
         run: python -m unittest research.g3_realtime_split_v1.test_fold_operator -v
+      - name: Fold counterexample qualification
+        run: python -m unittest research.g3_realtime_split_v1.test_fold_counterexamples -v
       - name: Independent fanout regression
         run: python -m unittest research.g3_realtime_split_v1.test_independent_fanout -v
       - name: Three-layer runtime regression
