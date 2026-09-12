@@ -5,7 +5,13 @@ from typing import Any, Mapping, Sequence
 
 from .common import G32InvariantError, RelationElementRef, normalize_distribution, require_tau
 from .history import HistoryEntry
-from .participation import CounterfactualProbeResult, ParticipationMeasurement, measure_participation
+from .participation import (
+    CounterfactualProbeResult,
+    GroupParticipationMeasurement,
+    ParticipationMeasurement,
+    measure_group_participation,
+    measure_participation,
+)
 from .reconstruction import ProvenanceLink, ReconstructionMeasurement
 
 
@@ -23,6 +29,7 @@ class G32EpochRecorder:
     relation_elements: tuple[RelationElementRef, ...]
     possibility_distribution: Mapping[str, float]
     participation: list[ParticipationMeasurement] = field(default_factory=list)
+    group_participation: list[GroupParticipationMeasurement] = field(default_factory=list)
     reconstruction: list[ReconstructionMeasurement] = field(default_factory=list)
 
     def __post_init__(self) -> None:
@@ -61,6 +68,32 @@ class G32EpochRecorder:
         self.participation.append(measurement)
         return measurement
 
+    def record_group_probe(
+        self,
+        relations: Sequence[RelationElementRef],
+        *,
+        before_fingerprint: str,
+        after_fingerprint: str,
+        group_ablated_distribution: Mapping[str, float],
+        generated_possibilities: Sequence[str] = (),
+    ) -> GroupParticipationMeasurement:
+        rels = tuple(relations)
+        if any(rel not in self.relation_elements for rel in rels):
+            raise G32InvariantError("group probe contains relation outside the epoch relation set")
+        if before_fingerprint != self.flow_fingerprint or after_fingerprint != self.flow_fingerprint:
+            raise G32InvariantError("group probe changed or mismatched the real-flow fingerprint")
+        measurement = measure_group_participation(
+            self.tau,
+            rels,
+            state_hash_before=before_fingerprint,
+            state_hash_after=after_fingerprint,
+            full_distribution=self.possibility_distribution,
+            group_ablated_distribution=group_ablated_distribution,
+            generated_possibilities=generated_possibilities,
+        )
+        self.group_participation.append(measurement)
+        return measurement
+
     def record_reconstruction(self, measurement: ReconstructionMeasurement) -> None:
         if measurement.observed_at_tau != self.tau:
             raise G32InvariantError("reconstruction is not aligned with the current epoch")
@@ -90,8 +123,9 @@ class G32EpochRecorder:
                     raise G32InvariantError("reconstruction source lacks participation measurement")
                 seen[key] = ProvenanceLink(
                     source=link.source,
-                    participation_degree=p.degree,
+                    distribution_effect=p.distribution_effect,
                     participation_roles=p.role_trace,
+                    generated_possibilities=p.generated_possibilities,
                     contribution_trace=link.contribution_trace,
                 )
         return tuple(seen.values())
@@ -138,5 +172,6 @@ class G32EpochRecorder:
             "relation_elements": [asdict(x) for x in self.relation_elements],
             "possibility_distribution": dict(self.possibility_distribution),
             "participation": [asdict(x) for x in self.participation],
+            "group_participation": [asdict(x) for x in self.group_participation],
             "reconstruction": [asdict(x) for x in self.reconstruction],
         }
