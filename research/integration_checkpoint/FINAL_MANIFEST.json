@@ -1,0 +1,36 @@
+{
+  "integration": "OASIS G3.2 + Choice Responsibility Final Pre-Experiment Integration v1",
+  "branch": "integration/oasis-g32-choice-responsibility-final",
+  "merge_commit": "34f61b730af407192f18b5c5b4fe3c15adb4e491",
+  "domain_runtime_parent": "00ca903e920108b8e8c940ed3e0dc206353d2383",
+  "choice_responsibility_parent": "e4eddad614067ec7c11cfe22af2baff96d63aa24",
+  "verification_source_commit": "7355170f24a9be436d14390c8500825d7bae5b63",
+  "verification_run_id": 34680830558,
+  "verification_conclusion": "success",
+  "unit_tests_passed": 101,
+  "synthetic_wiring": {
+    "g32_core": "PASS",
+    "g3_v12": "PASS",
+    "choice_responsibility": "PASS",
+    "cross_lineage_core": "PASS",
+    "canonical_harness_to_choice_responsibility": "PASS"
+  },
+  "source_sha256": {
+    "v12_current_relational_core": "c64ae931c110bd4cd099e5138a6ea574ee30cafbb74976db933e2fa0787318d2",
+    "choice_responsibility_integration": "fe2d089e9b08f0b94dac053654383726292abd03493b016a878ed795a480792e",
+    "current_frame_compatibility": "fae81d9fa9171775926d667f581da70069237a8186df89ab241bfd1c6b636637",
+    "selection_compatibility": "80fad4294ba7a40a676ca5236f9cd225ebede402c3067e065b6ea21e079813bc",
+    "canonical_harness_adapter": "075887315ec5967592cb3cef6164d0d13e63463d80e6f7e378b01acb09f69326",
+    "cross_lineage_test": "80d87fe4767de5c8c31d55ea991df82c71229b0e455801cd3308160eb499cd8a",
+    "harness_adapter_test": "50b3c6a896ee8362ae7dc7714b2195427c629e9c25dc3e599a628b4f4a0547cd",
+    "canonical_harness": "c29ea7e3e22afd0d5985ed24778e0e7e27414e208debe0027bb92f49ade29929",
+    "carla_runtime_adapter": "32d170381a6327b6eeb3119b67fd6ffa94b04dc2ee5c495395f6fd906fcb8490",
+    "independent_evaluator": "5c10d4e673c86dfd196246b8a80f8f4fc366dd4fa456af4a88589b723ab04083"
+  },
+  "historical_manifest_note": "research/oasis_core_v12/SOURCE_MANIFEST.json remains the historical v1.2 lineage manifest. The compatibility patch and cross-lineage freeze are recorded only in this final integration manifest.",
+  "recovery_lineage": "READ_ONLY_EXCLUDED_FROM_RUNTIME_MERGE",
+  "no_post_result_retuning": true,
+  "experimental_evidence": false,
+  "real_carla_execution": "BLOCKED_UNTIL_LIVE_RUNTIME_IDENTITY_IS_CAPTURED_VALIDATED_AND_FROZEN",
+  "g4": "BLOCKED_UNTIL_G32_REAL_EXPERIMENT_VALIDATED"
+}
