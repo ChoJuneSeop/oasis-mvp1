@@ -18,6 +18,8 @@ jobs:
         run: |
           echo '1ce3cafdd4da1fae5b481499d07ec2d5b7ab1c1830b82b6c59b915e0eb595bdb  research/oasis_core_v11/current_relational_core.py' | sha256sum -c -
           echo 'caba2f278a92b0fc2d09d8a180fa98a38871c7fde88f610b5e6bc7428869f0b8  research/oasis_core_v11/test_current_relational_core.py' | sha256sum -c -
+          echo 'ca2ff54aea7b920d0f25f42c82c3be2c530f071264502a74db32ddcaa105d433  research/oasis_core_v11/history_admission.py' | sha256sum -c -
+          echo 'c646e6cdd23daf3e2b91778a939a4905340af6d1a01dbae4f2830dd6072ae940  research/oasis_core_v11/test_history_admission.py' | sha256sum -c -
       - name: Compile current Core, canonical harness and G3.2 sidecar
         run: python -m compileall -q research/oasis_core_v11 research/carla_v22_harness_v11 research/g3_2_sidecar
       - name: Run current Core regression tests
@@ -30,6 +32,8 @@ jobs:
         run: |
           python -m unittest research.g3_2_sidecar.test_runtime_extension -v
           python -m unittest research.g3_2_sidecar.test_legacy_v1_compat -v
+      - name: Run full synthetic continuous-flow wiring test
+        run: python -m research.oasis_core_v11.synthetic_integrated_flow
       - name: Static recency-access boundary audit
         run: |
           python - <<'PY'
@@ -53,11 +57,11 @@ jobs:
           m=json.loads(Path('research/oasis_core_v11/SOURCE_MANIFEST.json').read_text())
           assert m['core_sha256']=='1ce3cafdd4da1fae5b481499d07ec2d5b7ab1c1830b82b6c59b915e0eb595bdb'
           assert m['test_sha256']=='caba2f278a92b0fc2d09d8a180fa98a38871c7fde88f610b5e6bc7428869f0b8'
+          assert m['history_admission_sha256']=='ca2ff54aea7b920d0f25f42c82c3be2c530f071264502a74db32ddcaa105d433'
+          assert m['history_admission_test_sha256']=='c646e6cdd23daf3e2b91778a939a4905340af6d1a01dbae4f2830dd6072ae940'
           assert m['experimental_evidence'] is False
           assert m['real_carla_g32_execution']=='BLOCKED_UNTIL_DOMAIN_OPERATORS_ARE_FROZEN'
           print('source-manifest=PASS')
           PY
-      - name: Record history-admission source SHA-256
-        run: |
-          sha256sum research/oasis_core_v11/history_admission.py
-          sha256sum research/oasis_core_v11/test_history_admission.py
+      - name: Record integrated synthetic wiring source SHA-256
+        run: sha256sum research/oasis_core_v11/synthetic_integrated_flow.py
