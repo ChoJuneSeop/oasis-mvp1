@@ -1,0 +1,14 @@
+name: G3 Three Layer CARLA 02
+on:
+  push:
+    branches: [experiment/g3-three-layer-carla-02]
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m unittest research.g3_three_layer_carla_02.test_protocol -v
+      - run: python -m unittest research.g3_realtime_split_v1.test_split_runtime research.g3_realtime_split_v1.test_three_layers -v
