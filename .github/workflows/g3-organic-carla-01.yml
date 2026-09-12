@@ -19,6 +19,26 @@ jobs:
       - name: Compile independent experiment package
         run: python -m compileall -q research/g3_organic_carla_01
 
+      - name: Print experiment source SHA256
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          files = [
+              Path('research/g3_organic_carla_01/G3_ORGANIC_CARLA_01_PREREGISTRATION.json'),
+              Path('research/g3_organic_carla_01/__init__.py'),
+              Path('research/g3_organic_carla_01/protocol.py'),
+              Path('research/g3_organic_carla_01/run_audit.py'),
+              Path('research/g3_organic_carla_01/live_runner.py'),
+              Path('research/g3_organic_carla_01/test_live_runner.py'),
+          ]
+          print('EXPERIMENT_SHA256=' + json.dumps({
+              p.as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in files
+          }, sort_keys=True))
+          PY
+
       - name: Independent experiment tests
         run: python -m unittest research.g3_organic_carla_01.test_live_runner -v
 
