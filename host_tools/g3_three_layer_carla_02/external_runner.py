@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import time
@@ -15,6 +16,27 @@ from research.g3_three_layer_carla_02.release_gate import (
 )
 
 _ACTIVE = {}
+_BASE_CANDIDATE_SOURCE_HASHES = split.candidate_source_hashes
+
+
+def _sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def experiment_source_hashes() -> dict[str, str]:
+    """Bind both the completed three-layer runtime and this experiment wrapper."""
+    result = {f"split:{k}": v for k, v in _BASE_CANDIDATE_SOURCE_HASHES().items()}
+    root = Path(__file__).resolve().parents[2]
+    paths = (
+        Path(__file__).resolve(),
+        root / "research/g3_three_layer_carla_02/__init__.py",
+        root / "research/g3_three_layer_carla_02/protocol.py",
+        root / "research/g3_three_layer_carla_02/release_gate.py",
+        protocol.PREREGISTRATION_PATH,
+    )
+    for path in paths:
+        result[f"experiment:{path.relative_to(root).as_posix()}"] = _sha256_file(path)
+    return result
 
 
 def prepare_existing_world(client, registered, *, seed: int):
@@ -62,12 +84,13 @@ class GatedRealtimeOrganicHarness(_BaseHarness):
             if status.get("phase") != "PRE_FIRST_TICK_READY":
                 raise RuntimeError("release gate requires PRE_FIRST_TICK_READY")
             pre = flow.capture()
+            expected_sources = experiment_source_hashes()
             request_sha = build_request(
                 run_dir=run_dir,
                 flow_id=_ACTIVE["flow_id"],
                 attempt=_ACTIVE["attempt"],
                 prereg_sha=protocol.preregistration_sha256(),
-                source_hashes=split.candidate_source_hashes(),
+                source_hashes=expected_sources,
                 runtime_identity_sha=str(status["runtime_identity_sha256"]),
                 scene_manifest_sha=str(status["scene_manifest_sha256"]),
                 frame=int(pre.observation.epoch),
@@ -77,21 +100,21 @@ class GatedRealtimeOrganicHarness(_BaseHarness):
             status["release_request_sha256"] = request_sha
             status["pre_first_tick_carla_frame"] = int(pre.observation.epoch)
             status["pre_first_tick_current_revision"] = pre.revision
+            status["experiment_source_sha256"] = expected_sources
             split._atomic_json(status_path, status)
             print("[PRE_FIRST_TICK_HOLD] empirical_evidence=false, empirical_ticks=0", flush=True)
             print("[PRE_FIRST_TICK_HOLD] Run the approval command in a second terminal.", flush=True)
             token_path = run_dir / TOKEN_NAME
-            expected_sources = split.candidate_source_hashes()
             while not token_path.exists():
-                if split.candidate_source_hashes() != expected_sources:
-                    raise RuntimeError("candidate source changed during pre-first-tick hold")
+                if experiment_source_hashes() != expected_sources:
+                    raise RuntimeError("experiment source changed during pre-first-tick hold")
                 current = flow.capture()
                 if not _same_current(pre, current):
                     raise RuntimeError("CARLA current state changed during pre-first-tick hold")
                 time.sleep(1.0)
             verify(run_dir, expected_request_sha=request_sha)
-            if split.candidate_source_hashes() != expected_sources:
-                raise RuntimeError("candidate source changed before release")
+            if experiment_source_hashes() != expected_sources:
+                raise RuntimeError("experiment source changed before release")
             if not _same_current(pre, flow.capture()):
                 raise RuntimeError("CARLA current state changed immediately before release")
             boundary = {
@@ -99,12 +122,21 @@ class GatedRealtimeOrganicHarness(_BaseHarness):
                 "flow_id": _ACTIVE["flow_id"],
                 "attempt": _ACTIVE["attempt"],
                 "release_request_sha256": request_sha,
+                "experiment_source_sha256": expected_sources,
                 "empirical_boundary": "OPEN_BEFORE_DECISION_EPOCH_1",
                 "carla_frame": int(pre.observation.epoch),
                 "tau": float(pre.tau),
                 "revision": pre.revision,
             }
             split._atomic_json(run_dir / "EXPERIMENTAL_BOUNDARY_OPEN.json", boundary)
+            status = json.loads(status_path.read_text(encoding="utf-8"))
+            status.update(
+                phase="PRE_FIRST_TICK_RELEASED",
+                empirical_boundary="OPEN_BEFORE_DECISION_EPOCH_1",
+                empirical_evidence=False,
+                empirical_ticks=0,
+            )
+            split._atomic_json(status_path, status)
             _ACTIVE["released"] = True
         return super().execute_decision_epoch(flow, **kwargs)
 
@@ -135,6 +167,22 @@ def run_flow(*, flow_id: str, attempt: int, output_root: str | Path, host: str, 
     _ACTIVE.clear()
     _ACTIVE.update(run_dir=str(run_dir), flow_id=flow_id, attempt=int(attempt), released=False)
 
+    original_write_status = split._write_status
+
+    def gate_aware_write_status(path, status, **updates):
+        boundary_exists = (run_dir / "EXPERIMENTAL_BOUNDARY_OPEN.json").is_file()
+        if boundary_exists:
+            updates["experimental_boundary"] = "OPEN_BEFORE_DECISION_EPOCH_1"
+            if updates.get("phase") == "PRE_FIRST_TICK_FAIL":
+                # After the boundary opened we conservatively retain a partial/uncertain
+                # empirical classification even if no completed world.tick is audited.
+                updates["phase"] = "PARTIAL_EMPIRICAL"
+                updates["empirical_evidence"] = True
+                updates["boundary_open_without_completed_tick"] = int(
+                    updates.get("empirical_ticks", 0)
+                ) == 0
+        return original_write_status(path, status, **updates)
+
     originals = {
         "PROTOCOL_ID": split.PROTOCOL_ID,
         "PREREGISTRATION_PATH": split.PREREGISTRATION_PATH,
@@ -144,6 +192,8 @@ def run_flow(*, flow_id: str, attempt: int, output_root: str | Path, host: str, 
         "prepare_live_world": split.prepare_live_world,
         "RealtimeOrganicHarness": split.RealtimeOrganicHarness,
         "_status_base": split._status_base,
+        "_write_status": split._write_status,
+        "candidate_source_hashes": split.candidate_source_hashes,
     }
     split.PROTOCOL_ID = protocol.PROTOCOL_ID
     split.PREREGISTRATION_PATH = protocol.PREREGISTRATION_PATH
@@ -153,14 +203,17 @@ def run_flow(*, flow_id: str, attempt: int, output_root: str | Path, host: str, 
     split.prepare_live_world = prepare_existing_world
     split.RealtimeOrganicHarness = GatedRealtimeOrganicHarness
     split._status_base = _status_base
+    split._write_status = gate_aware_write_status
+    split.candidate_source_hashes = experiment_source_hashes
     try:
-        return split.run_flow(
+        result = split.run_flow(
             flow_id=flow_id,
             attempt=int(attempt),
             output_root=output_root,
             host=host,
             port=int(port),
         )
+        return result
     finally:
         for name, value in originals.items():
             setattr(split, name, value)
