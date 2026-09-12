@@ -1,0 +1,22 @@
+{
+  "protocol_id": "G3-ORGANIC-CARLA-01",
+  "baseline_commit": "5ccccc1fe9e3b25305ab2f133fd8cb0e63d1c954",
+  "organic_source_snapshot_commit": "343dd3aa220537ad3dab2e8bb11c7a93a50378a5",
+  "organic_governance_commit": "950c8bfd7c7e1ce1ce6eb412665732e333996e22",
+  "experiment_source_snapshot_commit": "83cdf3327b2abf5f69fde89c918e307c7fa496e5",
+  "preregistration_sha256": "2bb2aeac8c649d9b4fd11f12269fc695bf89272d012f81079ac3fd0b817bd66f",
+  "source_snapshot_validation_run_id": 34694898359,
+  "source_snapshot_validation_conclusion": "success",
+  "no_post_result_retuning": true,
+  "experimental_evidence": false,
+  "execution_gate": "BLOCKED_UNTIL_USER_MACHINE_LIVE_RUNTIME_IDENTITY_AND_SCENE_PREFLIGHT_PASS_BEFORE_TICK_1",
+  "source_sha256": {
+    "research/g3_organic_carla_01/G3_ORGANIC_CARLA_01_PREREGISTRATION.json": "2bb2aeac8c649d9b4fd11f12269fc695bf89272d012f81079ac3fd0b817bd66f",
+    "research/g3_organic_carla_01/__init__.py": "cc9d4fab9fb30ee6f425811a46cdbb76a8abd86554c05913788d74548bb7d4ab",
+    "research/g3_organic_carla_01/frozen_runner.py": "3be19edf15e5c00d68906e5c3e816d3055fcebe84dd04718751198bf65cbfd6c",
+    "research/g3_organic_carla_01/live_runner.py": "76ab505db67900d4e4c6d6c7d419ed74eb253ee9c6a6604b621d2d625d0a4261",
+    "research/g3_organic_carla_01/protocol.py": "97d0b47a5caf251c645d9d880756cf7e362f6082595abdbc713ad904dec49f31",
+    "research/g3_organic_carla_01/run_audit.py": "edfc1be48dd93774f9913b9cc919ccf2e542c364c78c6dc3f507af385363c032",
+    "research/g3_organic_carla_01/test_live_runner.py": "2bc28f2381870264b7c272e09bd57457ff434143127722c7ba1bf21e6d5728e3"
+  }
+}
