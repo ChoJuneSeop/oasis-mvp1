@@ -6,10 +6,10 @@ from research.g3_2_sidecar.runtime_extension import G32EpochRecorder
 
 
 class RuntimeExtensionTests(unittest.TestCase):
-    def make_relation(self, completed=2.0):
+    def make_relation(self, rid="E1-r1", completed=2.0):
         return RelationElementRef(
             experience_id="E1",
-            relation_element_id="E1-r1",
+            relation_element_id=rid,
             completed_at_tau=completed,
             relation_descriptor={"process": "approach"},
         )
@@ -31,12 +31,14 @@ class RuntimeExtensionTests(unittest.TestCase):
             role_trace=("possibility-generation",),
             generated_possibilities=("yield",),
         )
-        self.assertGreater(p.degree, 0.0)
+        self.assertGreater(p.distribution_effect, 0.0)
+        self.assertTrue(p.has_structural_participation)
 
         link = ProvenanceLink(
             source=rel,
-            participation_degree=p.degree,
+            distribution_effect=p.distribution_effect,
             participation_roles=p.role_trace,
+            generated_possibilities=p.generated_possibilities,
             contribution_trace={"possibility": "yield"},
         )
         r = ReconstructionMeasurement(
@@ -64,6 +66,46 @@ class RuntimeExtensionTests(unittest.TestCase):
         self.assertEqual(entry.realization_count, 1)
         self.assertEqual(len(entry.provenance), 1)
         self.assertEqual(entry.reconstruction[0].vector, (0.2, 0.4, 0.3))
+
+    def test_zero_individual_effect_does_not_mean_nonparticipation(self):
+        rel1 = self.make_relation("E1-r1")
+        rel2 = self.make_relation("E1-r2")
+        rec = G32EpochRecorder(
+            tau=10.0,
+            flow_fingerprint="flow-10",
+            current_reality={},
+            relation_elements=(rel1, rel2),
+            possibility_distribution={"a": 0.5, "b": 0.5},
+        )
+        p1 = rec.record_relation_probe(
+            rel1,
+            before_fingerprint="flow-10",
+            after_fingerprint="flow-10",
+            relation_ablated_distribution={"a": 0.5, "b": 0.5},
+            role_trace=("constraint-support",),
+            generated_possibilities=("a",),
+        )
+        p2 = rec.record_relation_probe(
+            rel2,
+            before_fingerprint="flow-10",
+            after_fingerprint="flow-10",
+            relation_ablated_distribution={"a": 0.5, "b": 0.5},
+            role_trace=("constraint-support",),
+            generated_possibilities=("a",),
+        )
+        self.assertEqual(p1.distribution_effect, 0.0)
+        self.assertEqual(p2.distribution_effect, 0.0)
+        self.assertTrue(p1.has_structural_participation)
+        self.assertTrue(p2.has_structural_participation)
+
+        group = rec.record_group_probe(
+            (rel1, rel2),
+            before_fingerprint="flow-10",
+            after_fingerprint="flow-10",
+            group_ablated_distribution={"a": 0.1, "b": 0.9},
+            generated_possibilities=("a",),
+        )
+        self.assertGreater(group.joint_distribution_effect, 0.0)
 
     def test_probe_must_not_change_flow(self):
         rel = self.make_relation()
