@@ -60,6 +60,41 @@ jobs:
           assert params == {'self','observation','selected'}, params
           print('actuation-memory-isolation=PASS')
           PY
+      - name: Verify frozen source manifest
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+
+          manifest=json.loads(Path('research/oasis_core_v11/G32_DOMAIN_POLICY_MANIFEST.json').read_text())
+          expected={
+              'canonical_harness': 'research/carla_v22_harness_v11/canonical_harness.py',
+              'carla_runtime_adapter': 'research/carla_v22_harness_v11/carla_runtime_adapter_v1.py',
+              'independent_evaluator': 'research/carla_v22_harness_v11/independent_evaluator_v1.py',
+              'carla_runtime_adapter_tests': 'research/carla_v22_harness_v11/test_carla_runtime_adapter_v1.py',
+              'independent_evaluator_tests': 'research/carla_v22_harness_v11/test_independent_evaluator_v1.py',
+              'current_relational_core': 'research/oasis_core_v11/current_relational_core.py',
+              'g32_reconstruction_schema': 'research/g3_2_sidecar/reconstruction.py',
+              'carla_domain_policy': 'research/oasis_core_v11/carla_domain_policy_v1.py',
+              'carla_domain_bundle': 'research/oasis_core_v11/carla_domain_bundle_v1.py',
+              'carla_domain_policy_tests': 'research/oasis_core_v11/test_carla_domain_policy_v1.py',
+              'carla_domain_bundle_tests': 'research/oasis_core_v11/test_carla_domain_bundle_v1.py',
+              'carla_relational_domain': 'research/oasis_core_v11/carla_relational_domain.py',
+              'history_admission': 'research/oasis_core_v11/history_admission.py',
+          }
+          for key,path in expected.items():
+              actual=hashlib.sha256(Path(path).read_bytes()).hexdigest()
+              frozen=manifest['source_sha256'][key]
+              assert actual == frozen, (key, actual, frozen)
+          assert manifest['no_post_result_retuning'] is True
+          assert manifest['experimental_evidence'] is False
+          assert manifest['runtime_identity_requirements']['map'] == 'Town10HD_Opt'
+          assert manifest['runtime_identity_requirements']['synchronous_mode'] is True
+          assert manifest['runtime_identity_requirements']['fixed_delta_seconds'] == 0.05
+          assert manifest['runtime_identity_requirements']['client_server_version_match_required'] is True
+          assert manifest['real_carla_execution'] == 'BLOCKED_UNTIL_LIVE_RUNTIME_IDENTITY_IS_CAPTURED_VALIDATED_AND_FROZEN'
+          print('frozen-manifest=PASS')
+          PY
       - name: Record source SHA-256
         run: |
           sha256sum research/carla_v22_harness_v11/canonical_harness.py
