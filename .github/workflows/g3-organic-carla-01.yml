@@ -47,29 +47,14 @@ jobs:
       - name: Independent experiment tests
         run: python -m unittest research.g3_organic_carla_01.test_live_runner -v
 
-      - name: Compile host orchestrator
+      - name: Compile external CARLA host tools
         run: python -m compileall -q host_tools/g3_organic_carla_01
 
-      - name: Verify host orchestrator manifest
-        run: >-
-          python -c "from pathlib import Path; from host_tools.g3_organic_carla_01.windows_orchestrator import verify_host_manifest; verify_host_manifest(Path('host_tools/g3_organic_carla_01')); print('HOST_ORCHESTRATOR_MANIFEST_VERIFY=PASS')"
+      - name: External CARLA runner regression
+        run: python -m unittest host_tools.g3_organic_carla_01.test_external_carla_runner -v
 
-      - name: Host orchestrator regression
-        run: python -m unittest host_tools.g3_organic_carla_01.test_windows_orchestrator -v
-
-      - name: Verify low-VRAM host manifest
-        run: >-
-          python -c "from pathlib import Path; from host_tools.g3_organic_carla_01.windows_orchestrator_low_vram import verify_low_vram_manifest; verify_low_vram_manifest(Path('host_tools/g3_organic_carla_01')); print('LOW_VRAM_HOST_MANIFEST_VERIFY=PASS')"
-
-      - name: Low-VRAM host regression
-        run: python -m unittest host_tools.g3_organic_carla_01.test_low_vram_orchestrator -v
-
-      - name: Verify staged 5-second host manifest
-        run: >-
-          python -c "from pathlib import Path; from host_tools.g3_organic_carla_01.windows_orchestrator_staged import verify_staged_manifest; verify_staged_manifest(Path('host_tools/g3_organic_carla_01')); print('STAGED_5S_HOST_MANIFEST_VERIFY=PASS')"
-
-      - name: Staged 5-second host regression
-        run: python -m unittest host_tools.g3_organic_carla_01.test_staged_orchestrator -v
+      - name: Confirm orchestration is deprecated
+        run: test -f host_tools/g3_organic_carla_01/ORCHESTRATION_DEPRECATED.md
 
       - name: Organic integration regression
         run: >-
