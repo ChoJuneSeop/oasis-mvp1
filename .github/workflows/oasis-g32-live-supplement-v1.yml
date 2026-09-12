@@ -1,0 +1,36 @@
+name: OASIS G3.2 live execution supplement v1
+
+on:
+  push:
+    branches:
+      - oasis-g32-live-v1
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile live supplement
+        run: python -m compileall -q research/g32_live_execution_v1
+      - name: Run live supplement tests
+        run: python -m unittest research.g32_live_execution_v1.test_live_core -v
+      - name: Re-run frozen G3.2 integration tests
+        run: |
+          python -m unittest research.oasis_core_v11.test_current_relational_core -v
+          python -m unittest research.oasis_core_v11.test_history_admission -v
+          python -m unittest research.oasis_core_v11.test_carla_relational_domain -v
+          python -m unittest research.oasis_core_v11.test_carla_domain_policy_v1 -v
+          python -m unittest research.oasis_core_v11.test_carla_domain_bundle_v1 -v
+          python -m unittest research.carla_v22_harness_v11.test_canonical_harness -v
+          python -m unittest research.carla_v22_harness_v11.test_carla_runtime_adapter_v1 -v
+          python -m unittest research.carla_v22_harness_v11.test_independent_evaluator_v1 -v
+          python -m unittest research.g3_2_sidecar.test_runtime_extension -v
+          python -m unittest research.g3_2_sidecar.test_legacy_v1_compat -v
+          python -m unittest research.oasis_core_v12.test_supplement -v
+          python -m unittest research.choice_responsibility_v01.test_integration -v
+          python -m unittest research.integration_checkpoint.test_cross -v
+          python -m unittest research.integration_checkpoint.test_harness_adapter -v
