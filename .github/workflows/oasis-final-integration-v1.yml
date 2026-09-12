@@ -1,0 +1,69 @@
+name: OASIS final G3.2 choice-responsibility integration
+
+on:
+  push:
+    branches:
+      - integration/oasis-g32-choice-responsibility-final
+  workflow_dispatch:
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile integrated source
+        run: python -m compileall -q research/oasis_core_v11 research/oasis_core_v12 research/g3_2_sidecar research/carla_v22_harness_v11 research/choice_responsibility_v01
+      - name: Run G3.2 Core and domain checks
+        run: |
+          python -m unittest research.oasis_core_v11.test_current_relational_core -v
+          python -m unittest research.oasis_core_v11.test_history_admission -v
+          python -m unittest research.oasis_core_v11.test_carla_relational_domain -v
+          python -m unittest research.oasis_core_v11.test_carla_domain_policy_v1 -v
+          python -m unittest research.oasis_core_v11.test_carla_domain_bundle_v1 -v
+      - name: Run Harness runtime evaluator and sidecar checks
+        run: |
+          python -m unittest research.carla_v22_harness_v11.test_canonical_harness -v
+          python -m unittest research.carla_v22_harness_v11.test_carla_runtime_adapter_v1 -v
+          python -m unittest research.carla_v22_harness_v11.test_independent_evaluator_v1 -v
+          python -m unittest research.g3_2_sidecar.test_runtime_extension -v
+          python -m unittest research.g3_2_sidecar.test_legacy_v1_compat -v
+      - name: Run v1.2 and choice-responsibility checks
+        run: |
+          python -m unittest research.oasis_core_v12.test_supplement -v
+          python -m unittest research.choice_responsibility_v01.test_integration -v
+      - name: Run integrated synthetic wiring
+        run: |
+          python -m research.oasis_core_v11.synthetic_integrated_flow
+          python -m research.oasis_core_v12.synthetic_integrated_flow
+          python -m research.choice_responsibility_v01.example
+      - name: Verify unchanged G3.2 frozen manifest
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          manifest=json.loads(Path('research/oasis_core_v11/G32_DOMAIN_POLICY_MANIFEST.json').read_text())
+          expected={
+            'canonical_harness':'research/carla_v22_harness_v11/canonical_harness.py',
+            'carla_runtime_adapter':'research/carla_v22_harness_v11/carla_runtime_adapter_v1.py',
+            'independent_evaluator':'research/carla_v22_harness_v11/independent_evaluator_v1.py',
+            'current_relational_core':'research/oasis_core_v11/current_relational_core.py',
+            'g32_reconstruction_schema':'research/g3_2_sidecar/reconstruction.py',
+            'carla_domain_policy':'research/oasis_core_v11/carla_domain_policy_v1.py',
+            'carla_domain_bundle':'research/oasis_core_v11/carla_domain_bundle_v1.py',
+            'carla_relational_domain':'research/oasis_core_v11/carla_relational_domain.py',
+            'history_admission':'research/oasis_core_v11/history_admission.py',
+          }
+          for key,path in expected.items():
+            assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==manifest['source_sha256'][key], key
+          print('g32-frozen-baseline=PASS')
+          PY
+      - name: Record integrated source hashes
+        run: |
+          sha256sum research/oasis_core_v12/current_relational_core.py
+          sha256sum research/choice_responsibility_v01/integration.py
+          sha256sum research/carla_v22_harness_v11/canonical_harness.py
+          sha256sum research/carla_v22_harness_v11/carla_runtime_adapter_v1.py
+          sha256sum research/carla_v22_harness_v11/independent_evaluator_v1.py
