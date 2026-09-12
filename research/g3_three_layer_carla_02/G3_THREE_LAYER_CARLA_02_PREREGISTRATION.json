@@ -1,0 +1,22 @@
+{
+  "protocol_id": "G3-THREE-LAYER-CARLA-02",
+  "status": "PREREGISTERED_BEFORE_FIRST_EMPIRICAL_TICK",
+  "base_commit": "7851f097675f1e546133579947585dd8ee3efb7a",
+  "flow_id": "TL-Q01",
+  "seed": 111268688,
+  "map": "Town10HD_Opt",
+  "planned_horizon_ticks": 5000,
+  "fixed_delta_seconds": 0.05,
+  "npc_count": 12,
+  "external_carla_only": true,
+  "runner_must_not_reload_world": true,
+  "three_layers": ["Reality/Action", "Relation/Experience", "Observation/Validation"],
+  "scope": "Live runtime separation qualification; not a theory or safety proof.",
+  "forced_closure_forbidden": true,
+  "semantic_timeout_forbidden": true,
+  "fixed_pending_threshold_forbidden": true,
+  "reverse_causality_forbidden": true,
+  "explicit_pre_first_tick_release_required": true,
+  "attempts_never_resume_or_overwrite": true,
+  "post_result_retuning_forbidden": true
+}
