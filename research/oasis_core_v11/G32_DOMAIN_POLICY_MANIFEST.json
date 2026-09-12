@@ -1,14 +1,19 @@
 {
-  "bundle": "OASIS-CARLA G3.2 Domain Policy Bundle v1",
+  "bundle": "OASIS-CARLA G3.2 Domain Policy + Runtime Boundary v1",
   "branch": "implementation/oasis-g32-domain-policy-v1",
-  "verified_commit": "7b49d04afead155f7fdf4f3484d5c8c5d9de9bd4",
-  "verification_run_id": 34679212800,
+  "verified_source_commit": "1ec223fbc35a8ad2f6bd38793ffd831732c165f5",
+  "verification_run_id": 34679659917,
   "verification_conclusion": "success",
   "protocol": "OASIS-CARLA Paper Validation Protocol v2.2",
+  "harness": "OASIS-CARLA Paper Validation Harness v1.1",
   "no_post_result_retuning": true,
   "experimental_evidence": false,
   "source_sha256": {
-    "canonical_harness": "efa46b55d3400640dceeca4b1e7f0c787fe1d2eeb9bbfe6b0facaec35c385158",
+    "canonical_harness": "c29ea7e3e22afd0d5985ed24778e0e7e27414e208debe0027bb92f49ade29929",
+    "carla_runtime_adapter": "32d170381a6327b6eeb3119b67fd6ffa94b04dc2ee5c495395f6fd906fcb8490",
+    "independent_evaluator": "5c10d4e673c86dfd196246b8a80f8f4fc366dd4fa456af4a88589b723ab04083",
+    "carla_runtime_adapter_tests": "1e80dc6c8b6a782dd56c22249f851c8f7592474da2f3575b4868102a56435ff7",
+    "independent_evaluator_tests": "cab43840e460cc9800bcd9bf88465c54aff3e7ff810130e6c70223e5b9bffa6d",
     "current_relational_core": "a7a021cd1515a4860706b460711c387b38afcd43750899170397f7977106715d",
     "g32_reconstruction_schema": "a9c2d08a6204e4c1e87f867fb277893b271dcc173545bf1d64a1ca19f6db7261",
     "carla_domain_policy": "c349f06afb0a689ab451fcc582408349586dd90f7a6668afd0c52940d17cbe36",
@@ -28,13 +33,24 @@
   },
   "fixed_scientific_boundaries": [
     "authoritative current tau is supplied by host flow and never inferred from epoch",
+    "actual realization tau is captured from the host after the one real actuation",
     "relation participation operator receives no tau, age, recency or completion timestamp",
     "unmeasured reconstruction distribution effect is null, not numeric zero",
     "responsibility remains U/I/V/T vector and is not collapsed to one score",
     "choice uses Pareto non-domination before current possibility distribution",
     "actuation operator has no memory/provenance input",
     "relation-process closure has no universal timeout/distance/frame threshold",
-    "multi-source reconstruction requires a matching joint ablation probe"
+    "multi-source reconstruction requires a matching joint ablation probe",
+    "counterfactual probe purity fingerprint covers current host-visible actor state without exposing raw actor state to the Core",
+    "live CARLA client/server versions must match and are captured rather than guessed"
   ],
-  "real_carla_execution": "BLOCKED_UNTIL_RUNTIME_ADAPTERS_AND_RUNTIME_IDENTITY_ARE_FROZEN"
+  "runtime_identity_requirements": {
+    "map": "Town10HD_Opt",
+    "synchronous_mode": true,
+    "fixed_delta_seconds": 0.05,
+    "client_server_version_match_required": true,
+    "version_value": "TO_BE_CAPTURED_FROM_LIVE_CARLA_BEFORE_FIRST_EXPERIMENTAL_TICK",
+    "no_rendering_mode": "CAPTURE_AND_REPORT"
+  },
+  "real_carla_execution": "BLOCKED_UNTIL_LIVE_RUNTIME_IDENTITY_IS_CAPTURED_VALIDATED_AND_FROZEN"
 }
