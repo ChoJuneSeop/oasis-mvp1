@@ -55,11 +55,15 @@ class LiveHistoryCommitter:
         record = completed_episode.record
         entry: HistoryEntry | None = record.history_entry
         if not record.closed or entry is None:
-            raise CoreV11InvariantError("only an evaluator-closed realized relation process may enter live history")
+            raise CoreV11InvariantError(
+                "only an evaluator-closed realized relation process may enter live history"
+            )
 
         known = float(entry.relation_end_tau if known_at_tau is None else known_at_tau)
         if known < float(entry.relation_end_tau):
-            raise CoreV11InvariantError("history knowledge time cannot precede relation-process Closure")
+            raise CoreV11InvariantError(
+                "history knowledge time cannot precede relation-process Closure"
+            )
 
         responsibility = deepcopy(completed_episode.decision_responsibility)
         unresolved = _unresolved_from_responsibility(responsibility)
@@ -68,14 +72,18 @@ class LiveHistoryCommitter:
             occurrence_id=f"{entry.entry_id}:closure",
             occurred_at_tau=float(entry.relation_end_tau),
             received_at_tau=known,
-            description="Independent evaluator observed the realized front-relation process Closure.",
+            description=(
+                "Independent evaluator observed the realized front-relation process Closure."
+            ),
             source_ref="independent-evaluator-v1",
         )
 
         evidence = deepcopy(dict(entry.closure_evidence))
         closed_relations = evidence.get("closed_relations")
         if not isinstance(closed_relations, (tuple, list)) or not closed_relations:
-            raise CoreV11InvariantError("live Closure lacks evaluator-certified closed_relations")
+            raise CoreV11InvariantError(
+                "live Closure lacks evaluator-certified closed_relations"
+            )
 
         evidence["occurrence_refs"] = (occurrence.occurrence_id,)
         evidence["unresolved"] = tuple(
@@ -88,8 +96,10 @@ class LiveHistoryCommitter:
         for item in closed_relations:
             relation_id = str(item.get("relation_element_id", "")).strip()
             if not relation_id:
-                raise CoreV11InvariantError("closed relation lacks relation_element_id")
-            relation_occurrence_refs[relation_id] = (occurrrence.occurrence_id,
+                raise CoreV11InvariantError(
+                    "closed relation lacks relation_element_id"
+                )
+            relation_occurrence_refs[relation_id] = (occurrence.occurrence_id,)
 
         envelopes = self.bridge.admit(
             augmented,
@@ -98,7 +108,10 @@ class LiveHistoryCommitter:
             relation_occurrence_refs=relation_occurrence_refs,
         )
         keys = tuple(
-            (envelope.record.source.experience_id, envelope.record.source.relation_element_id)
+            (
+                envelope.record.source.experience_id,
+                envelope.record.source.relation_element_id,
+            )
             for envelope in envelopes
         )
         return LiveAdmissionRecord(
