@@ -143,6 +143,7 @@ class CurrentRelationalCoreV12:
                 )
 
         reconstruction = self.reconstruction_operator.reconstruct(
+            tau=frame.tau,
             observation=observation,
             current_relations=current_relations,
             candidates=candidates,
@@ -203,6 +204,7 @@ class CurrentRelationalCoreV12:
                 frame.assert_current_evidence(refs)
 
         return EpochEvaluation(
+            tau=frame.tau,
             observation=observation,
             current_relations=current_relations,
             candidates=candidates,
