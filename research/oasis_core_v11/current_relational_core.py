@@ -10,7 +10,7 @@ from research.carla_v22_harness_v11.canonical_harness import (
     Realization,
     VehicleActuation,
 )
-from research.g3_2_sidecar.common import RelationElementRef
+from research.g3_2_sidecar.common import RelationElementRef, require_tau
 from research.g3_2_sidecar.reconstruction import ReconstructionMeasurement
 
 
@@ -35,7 +35,6 @@ class CurrentRelation:
 @dataclass(frozen=True)
 class PastRelationSemanticView:
     """Semantic view deliberately excludes age/completed_at_tau and raw actor identity."""
-
     subject_role: str
     object_role: str
     relation_type: str
@@ -62,9 +61,7 @@ class PossibilityCandidate:
         if not self.possibility_id:
             raise CoreV11InvariantError("possibility_id is required")
         if not self.current_evidence:
-            raise CoreV11InvariantError(
-                "every current possibility must be anchored by current-reality evidence"
-            )
+            raise CoreV11InvariantError("every current possibility must be anchored by current-reality evidence")
 
 
 @dataclass(frozen=True)
@@ -79,9 +76,7 @@ class RelationContribution:
         if not self.possibility_id:
             raise CoreV11InvariantError("relation contribution requires a possibility")
         if not self.current_relation_ids:
-            raise CoreV11InvariantError(
-                "past relation cannot participate without an explicit current-relation anchor"
-            )
+            raise CoreV11InvariantError("past relation cannot participate without an explicit current-relation anchor")
 
 
 @dataclass(frozen=True)
@@ -122,6 +117,7 @@ class ResponsibilityVector:
 
 @dataclass(frozen=True)
 class EpochEvaluation:
+    tau: float
     observation: PresentObservation
     current_relations: tuple[CurrentRelation, ...]
     candidates: tuple[PossibilityCandidate, ...]
@@ -130,19 +126,16 @@ class EpochEvaluation:
     reconstructions: tuple[ReconstructionMeasurement, ...]
     responsibilities: Mapping[str, ResponsibilityVector]
 
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "tau", require_tau("tau", self.tau))
+
 
 class CurrentRelationBuilder(Protocol):
-    def build(self, observation: PresentObservation) -> Sequence[CurrentRelation]:
-        ...
+    def build(self, observation: PresentObservation) -> Sequence[CurrentRelation]: ...
 
 
 class CandidateProvider(Protocol):
-    def candidates(
-        self,
-        observation: PresentObservation,
-        current_relations: Sequence[CurrentRelation],
-    ) -> Sequence[PossibilityCandidate]:
-        ...
+    def candidates(self, observation: PresentObservation, current_relations: Sequence[CurrentRelation]) -> Sequence[PossibilityCandidate]: ...
 
 
 class RelationOperator(Protocol):
@@ -153,7 +146,7 @@ class RelationOperator(Protocol):
         past: PastRelationSemanticView,
         candidate_ids: Sequence[str],
     ) -> Sequence[RelationContribution]:
-        """No age/timestamp argument is available by design."""
+        """No age/timestamp/current-tau argument is available by design."""
         ...
 
 
@@ -161,12 +154,12 @@ class ReconstructionOperator(Protocol):
     def reconstruct(
         self,
         *,
+        tau: float,
         observation: PresentObservation,
         current_relations: Sequence[CurrentRelation],
         candidates: Sequence[PossibilityCandidate],
         contributions: Sequence[BoundContribution],
-    ) -> ReconstructionResult:
-        ...
+    ) -> ReconstructionResult: ...
 
 
 class ResponsibilityOperator(Protocol):
@@ -177,8 +170,7 @@ class ResponsibilityOperator(Protocol):
         current_relations: Sequence[CurrentRelation],
         candidate: PossibilityCandidate,
         contributions: Sequence[BoundContribution],
-    ) -> ResponsibilityVector:
-        ...
+    ) -> ResponsibilityVector: ...
 
 
 class ChoiceOperator(Protocol):
@@ -190,18 +182,11 @@ class ChoiceOperator(Protocol):
         distribution: Mapping[str, float],
         responsibilities: Mapping[str, ResponsibilityVector],
         contributions: Sequence[BoundContribution],
-    ) -> str:
-        ...
+    ) -> str: ...
 
 
 class ActuationOperator(Protocol):
-    def actuation(
-        self,
-        *,
-        observation: PresentObservation,
-        selected: PossibilityCandidate,
-    ) -> VehicleActuation:
-        ...
+    def actuation(self, *, observation: PresentObservation, selected: PossibilityCandidate) -> VehicleActuation: ...
 
 
 class TraceIncidenceDistribution:
@@ -211,23 +196,17 @@ class TraceIncidenceDistribution:
     the current epoch. It is recomputed from scratch after every ablation. It is not a
     permanent memory score, recency weight, quality score, or universal OASIS formula.
     """
-
     @staticmethod
-    def build(
-        candidates: Sequence[PossibilityCandidate],
-        contributions: Sequence[BoundContribution],
-    ) -> dict[str, float]:
+    def build(candidates: Sequence[PossibilityCandidate], contributions: Sequence[BoundContribution]) -> dict[str, float]:
         evidence: dict[str, set[str]] = {
-            c.possibility_id: {f"current:{x}" for x in c.current_evidence}
-            for c in candidates
+            c.possibility_id: {f"current:{x}" for x in c.current_evidence} for c in candidates
         }
         valid = set(evidence)
         for bound in contributions:
             pid = bound.contribution.possibility_id
             if pid not in valid:
                 continue
-            source_key = f"past:{bound.source.experience_id}:{bound.source.relation_element_id}"
-            evidence[pid].add(source_key)
+            evidence[pid].add(f"past:{bound.source.experience_id}:{bound.source.relation_element_id}")
         mass = {pid: float(len(tokens)) for pid, tokens in evidence.items()}
         total = sum(mass.values())
         if total <= 0.0:
@@ -240,7 +219,8 @@ class CurrentRelationalCoreV11:
 
     The Core owns history provenance and orchestration, while domain semantics remain
     explicit injected operators. Historical timestamps are retained in source records
-    but are never supplied to the relation-participation operator.
+    but are never supplied to the relation-participation operator. Authoritative current
+    flow time is supplied separately by the Harness and is never inferred from epoch.
     """
 
     def __init__(
@@ -275,16 +255,16 @@ class CurrentRelationalCoreV11:
         self._history[self._source_key(record.source)] = record
 
     def history_records(self) -> tuple[HistoricalRelationRecord, ...]:
-        # Stable order exists only for reproducible serialization; semantic operators
-        # receive no age and must not infer recency from iteration order.
         return tuple(self._history[k] for k in sorted(self._history))
 
     def _evaluate(
         self,
         observation: PresentObservation,
         *,
+        tau: float,
         excluded: frozenset[RelationKey] = frozenset(),
     ) -> EpochEvaluation:
+        tau = require_tau("tau", tau)
         current_relations = tuple(self.relation_builder.build(observation))
         relation_ids = [r.relation_id for r in current_relations]
         if len(relation_ids) != len(set(relation_ids)):
@@ -298,10 +278,11 @@ class CurrentRelationalCoreV11:
         bound: list[BoundContribution] = []
         candidate_ids = tuple(by_id)
         for record in self.history_records():
+            if record.source.completed_at_tau > tau:
+                raise CoreV11InvariantError("future historical relation is present in current Core history")
             source_key = self._source_key(record.source)
             if source_key in excluded:
                 continue
-            # Crucial: record.source.completed_at_tau is intentionally not supplied.
             contributions = self.relation_operator.relate(
                 current_relations=current_relations,
                 past=record.semantic,
@@ -313,26 +294,26 @@ class CurrentRelationalCoreV11:
                         "relation operator cannot resurrect an action absent from current candidates; "
                         "new possibilities must be emitted by the reconstruction operator with current evidence"
                     )
-                bound.append(
-                    BoundContribution(
-                        source=record.source,
-                        semantic=record.semantic,
-                        contribution=contribution,
-                    )
-                )
+                bound.append(BoundContribution(record.source, record.semantic, contribution))
 
         reconstruction = self.reconstruction_operator.reconstruct(
+            tau=tau,
             observation=observation,
             current_relations=current_relations,
             candidates=candidates,
             contributions=tuple(bound),
         )
+        for measurement in reconstruction.measurements:
+            if float(measurement.observed_at_tau) != tau:
+                raise CoreV11InvariantError(
+                    "reconstruction measurement must use authoritative current flow tau"
+                )
+
         if reconstruction.additional_candidates:
             merged = list(candidates)
             for candidate in reconstruction.additional_candidates:
                 if candidate.possibility_id in by_id:
                     raise CoreV11InvariantError("reconstruction emitted duplicate possibility id")
-                # PossibilityCandidate itself requires present-current evidence.
                 by_id[candidate.possibility_id] = candidate
                 merged.append(candidate)
             candidates = tuple(merged)
@@ -343,14 +324,13 @@ class CurrentRelationalCoreV11:
                 observation=observation,
                 current_relations=current_relations,
                 candidate=candidate,
-                contributions=tuple(
-                    x for x in bound if x.contribution.possibility_id == candidate.possibility_id
-                ),
+                contributions=tuple(x for x in bound if x.contribution.possibility_id == candidate.possibility_id),
             )
             for candidate in candidates
         }
 
         return EpochEvaluation(
+            tau=tau,
             observation=observation,
             current_relations=current_relations,
             candidates=candidates,
@@ -360,14 +340,9 @@ class CurrentRelationalCoreV11:
             responsibilities=responsibilities,
         )
 
-    @staticmethod
-    def _relation_ref(record: HistoricalRelationRecord) -> RelationElementRef:
-        return record.source
-
-    def open_epoch(self, observation: PresentObservation) -> CoreEpochView:
-        evaluation = self._evaluate(observation)
+    def open_epoch(self, observation: PresentObservation, tau: float) -> CoreEpochView:
+        evaluation = self._evaluate(observation, tau=tau)
         self._last_evaluation = evaluation
-
         roles: dict[RelationKey, list[str]] = {}
         generated: dict[RelationKey, list[str]] = {}
         for bound in evaluation.contributions:
@@ -390,9 +365,11 @@ class CurrentRelationalCoreV11:
         self,
         observation: PresentObservation,
         relation: RelationElementRef,
+        tau: float,
     ) -> Mapping[str, float]:
         return self._evaluate(
             observation,
+            tau=tau,
             excluded=frozenset({self._source_key(relation)}),
         ).possibility_distribution
 
@@ -400,16 +377,19 @@ class CurrentRelationalCoreV11:
         self,
         observation: PresentObservation,
         relations: Sequence[RelationElementRef],
+        tau: float,
     ) -> Mapping[str, float]:
         return self._evaluate(
             observation,
+            tau=tau,
             excluded=frozenset(self._source_key(r) for r in relations),
         ).possibility_distribution
 
-    def realize(self, observation: PresentObservation) -> Realization:
+    def realize(self, observation: PresentObservation, tau: float) -> Realization:
+        tau = require_tau("tau", tau)
         evaluation = self._last_evaluation
-        if evaluation is None or evaluation.observation != observation:
-            evaluation = self._evaluate(observation)
+        if evaluation is None or evaluation.observation != observation or evaluation.tau != tau:
+            evaluation = self._evaluate(observation, tau=tau)
             self._last_evaluation = evaluation
         selected_id = self.choice_operator.choose(
             observation=observation,
@@ -424,8 +404,5 @@ class CurrentRelationalCoreV11:
         selected = by_id[selected_id]
         return Realization(
             selected_possibility_id=selected_id,
-            actuation=self.actuation_operator.actuation(
-                observation=observation,
-                selected=selected,
-            ),
+            actuation=self.actuation_operator.actuation(observation=observation, selected=selected),
         )
