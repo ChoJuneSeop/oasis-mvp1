@@ -19,6 +19,10 @@ jobs:
       - name: Compile independent experiment package
         run: python -m compileall -q research/g3_organic_carla_01
 
+      - name: Verify frozen experiment source manifest
+        run: >-
+          python -c "from research.g3_organic_carla_01.frozen_runner import verify_experiment_manifest; m=verify_experiment_manifest(); print('EXPERIMENT_MANIFEST_VERIFY=PASS'); print('experiment_source_snapshot_commit=' + m['experiment_source_snapshot_commit']); print('preregistration_sha256=' + m['preregistration_sha256'])"
+
       - name: Print experiment source SHA256
         shell: bash
         run: |
