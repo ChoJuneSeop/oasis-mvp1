@@ -34,12 +34,12 @@ def inert_resource_sentinel() -> ResourcePlan:
 
 
 class G32LiveSession:
-    """Live CARLA host session preserving the full G3.2 realization-history chain.
+    """Live CARLA host session preserving the G3.2 decision-to-history chain.
 
-    Runtime identity is captured, validated and immutably frozen before this session
-    can execute a decision. Scenario spawning and Traffic Manager policy remain
-    separately frozen host concerns. The append-only ledger observes provenance but
-    is never an input to OASIS Core.
+    One Decision Epoch may occur on each current host frame even while earlier
+    front-relation processes remain unresolved. Each epoch has exactly one real
+    realization; front-related realizations are tracked independently until the
+    shared current relation reaches evaluator-observed Closure.
     """
 
     def __init__(
@@ -74,24 +74,27 @@ class G32LiveSession:
     def current_observation(self) -> PresentObservation:
         return PresentObservation.from_mapping(self.flow.present_observation())
 
-    def decision_if_episode_idle(self):
-        if self.episodes.active:
-            return None
+    def decision_epoch(self):
         execution = self.harness.execute_decision_epoch(
             self.flow,
             resources=inert_resource_sentinel(),
         )
         responsibility = self.core.responsibility_record()
         self.ledger.record_decision(execution, responsibility)
-        started = self.episodes.begin(
+        front_relation_tracked = self.episodes.begin(
             execution,
             decision_responsibility=responsibility,
         )
         return {
             "execution": execution,
             "decision_responsibility": responsibility,
-            "front_episode_started": started,
+            "front_relation_tracked": front_relation_tracked,
+            "pending_front_decisions": self.episodes.pending_count,
         }
+
+    def decision_if_episode_idle(self):
+        """Compatibility alias. Live v1 no longer blocks decisions while a relation is open."""
+        return self.decision_epoch()
 
     def advance_and_observe(self):
         self.world.tick()
@@ -101,13 +104,15 @@ class G32LiveSession:
             post_observation=observation,
             post_tau=tau,
         )
-        admission = None
-        if completed is not None:
-            admission = self.history.admit(completed, known_at_tau=tau)
-            self.ledger.record_closure_admission(completed, admission)
+        admissions = []
+        for item in completed:
+            admission = self.history.admit(item, known_at_tau=tau)
+            self.ledger.record_closure_admission(item, admission)
+            admissions.append(admission)
         return {
             "tau": tau,
             "observation": observation,
-            "completed_episode": completed,
-            "history_admission": admission,
+            "completed_episodes": completed,
+            "history_admissions": tuple(admissions),
+            "pending_front_decisions": self.episodes.pending_count,
         }
