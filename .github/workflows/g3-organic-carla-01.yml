@@ -57,6 +57,13 @@ jobs:
       - name: Host orchestrator regression
         run: python -m unittest host_tools.g3_organic_carla_01.test_windows_orchestrator -v
 
+      - name: Verify low-VRAM host manifest
+        run: >-
+          python -c "from pathlib import Path; from host_tools.g3_organic_carla_01.windows_orchestrator_low_vram import verify_low_vram_manifest; verify_low_vram_manifest(Path('host_tools/g3_organic_carla_01')); print('LOW_VRAM_HOST_MANIFEST_VERIFY=PASS')"
+
+      - name: Low-VRAM host regression
+        run: python -m unittest host_tools.g3_organic_carla_01.test_low_vram_orchestrator -v
+
       - name: Organic integration regression
         run: >-
           python -m unittest
