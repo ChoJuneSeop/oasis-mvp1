@@ -10,7 +10,7 @@
   "explicit_release_required": true,
   "release_phrase": "START TICK 1",
   "source_sha256": {
-    "windows_orchestrator.py": "05885ac4ec055db8f0aa283c187d002d3a08afe1c3c2c6b75cacd0ade2fd8d75",
+    "windows_orchestrator.py": "48ed141aa352a076f39ccc6473b4de09369205b7c93ccdcfda03348272aeea9f",
     "run_of01.bat": "21f3afa6e36c7492108e19c163ff5c0902a992baeb2ecfcbad5da82dd7a3b4bc",
     "test_windows_orchestrator.py": "e86a236079854c085a01de3b72fae493447a917e2cae181ee98e21d7e955103b"
   }
