@@ -1,0 +1,24 @@
+name: CARLA v2.2 canonical Harness v1.1
+
+on:
+  push:
+    branches:
+      - canonical/carla-v22-harness-v1.1-g32
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile canonical harness and G3.2 sidecar
+        run: python -m compileall -q research/carla_v22_canonical research/g3_2_sidecar
+      - name: Run canonical harness validation
+        run: python -m unittest research.carla_v22_canonical.validation_v1_1 -v
+      - name: Run G3.2 sidecar regression
+        run: python -m unittest research.g3_2_sidecar.test_runtime_extension research.g3_2_sidecar.test_legacy_v1_compat -v
+      - name: Record Harness v1.1 SHA-256
+        run: sha256sum research/carla_v22_canonical/harness_v1_1.py
