@@ -40,22 +40,8 @@ jobs:
       - name: Compile organic integration
         run: python -m compileall -q research/g3_organic_flow_v1
 
-      - name: Print organic source SHA256
-        shell: bash
-        run: |
-          python - <<'PY'
-          import hashlib, json
-          from pathlib import Path
-          root = Path('research/g3_organic_flow_v1')
-          files = sorted(
-              p for p in root.glob('*.py')
-              if p.name != 'verify_manifest.py'
-          )
-          print('ORGANIC_SHA256=' + json.dumps({
-              p.as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
-              for p in files
-          }, sort_keys=True))
-          PY
+      - name: Verify frozen organic source manifest
+        run: python research/g3_organic_flow_v1/verify_manifest.py
 
       - name: Organic integration tests
         run: >-
