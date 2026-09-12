@@ -15,12 +15,20 @@ from .participation import (
 from .reconstruction import ProvenanceLink, ReconstructionMeasurement
 
 
+def _relation_key(relation: RelationElementRef) -> tuple[str, str]:
+    return (relation.experience_id, relation.relation_element_id)
+
+
+def _relation_set_key(relations: Sequence[RelationElementRef]) -> frozenset[tuple[str, str]]:
+    return frozenset(_relation_key(r) for r in relations)
+
+
 @dataclass
 class G32EpochRecorder:
-    """Drop-in sidecar recorder for one continuous decision epoch.
+    """Read-only G3.2 recorder for one continuous decision epoch.
 
     The host harness remains authoritative for CARLA ticks and the one real action.
-    This recorder only observes decision-time structures and stores genealogy.
+    This recorder observes decision-time structures and stores relational genealogy.
     """
 
     tau: float
@@ -94,30 +102,30 @@ class G32EpochRecorder:
         self.group_participation.append(measurement)
         return measurement
 
+    def _has_matching_group_probe(self, source_links: Sequence[ProvenanceLink]) -> bool:
+        wanted = _relation_set_key(tuple(link.source for link in source_links))
+        return any(_relation_set_key(item.relations) == wanted for item in self.group_participation)
+
     def record_reconstruction(self, measurement: ReconstructionMeasurement) -> None:
         if measurement.observed_at_tau != self.tau:
             raise G32InvariantError("reconstruction is not aligned with the current epoch")
-        known = {
-            (r.experience_id, r.relation_element_id)
-            for r in self.relation_elements
-        }
+        known = {_relation_key(r) for r in self.relation_elements}
         for link in measurement.source_links:
-            key = (link.source.experience_id, link.source.relation_element_id)
+            key = _relation_key(link.source)
             if key not in known:
                 raise G32InvariantError("reconstruction provenance references an unknown relation element")
             if link.source.completed_at_tau > self.tau:
                 raise G32InvariantError("future relation entered reconstruction provenance")
+        if len(measurement.source_links) > 1 and not self._has_matching_group_probe(measurement.source_links):
+            raise G32InvariantError("multi-relation reconstruction requires a matching joint relation probe")
         self.reconstruction.append(measurement)
 
     def _provenance(self) -> tuple[ProvenanceLink, ...]:
         seen: dict[tuple[str, str], ProvenanceLink] = {}
-        participation_map = {
-            (p.relation.experience_id, p.relation.relation_element_id): p
-            for p in self.participation
-        }
+        participation_map = {_relation_key(p.relation): p for p in self.participation}
         for rec in self.reconstruction:
             for link in rec.source_links:
-                key = (link.source.experience_id, link.source.relation_element_id)
+                key = _relation_key(link.source)
                 p = participation_map.get(key)
                 if p is None:
                     raise G32InvariantError("reconstruction source lacks participation measurement")
