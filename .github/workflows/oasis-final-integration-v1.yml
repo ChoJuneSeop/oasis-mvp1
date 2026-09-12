@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Compile integrated source
-        run: python -m compileall -q research/oasis_core_v11 research/oasis_core_v12 research/g3_2_sidecar research/carla_v22_harness_v11 research/choice_responsibility_v01
+        run: python -m compileall -q research/oasis_core_v11 research/oasis_core_v12 research/g3_2_sidecar research/carla_v22_harness_v11 research/choice_responsibility_v01 research/integration_checkpoint
       - name: Run G3.2 Core and domain checks
         run: |
           python -m unittest research.oasis_core_v11.test_current_relational_core -v
@@ -34,6 +34,10 @@ jobs:
         run: |
           python -m unittest research.oasis_core_v12.test_supplement -v
           python -m unittest research.choice_responsibility_v01.test_integration -v
+      - name: Run cross-lineage wiring checks
+        run: |
+          python -m unittest research.integration_checkpoint.test_cross -v
+          python -m unittest research.integration_checkpoint.test_harness_adapter -v
       - name: Run integrated synthetic wiring
         run: |
           python -m research.oasis_core_v11.synthetic_integrated_flow
@@ -64,6 +68,11 @@ jobs:
         run: |
           sha256sum research/oasis_core_v12/current_relational_core.py
           sha256sum research/choice_responsibility_v01/integration.py
+          sha256sum research/integration_checkpoint/frame.py
+          sha256sum research/integration_checkpoint/selection.py
+          sha256sum research/integration_checkpoint/harness_adapter.py
+          sha256sum research/integration_checkpoint/test_cross.py
+          sha256sum research/integration_checkpoint/test_harness_adapter.py
           sha256sum research/carla_v22_harness_v11/canonical_harness.py
           sha256sum research/carla_v22_harness_v11/carla_runtime_adapter_v1.py
           sha256sum research/carla_v22_harness_v11/independent_evaluator_v1.py
