@@ -2,20 +2,17 @@ from __future__ import annotations
 
 """RPFO-integrated OASIS G3 Core.
 
-This is a new execution lineage.  The historical Fold-v1 core remains untouched as
-counterexample/provenance evidence.
-
-Action-path history access is:
-current frame -> current relations -> current-only lineage anchors -> indexed local
-frontier -> stateful participation -> existing relation/reconstruction/choice pipeline.
-
-No full-history pass is used to discover contacts.
+This execution lineage keeps Fold-v1 / G3-FOLD-QUAL A1 untouched as historical
+falsification evidence.  The action path does not discover contacts by iterating the
+complete past.  It uses current-only lineage anchors, direct indexes, persistent
+participation, and one-step deferred frontier expansion.
 """
 
 from copy import deepcopy
-from math import isfinite
 import inspect
+from math import isfinite
 
+from research.choice_responsibility_v01.integration import DecisionInputs
 from research.g3_organic_flow_v1.core import OrganicIntegratedChoiceCore
 from research.g3_rpfo_v1.rpfo import (
     CurrentLineageProvider,
@@ -31,8 +28,35 @@ from research.oasis_core_v11.current_relational_core import CoreV11InvariantErro
 from research.oasis_core_v12.current_relational_core import CurrentRelationalCoreV12
 
 
+class EpochStableRelationBuilder:
+    """Build the present relation surface once and reuse it inside one Decision Epoch."""
+
+    def __init__(self, inner):
+        self.inner = inner
+        self._observation = None
+        self._relations = None
+
+    def bind(self, observation):
+        if self._observation == observation and self._relations is not None:
+            return deepcopy(self._relations)
+        relations = tuple(deepcopy(self.inner.build(observation)))
+        ids = [str(item.relation_id) for item in relations]
+        if len(ids) != len(set(ids)):
+            raise CoreV11InvariantError("current relation ids must be unique")
+        self._observation = deepcopy(observation)
+        self._relations = deepcopy(relations)
+        return deepcopy(relations)
+
+    def build(self, observation):
+        if self._observation != observation or self._relations is None:
+            raise CoreV11InvariantError(
+                "current relation surface must be bound before Decision Epoch evaluation"
+            )
+        return deepcopy(self._relations)
+
+
 class RPFOOrganicCore(OrganicIntegratedChoiceCore):
-    """G3 organic core whose action path sees only RPFO-participating history."""
+    """Organic Core whose action path sees only RPFO-participating historical relations."""
 
     def __init__(
         self,
@@ -64,6 +88,8 @@ class RPFOOrganicCore(OrganicIntegratedChoiceCore):
                 )
 
         super().__init__(history=(), **kwargs)
+        self._domain_relation_builder = self.relation_builder
+        self.relation_builder = EpochStableRelationBuilder(self._domain_relation_builder)
         if initial_history:
             self.add_history_batch(initial_history)
         for link in historical_links:
@@ -76,8 +102,8 @@ class RPFOOrganicCore(OrganicIntegratedChoiceCore):
             return ()
         if not isinstance(raw, (tuple, list)):
             raise CoreV11InvariantError("rpfo_lineage_refs must be an explicit sequence")
-        refs = tuple(dict.fromkeys(str(x).strip() for x in raw if str(x).strip()))
-        if len(refs) != len(tuple(x for x in raw if str(x).strip())):
+        refs = tuple(str(x).strip() for x in raw if str(x).strip())
+        if len(refs) != len(set(refs)):
             raise CoreV11InvariantError("rpfo_lineage_refs must be unique")
         return refs
 
@@ -110,7 +136,9 @@ class RPFOOrganicCore(OrganicIntegratedChoiceCore):
         self.relation_repository.register_link(deepcopy(link))
 
     def _history_view(self):
-        return self._epoch_history_snapshot if self._epoch_history_snapshot is not None else self._history
+        if self._epoch_history_snapshot is not None:
+            return self._epoch_history_snapshot
+        return self._history
 
     def _visible_key(self, key) -> bool:
         if self._frame is None:
@@ -125,7 +153,7 @@ class RPFOOrganicCore(OrganicIntegratedChoiceCore):
     @staticmethod
     def _merge_frontiers(current_relation_ids, seed, carried):
         contacts = []
-        seen = set()
+        seen_contacts = set()
         visited = []
         trace = []
         if carried is not None:
@@ -134,12 +162,15 @@ class RPFOOrganicCore(OrganicIntegratedChoiceCore):
                     visited.append(key)
             trace.extend(carried.trace)
             for contact in carried.contacts:
-                if contact.current_relation_id in current_relation_ids and contact.contact_id not in seen:
-                    seen.add(contact.contact_id)
+                if (
+                    contact.current_relation_id in current_relation_ids
+                    and contact.contact_id not in seen_contacts
+                ):
+                    seen_contacts.add(contact.contact_id)
                     contacts.append(contact)
         for contact in seed.contacts:
-            if contact.contact_id not in seen:
-                seen.add(contact.contact_id)
+            if contact.contact_id not in seen_contacts:
+                seen_contacts.add(contact.contact_id)
                 contacts.append(contact)
         trace.extend(seed.trace)
         return RelationalFrontier(
@@ -153,9 +184,6 @@ class RPFOOrganicCore(OrganicIntegratedChoiceCore):
         if self._frame is None:
             raise CoreV11InvariantError("current frame required before RPFO")
         current_relations = tuple(self.relation_builder.build(self._frame.observation))
-        relation_ids = [r.relation_id for r in current_relations]
-        if len(relation_ids) != len(set(relation_ids)):
-            raise CoreV11InvariantError("current relation ids must be unique")
         anchors = tuple(
             self.lineage_provider.anchors(
                 frame=deepcopy(self._frame),
@@ -194,7 +222,6 @@ class RPFOOrganicCore(OrganicIntegratedChoiceCore):
             visited_keys=frontier.visited_keys,
             trace=frontier.trace,
         )
-
         self._epoch_rpfo_snapshot = self.rpfo_operator.step(
             current_tau=float(self._frame.tau),
             current_relations=current_relations,
@@ -210,15 +237,15 @@ class RPFOOrganicCore(OrganicIntegratedChoiceCore):
             if identity < self._epoch_identity or frame.tau < self._epoch_frame_copy.tau:
                 raise CoreV11InvariantError("Decision Epoch or current tau moved backwards")
             if identity == self._epoch_identity and frame != self._epoch_frame_copy:
-                raise CoreV11InvariantError(
-                    "same Decision Epoch has conflicting current frame"
-                )
+                raise CoreV11InvariantError("same Decision Epoch has conflicting current frame")
+
         if identity != self._epoch_identity:
             self._epoch_history_snapshot = self._history
             self._epoch_rpfo_snapshot = None
             self._epoch_identity = identity
             self._epoch_frame_copy = deepcopy(frame)
 
+        self.relation_builder.bind(frame.observation)
         previous_state = self._participation_state
         previous_frontier = self._carried_frontier
         try:
@@ -227,6 +254,7 @@ class RPFOOrganicCore(OrganicIntegratedChoiceCore):
         except Exception:
             self._participation_state = previous_state
             self._carried_frontier = previous_frontier
+            self._epoch_rpfo_snapshot = None
             raise
         self._participation_state = snapshot.participation_state
         self._carried_frontier = snapshot.next_frontier
@@ -237,14 +265,19 @@ class RPFOOrganicCore(OrganicIntegratedChoiceCore):
         records = []
         for key in snapshot.participating_keys:
             if not self._visible_key(key):
-                raise CoreV11InvariantError("participating history is not visible in current reality")
+                raise CoreV11InvariantError(
+                    "participating history is not visible in current reality"
+                )
             record = self.relation_repository.get(key)
             if record is None:
-                raise CoreV11InvariantError("participating history disappeared from repository")
+                raise CoreV11InvariantError(
+                    "participating history disappeared from repository"
+                )
             records.append(record)
         return tuple(records)
 
     def history_envelopes(self):
+        """Complete epoch history is diagnostic/archival, not a contact-discovery API."""
         history = self._history_view()
         return deepcopy(tuple(history[key] for key in sorted(history)))
 
@@ -257,6 +290,31 @@ class RPFOOrganicCore(OrganicIntegratedChoiceCore):
 
     def published_history_envelopes(self):
         return deepcopy(tuple(self._history[key] for key in sorted(self._history)))
+
+    def _inputs(self, observation):
+        """Choice/Responsibility reentry lookup uses only sources already in evaluation."""
+        frame = self._require_frame(observation)
+        evaluation = self._last_evaluation
+        if evaluation is None or evaluation.observation != observation:
+            evaluation = self._evaluate(observation)
+
+        keys = {self._source_key(x.source) for x in evaluation.contributions}
+        keys.update(
+            self._source_key(link.source)
+            for measurement in evaluation.reconstructions
+            for link in measurement.source_links
+        )
+        history = self._history_view()
+        reentered = {}
+        for key in keys:
+            envelope = history.get(key)
+            if envelope is None:
+                raise CoreV11InvariantError(
+                    "evaluation references history absent from epoch provenance snapshot"
+                )
+            if envelope.completion.unresolved:
+                reentered[envelope.completion.experience_id] = envelope.completion.unresolved
+        return deepcopy(DecisionInputs(frame, evaluation, tuple(reentered.items())))
 
     def rpfo_snapshot(self):
         return deepcopy(self._ensure_rpfo_snapshot())
@@ -284,7 +342,6 @@ class RPFOOrganicCore(OrganicIntegratedChoiceCore):
         return deepcopy(record)
 
     def _distribution(self, candidates, contributions, measurements):
-        """Use the epoch-stable history snapshot for provenance lookup."""
         history = self._history_view()
         tokens = {
             candidate.possibility_id: {("current", ref) for ref in candidate.current_evidence}
