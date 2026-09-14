@@ -13,8 +13,17 @@ jobs:
         with:
           python-version: '3.11'
       - name: Compile v1.2 path
-        run: python -m py_compile research/g3_rpfo_v1/rpfo_v12.py research/g3_rpfo_v1/core_v12.py research/g3_rpfo_v1/entry_v12.py research/g3_rpfo_v1/canonical12.py
-      - name: RPFO v1.2 contracts
-        run: python -m unittest research.g3_rpfo_v1.test_v12_contract -v
+        run: python -m py_compile research/g3_rpfo_v1/rpfo_v12.py research/g3_rpfo_v1/operator_v12.py research/g3_rpfo_v1/core_v12.py research/g3_rpfo_v1/canonical12.py
+      - name: Import canonical Core
+        run: python -c "from research.g3_rpfo_v1.canonical12 import StrictRPFOOrganicCoreV12"
+      - name: V1.2 provenance and epoch contracts
+        run: >-
+          python -m unittest -v
+          research.g3_rpfo_v1.test_v12_contract.RPFO12ContractTests.test_one_edge_addresses_one_historical_relation
+          research.g3_rpfo_v1.test_v12_contract.RPFO12ContractTests.test_unknown_future_edge_is_not_visible
+          research.g3_rpfo_v1.test_v12_contract.RPFO12ContractTests.test_edge_evidence_must_come_from_source_occurrence
+          research.g3_rpfo_v1.test_v12_contract.RPFO12ContractTests.test_epoch_snapshot_cannot_see_later_publication
+      - name: Canonical multi-contact participation
+        run: python -m unittest research.g3_rpfo_v1.test_v12_canonical -v
       - name: Preserve v1.1 and Fold-v1 lineage
         run: python -m unittest research.g3_rpfo_v1.test_state_v11 research.g3_realtime_split_v1.test_fold_operator research.g3_realtime_split_v1.test_fold_counterexamples -v
