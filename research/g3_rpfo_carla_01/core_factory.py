@@ -3,7 +3,7 @@ from research.g3_rpfo_carla_01.live_core import RPFOCARLALiveCore
 from research.g3_rpfo_carla_01.resolver import FrontProcessParticipationResolver, RPFOParticipationContributionOperator
 
 
-def make_core():
+def make_core(history=()):
     legacy, closure = build_legacy_core()
     names = (
         "assessment_operator", "verifier", "preference_operator", "resource_allocator",
@@ -13,4 +13,5 @@ def make_core():
     kwargs = {name: getattr(legacy, name) for name in names}
     kwargs["relation_operator"] = RPFOParticipationContributionOperator()
     kwargs["participation_resolver"] = FrontProcessParticipationResolver()
+    kwargs["history"] = tuple(history)
     return RPFOCARLALiveCore(**kwargs), closure

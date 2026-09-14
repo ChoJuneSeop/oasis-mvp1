@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from research.g3_organic_carla_01 import gated_runner as base_runner
 from research.g3_organic_carla_01 import live_runner as base_live
+from research.g3_organic_carla_01 import release_gate as base_release
 from research.g3_rpfo_carla_01.core_factory import make_core
 from research.g3_rpfo_carla_01.protocol import (
     EXPERIMENT_MANIFEST_PATH,
@@ -20,6 +21,7 @@ def _patch():
         "gate_build": (base_runner, "build_organic_core", make_core),
         "gate_id": (base_runner, "PROTOCOL_ID", PROTOCOL_ID),
         "live_id": (base_live, "PROTOCOL_ID", PROTOCOL_ID),
+        "release_id": (base_release, "PROTOCOL_ID", PROTOCOL_ID),
         "gate_prereg_path": (base_runner, "PREREGISTRATION_PATH", PREREGISTRATION_PATH),
         "gate_manifest_path": (base_runner, "EXPERIMENT_MANIFEST_PATH", EXPERIMENT_MANIFEST_PATH),
         "gate_load": (base_runner, "load_preregistration", load_preregistration),
