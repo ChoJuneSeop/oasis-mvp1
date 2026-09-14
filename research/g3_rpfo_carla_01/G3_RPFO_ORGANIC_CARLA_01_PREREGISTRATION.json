@@ -1,0 +1,62 @@
+{
+  "protocol_id": "G3-RPFO-ORGANIC-CARLA-01",
+  "protocol_version": "1.0",
+  "status": "PREREGISTERED_BEFORE_FIRST_EXPERIMENTAL_TICK",
+  "purpose": "Validate provenance-local RPFO participation in live CARLA without historical retrieval.",
+  "necessity_kill_search": {
+    "conclusion": "NECESSARY",
+    "reason": "Non-live checks do not establish RPFO participation and downstream Choice/Responsibility in one embodied CARLA flow. Graph memory and associative retrieval are not novelty claims."
+  },
+  "environment": {
+    "carla_client_version": "0.9.16",
+    "carla_server_version": "0.9.16",
+    "map": "Town10HD_Opt",
+    "synchronous_mode": true,
+    "fixed_delta_seconds": 0.05,
+    "no_rendering_mode": "CAPTURE_AND_FREEZE_CURRENT_BOOLEAN",
+    "traffic_manager_synchronous_mode": true,
+    "traffic_manager_port": 8000,
+    "npc_count": 12,
+    "history_initial_state": "EMPTY",
+    "reset_inside_flow": false,
+    "planned_horizon_ticks_per_flow": 30000,
+    "horizon_is_semantic_threshold": false,
+    "closure_by_timeout_distance_or_frame_threshold": false
+  },
+  "flows": [
+    {"flow_id": "OF-01", "seed": 111268688},
+    {"flow_id": "OF-02", "seed": 1108629046},
+    {"flow_id": "OF-03", "seed": 1920591008},
+    {"flow_id": "OF-04", "seed": 1195057233},
+    {"flow_id": "OF-05", "seed": 376969124},
+    {"flow_id": "OF-06", "seed": 1164411670}
+  ],
+  "rpfo_constraints": {
+    "global_history_scan": false,
+    "similarity_or_rank_gate": false,
+    "direct_current_contact_per_scope": "AT_MOST_ONE",
+    "same_step_recursive_frontier_expansion": false,
+    "unresolved_is_zero": false,
+    "reverse_temporal_causality": false,
+    "relational_direction_fixed": false,
+    "current_contact_basis": "APPROVED_CURRENT_FRAME_PLUS_ORDERED_PROCESS_POINTER"
+  },
+  "required_before_tick_1": [
+    "verify experiment source manifest",
+    "verify preregistration bytes",
+    "verify full regressions",
+    "verify CARLA versions map and synchronous settings",
+    "capture no_rendering_mode",
+    "freeze runtime identity and scene manifest",
+    "verify empty history and tick audit",
+    "confirm pre-first-tick approval and empirical_ticks zero"
+  ],
+  "negative_result_policy": {
+    "preserve_negative_results": true,
+    "extend_horizon_after_result_inspection": false,
+    "retune_after_result_inspection": false
+  },
+  "overall_completion": "All six independent flows must be VALID_COMPLETE before interpretation.",
+  "post_result_retuning": false,
+  "experimental_evidence": false
+}
