@@ -1,0 +1,46 @@
+name: G3 RPFO Organic CARLA A2 Preflight
+
+on:
+  push:
+    branches:
+      - experiment/g3-rpfo-organic-carla-01-a2
+  workflow_dispatch:
+
+jobs:
+  non-empirical-a2-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: A2 host contract
+        run: python -m unittest host_tools.g3_rpfo_carla_01_a2.test_host_contract -v
+      - name: RPFO CARLA semantic preflight contract
+        run: python -m unittest research.g3_rpfo_carla_01.test_preflight -v
+      - name: RPFO canonical v1.2 regressions
+        run: >-
+          python -m unittest
+          research.g3_rpfo_v1.test_v12_contract
+          research.g3_rpfo_v1.test_v12_core
+          research.g3_rpfo_v1.test_v12_migrated_invariants
+          -v
+      - name: Organic flow regressions
+        run: >-
+          python -m unittest
+          research.g3_organic_flow_v1.test_organic_flow
+          research.g3_organic_flow_v1.test_carla_atomic_port
+          research.g3_organic_flow_v1.test_shared_closure
+          research.g3_organic_flow_v1.test_runtime_freeze
+          -v
+      - name: Choice responsibility regressions
+        run: python -m unittest research.choice_responsibility_v01.test_integration -v
+      - name: G3.2 and current Core regressions
+        run: >-
+          python -m unittest
+          research.g3_2_sidecar.test_runtime_extension
+          research.oasis_core_v11.test_carla_domain_policy_v1
+          research.oasis_core_v11.test_carla_relational_domain
+          research.oasis_core_v12.test_supplement
+          -v
