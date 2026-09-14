@@ -1,0 +1,19 @@
+{
+  "host_execution_manifest_version": "1.0",
+  "semantic_experiment_base_commit": "31f8e585e069df83857cab93d2ee329a3a7bf54d",
+  "semantic_experiment_manifest_git_blob_sha1": "1f9fd7f9b33eca5ad6b038a898a924c919db5659",
+  "flow_id": "OF-01",
+  "attempt": 2,
+  "prior_attempt_policy": "A1_PRESERVED_NO_OVERWRITE",
+  "host_profile_id": "G3-RPFO-CARLA-HOST-MINIMAL-V1",
+  "empirical_boundary": "CLOSED_UNTIL_SEPARATE_RELEASE_GATE",
+  "host_files_git_blob_sha1": {
+    "manifest_compat.py": "79bb23eb9ff7c4f141a0b20fc1c5f61a46912d48",
+    "failure_guard.py": "8600a34bc4fb7bc6a865d863823b66c2fa7acfa5",
+    "run_compat.py": "35b70e4ca05b1d8f94e3ba2d290e9032973e51db",
+    "HOST_LAUNCH_PROFILE.json": "778c8e9f59973dee83164cd9358ad710d1f6cac0",
+    "run_existing_of01_a2.bat": "8dadd603c70201c18456588dcba1f8e8a30b6dc3",
+    "start_minimal_and_run_of01_a2.bat": "ebba66c980bd15d87f3c51b9478bba08b1d9ea67",
+    "approve_of01_a2.bat": "b0666165e033218f65686aae0363f2face06e7f9"
+  }
+}
