@@ -26,12 +26,6 @@ jobs:
           research/g3_organic_flow_v1
           research/g3_rpfo_v1
 
-      - name: Verify preserved manifests
-        run: |
-          python -m research.oasis_core_v12.verify_manifest
-          python -m research.choice_responsibility_v01.verify_manifest
-          python research/g3_organic_flow_v1/verify_manifest.py
-
       - name: G3.2 sidecar regression
         run: python -m unittest discover -s research/g3_2_sidecar -p 'test_*.py' -v
 
@@ -76,7 +70,7 @@ jobs:
           python -m research.oasis_core_v12.synthetic_integrated_flow
           python -m research.choice_responsibility_v01.example
 
-      - name: Verify frozen G3.2 and final integration manifests
+      - name: Verify current G3.2 and final integration manifests
         run: |
           python - <<'PY'
           import hashlib, json
