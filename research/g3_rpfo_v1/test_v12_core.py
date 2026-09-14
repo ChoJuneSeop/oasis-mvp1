@@ -88,7 +88,12 @@ class RPFO12CoreTests(unittest.TestCase):
         core.rpfo_operator.resolver = ParticipateLocal()
         view = core.open_current_epoch(current_frame)
         self.assertEqual(len(view.relation_elements), 1)
-        self.assertEqual(core.rpfo_snapshot().opened_keys, (("exp-1", "rel-1"),))
+        opened = core.rpfo_snapshot().opened_keys
+        relation_ref = view.relation_elements[0]
+        self.assertEqual(
+            opened,
+            ((relation_ref.experience_id, relation_ref.relation_element_id),),
+        )
 
 
 if __name__ == "__main__":
