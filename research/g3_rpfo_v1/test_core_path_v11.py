@@ -3,8 +3,8 @@ import unittest
 
 from research.g3_2_sidecar.common import RelationElementRef
 from research.g3_organic_flow_v1.operators import OrganicCurrentAssessment, OrganicCurrentVerifier, OrganicResponsibilityResourceAllocator
-from research.g3_rpfo_v1.core import RPFOOrganicCore
 from research.g3_rpfo_v1.rpfo import CurrentLineageAnchor, ParticipationDecision
+from research.g3_rpfo_v1.strict_core import StrictRPFOOrganicCore
 from research.integration_checkpoint.selection import ParetoContextPreference
 from research.oasis_core_v11.test_current_relational_core import make_core as legacy_core
 from research.oasis_core_v12.test_supplement import envelope, frame
@@ -35,7 +35,7 @@ class CorePathTests(unittest.TestCase):
         source = past.record.source
         source = RelationElementRef(source.experience_id, source.relation_element_id, source.completed_at_tau, {**source.relation_descriptor, "rpfo_lineage_refs": ("lineage:front",)})
         past = replace(past, record=replace(past.record, source=source))
-        core = RPFOOrganicCore(
+        core = StrictRPFOOrganicCore(
             participation_resolver=ParticipateLocal(), lineage_provider=CurrentOnlyLineage(), history=(past,),
             assessment_operator=OrganicCurrentAssessment(), verifier=OrganicCurrentVerifier(), preference_operator=ParetoContextPreference(), resource_allocator=OrganicResponsibilityResourceAllocator(),
             relation_builder=base.relation_builder, candidate_provider=base.candidate_provider, relation_operator=base.relation_operator, reconstruction_operator=base.reconstruction_operator,
