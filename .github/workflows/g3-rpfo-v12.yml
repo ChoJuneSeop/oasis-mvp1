@@ -25,5 +25,7 @@ jobs:
           research.g3_rpfo_v1.test_v12_contract.RPFO12ContractTests.test_epoch_snapshot_cannot_see_later_publication
       - name: Canonical multi-contact participation
         run: python -m unittest research.g3_rpfo_v1.test_v12_canonical -v
+      - name: Canonical Core transaction rollback
+        run: python -m unittest research.g3_rpfo_v1.test_v12_core -v
       - name: Preserve v1.1 and Fold-v1 lineage
         run: python -m unittest research.g3_rpfo_v1.test_state_v11 research.g3_realtime_split_v1.test_fold_operator research.g3_realtime_split_v1.test_fold_counterexamples -v
