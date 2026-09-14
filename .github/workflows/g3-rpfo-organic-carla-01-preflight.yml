@@ -17,6 +17,8 @@ jobs:
           python-version: '3.12'
       - name: RPFO CARLA preflight contract
         run: python -m unittest research.g3_rpfo_carla_01.test_preflight -v
+      - name: RPFO external CARLA host regression
+        run: python -m unittest host_tools.g3_rpfo_carla_01.test_external_carla_runner -v
       - name: RPFO canonical v1.2 regressions
         run: >-
           python -m unittest
