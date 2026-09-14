@@ -1,0 +1,15 @@
+{
+  "profile_id": "G3-RPFO-CARLA-HOST-MINIMAL-V1",
+  "arguments": [
+    "-dx11",
+    "-RenderOffScreen",
+    "-nosound",
+    "-quality-level=Low",
+    "-carla-port=2000"
+  ],
+  "semantic_effect_claimed": false,
+  "physics_changed": false,
+  "synchronous_mode_changed_by_profile": false,
+  "fixed_delta_seconds_changed_by_profile": false,
+  "no_rendering_mode_is_separately_captured_from_live_world": true
+}
