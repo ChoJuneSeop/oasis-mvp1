@@ -1,0 +1,20 @@
+name: G3 RPFO v1.2 Regression
+
+on:
+  push:
+    branches: [rpfo12]
+
+jobs:
+  rpfo-v12:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile v1.2 path
+        run: python -m py_compile research/g3_rpfo_v1/rpfo_v12.py research/g3_rpfo_v1/core_v12.py research/g3_rpfo_v1/entry_v12.py research/g3_rpfo_v1/canonical12.py
+      - name: RPFO v1.2 contracts
+        run: python -m unittest research.g3_rpfo_v1.test_v12_contract -v
+      - name: Preserve v1.1 and Fold-v1 lineage
+        run: python -m unittest research.g3_rpfo_v1.test_state_v11 research.g3_realtime_split_v1.test_fold_operator research.g3_realtime_split_v1.test_fold_counterexamples -v
