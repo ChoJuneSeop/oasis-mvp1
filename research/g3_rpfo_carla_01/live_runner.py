@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 from research.g3_organic_carla_01 import gated_runner as base_runner
 from research.g3_organic_carla_01 import live_runner as base_live
 from research.g3_organic_carla_01 import release_gate as base_release
@@ -42,11 +45,69 @@ def _restore(saved):
         setattr(module, name, value)
 
 
+def _atomic_status(path: Path, payload: dict) -> None:
+    encoded = json.dumps(
+        payload,
+        sort_keys=True,
+        indent=2,
+        ensure_ascii=False,
+        allow_nan=False,
+    ) + "\n"
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(encoded, encoding="utf-8")
+    temporary.replace(path)
+
+
+def _record_pre_first_tick_failure(kwargs, exc: BaseException) -> None:
+    """Preserve a failed empirical attempt even when the legacy runner fails before its try block."""
+    flow_id = str(kwargs.get("flow_id", ""))
+    attempt = int(kwargs.get("attempt", 0) or 0)
+    output_root = kwargs.get("output_root")
+    if not flow_id or attempt < 1 or output_root is None:
+        return
+
+    run_dir = Path(output_root) / PROTOCOL_ID / f"{flow_id}-A{attempt}"
+    status_path = run_dir / "status.json"
+    if not run_dir.exists():
+        run_dir.mkdir(parents=True, exist_ok=False)
+
+    status = {}
+    if status_path.is_file():
+        try:
+            status = json.loads(status_path.read_text(encoding="utf-8"))
+        except Exception:
+            status = {}
+
+    # Never rewrite an attempt that has crossed the empirical boundary.
+    if bool(status.get("empirical_evidence")) or int(status.get("empirical_ticks", 0) or 0) > 0:
+        return
+
+    status.update(
+        {
+            "protocol_id": PROTOCOL_ID,
+            "flow_id": flow_id,
+            "attempt": attempt,
+            "phase": "PRE_FIRST_TICK_FAIL",
+            "empirical_evidence": False,
+            "empirical_ticks": 0,
+            "valid_complete": False,
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+            "failure_recorded_by": "rpfo-live-wrapper-v1",
+        }
+    )
+    _atomic_status(status_path, status)
+
+
 def run_flow(**kwargs):
     verify_experiment_manifest()
     saved = _patch()
     try:
-        return base_runner.run_flow(**kwargs)
+        try:
+            return base_runner.run_flow(**kwargs)
+        except BaseException as exc:
+            _record_pre_first_tick_failure(kwargs, exc)
+            raise
     finally:
         _restore(saved)
 
