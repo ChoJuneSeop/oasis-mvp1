@@ -1,7 +1,7 @@
 {
   "protocol_id": "G3-RPFO-ORGANIC-CARLA-01",
   "manifest_version": "1.0",
-  "source_snapshot_commit": "5bbcccf795937f6e27a957826b30426127df4b17",
+  "source_snapshot_commit": "47be21b80f869fb0cce0cf0a7981ba59c2d5b078",
   "preregistration_git_blob_sha1": "fc1424bfac30edf9709cee0041f1df16320f417c",
   "no_post_result_retuning": true,
   "experimental_evidence": false,
@@ -16,7 +16,7 @@
     "research/g3_rpfo_carla_01/protocol.py": "6252df586c49e0e386a2398f1d7f69756349aba2",
     "research/g3_rpfo_carla_01/resolver.py": "6cdf062648fbbbb308395bc10e18e06a7e0175f3",
     "research/g3_rpfo_carla_01/core_factory.py": "92abfdb9e1fb4403cfe3631a59e384eee31189b1",
-    "research/g3_rpfo_carla_01/live_core.py": "c2b281392b4411d414190031351fd18ab28c8c3f",
+    "research/g3_rpfo_carla_01/live_core.py": "81534de7ec7528261fd3f44d454fb5c0290e109f",
     "research/g3_rpfo_carla_01/live_runner.py": "1b7dfe77950265367e3da56f0f4882e886399ac2",
     "research/g3_rpfo_carla_01/release_gate.py": "3dd79345e948517c08bd6e6104678cc5ed7b2232",
     "research/g3_rpfo_v1/rpfo.py": "19aba73513a2c4c1d2eb890a8022e02f1eda405c",
