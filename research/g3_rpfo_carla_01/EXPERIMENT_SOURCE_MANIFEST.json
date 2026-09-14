@@ -1,7 +1,7 @@
 {
   "protocol_id": "G3-RPFO-ORGANIC-CARLA-01",
-  "manifest_version": "1.0",
-  "source_snapshot_commit": "9e332e5687997e3984f3a9c52f10f1b56d96c6e5",
+  "manifest_version": "1.1",
+  "source_snapshot_commit": "e9a73dd1f875491ec6bc5af2716962761815452f",
   "preregistration_git_blob_sha1": "fc1424bfac30edf9709cee0041f1df16320f417c",
   "no_post_result_retuning": true,
   "experimental_evidence": false,
@@ -13,6 +13,9 @@
   "reverse_temporal_causality": false,
   "semantic_similarity_rank_threshold_topk_gate": false,
   "source_git_blob_sha1": {
+    "host_tools/g3_rpfo_carla_01/external_carla_runner.py": "0475f05a4a04cb2fd0c8b89de43fa10aff2476a1",
+    "host_tools/g3_rpfo_carla_01/run_of01_external.bat": "1a089140a76969f35f0a81a55e94d6fa37885d79",
+    "host_tools/g3_rpfo_carla_01/approve_of01_a1.bat": "8b2f54dc481681d5611fc96f36f1ffee955c40ec",
     "research/g3_rpfo_carla_01/protocol.py": "6252df586c49e0e386a2398f1d7f69756349aba2",
     "research/g3_rpfo_carla_01/resolver.py": "6cdf062648fbbbb308395bc10e18e06a7e0175f3",
     "research/g3_rpfo_carla_01/core_factory.py": "84f3ea2903bfc53f8650c20386eae3b1c4b5466e",
