@@ -51,7 +51,7 @@ def verify_experiment_manifest():
         raise ValueError("no-retuning guard missing")
     if manifest.get("experimental_evidence") is not False:
         raise ValueError("source manifest cannot be empirical evidence")
-    if preregistration_sha256() != str(manifest["preregistration_sha256"]):
+    if git_blob_sha1(PREREGISTRATION_PATH) != str(manifest["preregistration_git_blob_sha1"]):
         raise ValueError("preregistration bytes changed after freeze")
     for relative, expected in sorted(manifest["source_git_blob_sha1"].items()):
         path = REPO_ROOT / relative
