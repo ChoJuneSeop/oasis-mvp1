@@ -1,0 +1,121 @@
+name: G3 RPFO v1.2 Cross-lineage Regression
+
+on:
+  push:
+    branches: [rpfo12]
+  workflow_dispatch:
+
+jobs:
+  cross-lineage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Compile non-empirical integration surface
+        run: >-
+          python -m compileall -q
+          research/oasis_core_v11
+          research/oasis_core_v12
+          research/g3_2_sidecar
+          research/carla_v22_harness_v11
+          research/choice_responsibility_v01
+          research/integration_checkpoint
+          research/g3_organic_flow_v1
+          research/g3_rpfo_v1
+
+      - name: Verify preserved manifests
+        run: |
+          python -m research.oasis_core_v12.verify_manifest
+          python -m research.choice_responsibility_v01.verify_manifest
+          python research/g3_organic_flow_v1/verify_manifest.py
+
+      - name: G3.2 sidecar regression
+        run: python -m unittest discover -s research/g3_2_sidecar -p 'test_*.py' -v
+
+      - name: OASIS Core v1.1 regression
+        run: python -m unittest discover -s research/oasis_core_v11 -p 'test_*.py' -v
+
+      - name: OASIS Core v1.2 regression
+        run: python -m unittest research.oasis_core_v12.test_supplement -v
+
+      - name: Choice responsibility regression
+        run: python -m unittest research.choice_responsibility_v01.test_integration -v
+
+      - name: Final integration checkpoint regression
+        run: >-
+          python -m unittest
+          research.integration_checkpoint.test_cross
+          research.integration_checkpoint.test_harness_adapter -v
+
+      - name: Canonical CARLA harness regression without live server
+        run: python -m unittest discover -s research/carla_v22_harness_v11 -p 'test_*.py' -v
+
+      - name: Organic flow regression
+        run: >-
+          python -m unittest
+          research.g3_organic_flow_v1.test_organic_flow
+          research.g3_organic_flow_v1.test_shared_closure
+          research.g3_organic_flow_v1.test_carla_atomic_port
+          research.g3_organic_flow_v1.test_runtime_freeze -v
+
+      - name: RPFO v1.2 full discovery
+        run: python -m unittest discover -s research/g3_rpfo_v1 -p 'test*.py' -v
+
+      - name: Preserve Fold-v1 historical lineage
+        run: >-
+          python -m unittest
+          research.g3_realtime_split_v1.test_fold_operator
+          research.g3_realtime_split_v1.test_fold_counterexamples -v
+
+      - name: Synthetic integration wiring
+        run: |
+          python -m research.oasis_core_v11.synthetic_integrated_flow
+          python -m research.oasis_core_v12.synthetic_integrated_flow
+          python -m research.choice_responsibility_v01.example
+
+      - name: Verify frozen G3.2 and final integration manifests
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+
+          checks = [
+              ('research/oasis_core_v11/G32_DOMAIN_POLICY_MANIFEST.json', {
+                  'canonical_harness':'research/carla_v22_harness_v11/canonical_harness.py',
+                  'carla_runtime_adapter':'research/carla_v22_harness_v11/carla_runtime_adapter_v1.py',
+                  'independent_evaluator':'research/carla_v22_harness_v11/independent_evaluator_v1.py',
+                  'current_relational_core':'research/oasis_core_v11/current_relational_core.py',
+                  'g32_reconstruction_schema':'research/g3_2_sidecar/reconstruction.py',
+                  'carla_domain_policy':'research/oasis_core_v11/carla_domain_policy_v1.py',
+                  'carla_domain_bundle':'research/oasis_core_v11/carla_domain_bundle_v1.py',
+                  'carla_relational_domain':'research/oasis_core_v11/carla_relational_domain.py',
+                  'history_admission':'research/oasis_core_v11/history_admission.py',
+              }),
+              ('research/integration_checkpoint/FINAL_MANIFEST.json', {
+                  'v12_current_relational_core':'research/oasis_core_v12/current_relational_core.py',
+                  'choice_responsibility_integration':'research/choice_responsibility_v01/integration.py',
+                  'current_frame_compatibility':'research/integration_checkpoint/frame.py',
+                  'selection_compatibility':'research/integration_checkpoint/selection.py',
+                  'canonical_harness_adapter':'research/integration_checkpoint/harness_adapter.py',
+                  'cross_lineage_test':'research/integration_checkpoint/test_cross.py',
+                  'harness_adapter_test':'research/integration_checkpoint/test_harness_adapter.py',
+                  'canonical_harness':'research/carla_v22_harness_v11/canonical_harness.py',
+                  'carla_runtime_adapter':'research/carla_v22_harness_v11/carla_runtime_adapter_v1.py',
+                  'independent_evaluator':'research/carla_v22_harness_v11/independent_evaluator_v1.py',
+              }),
+          ]
+          for manifest_path, expected in checks:
+              manifest = json.loads(Path(manifest_path).read_text())
+              for key, path in expected.items():
+                  actual = hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                  assert actual == manifest['source_sha256'][key], (manifest_path, key)
+          final = json.loads(Path('research/integration_checkpoint/FINAL_MANIFEST.json').read_text())
+          assert final['verification_conclusion'] == 'success'
+          assert final['unit_tests_passed'] == 101
+          assert final['no_post_result_retuning'] is True
+          assert final['experimental_evidence'] is False
+          print('cross-lineage-manifest=PASS')
+          PY
