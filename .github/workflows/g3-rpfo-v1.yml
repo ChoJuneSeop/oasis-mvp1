@@ -1,0 +1,22 @@
+name: G3 RPFO v1 Regression
+
+on:
+  push:
+    branches: [feature/g3-rpfo-v1]
+
+jobs:
+  rpfo-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: RPFO locality regression
+        run: python -m unittest research.g3_rpfo_v1.test_locality -v
+      - name: RPFO traversal regression
+        run: python -m unittest research.g3_rpfo_v1.test_traversal -v
+      - name: RPFO invariant regression
+        run: python -m unittest research.g3_rpfo_v1.test_invariants -v
+      - name: Preserve Fold-v1 counterexample lineage
+        run: python -m unittest research.g3_realtime_split_v1.test_fold_operator research.g3_realtime_split_v1.test_fold_counterexamples -v
