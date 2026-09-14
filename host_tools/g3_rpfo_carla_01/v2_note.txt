@@ -1,0 +1,1 @@
+A2 host execution uses a compatibility alias for the legacy snapshot key and records all pre-first-tick failures with empirical_ticks=0.
