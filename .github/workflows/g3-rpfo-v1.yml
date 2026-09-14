@@ -13,7 +13,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Compile RPFO path
-        run: python -m py_compile research/g3_rpfo_v1/rpfo.py research/g3_rpfo_v1/core.py
+        run: python -m py_compile research/g3_rpfo_v1/rpfo.py research/g3_rpfo_v1/core.py research/g3_rpfo_v1/hardening.py research/g3_rpfo_v1/strict_core.py
       - name: Local lineage access
         run: python -m unittest research.g3_rpfo_v1.test_state_v11 -v
       - name: Deferred frontier expansion
@@ -24,6 +24,8 @@ jobs:
         run: python -m unittest research.g3_rpfo_v1.test_joint_unfold_v11 -v
       - name: Provenance fail-closed
         run: python -m unittest research.g3_rpfo_v1.test_provenance_v11 -v
+      - name: Strict provenance and deterministic order
+        run: python -m unittest research.g3_rpfo_v1.test_strict_v11 -v
       - name: Core action-path wiring
         run: python -m unittest research.g3_rpfo_v1.test_core_path_v11 -v
       - name: Preserve Fold-v1 counterexample lineage
