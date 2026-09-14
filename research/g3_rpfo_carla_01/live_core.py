@@ -21,8 +21,8 @@ def _digest(*parts):
 
 class RPFOCARLALiveCore(StrictRPFOOrganicCoreV12):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self._latest_front_relation = None
+        super().__init__(*args, **kwargs)
 
     def add_history_batch(self, envelopes):
         batch = tuple(envelopes)

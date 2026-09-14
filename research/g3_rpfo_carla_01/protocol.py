@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from hashlib import sha256
+from hashlib import sha1, sha256
 import json
 from pathlib import Path
 
@@ -13,6 +13,12 @@ PROTOCOL_ID = "G3-RPFO-ORGANIC-CARLA-01"
 
 def file_sha256(path):
     return sha256(Path(path).read_bytes()).hexdigest()
+
+
+def git_blob_sha1(path):
+    data = Path(path).read_bytes()
+    prefix = ("blob %d\0" % len(data)).encode("ascii")
+    return sha1(prefix + data).hexdigest()
 
 
 def load_preregistration():
@@ -45,11 +51,10 @@ def verify_experiment_manifest():
         raise ValueError("no-retuning guard missing")
     if manifest.get("experimental_evidence") is not False:
         raise ValueError("source manifest cannot be empirical evidence")
-    expected = manifest.get("source_sha256", {})
-    for relative, digest in sorted(expected.items()):
-        path = REPO_ROOT / relative
-        if not path.is_file() or file_sha256(path) != str(digest):
-            raise ValueError("experiment source mismatch: %s" % relative)
     if preregistration_sha256() != str(manifest["preregistration_sha256"]):
         raise ValueError("preregistration bytes changed after freeze")
+    for relative, expected in sorted(manifest["source_git_blob_sha1"].items()):
+        path = REPO_ROOT / relative
+        if not path.is_file() or git_blob_sha1(path) != str(expected):
+            raise ValueError("runtime source mismatch: %s" % relative)
     return manifest
