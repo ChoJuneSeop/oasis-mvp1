@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from hashlib import sha256
 
 from research.g3_rpfo_v1.canonical12 import StrictRPFOOrganicCoreV12
@@ -9,6 +10,7 @@ from research.g3_rpfo_v1.rpfo_v12 import (
     CurrentContinuityClaimV12,
     HistoricalLinkProvenanceV12,
     HistoricalRelationLinkV12,
+    RegisteredRelationV12,
 )
 from research.oasis_core_v11.current_relational_core import CoreV11InvariantError
 
@@ -22,8 +24,11 @@ def _digest(*parts):
 
 class RPFOCARLALiveCore(StrictRPFOOrganicCoreV12):
     def __init__(self, *args, **kwargs):
+        initial_history = tuple(kwargs.pop("history", ()))
         self._latest_front_relation = None
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, history=(), **kwargs)
+        for envelope in initial_history:
+            self.add_history_batch((envelope,))
 
     @staticmethod
     def _front_admission(batch):
@@ -46,19 +51,13 @@ class RPFOCARLALiveCore(StrictRPFOOrganicCoreV12):
             )
         return envelope, source, refs[0]
 
-    def add_history_batch(self, envelopes):
-        batch = tuple(envelopes)
-        checked = self._front_admission(batch)
-        super().add_history_batch(batch)
-        if checked is None:
-            return
-        envelope, source, occurrence_ref = checked
+    @staticmethod
+    def _edge_for(envelope, source, occurrence_ref):
         key = (source.experience_id, source.relation_element_id)
         formed = float(source.completed_at_tau)
         known = float(envelope.known_at_tau)
-        edge_id = "front-edge:" + _digest(key, occurrence_ref)
-        self.register_continuity_edge(ContinuityEdgeV12(
-            edge_id=edge_id,
+        return ContinuityEdgeV12(
+            edge_id="front-edge:" + _digest(key, occurrence_ref),
             key=key,
             provenance=ContinuityEdgeProvenanceV12(
                 source_key=key,
@@ -67,28 +66,67 @@ class RPFOCARLALiveCore(StrictRPFOOrganicCoreV12):
                 formed_at_tau=formed,
                 known_at_tau=known,
             ),
-        ))
+        )
+
+    def add_history_batch(self, envelopes):
+        batch = tuple(envelopes)
+        checked = self._front_admission(batch)
+        if checked is None:
+            return super().add_history_batch(batch)
+
+        envelope, source, occurrence_ref = checked
+        key = (source.experience_id, source.relation_element_id)
+        existing = self._history.get(key)
+        if existing is not None:
+            if existing == envelope:
+                return
+            super().add_history_batch(batch)
+            raise CoreV11InvariantError("conflicting replay was not rejected")
+
+        edge = self._edge_for(envelope, source, occurrence_ref)
+        formed = float(source.completed_at_tau)
+        known = float(envelope.known_at_tau)
         prior = self._latest_front_relation
-        if prior is not None and prior[0] != key:
-            prior_key, prior_occurrence, prior_formed = prior
-            self.register_historical_link(HistoricalRelationLinkV12(
+        link = None
+        if prior is not None and prior[0] != key and prior[1] != occurrence_ref:
+            prior_key, prior_occurrence, prior_formed, prior_known = prior
+            link = HistoricalRelationLinkV12(
                 link_id="front-order-link:" + _digest(prior_key, key),
                 members=(prior_key, key),
                 formed_at_tau=max(float(prior_formed), formed),
-                known_at_tau=known,
+                known_at_tau=max(float(prior_known), known),
                 provenance=HistoricalLinkProvenanceV12(
-                    formation_basis="observed order of completed front processes",
+                    formation_basis="observed order of distinct completed front-process occurrences",
                     source_experience_ids=(prior_key[0], key[0]),
                     evidence_refs=(prior_occurrence, occurrence_ref),
                 ),
-            ))
-        self._latest_front_relation = (key, occurrence_ref, formed)
+            )
+
+        staged = deepcopy(self.rpfo_repository)
+        staged.register_relation(
+            RegisteredRelationV12(
+                envelope.record,
+                envelope.known_at_tau,
+                tuple(envelope.occurrence_refs),
+            )
+        )
+        staged.register_continuity_edge(edge)
+        if link is not None:
+            staged.register_link(link)
+
+        super().add_history_batch(batch)
+        self.register_continuity_edge(edge)
+        if link is not None:
+            self.register_historical_link(link)
+
+        if prior is None or prior[1] != occurrence_ref:
+            self._latest_front_relation = (key, occurrence_ref, formed, known)
 
     def _current_claims(self, frame):
         if not frame.observation.front_present or self._latest_front_relation is None:
             return ()
         frame.assert_current_evidence(FRONT_EVIDENCE_REFS)
-        key, occurrence_ref, _ = self._latest_front_relation
+        key, occurrence_ref, _, _ = self._latest_front_relation
         edge_id = "front-edge:" + _digest(key, occurrence_ref)
         return (CurrentContinuityClaimV12(
             claim_id="front-claim:%s:%s" % (frame.observation.epoch, edge_id),
