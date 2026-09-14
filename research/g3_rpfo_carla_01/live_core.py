@@ -10,6 +10,7 @@ from research.g3_rpfo_v1.rpfo_v12 import (
     HistoricalLinkProvenanceV12,
     HistoricalRelationLinkV12,
 )
+from research.oasis_core_v11.current_relational_core import CoreV11InvariantError
 
 FRONT_RELATION_ID = "current:front-longitudinal"
 FRONT_EVIDENCE_REFS = ("current:front-longitudinal", "observation:front-present")
@@ -24,22 +25,35 @@ class RPFOCARLALiveCore(StrictRPFOOrganicCoreV12):
         self._latest_front_relation = None
         super().__init__(*args, **kwargs)
 
-    def add_history_batch(self, envelopes):
-        batch = tuple(envelopes)
-        super().add_history_batch(batch)
+    @staticmethod
+    def _front_admission(batch):
         if not batch:
-            return
+            return None
         if len(batch) != 1:
-            raise ValueError("front empirical lineage requires one relation per admission")
+            raise CoreV11InvariantError(
+                "front empirical lineage requires one relation per admission"
+            )
         envelope = batch[0]
         source = envelope.record.source
         if source.relation_element_id != "front-interaction":
-            raise ValueError("non-front relation entered front empirical lineage")
+            raise CoreV11InvariantError(
+                "non-front relation entered front empirical lineage"
+            )
         refs = tuple(envelope.occurrence_refs)
         if len(refs) != 1:
-            raise ValueError("front relation requires one closure occurrence")
+            raise CoreV11InvariantError(
+                "front relation requires one closure occurrence"
+            )
+        return envelope, source, refs[0]
+
+    def add_history_batch(self, envelopes):
+        batch = tuple(envelopes)
+        checked = self._front_admission(batch)
+        super().add_history_batch(batch)
+        if checked is None:
+            return
+        envelope, source, occurrence_ref = checked
         key = (source.experience_id, source.relation_element_id)
-        occurrence_ref = refs[0]
         formed = float(source.completed_at_tau)
         known = float(envelope.known_at_tau)
         edge_id = "front-edge:" + _digest(key, occurrence_ref)
