@@ -1,6 +1,9 @@
 import unittest
 
 from research.g3_2_sidecar.common import RelationElementRef
+from research.g3_rpfo_v1.operator_v12 import (
+    CanonicalRelationalParticipationFoldOperatorV12,
+)
 from research.g3_rpfo_v1.rpfo import ParticipationDecision
 from research.g3_rpfo_v1.rpfo_v12 import (
     ContinuityEdgeProvenanceV12,
@@ -8,7 +11,6 @@ from research.g3_rpfo_v1.rpfo_v12 import (
     CurrentContinuityClaimV12,
     IndexedRelationRepositoryV12,
     RegisteredRelationV12,
-    RelationalParticipationFoldOperatorV12,
 )
 from research.oasis_core_v11.current_relational_core import (
     CoreV11InvariantError,
@@ -102,7 +104,7 @@ class RPFO12ContractTests(unittest.TestCase):
             CurrentContinuityClaimV12("claim:a", "now:a", "edge:e1", ("ev:a",), 10.0),
             CurrentContinuityClaimV12("claim:b", "now:b", "edge:e1", ("ev:b",), 10.0),
         )
-        op = RelationalParticipationFoldOperatorV12(resolver=NoopResolver())
+        op = CanonicalRelationalParticipationFoldOperatorV12(resolver=NoopResolver())
         frontier = op.seed_frontier(
             current_tau=10.0,
             current_relations=relations,
