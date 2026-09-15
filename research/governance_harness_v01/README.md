@@ -1,23 +1,26 @@
 # Governance Harness v0.1
 
-This prototype adds governance as a thin orchestration layer over
-`CanonicalHarnessV11`; it does not replace the canonical memory, relation-history,
-Completed Experience, probing, or single-realization paths.
+This module is a governance sidecar around CanonicalHarnessV11. It preserves the
+canonical probe and one-realization rules and adds these boundaries:
 
-The enforced order is:
+1. Gap detection receives only an episode-local current-flow trace. Integrity
+   fingerprints are held separately and are never semantic detector input.
+2. NO exposes no historical relation to the Core. YES validates every reengagement
+   ID/provenance and exposes only participate=True experiences. Negative decisions
+   remain in the governance audit only.
+3. The Core creates the actual possibility distribution before responsibility is
+   assessed. Responsibility is tied to candidate selection/nonselection and dynamic
+   uncertainty, impact, vulnerability, and temporality evidence; no permanent score
+   is stored.
+4. Every branch starts the canonical IndependentEvaluatorV1 lifecycle. The epoch
+   stays pending until a post-realization observation establishes relation closure.
+5. Only then is realization reference/tau/fingerprint consistency checked and typed
+   result-based revalidation performed for gap, every participation/nonparticipation
+   decision, choice, and responsibility.
+6. Governance provenance is attached by HistoryEntry ID in GovernanceHistorySidecar;
+   typed feedback is available to later governance judgments. Per-epoch access,
+   exposure, candidate, and operation counts are kept in GovernanceMetrics.
 
-1. Capture the present flow.
-2. Detect abnormal output, relation change, or progress anomaly using only that
-   present-flow snapshot.
-3. On `NO`, run the canonical decision, single realization, and outcome observation.
-4. On `YES`, and only then, assess Completed Experience reengagement and explicit
-   responsibility for selection and non-selection.
-5. Bind that context to a governance-aware core adapter when one is supplied, then
-   run the unchanged canonical single-realization path.
-6. Observe the realized outcome and revalidate the gap, every participation or
-   non-participation judgment, the choice, and the responsibility judgment.
-
-`CurrentFlowSnapshot` intentionally has no history field. This capability boundary,
-plus the call-order tests, prevents gap detection from becoming a historical
-comparison. The prototype records both positive and negative reengagement decisions
-without creating a separate Completed Experience for a mere `NO` decision.
+Governance context is bound only during the current canonical epoch and is cleared
+in finally, including failures. This remains a synthetic contract implementation;
+the repository's CARLA compatibility audit still controls real experimental use.

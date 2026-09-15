@@ -1,168 +1,100 @@
 from __future__ import annotations
-
 import unittest
-
-from research.carla_v22_harness_v11.canonical_harness import CanonicalHarnessV11
+from dataclasses import replace
+from research.carla_v22_harness_v11.canonical_harness import CanonicalHarnessV11, PresentObservation
+from research.carla_v22_harness_v11.independent_evaluator_v1 import IndependentEvaluatorV1
 from research.carla_v22_harness_v11.synthetic_dry_run import SyntheticCore, SyntheticFlow
-from research.governance_harness_v01.harness import (
-    ExperienceReengagement,
-    GapAssessment,
-    GovernanceHarnessV01,
-    GovernanceInvariantError,
-    JudgmentRevalidation,
-    OutcomeObservation,
-    ResponsibilityJudgment,
-)
+from research.oasis_core_v11.carla_domain_bundle_v1 import build_domain_bundle
+from research.governance_harness_v01.harness import *
 
-
-class GapDetector:
-    def __init__(self, events, detected):
-        self.events, self.detected = events, detected
-
-    def assess(self, snapshot):
-        self.events.append("gap")
-        self.assert_snapshot_has_no_history(snapshot)
-        return GapAssessment(
-            self.detected,
-            progress_anomalies=("stalled",) if self.detected else (),
-            current_evidence_refs=("present:progress",),
-        )
-
-    @staticmethod
-    def assert_snapshot_has_no_history(snapshot):
-        assert not hasattr(snapshot, "history")
-        assert not hasattr(snapshot, "experiences")
-
-
-class Reengagement:
-    def __init__(self, events):
-        self.events = events
-
-    def assess(self, snapshot, gap):
-        self.events.append("history")
-        return (
-            ExperienceReengagement("completed-exp-1", True, "relevant after current gap"),
-            ExperienceReengagement("completed-exp-2", False, "not needed in this relation"),
-        )
-
-
+class Gap:
+    def __init__(self): self.inputs=[]
+    def assess(self,flow):
+        self.inputs.append(flow)
+        assert not hasattr(flow,"flow_fingerprint") and not hasattr(flow,"history")
+        detected=len(flow.samples)>1 and flow.samples[-1].observation.ego_speed_mps < flow.samples[-2].observation.ego_speed_mps
+        return GapAssessment(detected,progress_anomalies=("slowing",) if detected else (),current_evidence_refs=(f"episode:{flow.episode_id}",))
+class Reengage:
+    def __init__(self): self.feedback_seen=()
+    def assess(self,flow,gap,feedback):
+        self.feedback_seen=feedback
+        return (ExperienceReengagement("E-old-yield",True,"relevant",provenance_ref="prov:old"),
+                ExperienceReengagement("E-mid-merge",False,"exclude",provenance_ref="prov:mid"))
+class Catalog:
+    def validate(self,e,p): return (e,p) in {("E-old-yield","prov:old"),("E-mid-merge","prov:mid")}
 class Responsibility:
-    def __init__(self, events):
-        self.events = events
-
-    def assess(self, snapshot, gap, reengagement):
-        self.events.append("responsibility")
-        return ResponsibilityJudgment(
-            selected_obligations=("verify braking outcome",),
-            nonselected_obligations=("record why acceleration was rejected",),
-        )
-
-
+    def assess(self,c):
+        assert c.candidate_ids
+        selected="yield"
+        return ResponsibilityJudgment(c.candidate_ids,selected,tuple(x for x in c.candidate_ids if x!=selected),
+            DynamicResponsibilityAxes(("sensor confidence",),("collision",),("front actor",),("immediate",)),
+            ("verify yield",),("record rejected alternatives",))
+class Context:
+    def __init__(self): self.bound=[]; self.clears=0
+    def bind_governance_context(self,c): self.bound.append(c)
+    def clear_governance_context(self): self.clears+=1
 class Outcome:
-    def __init__(self, events):
-        self.events = events
+    def observe_post(self,d,record,flow):
+        return OutcomeObservation("closed",record.evidence,float(record.evidence["post_tau"]),d.realization_ref,d.realization_tau,d.after_realization_fingerprint,flow.flow_fingerprint())
+class Revalidate:
+    def revalidate(self,c,audit,d,o):
+        return JudgmentRevalidation(RevalidationState.CONFIRMED,
+            tuple((x.experience_id,RevalidationState.CONFIRMED if x.participate else RevalidationState.REVISED) for x in audit),
+            RevalidationState.CONFIRMED,RevalidationState.CONFIRMED)
+class MutableFlow(SyntheticFlow):
+    def __init__(self): super().__init__(); self.speed=2.0; self.epoch=200
+    def present_observation(self):
+        d=super().present_observation(); d["ego_speed_mps"]=self.speed; d["epoch"]=self.epoch; return d
+    def next_epoch(self,speed):
+        self.apply_count=0; self.speed=speed; self.epoch+=1
 
-    def observe(self, execution, flow):
-        self.events.append("outcome")
-        return OutcomeObservation(
-            "host result observed",
-            {"realization_ref": execution.realization_ref},
-            float(flow.current_tau()),
-            flow.flow_fingerprint(),
-        )
+def closed_observation(d):
+    o=d.observation
+    return PresentObservation(o.epoch+1,o.ego_speed_mps,False,0.0,0.0,"none",o.local_heading_error_deg,o.local_density)
 
+class Tests(unittest.TestCase):
+    def build(self,flow_gap=None):
+        gap=flow_gap or Gap(); re=Reengage(); context=Context(); sidecar=GovernanceHistorySidecar()
+        h=GovernanceHarnessV01(CanonicalHarnessV11(SyntheticCore()),gap_detector=gap,
+            evaluator=IndependentEvaluatorV1(build_domain_bundle().closure_evaluator),outcome_observer=Outcome(),
+            responsibility_operator=Responsibility(),revalidation_operator=Revalidate(),reengagement_operator=re,
+            experience_catalog=Catalog(),context_port=context,history_sidecar=sidecar)
+        return h,gap,re,context,sidecar
+    def test_no_is_pending_has_responsibility_and_blocks_history(self):
+        h,_,_,ctx,_=self.build(); flow=MutableFlow()
+        p=h.execute_decision_epoch(flow,episode_id="road-1")
+        self.assertEqual(p.branch,"NO"); self.assertTrue(p.pending); self.assertIsNone(p.outcome)
+        self.assertEqual(p.metrics.archive_experience_reads,0); self.assertEqual(p.metrics.core_exposed_experience_count,0)
+        self.assertEqual(p.decision.recorder.relation_elements,()); self.assertEqual(ctx.clears,1)
+        done=h.observe_post(flow,post_observation=closed_observation(p.decision),post_tau=flow.current_tau()+.1)
+        self.assertFalse(done.pending); self.assertIsNotNone(done.responsibility); self.assertIsNotNone(done.revalidation)
+    def test_yes_only_participant_reaches_context_and_core_but_audit_keeps_no(self):
+        h,gap,_,ctx,sidecar=self.build(); flow=MutableFlow()
+        first=h.execute_decision_epoch(flow,episode_id="road")
+        h.observe_post(flow,post_observation=closed_observation(first.decision),post_tau=flow.current_tau()+.1)
+        flow.next_epoch(1.0)
+        yes=h.execute_decision_epoch(flow,episode_id="road")
+        self.assertEqual(yes.branch,"YES"); self.assertEqual([x.experience_id for x in yes.reengagement],["E-old-yield","E-mid-merge"])
+        self.assertEqual([x.experience_id for x in ctx.bound[-1].participating_experiences],["E-old-yield"])
+        self.assertEqual({r.experience_id for r in yes.decision.recorder.relation_elements},{"E-old-yield"})
+        self.assertEqual(yes.metrics.core_exposed_experience_count,1)
+        done=h.observe_post(flow,post_observation=closed_observation(yes.decision),post_tau=flow.current_tau()+.1)
+        self.assertIs(sidecar.get(done.history_entry.entry_id),done.provenance)
+    def test_feedback_enters_next_non_gap_responsibility_context(self):
+        h,_,_,ctx,_=self.build(); flow=MutableFlow(); p=h.execute_decision_epoch(flow)
+        h.observe_post(flow,post_observation=closed_observation(p.decision),post_tau=flow.current_tau()+.1)
+        flow.next_epoch(2.0); h.execute_decision_epoch(flow)
+        self.assertEqual(len(ctx.bound[-1].feedback),1)
+    def test_duplicate_and_bad_provenance_rejected(self):
+        h,_,_,_,_=self.build(); flow=MutableFlow()
+        h.gap_detector.assess=lambda f: GapAssessment(True)
+        h.reengagement_operator.assess=lambda *a:(ExperienceReengagement("x",True,"",provenance_ref="bad"),)*2
+        with self.assertRaises(GovernanceInvariantError): h.execute_decision_epoch(flow)
+    def test_open_post_stays_pending(self):
+        h,_,_,_,_=self.build(); flow=MutableFlow(); p=h.execute_decision_epoch(flow)
+        same=h.observe_post(flow,post_observation=p.decision.observation,post_tau=999)
+        self.assertTrue(same.pending)
+    def test_typed_revalidation_rejects_free_text(self):
+        with self.assertRaises(ValueError): RevalidationState("maybe")
 
-class Revalidation:
-    def __init__(self, events):
-        self.events = events
-
-    def revalidate(self, context, execution, outcome):
-        self.events.append("revalidate")
-        return JudgmentRevalidation(
-            "confirmed",
-            (("completed-exp-1", "confirmed"), ("completed-exp-2", "revise")),
-            "confirmed",
-            "revise",
-        )
-
-
-class ContextPort:
-    def __init__(self, events):
-        self.events, self.context = events, None
-
-    def bind_governance_context(self, context):
-        self.events.append("bind")
-        self.context = context
-
-
-class GovernanceHarnessTests(unittest.TestCase):
-    def build(self, detected, events, *, revalidator=True):
-        return GovernanceHarnessV01(
-            CanonicalHarnessV11(SyntheticCore()),
-            gap_detector=GapDetector(events, detected),
-            outcome_observer=Outcome(events),
-            reengagement_operator=Reengagement(events),
-            responsibility_operator=Responsibility(events),
-            revalidation_operator=Revalidation(events) if revalidator else None,
-            context_port=ContextPort(events),
-        )
-
-    def test_no_gap_preserves_canonical_flow_without_history_access(self):
-        events, flow = [], SyntheticFlow()
-        result = self.build(False, events).execute_decision_epoch(flow)
-        self.assertEqual(result.branch, "NO")
-        self.assertEqual(events, ["gap", "outcome"])
-        self.assertEqual(flow.apply_count, 1)
-        self.assertEqual(result.reengagement, ())
-        self.assertIsNone(result.responsibility)
-        self.assertIsNone(result.revalidation)
-
-    def test_gap_uses_history_only_after_current_flow_assessment(self):
-        events, flow = [], SyntheticFlow()
-        result = self.build(True, events).execute_decision_epoch(flow)
-        self.assertEqual(result.branch, "YES")
-        self.assertEqual(events, ["gap", "history", "responsibility", "bind", "outcome", "revalidate"])
-        self.assertEqual(flow.apply_count, 1)
-        self.assertEqual([x.participate for x in result.reengagement], [True, False])
-        self.assertTrue(result.responsibility.nonselected_obligations)
-        self.assertEqual(result.revalidation.responsibility_judgment, "revise")
-
-    def test_no_can_transition_to_yes_on_a_later_present_flow(self):
-        events, first_flow = [], SyntheticFlow()
-        detector = GapDetector(events, False)
-        harness = GovernanceHarnessV01(
-            CanonicalHarnessV11(SyntheticCore()),
-            gap_detector=detector,
-            outcome_observer=Outcome(events),
-            reengagement_operator=Reengagement(events),
-            responsibility_operator=Responsibility(events),
-            revalidation_operator=Revalidation(events),
-        )
-        self.assertEqual(harness.execute_decision_epoch(first_flow).branch, "NO")
-        detector.detected = True
-        later_flow = SyntheticFlow()
-        later_flow.tau = first_flow.tau
-        later_flow.fingerprint = first_flow.fingerprint
-        self.assertEqual(harness.execute_decision_epoch(later_flow).branch, "YES")
-        self.assertEqual(first_flow.apply_count + later_flow.apply_count, 2)
-
-    def test_yes_requires_result_based_revalidation(self):
-        with self.assertRaises(GovernanceInvariantError):
-            self.build(True, [], revalidator=False).execute_decision_epoch(SyntheticFlow())
-
-    def test_revalidation_covers_participation_and_nonparticipation(self):
-        class Incomplete(Revalidation):
-            def revalidate(self, context, execution, outcome):
-                return JudgmentRevalidation(
-                    "confirmed", (("completed-exp-1", "confirmed"),), "confirmed", "confirmed"
-                )
-
-        events = []
-        harness = self.build(True, events)
-        harness.revalidation_operator = Incomplete(events)
-        with self.assertRaises(GovernanceInvariantError):
-            harness.execute_decision_epoch(SyntheticFlow())
-
-
-if __name__ == "__main__":
-    unittest.main()
+if __name__=="__main__": unittest.main()

@@ -1,27 +1,39 @@
 """Governance extension for the canonical OASIS harness."""
 
 from .harness import (
-    CurrentFlowSnapshot,
+    CurrentFlowEvidence,
+    CurrentFlowSample,
+    DynamicResponsibilityAxes,
     ExperienceReengagement,
     GapAssessment,
     GovernanceDecisionContext,
     GovernanceEpochExecution,
     GovernanceHarnessV01,
     GovernanceInvariantError,
+    GovernanceHistorySidecar,
+    GovernanceMetrics,
+    GovernanceProvenance,
     JudgmentRevalidation,
     OutcomeObservation,
     ResponsibilityJudgment,
+    RevalidationState,
 )
 
 __all__ = (
-    "CurrentFlowSnapshot",
+    "CurrentFlowEvidence",
+    "CurrentFlowSample",
+    "DynamicResponsibilityAxes",
     "ExperienceReengagement",
     "GapAssessment",
     "GovernanceDecisionContext",
     "GovernanceEpochExecution",
     "GovernanceHarnessV01",
     "GovernanceInvariantError",
+    "GovernanceHistorySidecar",
+    "GovernanceMetrics",
+    "GovernanceProvenance",
     "JudgmentRevalidation",
     "OutcomeObservation",
     "ResponsibilityJudgment",
+    "RevalidationState",
 )
