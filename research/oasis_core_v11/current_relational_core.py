@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from contextlib import contextmanager
 from math import isfinite
 from typing import Any, Mapping, Protocol, Sequence
 
@@ -246,6 +247,7 @@ class CurrentRelationalCoreV11:
         for record in history:
             self.add_history(record)
         self._last_evaluation: EpochEvaluation | None = None
+        self._governance_allowed_experiences: frozenset[str] | None = None
 
     @staticmethod
     def _source_key(source: RelationElementRef) -> RelationKey:
@@ -255,7 +257,21 @@ class CurrentRelationalCoreV11:
         self._history[self._source_key(record.source)] = record
 
     def history_records(self) -> tuple[HistoricalRelationRecord, ...]:
-        return tuple(self._history[k] for k in sorted(self._history))
+        records=tuple(self._history[k] for k in sorted(self._history))
+        allowed=self._governance_allowed_experiences
+        return records if allowed is None else tuple(r for r in records if r.source.experience_id in allowed)
+
+    @contextmanager
+    def governance_history_scope(self, allowed_experience_ids: frozenset[str]):
+        """Temporarily narrow history capability for a governance epoch."""
+        previous=self._governance_allowed_experiences
+        self._governance_allowed_experiences=frozenset(allowed_experience_ids)
+        self._last_evaluation=None
+        try:
+            yield
+        finally:
+            self._last_evaluation=None
+            self._governance_allowed_experiences=previous
 
     def _evaluate(
         self,

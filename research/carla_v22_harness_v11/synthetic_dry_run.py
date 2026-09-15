@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+from contextlib import contextmanager
 
 from research.carla_v22_harness_v11.canonical_harness import (
     CanonicalHarnessV11,
@@ -53,6 +54,13 @@ class SyntheticCore:
         self.r1 = RelationElementRef("E-old-yield", "rel-approach-gap", 2.0, {"process": "approach", "relation": "space-closing"})
         self.r2 = RelationElementRef("E-mid-merge", "rel-yield-opening", 6.0, {"process": "merge", "relation": "yield-opening"})
         self.last_tau = None
+        self._governance_allowed = None
+
+    @contextmanager
+    def governance_history_scope(self, allowed_experience_ids):
+        previous=self._governance_allowed; self._governance_allowed=frozenset(allowed_experience_ids)
+        try: yield
+        finally: self._governance_allowed=previous
 
     def open_epoch(self, observation: PresentObservation, tau: float) -> CoreEpochView:
         self.last_tau = tau
@@ -82,18 +90,21 @@ class SyntheticCore:
             relation_graph_before={"sources": 2},
             relation_graph_after={"possibility": "yield"},
         )
+        allowed=self._governance_allowed
+        relation_elements=(self.r1,self.r2) if allowed is None else tuple(r for r in (self.r1,self.r2) if r.experience_id in allowed)
+        allowed_keys={(r.experience_id,r.relation_element_id) for r in relation_elements}
         return CoreEpochView(
-            relation_elements=(self.r1, self.r2),
+            relation_elements=relation_elements,
             possibility_distribution={"proceed": 0.6, "yield": 0.4},
-            role_trace_by_relation={
+            role_trace_by_relation={k:v for k,v in {
                 ("E-old-yield", "rel-approach-gap"): ("recognition", "generation"),
                 ("E-mid-merge", "rel-yield-opening"): ("constraint",),
-            },
-            generated_by_relation={
+            }.items() if allowed is None or k in allowed_keys},
+            generated_by_relation={k:v for k,v in {
                 ("E-old-yield", "rel-approach-gap"): ("yield",),
                 ("E-mid-merge", "rel-yield-opening"): ("yield",),
-            },
-            reconstructions=(reconstruction,),
+            }.items() if allowed is None or k in allowed_keys},
+            reconstructions=(reconstruction,) if allowed is None or len(allowed_keys)==2 else (),
         )
 
     def ablate_relation(self, observation, relation, tau):

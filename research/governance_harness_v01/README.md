@@ -1,11 +1,11 @@
-# Governance Harness v0.1
+# Governance Harness v0.2
 
 This module is a governance sidecar around CanonicalHarnessV11. It preserves the
 canonical probe and one-realization rules and adds these boundaries:
 
 1. Gap detection receives only an episode-local current-flow trace. Integrity
    fingerprints are held separately and are never semantic detector input.
-2. NO exposes no historical relation to the Core. YES validates every reengagement
+2. NO grants the Core an empty historical capability before evaluation. YES validates every reengagement
    ID/provenance and exposes only participate=True experiences. Negative decisions
    remain in the governance audit only.
 3. The Core creates the actual possibility distribution before responsibility is
@@ -24,3 +24,6 @@ canonical probe and one-realization rules and adds these boundaries:
 Governance context is bound only during the current canonical epoch and is cleared
 in finally, including failures. This remains a synthetic contract implementation;
 the repository's CARLA compatibility audit still controls real experimental use.
+
+The implementation is `GovernanceHarnessV02`. `GovernanceHarnessV01` remains as a
+compatibility alias for existing callers; it has the v0.2 semantics.

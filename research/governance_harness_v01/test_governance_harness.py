@@ -21,6 +21,7 @@ class Reengage:
         return (ExperienceReengagement("E-old-yield",True,"relevant",provenance_ref="prov:old"),
                 ExperienceReengagement("E-mid-merge",False,"exclude",provenance_ref="prov:mid"))
 class Catalog:
+    def exists(self,e): return e in {"E-old-yield","E-mid-merge"}
     def validate(self,e,p): return (e,p) in {("E-old-yield","prov:old"),("E-mid-merge","prov:mid")}
 class Responsibility:
     def assess(self,c):
