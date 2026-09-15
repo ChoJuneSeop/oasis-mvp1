@@ -1,0 +1,20 @@
+# Rebuildable Python and local runtime material
+__pycache__/
+*.py[cod]
+.runtime/
+
+# Raw experimental outputs stay outside ordinary Git history.
+/runs/**
+!/runs/governance_axis2/
+!/runs/governance_axis2/track_a_stage02_003/
+!/runs/governance_axis2/track_a_stage02_003/axis2_track_a_stage02.json
+!/runs/governance_axis2/pre_stage3_control_audit_002/
+!/runs/governance_axis2/pre_stage3_control_audit_002/control_audit.json
+!/runs/governance_axis2/track_a_stage03_001/
+!/runs/governance_axis2/track_a_stage03_001/stage03.json
+!/runs/governance_axis2/pre_stage4_audit_001/
+!/runs/governance_axis2/pre_stage4_audit_001/gate.json
+!/runs/governance_axis2/track_a_stage04_001/
+!/runs/governance_axis2/track_a_stage04_001/stage04.json
+!/runs/governance_axis2/pre_stage5_audit_003/
+!/runs/governance_axis2/pre_stage5_audit_003/gate.json

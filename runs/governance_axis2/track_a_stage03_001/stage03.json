@@ -1,0 +1,116 @@
+{
+  "stage": "STAGE3",
+  "status": "STAGE3_PASS",
+  "pre_audit_sha256": "7bdda9dfa77ee38127e4680184c3d90ef2f5832dcef8a33f2ae35d5bf891bb02",
+  "calibration_seed_count": 12,
+  "rows": [
+    {
+      "seed": 31001,
+      "stage2_pass": true,
+      "all_controls": true,
+      "distribution_l1": 0.19047619047619047,
+      "irrelevant_invariant": true,
+      "no_gap_invariant": true
+    },
+    {
+      "seed": 31007,
+      "stage2_pass": true,
+      "all_controls": true,
+      "distribution_l1": 0.19047619047619047,
+      "irrelevant_invariant": true,
+      "no_gap_invariant": true
+    },
+    {
+      "seed": 31013,
+      "stage2_pass": true,
+      "all_controls": true,
+      "distribution_l1": 0.19047619047619047,
+      "irrelevant_invariant": true,
+      "no_gap_invariant": true
+    },
+    {
+      "seed": 31019,
+      "stage2_pass": true,
+      "all_controls": true,
+      "distribution_l1": 0.19999999999999996,
+      "irrelevant_invariant": true,
+      "no_gap_invariant": true
+    },
+    {
+      "seed": 31033,
+      "stage2_pass": true,
+      "all_controls": true,
+      "distribution_l1": 0.19047619047619047,
+      "irrelevant_invariant": true,
+      "no_gap_invariant": true
+    },
+    {
+      "seed": 31039,
+      "stage2_pass": true,
+      "all_controls": true,
+      "distribution_l1": 0.19047619047619047,
+      "irrelevant_invariant": true,
+      "no_gap_invariant": true
+    },
+    {
+      "seed": 31051,
+      "stage2_pass": true,
+      "all_controls": true,
+      "distribution_l1": 0.19047619047619047,
+      "irrelevant_invariant": true,
+      "no_gap_invariant": true
+    },
+    {
+      "seed": 31063,
+      "stage2_pass": true,
+      "all_controls": true,
+      "distribution_l1": 0.19047619047619047,
+      "irrelevant_invariant": true,
+      "no_gap_invariant": true
+    },
+    {
+      "seed": 31069,
+      "stage2_pass": true,
+      "all_controls": true,
+      "distribution_l1": 0.19047619047619047,
+      "irrelevant_invariant": true,
+      "no_gap_invariant": true
+    },
+    {
+      "seed": 31079,
+      "stage2_pass": true,
+      "all_controls": true,
+      "distribution_l1": 0.19999999999999996,
+      "irrelevant_invariant": true,
+      "no_gap_invariant": true
+    },
+    {
+      "seed": 31091,
+      "stage2_pass": true,
+      "all_controls": true,
+      "distribution_l1": 0.19999999999999996,
+      "irrelevant_invariant": true,
+      "no_gap_invariant": true
+    },
+    {
+      "seed": 31121,
+      "stage2_pass": true,
+      "all_controls": true,
+      "distribution_l1": 0.19047619047619047,
+      "irrelevant_invariant": true,
+      "no_gap_invariant": true
+    }
+  ],
+  "effect": {
+    "endpoint": "paired C3-C2 possibility-distribution L1",
+    "mean": 0.19285714285714284,
+    "sample_sd": 0.004307304922539465
+  },
+  "locked_confirmatory": {
+    "sample_size": 20,
+    "irrelevant_history_count": 8,
+    "alpha": 0.05,
+    "target_power": 0.8,
+    "all_structural_invariants_required": true
+  }
+}

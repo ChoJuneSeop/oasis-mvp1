@@ -1,0 +1,3480 @@
+{
+  "experiment": "governance-oasis-axis2-track-a-stage02-calibration",
+  "status": "STAGE2_CALIBRATION_PASS",
+  "seed": 9152026,
+  "checks": {
+    "no_gap_non_interference": true,
+    "gap_current_only": true,
+    "relevant_retrieved_and_reentered": true,
+    "surface_retrieved_but_not_reentered": true,
+    "irrelevant_not_reentered": true,
+    "mixed_only_relevant_reentered": true,
+    "irrelevant_volume_non_amplification": true,
+    "poison_rejected": true,
+    "functional_internal_effect": true,
+    "reentry_not_automatically_reevaluation": true,
+    "C8_eligible_zero_candidate_effect": true,
+    "gap_axis_local_selectivity": true
+  },
+  "conditions": {
+    "C0": {
+      "run_id": "governance-oasis-axis2-track-a-stage02-calibration:9152026:C0",
+      "condition": "C0",
+      "epoch": 1,
+      "observation_hash": "53d49d5c5809cb8e765548323adbecf6d998e4c7615a0a05ad9be967ebe593af",
+      "flow_fingerprint": "axis2-stage02:no-gap-comparison",
+      "history_manifest_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_hash": "f078ce0d54a5c458d4c8ae1cc8ebfa88eac714ee3ca92776810a9adcf8c28aec",
+      "output_hash": "5a27d9bd75b4eeaf62c4364b63c26ceee1aa40de68f40a3fa0d7a89884061a76",
+      "wall_clock": {
+        "harness_elapsed_ms": 1.0501000069780275,
+        "condition_elapsed_ms": 1.2771000037901103
+      },
+      "gap_signature": "RealityGapSignature(revision='axis2-stage02:no-gap-comparison', observed_at_tau=30.0, observations=(RealityGapObservation(observation_id='gap:axis2-stage02:no-gap-comparison', axis=<RealityGapAxis.RELATION: 'reality-gap-relation'>, status=<GapStatus.ABSENT: 'ABSENT'>, current_relation_ids=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), current_evidence_refs=(), description='no current relation gap', observed_at_tau=30.0),))",
+      "recall_decision": "MaintainCurrentFlow(revision='axis2-stage02:no-gap-comparison', observed_at_tau=30.0, reason='no current reality gap; preserve current flow', recall_requested=False, candidate_generation_requested=False, reevaluation_requested=False)",
+      "history_envelope_count": 0,
+      "admitted_experience_ids": [],
+      "poison_rejected": null,
+      "retrieved_source_keys": [],
+      "eligibility": [],
+      "reentry_authorized_source_keys": [],
+      "active_history_keys": [],
+      "snapshot": {
+        "contributions": [],
+        "eligible_ids": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ],
+        "possibility_distribution": {
+          "align-heading-positive": 0.3333333333333333,
+          "continue-flow": 0.3333333333333333,
+          "yield-space": 0.3333333333333333
+        },
+        "reconstructions": [],
+        "reentered_unresolved": [],
+        "responsibilities": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        },
+        "selected_id": "yield-space"
+      },
+      "selected_id": "yield-space",
+      "reevaluation": {
+        "changed_inputs": [],
+        "occurred": false,
+        "reason": "re-entry alone supplied no independent reevaluation cause"
+      }
+    },
+    "C1": {
+      "run_id": "governance-oasis-axis2-track-a-stage02-calibration:9152026:C1",
+      "condition": "C1",
+      "epoch": 1,
+      "observation_hash": "53d49d5c5809cb8e765548323adbecf6d998e4c7615a0a05ad9be967ebe593af",
+      "flow_fingerprint": "axis2-stage02:no-gap-comparison",
+      "history_manifest_hash": "87675d8c45586b650de35b0d8bdea97eb554440ce8f50083265ac63fb75f7828",
+      "input_hash": "4e6e85b1f48448bbba8be195a6163c73ba391d17d1f60803b6c76725169b710c",
+      "output_hash": "5a27d9bd75b4eeaf62c4364b63c26ceee1aa40de68f40a3fa0d7a89884061a76",
+      "wall_clock": {
+        "harness_elapsed_ms": 1.329000006080605,
+        "condition_elapsed_ms": 1.520000005257316
+      },
+      "gap_signature": "RealityGapSignature(revision='axis2-stage02:no-gap-comparison', observed_at_tau=30.0, observations=(RealityGapObservation(observation_id='gap:axis2-stage02:no-gap-comparison', axis=<RealityGapAxis.RELATION: 'reality-gap-relation'>, status=<GapStatus.ABSENT: 'ABSENT'>, current_relation_ids=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), current_evidence_refs=(), description='no current relation gap', observed_at_tau=30.0),))",
+      "recall_decision": "MaintainCurrentFlow(revision='axis2-stage02:no-gap-comparison', observed_at_tau=30.0, reason='no current reality gap; preserve current flow', recall_requested=False, candidate_generation_requested=False, reevaluation_requested=False)",
+      "history_envelope_count": 3,
+      "admitted_experience_ids": [
+        "AXIS1-V2-E1"
+      ],
+      "poison_rejected": null,
+      "retrieved_source_keys": [],
+      "eligibility": [],
+      "reentry_authorized_source_keys": [],
+      "active_history_keys": [],
+      "snapshot": {
+        "contributions": [],
+        "eligible_ids": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ],
+        "possibility_distribution": {
+          "align-heading-positive": 0.3333333333333333,
+          "continue-flow": 0.3333333333333333,
+          "yield-space": 0.3333333333333333
+        },
+        "reconstructions": [],
+        "reentered_unresolved": [],
+        "responsibilities": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        },
+        "selected_id": "yield-space"
+      },
+      "selected_id": "yield-space",
+      "reevaluation": {
+        "changed_inputs": [],
+        "occurred": false,
+        "reason": "re-entry alone supplied no independent reevaluation cause"
+      }
+    },
+    "C2": {
+      "run_id": "governance-oasis-axis2-track-a-stage02-calibration:9152026:C2",
+      "condition": "C2",
+      "epoch": 1,
+      "observation_hash": "53d49d5c5809cb8e765548323adbecf6d998e4c7615a0a05ad9be967ebe593af",
+      "flow_fingerprint": "axis2-stage02:gap-comparison",
+      "history_manifest_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_hash": "6065f2949d2c9f105e9204428a72967b6cb7c0945b0e7dc658ee8a3f172b65c1",
+      "output_hash": "5a27d9bd75b4eeaf62c4364b63c26ceee1aa40de68f40a3fa0d7a89884061a76",
+      "wall_clock": {
+        "harness_elapsed_ms": 0.9499000007053837,
+        "condition_elapsed_ms": 1.145999995060265
+      },
+      "gap_signature": "RealityGapSignature(revision='axis2-stage02:gap-comparison', observed_at_tau=30.0, observations=(RealityGapObservation(observation_id='gap:axis2-stage02:gap-comparison', axis=<RealityGapAxis.RELATION: 'reality-gap-relation'>, status=<GapStatus.PRESENT: 'PRESENT'>, current_relation_ids=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), current_evidence_refs=('evidence:axis2-stage02:gap-comparison',), description='evidenced current relation gap', observed_at_tau=30.0),))",
+      "recall_decision": "RecallDirective(directive_id='recall:axis2-stage02:gap-comparison', revision='axis2-stage02:gap-comparison', observed_at_tau=30.0, gap_observation_ids=('gap:axis2-stage02:gap-comparison',), relation_query=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), evidence_refs=('evidence:axis2-stage02:gap-comparison',), permits_direct_probability_update=False, permits_direct_choice=False, constitutes_reentry=False, constitutes_reevaluation=False)",
+      "history_envelope_count": 0,
+      "admitted_experience_ids": [],
+      "poison_rejected": null,
+      "retrieved_source_keys": [],
+      "eligibility": [],
+      "reentry_authorized_source_keys": [],
+      "active_history_keys": [],
+      "snapshot": {
+        "contributions": [],
+        "eligible_ids": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ],
+        "possibility_distribution": {
+          "align-heading-positive": 0.3333333333333333,
+          "continue-flow": 0.3333333333333333,
+          "yield-space": 0.3333333333333333
+        },
+        "reconstructions": [],
+        "reentered_unresolved": [],
+        "responsibilities": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        },
+        "selected_id": "yield-space"
+      },
+      "selected_id": "yield-space",
+      "reevaluation": {
+        "changed_inputs": [],
+        "occurred": false,
+        "reason": "re-entry alone supplied no independent reevaluation cause"
+      }
+    },
+    "C3": {
+      "run_id": "governance-oasis-axis2-track-a-stage02-calibration:9152026:C3",
+      "condition": "C3",
+      "epoch": 1,
+      "observation_hash": "53d49d5c5809cb8e765548323adbecf6d998e4c7615a0a05ad9be967ebe593af",
+      "flow_fingerprint": "axis2-stage02:gap-comparison",
+      "history_manifest_hash": "87675d8c45586b650de35b0d8bdea97eb554440ce8f50083265ac63fb75f7828",
+      "input_hash": "18cb3781b993f12b738f6bdfbb988fbaf79bab1c6d6159e684f3f8a049e1240c",
+      "output_hash": "e5cd3f942dabf0ba0b6e8e31807324e91ad798676e4b1d932d56ed0079312a01",
+      "wall_clock": {
+        "harness_elapsed_ms": 3.6986999912187457,
+        "condition_elapsed_ms": 4.066800000146031
+      },
+      "gap_signature": "RealityGapSignature(revision='axis2-stage02:gap-comparison', observed_at_tau=30.0, observations=(RealityGapObservation(observation_id='gap:axis2-stage02:gap-comparison', axis=<RealityGapAxis.RELATION: 'reality-gap-relation'>, status=<GapStatus.PRESENT: 'PRESENT'>, current_relation_ids=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), current_evidence_refs=('evidence:axis2-stage02:gap-comparison',), description='evidenced current relation gap', observed_at_tau=30.0),))",
+      "recall_decision": "RecallDirective(directive_id='recall:axis2-stage02:gap-comparison', revision='axis2-stage02:gap-comparison', observed_at_tau=30.0, gap_observation_ids=('gap:axis2-stage02:gap-comparison',), relation_query=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), evidence_refs=('evidence:axis2-stage02:gap-comparison',), permits_direct_probability_update=False, permits_direct_choice=False, constitutes_reentry=False, constitutes_reevaluation=False)",
+      "history_envelope_count": 3,
+      "admitted_experience_ids": [
+        "AXIS1-V2-E1"
+      ],
+      "poison_rejected": null,
+      "retrieved_source_keys": [
+        [
+          "AXIS1-V2-E1",
+          "current:front-longitudinal"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:lane-heading"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:local-participation"
+        ]
+      ],
+      "eligibility": [
+        {
+          "source_key": [
+            "AXIS1-V2-E1",
+            "current:front-longitudinal"
+          ],
+          "eligible": true,
+          "reason": "exact relation provenance matches current gap evidence"
+        },
+        {
+          "source_key": [
+            "AXIS1-V2-E1",
+            "current:lane-heading"
+          ],
+          "eligible": true,
+          "reason": "exact relation provenance matches current gap evidence"
+        },
+        {
+          "source_key": [
+            "AXIS1-V2-E1",
+            "current:local-participation"
+          ],
+          "eligible": true,
+          "reason": "exact relation provenance matches current gap evidence"
+        }
+      ],
+      "reentry_authorized_source_keys": [
+        [
+          "AXIS1-V2-E1",
+          "current:front-longitudinal"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:lane-heading"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:local-participation"
+        ]
+      ],
+      "active_history_keys": [
+        [
+          "AXIS1-V2-E1",
+          "current:front-longitudinal"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:lane-heading"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:local-participation"
+        ]
+      ],
+      "snapshot": {
+        "contributions": [
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:front-longitudinal"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:front-longitudinal"
+                ],
+                "historical_relation_state": "closing"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "front_kind": "vehicle",
+                "observed_closing_mps": 2.7985,
+                "observed_gap_m": 14.6834
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "front-traffic-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "front-interaction"
+              ],
+              "relation_state": "closing",
+              "relation_type": "longitudinal-relative-motion",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:front-longitudinal"
+            }
+          },
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:lane-heading"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:lane-heading"
+                ],
+                "historical_relation_state": "negative-heading-offset"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "observed_heading_error_deg": -4.4786
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "lane-flow-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "lane-following"
+              ],
+              "relation_state": "negative-heading-offset",
+              "relation_type": "lane-relative-heading",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:lane-heading"
+            }
+          },
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:local-participation"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:local-participation"
+                ],
+                "historical_relation_state": "observed"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "observed_participant_count": 6
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "local-traffic-field-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "local-flow"
+              ],
+              "relation_state": "observed",
+              "relation_type": "local-participation-state",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:local-participation"
+            }
+          }
+        ],
+        "eligible_ids": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ],
+        "possibility_distribution": {
+          "align-heading-positive": 0.2857142857142857,
+          "continue-flow": 0.2857142857142857,
+          "yield-space": 0.42857142857142855
+        },
+        "reconstructions": [
+          {
+            "observed_at_tau": 30.0,
+            "possibility_id": "yield-space",
+            "recombination": {
+              "evidence": {
+                "source_count": 3
+              },
+              "method": "source-incidence-recombination",
+              "value": 0.6666666666666666
+            },
+            "relation_graph_after": {
+              "joint_relation": {
+                "current_anchors": [
+                  "current:front-longitudinal",
+                  "current:lane-heading",
+                  "current:local-participation"
+                ],
+                "possibility": "yield-space",
+                "sources": 3
+              }
+            },
+            "relation_graph_before": {
+              "current_anchors": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "source_relations": [
+                [
+                  "AXIS1-V2-E1",
+                  "current:front-longitudinal"
+                ],
+                [
+                  "AXIS1-V2-E1",
+                  "current:lane-heading"
+                ],
+                [
+                  "AXIS1-V2-E1",
+                  "current:local-participation"
+                ]
+              ]
+            },
+            "role_transformation": {
+              "evidence": {
+                "per_source_distance": [
+                  1.0,
+                  1.0,
+                  1.0
+                ]
+              },
+              "method": "historical-to-current-role-jaccard-distance",
+              "value": 1.0
+            },
+            "source_links": [
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:front-longitudinal"
+                  ],
+                  "historical_relation_state": "closing"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:front-longitudinal"
+                }
+              },
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:lane-heading"
+                  ],
+                  "historical_relation_state": "negative-heading-offset"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:lane-heading"
+                }
+              },
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:local-participation"
+                  ],
+                  "historical_relation_state": "observed"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:local-participation"
+                }
+              }
+            ],
+            "structural_transformation": {
+              "evidence": {
+                "current_anchor_nodes": 3,
+                "joint_edges_added": 1,
+                "source_nodes": 3
+              },
+              "method": "joint-hyperedge-graph-delta",
+              "value": 0.14285714285714285
+            }
+          }
+        ],
+        "reentered_unresolved": [
+          [
+            "AXIS1-V2-E1",
+            [
+              "later downstream effects remain open to later relation"
+            ]
+          ]
+        ],
+        "responsibilities": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 3
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        },
+        "selected_id": "yield-space"
+      },
+      "selected_id": "yield-space",
+      "reevaluation": {
+        "changed_inputs": [
+          "possibility_distribution",
+          "responsibilities"
+        ],
+        "occurred": true,
+        "reason": "possibility or responsibility state changed"
+      }
+    },
+    "C4": {
+      "run_id": "governance-oasis-axis2-track-a-stage02-calibration:9152026:C4",
+      "condition": "C4",
+      "epoch": 1,
+      "observation_hash": "53d49d5c5809cb8e765548323adbecf6d998e4c7615a0a05ad9be967ebe593af",
+      "flow_fingerprint": "axis2-stage02:gap-comparison",
+      "history_manifest_hash": "8a877d01ee05b1394fb86ca0cb798dc123dc1a8a24a0ffda99ad855fe8167ed1",
+      "input_hash": "a41e561f2fe700d86e3114e5c21c2e8a6997786165e87d890d881a28076ddb0c",
+      "output_hash": "5a27d9bd75b4eeaf62c4364b63c26ceee1aa40de68f40a3fa0d7a89884061a76",
+      "wall_clock": {
+        "harness_elapsed_ms": 1.4190000074449927,
+        "condition_elapsed_ms": 1.6168000001925975
+      },
+      "gap_signature": "RealityGapSignature(revision='axis2-stage02:gap-comparison', observed_at_tau=30.0, observations=(RealityGapObservation(observation_id='gap:axis2-stage02:gap-comparison', axis=<RealityGapAxis.RELATION: 'reality-gap-relation'>, status=<GapStatus.PRESENT: 'PRESENT'>, current_relation_ids=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), current_evidence_refs=('evidence:axis2-stage02:gap-comparison',), description='evidenced current relation gap', observed_at_tau=30.0),))",
+      "recall_decision": "RecallDirective(directive_id='recall:axis2-stage02:gap-comparison', revision='axis2-stage02:gap-comparison', observed_at_tau=30.0, gap_observation_ids=('gap:axis2-stage02:gap-comparison',), relation_query=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), evidence_refs=('evidence:axis2-stage02:gap-comparison',), permits_direct_probability_update=False, permits_direct_choice=False, constitutes_reentry=False, constitutes_reevaluation=False)",
+      "history_envelope_count": 3,
+      "admitted_experience_ids": [
+        "AXIS1-V2-E401"
+      ],
+      "poison_rejected": null,
+      "retrieved_source_keys": [
+        [
+          "AXIS1-V2-E401",
+          "current:front-longitudinal::surface-decoy-0"
+        ],
+        [
+          "AXIS1-V2-E401",
+          "current:lane-heading::surface-decoy-0"
+        ],
+        [
+          "AXIS1-V2-E401",
+          "current:local-participation::surface-decoy-0"
+        ]
+      ],
+      "eligibility": [
+        {
+          "source_key": [
+            "AXIS1-V2-E401",
+            "current:front-longitudinal::surface-decoy-0"
+          ],
+          "eligible": false,
+          "reason": "surface similarity lacks exact current relation provenance"
+        },
+        {
+          "source_key": [
+            "AXIS1-V2-E401",
+            "current:lane-heading::surface-decoy-0"
+          ],
+          "eligible": false,
+          "reason": "surface similarity lacks exact current relation provenance"
+        },
+        {
+          "source_key": [
+            "AXIS1-V2-E401",
+            "current:local-participation::surface-decoy-0"
+          ],
+          "eligible": false,
+          "reason": "surface similarity lacks exact current relation provenance"
+        }
+      ],
+      "reentry_authorized_source_keys": [],
+      "active_history_keys": [],
+      "snapshot": {
+        "contributions": [],
+        "eligible_ids": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ],
+        "possibility_distribution": {
+          "align-heading-positive": 0.3333333333333333,
+          "continue-flow": 0.3333333333333333,
+          "yield-space": 0.3333333333333333
+        },
+        "reconstructions": [],
+        "reentered_unresolved": [],
+        "responsibilities": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        },
+        "selected_id": "yield-space"
+      },
+      "selected_id": "yield-space",
+      "reevaluation": {
+        "changed_inputs": [],
+        "occurred": false,
+        "reason": "re-entry alone supplied no independent reevaluation cause"
+      }
+    },
+    "C5": {
+      "run_id": "governance-oasis-axis2-track-a-stage02-calibration:9152026:C5",
+      "condition": "C5",
+      "epoch": 1,
+      "observation_hash": "53d49d5c5809cb8e765548323adbecf6d998e4c7615a0a05ad9be967ebe593af",
+      "flow_fingerprint": "axis2-stage02:gap-comparison",
+      "history_manifest_hash": "c9fbcaf54c6d1e814714ba585968a39c6f2b5db6cb5a89c62b9525a19b453d51",
+      "input_hash": "30e9b85993a41af411134f7ce0f3b9dc192e2cf6a9500012a9954a4f8d24dc51",
+      "output_hash": "5a27d9bd75b4eeaf62c4364b63c26ceee1aa40de68f40a3fa0d7a89884061a76",
+      "wall_clock": {
+        "harness_elapsed_ms": 4.172000000835396,
+        "condition_elapsed_ms": 4.379299993161112
+      },
+      "gap_signature": "RealityGapSignature(revision='axis2-stage02:gap-comparison', observed_at_tau=30.0, observations=(RealityGapObservation(observation_id='gap:axis2-stage02:gap-comparison', axis=<RealityGapAxis.RELATION: 'reality-gap-relation'>, status=<GapStatus.PRESENT: 'PRESENT'>, current_relation_ids=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), current_evidence_refs=('evidence:axis2-stage02:gap-comparison',), description='evidenced current relation gap', observed_at_tau=30.0),))",
+      "recall_decision": "RecallDirective(directive_id='recall:axis2-stage02:gap-comparison', revision='axis2-stage02:gap-comparison', observed_at_tau=30.0, gap_observation_ids=('gap:axis2-stage02:gap-comparison',), relation_query=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), evidence_refs=('evidence:axis2-stage02:gap-comparison',), permits_direct_probability_update=False, permits_direct_choice=False, constitutes_reentry=False, constitutes_reevaluation=False)",
+      "history_envelope_count": 24,
+      "admitted_experience_ids": [
+        "AXIS1-V2-E501",
+        "AXIS1-V2-E502",
+        "AXIS1-V2-E503",
+        "AXIS1-V2-E504",
+        "AXIS1-V2-E505",
+        "AXIS1-V2-E506",
+        "AXIS1-V2-E507",
+        "AXIS1-V2-E508"
+      ],
+      "poison_rejected": null,
+      "retrieved_source_keys": [],
+      "eligibility": [],
+      "reentry_authorized_source_keys": [],
+      "active_history_keys": [],
+      "snapshot": {
+        "contributions": [],
+        "eligible_ids": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ],
+        "possibility_distribution": {
+          "align-heading-positive": 0.3333333333333333,
+          "continue-flow": 0.3333333333333333,
+          "yield-space": 0.3333333333333333
+        },
+        "reconstructions": [],
+        "reentered_unresolved": [],
+        "responsibilities": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        },
+        "selected_id": "yield-space"
+      },
+      "selected_id": "yield-space",
+      "reevaluation": {
+        "changed_inputs": [],
+        "occurred": false,
+        "reason": "re-entry alone supplied no independent reevaluation cause"
+      }
+    },
+    "C6": {
+      "run_id": "governance-oasis-axis2-track-a-stage02-calibration:9152026:C6",
+      "condition": "C6",
+      "epoch": 1,
+      "observation_hash": "53d49d5c5809cb8e765548323adbecf6d998e4c7615a0a05ad9be967ebe593af",
+      "flow_fingerprint": "axis2-stage02:gap-comparison",
+      "history_manifest_hash": "c5661f4e8a8b55a5951158159586911dab1a7d6d1e5cb0f5cc29549dd20a0240",
+      "input_hash": "4ecb62e3517499326e7125ca8f9d9384db1533966d2b04fe363e763a6237ed47",
+      "output_hash": "e5cd3f942dabf0ba0b6e8e31807324e91ad798676e4b1d932d56ed0079312a01",
+      "wall_clock": {
+        "harness_elapsed_ms": 10.900900000706315,
+        "condition_elapsed_ms": 11.276999997789972
+      },
+      "gap_signature": "RealityGapSignature(revision='axis2-stage02:gap-comparison', observed_at_tau=30.0, observations=(RealityGapObservation(observation_id='gap:axis2-stage02:gap-comparison', axis=<RealityGapAxis.RELATION: 'reality-gap-relation'>, status=<GapStatus.PRESENT: 'PRESENT'>, current_relation_ids=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), current_evidence_refs=('evidence:axis2-stage02:gap-comparison',), description='evidenced current relation gap', observed_at_tau=30.0),))",
+      "recall_decision": "RecallDirective(directive_id='recall:axis2-stage02:gap-comparison', revision='axis2-stage02:gap-comparison', observed_at_tau=30.0, gap_observation_ids=('gap:axis2-stage02:gap-comparison',), relation_query=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), evidence_refs=('evidence:axis2-stage02:gap-comparison',), permits_direct_probability_update=False, permits_direct_choice=False, constitutes_reentry=False, constitutes_reevaluation=False)",
+      "history_envelope_count": 27,
+      "admitted_experience_ids": [
+        "AXIS1-V2-E1",
+        "AXIS1-V2-E602",
+        "AXIS1-V2-E603",
+        "AXIS1-V2-E604",
+        "AXIS1-V2-E605",
+        "AXIS1-V2-E606",
+        "AXIS1-V2-E607",
+        "AXIS1-V2-E608",
+        "AXIS1-V2-E609"
+      ],
+      "poison_rejected": null,
+      "retrieved_source_keys": [
+        [
+          "AXIS1-V2-E1",
+          "current:front-longitudinal"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:lane-heading"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:local-participation"
+        ]
+      ],
+      "eligibility": [
+        {
+          "source_key": [
+            "AXIS1-V2-E1",
+            "current:front-longitudinal"
+          ],
+          "eligible": true,
+          "reason": "exact relation provenance matches current gap evidence"
+        },
+        {
+          "source_key": [
+            "AXIS1-V2-E1",
+            "current:lane-heading"
+          ],
+          "eligible": true,
+          "reason": "exact relation provenance matches current gap evidence"
+        },
+        {
+          "source_key": [
+            "AXIS1-V2-E1",
+            "current:local-participation"
+          ],
+          "eligible": true,
+          "reason": "exact relation provenance matches current gap evidence"
+        }
+      ],
+      "reentry_authorized_source_keys": [
+        [
+          "AXIS1-V2-E1",
+          "current:front-longitudinal"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:lane-heading"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:local-participation"
+        ]
+      ],
+      "active_history_keys": [
+        [
+          "AXIS1-V2-E1",
+          "current:front-longitudinal"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:lane-heading"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:local-participation"
+        ]
+      ],
+      "snapshot": {
+        "contributions": [
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:front-longitudinal"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:front-longitudinal"
+                ],
+                "historical_relation_state": "closing"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "front_kind": "vehicle",
+                "observed_closing_mps": 2.7985,
+                "observed_gap_m": 14.6834
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "front-traffic-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "front-interaction"
+              ],
+              "relation_state": "closing",
+              "relation_type": "longitudinal-relative-motion",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:front-longitudinal"
+            }
+          },
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:lane-heading"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:lane-heading"
+                ],
+                "historical_relation_state": "negative-heading-offset"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "observed_heading_error_deg": -4.4786
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "lane-flow-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "lane-following"
+              ],
+              "relation_state": "negative-heading-offset",
+              "relation_type": "lane-relative-heading",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:lane-heading"
+            }
+          },
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:local-participation"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:local-participation"
+                ],
+                "historical_relation_state": "observed"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "observed_participant_count": 6
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "local-traffic-field-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "local-flow"
+              ],
+              "relation_state": "observed",
+              "relation_type": "local-participation-state",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:local-participation"
+            }
+          }
+        ],
+        "eligible_ids": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ],
+        "possibility_distribution": {
+          "align-heading-positive": 0.2857142857142857,
+          "continue-flow": 0.2857142857142857,
+          "yield-space": 0.42857142857142855
+        },
+        "reconstructions": [
+          {
+            "observed_at_tau": 30.0,
+            "possibility_id": "yield-space",
+            "recombination": {
+              "evidence": {
+                "source_count": 3
+              },
+              "method": "source-incidence-recombination",
+              "value": 0.6666666666666666
+            },
+            "relation_graph_after": {
+              "joint_relation": {
+                "current_anchors": [
+                  "current:front-longitudinal",
+                  "current:lane-heading",
+                  "current:local-participation"
+                ],
+                "possibility": "yield-space",
+                "sources": 3
+              }
+            },
+            "relation_graph_before": {
+              "current_anchors": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "source_relations": [
+                [
+                  "AXIS1-V2-E1",
+                  "current:front-longitudinal"
+                ],
+                [
+                  "AXIS1-V2-E1",
+                  "current:lane-heading"
+                ],
+                [
+                  "AXIS1-V2-E1",
+                  "current:local-participation"
+                ]
+              ]
+            },
+            "role_transformation": {
+              "evidence": {
+                "per_source_distance": [
+                  1.0,
+                  1.0,
+                  1.0
+                ]
+              },
+              "method": "historical-to-current-role-jaccard-distance",
+              "value": 1.0
+            },
+            "source_links": [
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:front-longitudinal"
+                  ],
+                  "historical_relation_state": "closing"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:front-longitudinal"
+                }
+              },
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:lane-heading"
+                  ],
+                  "historical_relation_state": "negative-heading-offset"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:lane-heading"
+                }
+              },
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:local-participation"
+                  ],
+                  "historical_relation_state": "observed"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:local-participation"
+                }
+              }
+            ],
+            "structural_transformation": {
+              "evidence": {
+                "current_anchor_nodes": 3,
+                "joint_edges_added": 1,
+                "source_nodes": 3
+              },
+              "method": "joint-hyperedge-graph-delta",
+              "value": 0.14285714285714285
+            }
+          }
+        ],
+        "reentered_unresolved": [
+          [
+            "AXIS1-V2-E1",
+            [
+              "later downstream effects remain open to later relation"
+            ]
+          ]
+        ],
+        "responsibilities": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 3
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        },
+        "selected_id": "yield-space"
+      },
+      "selected_id": "yield-space",
+      "reevaluation": {
+        "changed_inputs": [
+          "possibility_distribution",
+          "responsibilities"
+        ],
+        "occurred": true,
+        "reason": "possibility or responsibility state changed"
+      }
+    },
+    "C7": {
+      "run_id": "governance-oasis-axis2-track-a-stage02-calibration:9152026:C7",
+      "condition": "C7",
+      "epoch": 1,
+      "observation_hash": "53d49d5c5809cb8e765548323adbecf6d998e4c7615a0a05ad9be967ebe593af",
+      "flow_fingerprint": "axis2-stage02:gap-comparison",
+      "history_manifest_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "input_hash": "6065f2949d2c9f105e9204428a72967b6cb7c0945b0e7dc658ee8a3f172b65c1",
+      "output_hash": "5a27d9bd75b4eeaf62c4364b63c26ceee1aa40de68f40a3fa0d7a89884061a76",
+      "wall_clock": {
+        "harness_elapsed_ms": 0.9497999999439344,
+        "condition_elapsed_ms": 1.1743999930331483
+      },
+      "gap_signature": "RealityGapSignature(revision='axis2-stage02:gap-comparison', observed_at_tau=30.0, observations=(RealityGapObservation(observation_id='gap:axis2-stage02:gap-comparison', axis=<RealityGapAxis.RELATION: 'reality-gap-relation'>, status=<GapStatus.PRESENT: 'PRESENT'>, current_relation_ids=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), current_evidence_refs=('evidence:axis2-stage02:gap-comparison',), description='evidenced current relation gap', observed_at_tau=30.0),))",
+      "recall_decision": "RecallDirective(directive_id='recall:axis2-stage02:gap-comparison', revision='axis2-stage02:gap-comparison', observed_at_tau=30.0, gap_observation_ids=('gap:axis2-stage02:gap-comparison',), relation_query=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), evidence_refs=('evidence:axis2-stage02:gap-comparison',), permits_direct_probability_update=False, permits_direct_choice=False, constitutes_reentry=False, constitutes_reevaluation=False)",
+      "history_envelope_count": 0,
+      "admitted_experience_ids": [],
+      "poison_rejected": true,
+      "retrieved_source_keys": [],
+      "eligibility": [],
+      "reentry_authorized_source_keys": [],
+      "active_history_keys": [],
+      "snapshot": {
+        "contributions": [],
+        "eligible_ids": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ],
+        "possibility_distribution": {
+          "align-heading-positive": 0.3333333333333333,
+          "continue-flow": 0.3333333333333333,
+          "yield-space": 0.3333333333333333
+        },
+        "reconstructions": [],
+        "reentered_unresolved": [],
+        "responsibilities": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        },
+        "selected_id": "yield-space"
+      },
+      "selected_id": "yield-space",
+      "reevaluation": {
+        "changed_inputs": [],
+        "occurred": false,
+        "reason": "re-entry alone supplied no independent reevaluation cause"
+      }
+    },
+    "C8": {
+      "run_id": "governance-oasis-axis2-track-a-stage02-calibration:9152026:C8",
+      "condition": "C8",
+      "epoch": 1,
+      "observation_hash": "53d49d5c5809cb8e765548323adbecf6d998e4c7615a0a05ad9be967ebe593af",
+      "flow_fingerprint": "axis2-stage02:gap-comparison",
+      "history_manifest_hash": "263b66cacfc4d73561cd680ac67a3824629b5315756faf78fa402d1bf768fede",
+      "input_hash": "b5b86e6b1ba4db8d6e690e320453ed335c4c88b6b684caba712d2e76e35134f7",
+      "output_hash": "5a27d9bd75b4eeaf62c4364b63c26ceee1aa40de68f40a3fa0d7a89884061a76",
+      "wall_clock": {
+        "harness_elapsed_ms": 1.9240999972680584,
+        "condition_elapsed_ms": 2.1188999962760136
+      },
+      "gap_signature": "RealityGapSignature(revision='axis2-stage02:gap-comparison', observed_at_tau=30.0, observations=(RealityGapObservation(observation_id='gap:axis2-stage02:gap-comparison', axis=<RealityGapAxis.RELATION: 'reality-gap-relation'>, status=<GapStatus.PRESENT: 'PRESENT'>, current_relation_ids=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), current_evidence_refs=('evidence:axis2-stage02:gap-comparison',), description='evidenced current relation gap', observed_at_tau=30.0),))",
+      "recall_decision": "RecallDirective(directive_id='recall:axis2-stage02:gap-comparison', revision='axis2-stage02:gap-comparison', observed_at_tau=30.0, gap_observation_ids=('gap:axis2-stage02:gap-comparison',), relation_query=('current:front-longitudinal', 'current:lane-heading', 'current:local-participation'), evidence_refs=('evidence:axis2-stage02:gap-comparison',), permits_direct_probability_update=False, permits_direct_choice=False, constitutes_reentry=False, constitutes_reevaluation=False)",
+      "history_envelope_count": 3,
+      "admitted_experience_ids": [
+        "AXIS1-V2-E1"
+      ],
+      "poison_rejected": null,
+      "retrieved_source_keys": [
+        [
+          "AXIS1-V2-E1",
+          "current:front-longitudinal"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:lane-heading"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:local-participation"
+        ]
+      ],
+      "eligibility": [
+        {
+          "source_key": [
+            "AXIS1-V2-E1",
+            "current:front-longitudinal"
+          ],
+          "eligible": true,
+          "reason": "exact relation provenance matches current gap evidence"
+        },
+        {
+          "source_key": [
+            "AXIS1-V2-E1",
+            "current:lane-heading"
+          ],
+          "eligible": true,
+          "reason": "exact relation provenance matches current gap evidence"
+        },
+        {
+          "source_key": [
+            "AXIS1-V2-E1",
+            "current:local-participation"
+          ],
+          "eligible": true,
+          "reason": "exact relation provenance matches current gap evidence"
+        }
+      ],
+      "reentry_authorized_source_keys": [
+        [
+          "AXIS1-V2-E1",
+          "current:front-longitudinal"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:lane-heading"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:local-participation"
+        ]
+      ],
+      "active_history_keys": [
+        [
+          "AXIS1-V2-E1",
+          "current:front-longitudinal"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:lane-heading"
+        ],
+        [
+          "AXIS1-V2-E1",
+          "current:local-participation"
+        ]
+      ],
+      "snapshot": {
+        "contributions": [],
+        "eligible_ids": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ],
+        "possibility_distribution": {
+          "align-heading-positive": 0.3333333333333333,
+          "continue-flow": 0.3333333333333333,
+          "yield-space": 0.3333333333333333
+        },
+        "reconstructions": [],
+        "reentered_unresolved": [],
+        "responsibilities": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        },
+        "selected_id": "yield-space"
+      },
+      "selected_id": "yield-space",
+      "reevaluation": {
+        "changed_inputs": [],
+        "occurred": false,
+        "reason": "re-entry alone supplied no independent reevaluation cause"
+      }
+    }
+  },
+  "paired_diffs": {
+    "E2_A_C0_vs_C1": {
+      "possibility_distribution": {
+        "different": false,
+        "history_enabled": {
+          "align-heading-positive": 0.3333333333333333,
+          "continue-flow": 0.3333333333333333,
+          "yield-space": 0.3333333333333333
+        },
+        "no_history_twin": {
+          "align-heading-positive": 0.3333333333333333,
+          "continue-flow": 0.3333333333333333,
+          "yield-space": 0.3333333333333333
+        }
+      },
+      "responsibilities": {
+        "different": false,
+        "history_enabled": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        },
+        "no_history_twin": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        }
+      },
+      "contributions": {
+        "different": false,
+        "history_enabled": [],
+        "no_history_twin": []
+      },
+      "reconstructions": {
+        "different": false,
+        "history_enabled": [],
+        "no_history_twin": []
+      },
+      "reentered_unresolved": {
+        "different": false,
+        "history_enabled": [],
+        "no_history_twin": []
+      },
+      "eligible_ids": {
+        "different": false,
+        "history_enabled": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ],
+        "no_history_twin": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ]
+      },
+      "selected_id": {
+        "different": false,
+        "history_enabled": "yield-space",
+        "no_history_twin": "yield-space"
+      }
+    },
+    "E2_D_C3_vs_C2": {
+      "possibility_distribution": {
+        "different": true,
+        "history_enabled": {
+          "align-heading-positive": 0.2857142857142857,
+          "continue-flow": 0.2857142857142857,
+          "yield-space": 0.42857142857142855
+        },
+        "no_history_twin": {
+          "align-heading-positive": 0.3333333333333333,
+          "continue-flow": 0.3333333333333333,
+          "yield-space": 0.3333333333333333
+        }
+      },
+      "responsibilities": {
+        "different": true,
+        "history_enabled": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 3
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        },
+        "no_history_twin": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        }
+      },
+      "contributions": {
+        "different": true,
+        "history_enabled": [
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:front-longitudinal"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:front-longitudinal"
+                ],
+                "historical_relation_state": "closing"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "front_kind": "vehicle",
+                "observed_closing_mps": 2.7985,
+                "observed_gap_m": 14.6834
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "front-traffic-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "front-interaction"
+              ],
+              "relation_state": "closing",
+              "relation_type": "longitudinal-relative-motion",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:front-longitudinal"
+            }
+          },
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:lane-heading"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:lane-heading"
+                ],
+                "historical_relation_state": "negative-heading-offset"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "observed_heading_error_deg": -4.4786
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "lane-flow-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "lane-following"
+              ],
+              "relation_state": "negative-heading-offset",
+              "relation_type": "lane-relative-heading",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:lane-heading"
+            }
+          },
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:local-participation"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:local-participation"
+                ],
+                "historical_relation_state": "observed"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "observed_participant_count": 6
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "local-traffic-field-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "local-flow"
+              ],
+              "relation_state": "observed",
+              "relation_type": "local-participation-state",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:local-participation"
+            }
+          }
+        ],
+        "no_history_twin": []
+      },
+      "reconstructions": {
+        "different": true,
+        "history_enabled": [
+          {
+            "observed_at_tau": 30.0,
+            "possibility_id": "yield-space",
+            "recombination": {
+              "evidence": {
+                "source_count": 3
+              },
+              "method": "source-incidence-recombination",
+              "value": 0.6666666666666666
+            },
+            "relation_graph_after": {
+              "joint_relation": {
+                "current_anchors": [
+                  "current:front-longitudinal",
+                  "current:lane-heading",
+                  "current:local-participation"
+                ],
+                "possibility": "yield-space",
+                "sources": 3
+              }
+            },
+            "relation_graph_before": {
+              "current_anchors": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "source_relations": [
+                [
+                  "AXIS1-V2-E1",
+                  "current:front-longitudinal"
+                ],
+                [
+                  "AXIS1-V2-E1",
+                  "current:lane-heading"
+                ],
+                [
+                  "AXIS1-V2-E1",
+                  "current:local-participation"
+                ]
+              ]
+            },
+            "role_transformation": {
+              "evidence": {
+                "per_source_distance": [
+                  1.0,
+                  1.0,
+                  1.0
+                ]
+              },
+              "method": "historical-to-current-role-jaccard-distance",
+              "value": 1.0
+            },
+            "source_links": [
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:front-longitudinal"
+                  ],
+                  "historical_relation_state": "closing"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:front-longitudinal"
+                }
+              },
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:lane-heading"
+                  ],
+                  "historical_relation_state": "negative-heading-offset"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:lane-heading"
+                }
+              },
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:local-participation"
+                  ],
+                  "historical_relation_state": "observed"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:local-participation"
+                }
+              }
+            ],
+            "structural_transformation": {
+              "evidence": {
+                "current_anchor_nodes": 3,
+                "joint_edges_added": 1,
+                "source_nodes": 3
+              },
+              "method": "joint-hyperedge-graph-delta",
+              "value": 0.14285714285714285
+            }
+          }
+        ],
+        "no_history_twin": []
+      },
+      "reentered_unresolved": {
+        "different": true,
+        "history_enabled": [
+          [
+            "AXIS1-V2-E1",
+            [
+              "later downstream effects remain open to later relation"
+            ]
+          ]
+        ],
+        "no_history_twin": []
+      },
+      "eligible_ids": {
+        "different": false,
+        "history_enabled": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ],
+        "no_history_twin": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ]
+      },
+      "selected_id": {
+        "different": false,
+        "history_enabled": "yield-space",
+        "no_history_twin": "yield-space"
+      }
+    },
+    "E2_F_C6_vs_C3": {
+      "possibility_distribution": {
+        "different": false,
+        "history_enabled": {
+          "align-heading-positive": 0.2857142857142857,
+          "continue-flow": 0.2857142857142857,
+          "yield-space": 0.42857142857142855
+        },
+        "no_history_twin": {
+          "align-heading-positive": 0.2857142857142857,
+          "continue-flow": 0.2857142857142857,
+          "yield-space": 0.42857142857142855
+        }
+      },
+      "responsibilities": {
+        "different": false,
+        "history_enabled": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 3
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        },
+        "no_history_twin": {
+          "align-heading-positive": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "align-heading-positive",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "continue-flow": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "continue-flow",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 0
+            },
+            "impact": 0.8216182749237337,
+            "irreversibility": 0.9064983637213652,
+            "time_constraint": 0.8004998704547557,
+            "uncertainty": 0.8571428571428571
+          },
+          "yield-space": {
+            "additional": {
+              "heading_magnitude": 0.8174716168364181
+            },
+            "evidence": {
+              "candidate": "yield-space",
+              "current_relation_ids": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "formula": "continuous-current-observation-only",
+              "heading_magnitude": [
+                "observation:heading-error"
+              ],
+              "historical_contribution_count": 3
+            },
+            "impact": 0.41080913746186687,
+            "irreversibility": 0.4532491818606826,
+            "time_constraint": 0.04697566765663711,
+            "uncertainty": 0.8373072369896376
+          }
+        }
+      },
+      "contributions": {
+        "different": false,
+        "history_enabled": [
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:front-longitudinal"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:front-longitudinal"
+                ],
+                "historical_relation_state": "closing"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "front_kind": "vehicle",
+                "observed_closing_mps": 2.7985,
+                "observed_gap_m": 14.6834
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "front-traffic-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "front-interaction"
+              ],
+              "relation_state": "closing",
+              "relation_type": "longitudinal-relative-motion",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:front-longitudinal"
+            }
+          },
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:lane-heading"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:lane-heading"
+                ],
+                "historical_relation_state": "negative-heading-offset"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "observed_heading_error_deg": -4.4786
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "lane-flow-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "lane-following"
+              ],
+              "relation_state": "negative-heading-offset",
+              "relation_type": "lane-relative-heading",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:lane-heading"
+            }
+          },
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:local-participation"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:local-participation"
+                ],
+                "historical_relation_state": "observed"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "observed_participant_count": 6
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "local-traffic-field-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "local-flow"
+              ],
+              "relation_state": "observed",
+              "relation_type": "local-participation-state",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:local-participation"
+            }
+          }
+        ],
+        "no_history_twin": [
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:front-longitudinal"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:front-longitudinal"
+                ],
+                "historical_relation_state": "closing"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "front_kind": "vehicle",
+                "observed_closing_mps": 2.7985,
+                "observed_gap_m": 14.6834
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "front-traffic-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "front-interaction"
+              ],
+              "relation_state": "closing",
+              "relation_type": "longitudinal-relative-motion",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:front-longitudinal"
+            }
+          },
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:lane-heading"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:lane-heading"
+                ],
+                "historical_relation_state": "negative-heading-offset"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "observed_heading_error_deg": -4.4786
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "lane-flow-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "lane-following"
+              ],
+              "relation_state": "negative-heading-offset",
+              "relation_type": "lane-relative-heading",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:lane-heading"
+            }
+          },
+          {
+            "contribution": {
+              "current_relation_ids": [
+                "current:local-participation"
+              ],
+              "generated_possibilities": [
+                "yield-space"
+              ],
+              "possibility_id": "yield-space",
+              "role_trace": [
+                "relation-continuity",
+                "historical-comparison"
+              ],
+              "trace": {
+                "basis": "role/type continuity in current relations",
+                "current_anchor_ids": [
+                  "current:local-participation"
+                ],
+                "historical_relation_state": "observed"
+              }
+            },
+            "semantic": {
+              "environment_context": {
+                "current_only": true,
+                "observed_participant_count": 6
+              },
+              "historical_roles": [
+                "realized-relation"
+              ],
+              "object_role": "local-traffic-field-role",
+              "possibility_links": [
+                "yield-space"
+              ],
+              "process_context": [
+                "local-flow"
+              ],
+              "relation_state": "observed",
+              "relation_type": "local-participation-state",
+              "subject_role": "ego-role"
+            },
+            "source": {
+              "completed_at_tau": 20.1,
+              "experience_id": "AXIS1-V2-E1",
+              "relation_descriptor": {
+                "axis1_v2": true,
+                "origin_entry_id": "AXIS1-V2-E1",
+                "selected_possibility": "yield-space"
+              },
+              "relation_element_id": "current:local-participation"
+            }
+          }
+        ]
+      },
+      "reconstructions": {
+        "different": false,
+        "history_enabled": [
+          {
+            "observed_at_tau": 30.0,
+            "possibility_id": "yield-space",
+            "recombination": {
+              "evidence": {
+                "source_count": 3
+              },
+              "method": "source-incidence-recombination",
+              "value": 0.6666666666666666
+            },
+            "relation_graph_after": {
+              "joint_relation": {
+                "current_anchors": [
+                  "current:front-longitudinal",
+                  "current:lane-heading",
+                  "current:local-participation"
+                ],
+                "possibility": "yield-space",
+                "sources": 3
+              }
+            },
+            "relation_graph_before": {
+              "current_anchors": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "source_relations": [
+                [
+                  "AXIS1-V2-E1",
+                  "current:front-longitudinal"
+                ],
+                [
+                  "AXIS1-V2-E1",
+                  "current:lane-heading"
+                ],
+                [
+                  "AXIS1-V2-E1",
+                  "current:local-participation"
+                ]
+              ]
+            },
+            "role_transformation": {
+              "evidence": {
+                "per_source_distance": [
+                  1.0,
+                  1.0,
+                  1.0
+                ]
+              },
+              "method": "historical-to-current-role-jaccard-distance",
+              "value": 1.0
+            },
+            "source_links": [
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:front-longitudinal"
+                  ],
+                  "historical_relation_state": "closing"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:front-longitudinal"
+                }
+              },
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:lane-heading"
+                  ],
+                  "historical_relation_state": "negative-heading-offset"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:lane-heading"
+                }
+              },
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:local-participation"
+                  ],
+                  "historical_relation_state": "observed"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:local-participation"
+                }
+              }
+            ],
+            "structural_transformation": {
+              "evidence": {
+                "current_anchor_nodes": 3,
+                "joint_edges_added": 1,
+                "source_nodes": 3
+              },
+              "method": "joint-hyperedge-graph-delta",
+              "value": 0.14285714285714285
+            }
+          }
+        ],
+        "no_history_twin": [
+          {
+            "observed_at_tau": 30.0,
+            "possibility_id": "yield-space",
+            "recombination": {
+              "evidence": {
+                "source_count": 3
+              },
+              "method": "source-incidence-recombination",
+              "value": 0.6666666666666666
+            },
+            "relation_graph_after": {
+              "joint_relation": {
+                "current_anchors": [
+                  "current:front-longitudinal",
+                  "current:lane-heading",
+                  "current:local-participation"
+                ],
+                "possibility": "yield-space",
+                "sources": 3
+              }
+            },
+            "relation_graph_before": {
+              "current_anchors": [
+                "current:front-longitudinal",
+                "current:lane-heading",
+                "current:local-participation"
+              ],
+              "source_relations": [
+                [
+                  "AXIS1-V2-E1",
+                  "current:front-longitudinal"
+                ],
+                [
+                  "AXIS1-V2-E1",
+                  "current:lane-heading"
+                ],
+                [
+                  "AXIS1-V2-E1",
+                  "current:local-participation"
+                ]
+              ]
+            },
+            "role_transformation": {
+              "evidence": {
+                "per_source_distance": [
+                  1.0,
+                  1.0,
+                  1.0
+                ]
+              },
+              "method": "historical-to-current-role-jaccard-distance",
+              "value": 1.0
+            },
+            "source_links": [
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:front-longitudinal"
+                  ],
+                  "historical_relation_state": "closing"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:front-longitudinal"
+                }
+              },
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:lane-heading"
+                  ],
+                  "historical_relation_state": "negative-heading-offset"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:lane-heading"
+                }
+              },
+              {
+                "contribution_trace": {
+                  "basis": "role/type continuity in current relations",
+                  "current_anchor_ids": [
+                    "current:local-participation"
+                  ],
+                  "historical_relation_state": "observed"
+                },
+                "distribution_effect": null,
+                "generated_possibilities": [
+                  "yield-space"
+                ],
+                "participation_roles": [
+                  "relation-continuity",
+                  "historical-comparison"
+                ],
+                "source": {
+                  "completed_at_tau": 20.1,
+                  "experience_id": "AXIS1-V2-E1",
+                  "relation_descriptor": {
+                    "axis1_v2": true,
+                    "origin_entry_id": "AXIS1-V2-E1",
+                    "selected_possibility": "yield-space"
+                  },
+                  "relation_element_id": "current:local-participation"
+                }
+              }
+            ],
+            "structural_transformation": {
+              "evidence": {
+                "current_anchor_nodes": 3,
+                "joint_edges_added": 1,
+                "source_nodes": 3
+              },
+              "method": "joint-hyperedge-graph-delta",
+              "value": 0.14285714285714285
+            }
+          }
+        ]
+      },
+      "reentered_unresolved": {
+        "different": false,
+        "history_enabled": [
+          [
+            "AXIS1-V2-E1",
+            [
+              "later downstream effects remain open to later relation"
+            ]
+          ]
+        ],
+        "no_history_twin": [
+          [
+            "AXIS1-V2-E1",
+            [
+              "later downstream effects remain open to later relation"
+            ]
+          ]
+        ]
+      },
+      "eligible_ids": {
+        "different": false,
+        "history_enabled": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ],
+        "no_history_twin": [
+          "continue-flow",
+          "yield-space",
+          "align-heading-positive"
+        ]
+      },
+      "selected_id": {
+        "different": false,
+        "history_enabled": "yield-space",
+        "no_history_twin": "yield-space"
+      }
+    }
+  },
+  "gap_axis_selectivity_matrix": {
+    "reality-gap-relation": {
+      "query": [
+        "axis-scope:reality-gap-relation"
+      ],
+      "expected_query": [
+        "axis-scope:reality-gap-relation"
+      ],
+      "other_axis_terms_absent": true,
+      "direct_choice": false
+    },
+    "reality-gap-role": {
+      "query": [
+        "axis-scope:reality-gap-role"
+      ],
+      "expected_query": [
+        "axis-scope:reality-gap-role"
+      ],
+      "other_axis_terms_absent": true,
+      "direct_choice": false
+    },
+    "reality-gap-process": {
+      "query": [
+        "axis-scope:reality-gap-process"
+      ],
+      "expected_query": [
+        "axis-scope:reality-gap-process"
+      ],
+      "other_axis_terms_absent": true,
+      "direct_choice": false
+    },
+    "reality-gap-possibility-coverage": {
+      "query": [
+        "axis-scope:reality-gap-possibility-coverage"
+      ],
+      "expected_query": [
+        "axis-scope:reality-gap-possibility-coverage"
+      ],
+      "other_axis_terms_absent": true,
+      "direct_choice": false
+    },
+    "reality-gap-responsibility-coverage": {
+      "query": [
+        "axis-scope:reality-gap-responsibility-coverage"
+      ],
+      "expected_query": [
+        "axis-scope:reality-gap-responsibility-coverage"
+      ],
+      "other_axis_terms_absent": true,
+      "direct_choice": false
+    }
+  },
+  "axis1_freeze": {
+    "unchanged": true,
+    "before": {
+      "C:\\CARLA_0.9.16\\oasis-mvp1\\experiments\\governance_axis1\\axis1_empirical_v2.py": "d71f873fe028c2ae4efc98bfa8248d3cb0e0fc5c8bd328115ec1a3dbf91602c8",
+      "C:\\CARLA_0.9.16\\oasis-mvp1\\experiments\\governance_axis1\\axis1_behavior_probe_v21.py": "7611c1ef0ba9e624502d8e698de0d7abaa22c0e8f76fa66fa9c2027c51c78dc6",
+      "C:\\CARLA_0.9.16\\oasis-mvp1\\experiments\\governance_axis1\\axis1_paper_closeout_v30.py": "ebdd2811a697a6e42cf46d594376651b22ace055e7d3324caaf0079b35d438d3"
+    },
+    "after": {
+      "C:\\CARLA_0.9.16\\oasis-mvp1\\experiments\\governance_axis1\\axis1_empirical_v2.py": "d71f873fe028c2ae4efc98bfa8248d3cb0e0fc5c8bd328115ec1a3dbf91602c8",
+      "C:\\CARLA_0.9.16\\oasis-mvp1\\experiments\\governance_axis1\\axis1_behavior_probe_v21.py": "7611c1ef0ba9e624502d8e698de0d7abaa22c0e8f76fa66fa9c2027c51c78dc6",
+      "C:\\CARLA_0.9.16\\oasis-mvp1\\experiments\\governance_axis1\\axis1_paper_closeout_v30.py": "ebdd2811a697a6e42cf46d594376651b22ace055e7d3324caaf0079b35d438d3"
+    }
+  },
+  "scope_note": "C8 uses the official admission bridge with a provenance-preserving extractor whose completed relation has no current candidate link."
+}

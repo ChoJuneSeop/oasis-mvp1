@@ -1,0 +1,20 @@
+{
+  "protocol_id": "GOVERNANCE-OASIS-AXIS2-STAGE5",
+  "status": "PREREGISTERED_BEFORE_FIRST_EXPERIMENTAL_TICK",
+  "created_date": "2026-09-15",
+  "upstream_stage4_status": "STAGE4_CONFIRMATORY_PASS",
+  "flow": "OF-01",
+  "attempt": 1,
+  "gap_rule": "relation gap is PRESENT only when an observed front participant exists and current longitudinal closing speed is positive",
+  "recall_scope": ["front-interaction"],
+  "semantic_separations": [
+    "gap_detection_is_not_recall",
+    "recall_is_not_relation_eligibility",
+    "eligibility_is_not_reentry",
+    "reentry_is_not_reevaluation",
+    "reevaluation_is_not_action_change"
+  ],
+  "pre_first_tick_hold": true,
+  "post_result_retuning": false,
+  "empirical_ticks": 0
+}

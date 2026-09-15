@@ -1,0 +1,14 @@
+{
+  "gate": "PRE_STAGE5",
+  "authorization": "READY",
+  "checks": {
+    "stage4_confirmatory_pass": true,
+    "carla_executable_present": true,
+    "carla_rpc_ready": true,
+    "axis2_stage5_live_runner_present": true,
+    "carla_python_api_available": true
+  },
+  "errors": [],
+  "stage4_sha256": "03589956c43f27a340b9d76fef02a145ec79afbba10d8d04a3c7a60d4aa6f189",
+  "rule": "Stage 5 must not execute unless every check passes."
+}

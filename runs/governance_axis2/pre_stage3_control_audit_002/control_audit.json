@@ -1,0 +1,235 @@
+{
+  "audit": "axis2-pre-stage3-control-audit",
+  "stage3_authorization": "READY",
+  "reason": "All preregistered pre-Stage-3 controls passed.",
+  "summary": {
+    "pass": 15,
+    "partial": 0,
+    "fail": 0,
+    "not_tested": 0,
+    "blocker_ids": []
+  },
+  "controls": [
+    {
+      "control_id": "G0_CURRENT_ONLY_GAP_EXACT_TWIN",
+      "verdict": "PASS",
+      "evidence": {
+        "C2_equals_C3_exactly": true,
+        "stage2_check_used_string_replacement": false
+      },
+      "remediation": "Use one shared comparison revision/evidence identity and compare canonical signature objects without rewriting strings."
+    },
+    {
+      "control_id": "G1_GAP_OPERATOR_PURITY",
+      "verdict": "PASS",
+      "evidence": {
+        "recall_direct_probability": false,
+        "recall_direct_choice": false,
+        "recall_is_reentry": false,
+        "integration_rejects_raw_recall": true
+      },
+      "remediation": ""
+    },
+    {
+      "control_id": "G2_OFFICIAL_ADMISSION_AND_POISON",
+      "verdict": "PASS",
+      "evidence": {
+        "official_bridge_named_in_source": true,
+        "poison_rejected": true
+      },
+      "remediation": ""
+    },
+    {
+      "control_id": "G3_INFORMATION_BOUNDARY",
+      "verdict": "PASS",
+      "evidence": {
+        "gap_integration_accepts_current_frame_and_gate_output_only": true,
+        "past_outcome_used_only_for_completed_history_admission": true,
+        "current_decision_tau": 30.0,
+        "past_completion_tau": 20.1
+      },
+      "remediation": ""
+    },
+    {
+      "control_id": "TWIN_OBSERVATION_SEED_TAU_RESOURCES_CANDIDATES",
+      "verdict": "PASS",
+      "evidence": {
+        "single_observation_fixture_in_source": true,
+        "single_seed": 9152026,
+        "same_tau": true,
+        "single_resource_plan": true,
+        "same_candidate_provider_factory": true,
+        "same_revision": true
+      },
+      "remediation": "Bind each preregistered comparison pair to the same revision; log observation/resource/candidate hashes per condition."
+    },
+    {
+      "control_id": "NO_GAP_NON_INTERFERENCE",
+      "verdict": "PASS",
+      "evidence": {
+        "C0_C1_snapshot_identical": true,
+        "C1_active_history_empty": true
+      },
+      "remediation": ""
+    },
+    {
+      "control_id": "RECALL_ELIGIBILITY_REENTRY_SEPARATION",
+      "verdict": "PASS",
+      "evidence": {
+        "C4_retrieved": 3,
+        "C4_reentered": 0,
+        "distinct_contract_types": true
+      },
+      "remediation": ""
+    },
+    {
+      "control_id": "IRRELEVANT_HISTORY_NON_AMPLIFICATION",
+      "verdict": "PASS",
+      "evidence": {
+        "irrelevant_count": 8,
+        "C6_equals_C3_snapshot": true
+      },
+      "remediation": ""
+    },
+    {
+      "control_id": "REENTRY_FUNCTIONAL_EFFECT",
+      "verdict": "PASS",
+      "evidence": {
+        "C3_C2_internal_effect": true
+      },
+      "remediation": ""
+    },
+    {
+      "control_id": "REEVALUATION_INDEPENDENT_CAUSE_INSTRUMENTATION",
+      "verdict": "PASS",
+      "evidence": {
+        "C3": {
+          "changed_inputs": [
+            "possibility_distribution",
+            "responsibilities"
+          ],
+          "occurred": true,
+          "reason": "possibility or responsibility state changed"
+        },
+        "C8": {
+          "changed_inputs": [],
+          "occurred": false,
+          "reason": "re-entry alone supplied no independent reevaluation cause"
+        },
+        "independent_gate_in_source": true
+      },
+      "remediation": "Implement a reevaluation decision contract/operator with recorded inputs and reason; do not assign a constant audit value."
+    },
+    {
+      "control_id": "C8_ELIGIBLE_ZERO_CANDIDATE_EFFECT_FIXTURE",
+      "verdict": "PASS",
+      "evidence": {
+        "scope_note": "C8 uses the official admission bridge with a provenance-preserving extractor whose completed relation has no current candidate link.",
+        "check": true
+      },
+      "remediation": "Create an officially admitted eligible experience whose possibility links do not affect current candidates, then verify re-entry with no reevaluation."
+    },
+    {
+      "control_id": "E2G_GAP_AXIS_LOCAL_SELECTIVITY",
+      "verdict": "PASS",
+      "evidence": {
+        "matrix": {
+          "reality-gap-relation": {
+            "query": [
+              "axis-scope:reality-gap-relation"
+            ],
+            "expected_query": [
+              "axis-scope:reality-gap-relation"
+            ],
+            "other_axis_terms_absent": true,
+            "direct_choice": false
+          },
+          "reality-gap-role": {
+            "query": [
+              "axis-scope:reality-gap-role"
+            ],
+            "expected_query": [
+              "axis-scope:reality-gap-role"
+            ],
+            "other_axis_terms_absent": true,
+            "direct_choice": false
+          },
+          "reality-gap-process": {
+            "query": [
+              "axis-scope:reality-gap-process"
+            ],
+            "expected_query": [
+              "axis-scope:reality-gap-process"
+            ],
+            "other_axis_terms_absent": true,
+            "direct_choice": false
+          },
+          "reality-gap-possibility-coverage": {
+            "query": [
+              "axis-scope:reality-gap-possibility-coverage"
+            ],
+            "expected_query": [
+              "axis-scope:reality-gap-possibility-coverage"
+            ],
+            "other_axis_terms_absent": true,
+            "direct_choice": false
+          },
+          "reality-gap-responsibility-coverage": {
+            "query": [
+              "axis-scope:reality-gap-responsibility-coverage"
+            ],
+            "expected_query": [
+              "axis-scope:reality-gap-responsibility-coverage"
+            ],
+            "other_axis_terms_absent": true,
+            "direct_choice": false
+          }
+        },
+        "required_axes": [
+          "RELATION",
+          "ROLE",
+          "PROCESS",
+          "POSSIBILITY_COVERAGE",
+          "RESPONSIBILITY_COVERAGE"
+        ]
+      },
+      "remediation": "Add a local one-axis-at-a-time perturbation matrix while holding history fixed."
+    },
+    {
+      "control_id": "PREREGISTERED_RECORD_SCHEMA",
+      "verdict": "PASS",
+      "evidence": {
+        "missing_per_condition_fields": []
+      },
+      "remediation": "Record canonical stage input/output hashes, observation/history manifests, flow fingerprint, epoch and timing before Stage 3."
+    },
+    {
+      "control_id": "AXIS1_FREEZE",
+      "verdict": "PASS",
+      "evidence": {
+        "unchanged": true,
+        "before": {
+          "C:\\CARLA_0.9.16\\oasis-mvp1\\experiments\\governance_axis1\\axis1_empirical_v2.py": "d71f873fe028c2ae4efc98bfa8248d3cb0e0fc5c8bd328115ec1a3dbf91602c8",
+          "C:\\CARLA_0.9.16\\oasis-mvp1\\experiments\\governance_axis1\\axis1_behavior_probe_v21.py": "7611c1ef0ba9e624502d8e698de0d7abaa22c0e8f76fa66fa9c2027c51c78dc6",
+          "C:\\CARLA_0.9.16\\oasis-mvp1\\experiments\\governance_axis1\\axis1_paper_closeout_v30.py": "ebdd2811a697a6e42cf46d594376651b22ace055e7d3324caaf0079b35d438d3"
+        },
+        "after": {
+          "C:\\CARLA_0.9.16\\oasis-mvp1\\experiments\\governance_axis1\\axis1_empirical_v2.py": "d71f873fe028c2ae4efc98bfa8248d3cb0e0fc5c8bd328115ec1a3dbf91602c8",
+          "C:\\CARLA_0.9.16\\oasis-mvp1\\experiments\\governance_axis1\\axis1_behavior_probe_v21.py": "7611c1ef0ba9e624502d8e698de0d7abaa22c0e8f76fa66fa9c2027c51c78dc6",
+          "C:\\CARLA_0.9.16\\oasis-mvp1\\experiments\\governance_axis1\\axis1_paper_closeout_v30.py": "ebdd2811a697a6e42cf46d594376651b22ace055e7d3324caaf0079b35d438d3"
+        }
+      },
+      "remediation": ""
+    },
+    {
+      "control_id": "OUTPUT_IMMUTABILITY_AND_TRACE",
+      "verdict": "PASS",
+      "evidence": {
+        "input_path": "C:\\CARLA_0.9.16\\oasis-mvp1\\runs\\governance_axis2\\track_a_stage02_003\\axis2_track_a_stage02.json",
+        "input_sha256": "f6e1583e7b4fded49d39fa5299be3cb5fface33960085fb926649da55a8a644f",
+        "overwrite_refused_by_harness": true
+      },
+      "remediation": ""
+    }
+  ]
+}
