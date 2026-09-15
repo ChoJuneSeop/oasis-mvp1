@@ -8,6 +8,14 @@ from research.carla_v22_harness_v11.independent_evaluator_v1 import IndependentE
 from research.g3_2_sidecar.history import HistoryEntry
 
 class GovernanceInvariantError(RuntimeError): pass
+
+class ResponsibilitySelectionPort(Protocol):
+    """Optional Core port that binds realization to governance's selected candidate."""
+    def realize_selected(self, observation: PresentObservation, tau: float, selected_candidate_id: str): ...
+
+class PureGapDetector(Protocol):
+    """Gap detectors receive only episode-local present-flow evidence."""
+    def assess(self, evidence: CurrentFlowEvidence) -> GapAssessment: ...
 class RevalidationState(str, Enum):
     CONFIRMED="confirmed"; REVISED="revised"; INCONCLUSIVE="inconclusive"
 
@@ -89,7 +97,17 @@ class _CoreBoundary:
         self.o.bump(core_exposed_experience_count=len({r.experience_id for r in rels})); self.o.after_candidates(view); return view
     def ablate_relation(self,*a): self.o.bump(core_calls=1,operation_calls=1); return self.inner.ablate_relation(*a)
     def ablate_relation_group(self,*a): self.o.bump(core_calls=1,operation_calls=1); return self.inner.ablate_relation_group(*a)
-    def realize(self,*a): self.o.bump(core_calls=1,operation_calls=1); return self.inner.realize(*a)
+    def realize(self,observation,tau):
+        self.o.bump(core_calls=1,operation_calls=1)
+        selected=self.o.context.responsibility.selected_candidate_id
+        if selected is None: raise GovernanceInvariantError("responsibility did not select a candidate")
+        if hasattr(self.inner,"realize_selected"):
+            realization=self.inner.realize_selected(observation,tau,selected)
+        else:
+            realization=self.inner.realize(observation,tau)
+        if realization.selected_possibility_id!=selected:
+            raise GovernanceInvariantError("responsibility selection mismatch before actuation")
+        return realization
 
 class GovernanceHarnessV02:
     def __init__(self,canonical_harness:CanonicalHarnessV11,*,gap_detector,evaluator:IndependentEvaluatorV1,outcome_observer,responsibility_operator,revalidation_operator,reengagement_operator=None,experience_catalog=None,context_port=None,history_sidecar=None):
@@ -98,10 +116,32 @@ class GovernanceHarnessV02:
         self.experience_catalog=experience_catalog; self.context_port=context_port; self.history_sidecar=history_sidecar or GovernanceHistorySidecar()
         self.samples={}; self.feedback=[]; self.pending=None; self.context=None; self._pending_context=None; self.metrics=GovernanceMetrics()
     def bump(self,**kw): self.metrics=replace(self.metrics,**{k:getattr(self.metrics,k)+v for k,v in kw.items()})
+    @staticmethod
+    def _validate_gap_semantics(value,path="current_reality"):
+        forbidden=("archive","history","catalog","reengagement","integrity","fingerprint","seed","scenario","future","raw_actor_id","actor_id")
+        if isinstance(value,Mapping):
+            for key,item in value.items():
+                if not isinstance(key,str): raise GovernanceInvariantError(f"non-text semantic key at {path}")
+                if any(token in key.lower() for token in forbidden): raise GovernanceInvariantError(f"forbidden gap semantic at {path}.{key}")
+                GovernanceHarnessV02._validate_gap_semantics(item,f"{path}.{key}")
+        elif isinstance(value,(tuple,list)):
+            for index,item in enumerate(value): GovernanceHarnessV02._validate_gap_semantics(item,f"{path}[{index}]")
+        elif value is not None and not isinstance(value,(str,int,float,bool)):
+            raise GovernanceInvariantError(f"non-data gap semantic capability at {path}")
     def capture(self,flow,episode):
-        tau=float(flow.current_tau()); fp=flow.flow_fingerprint(); s=CurrentFlowSample(tau,PresentObservation.from_mapping(flow.present_observation()),deepcopy(dict(flow.current_reality())))
+        tau=float(flow.current_tau()); fp=flow.flow_fingerprint(); reality=deepcopy(dict(flow.current_reality())); self._validate_gap_semantics(reality)
+        s=CurrentFlowSample(tau,PresentObservation.from_mapping(flow.present_observation()),reality)
         if float(flow.current_tau())!=tau or flow.flow_fingerprint()!=fp: raise GovernanceInvariantError("flow changed during capture")
         self.samples.setdefault(episode,[]).append(s); return CurrentFlowEvidence(episode,tuple(deepcopy(self.samples[episode]))),FlowIntegrityGuard(tau,fp)
+    @staticmethod
+    def _assess_gap(detector:PureGapDetector,evidence:CurrentFlowEvidence):
+        forbidden=("archive","history","catalog","reengagement","integrity","fingerprint","seed","scenario","future","actor")
+        owned=vars(detector) if hasattr(detector,"__dict__") else {}
+        leaked=tuple(name for name in owned if any(token in name.lower() for token in forbidden))
+        if leaked: raise GovernanceInvariantError(f"gap detector owns forbidden capability: {leaked}")
+        assess=getattr(detector,"assess",None)
+        if not callable(assess): raise GovernanceInvariantError("gap detector must implement pure assess(evidence)")
+        return deepcopy(assess(deepcopy(evidence)))
     @staticmethod
     def integrity(flow,g):
         if float(flow.current_tau())!=g.tau or flow.flow_fingerprint()!=g.fingerprint: raise GovernanceInvariantError("governance mutated real flow")
@@ -115,7 +155,7 @@ class GovernanceHarnessV02:
     def execute_decision_epoch(self,flow:PresentFlowPort,*,episode_id="default"):
         if self.pending or self.evaluator.has_pending_relation: raise GovernanceInvariantError("result pending closure")
         self.metrics=GovernanceMetrics(); evidence,guard=self.capture(flow,episode_id); self.bump(gap_calls=1,operation_calls=1)
-        gap=deepcopy(self.gap_detector.assess(deepcopy(evidence)))
+        gap=self._assess_gap(self.gap_detector,evidence)
         if not isinstance(gap,GapAssessment): raise GovernanceInvariantError("invalid gap")
         self.integrity(flow,guard); audit=()
         if gap.detected:
@@ -138,7 +178,6 @@ class GovernanceHarnessV02:
         try:
             self.integrity(flow,guard)
             with scope: decision=self.canonical_harness.execute_decision_epoch(flow)
-            if self.context.responsibility.selected_candidate_id!=decision.realization.selected_possibility_id: raise GovernanceInvariantError("responsibility selection mismatch")
             self.evaluator.begin(decision)
         except Exception:
             self.context=None
@@ -160,7 +199,10 @@ class GovernanceHarnessV02:
         if tuple(x[0] for x in rv.reengagement_judgments)!=tuple(x.experience_id for x in self.pending.reengagement): raise GovernanceInvariantError("incomplete reengagement revalidation")
         h=record.history_entry; p=GovernanceProvenance(h.entry_id,self.pending.branch,self.pending.gap,self.pending.reengagement,self.pending.responsibility,rv,outcome,self.pending.metrics)
         self.history_sidecar.attach(h,p); self.feedback.append(GovernanceFeedback(h.entry_id,rv.gap_judgment,rv.choice_judgment,rv.responsibility_judgment))
-        done=replace(self.pending,pending=False,outcome=outcome,revalidation=rv,history_entry=h,provenance=p); self.pending=None; self.context=None; self._pending_context=None; return done
+        done=replace(self.pending,pending=False,outcome=outcome,revalidation=rv,history_entry=h,provenance=p)
+        self.samples.pop(done.flow.episode_id,None)
+        self.pending=None; self.context=None; self._pending_context=None; return done
 
-# Compatibility name for callers of the v0.1 package.  Semantics are v0.2.
+# Compatibility names for callers of the v0.1/v0.2 package. Semantics are v0.3.
+GovernanceHarnessV03 = GovernanceHarnessV02
 GovernanceHarnessV01 = GovernanceHarnessV02

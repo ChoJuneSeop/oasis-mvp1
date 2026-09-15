@@ -71,8 +71,7 @@ class Tests(unittest.TestCase):
         self.assertFalse(done.pending); self.assertIsNotNone(done.responsibility); self.assertIsNotNone(done.revalidation)
     def test_yes_only_participant_reaches_context_and_core_but_audit_keeps_no(self):
         h,gap,_,ctx,sidecar=self.build(); flow=MutableFlow()
-        first=h.execute_decision_epoch(flow,episode_id="road")
-        h.observe_post(flow,post_observation=closed_observation(first.decision),post_tau=flow.current_tau()+.1)
+        h.capture(flow,"road")
         flow.next_epoch(1.0)
         yes=h.execute_decision_epoch(flow,episode_id="road")
         self.assertEqual(yes.branch,"YES"); self.assertEqual([x.experience_id for x in yes.reengagement],["E-old-yield","E-mid-merge"])

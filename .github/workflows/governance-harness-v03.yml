@@ -1,0 +1,33 @@
+name: Governance Harness v0.3 gate
+
+on:
+  push:
+    branches:
+      - feature/governance-harness-v1
+    paths:
+      - 'research/governance_harness_v01/**'
+      - 'research/carla_v22_harness_v11/**'
+      - 'research/oasis_core_v11/**'
+      - '.github/workflows/governance-harness-v03.yml'
+  pull_request:
+    paths:
+      - 'research/governance_harness_v01/**'
+      - 'research/carla_v22_harness_v11/**'
+      - 'research/oasis_core_v11/**'
+      - '.github/workflows/governance-harness-v03.yml'
+  workflow_dispatch:
+
+jobs:
+  invariant-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Governance adversarial and regression tests
+        run: python -m unittest research.governance_harness_v01.test_governance_attack research.governance_harness_v01.test_governance_harness
+      - name: Canonical Harness regression tests
+        run: python -m unittest discover -s research/carla_v22_harness_v11 -p 'test_*.py'
+      - name: Relational Core and history regression tests
+        run: python -m unittest research.oasis_core_v11.test_current_relational_core research.oasis_core_v11.test_history_admission
