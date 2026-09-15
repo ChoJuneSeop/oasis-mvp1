@@ -18,8 +18,9 @@ sidecar rollback, incomplete candidate decisions, post-actuation recovery, and
 trace poisoning. Those findings were fixed and the final independent re-review
 returned **PASS**, with no remaining semantic, atomicity, or recovery blocker.
 
-GitHub Actions run/conclusion: pending push. This document is not a final
-completion claim until the run ID and successful conclusion are recorded.
+GitHub Actions run: `35004302952`, workflow run `#1`, commit
+`cf98494733b77df493372e678abe3e077a760752`. Conclusion: **success** in 11s.
+The run independently executed the same 78-test gate on Ubuntu/Python 3.11.
 
 Actual Core admission: `REAL_EXPERIMENT = BLOCKED`. The repository has no frozen
 live Core/runtime proof for exclusive HistoryAccessPort use and the other v0.4
