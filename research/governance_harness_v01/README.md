@@ -1,4 +1,23 @@
-# Governance Harness v0.3
+# Governance Harness v0.4
+
+`harness_v04.py` is the final-closure implementation. It is an additive sidecar
+which drives the unchanged `CanonicalHarnessV11` through a capability-restricted
+Core adapter. The older v0.1-v0.3 compatibility names in `harness.py` remain
+available for prior callers and regression evidence.
+
+The v0.4 boundary adds an atomic host snapshot, a declarative (non-callable) gap
+rule, the sole metered `HistoryAccessPort`, immutable participating-experience
+views, mandatory `realize_selected`, authoritative host-only post observation,
+prepare/commit closure, atomic sidecar/history/feedback commit, recoverable
+finalization, contextual feedback, explicit lifecycle states, and resource/access
+metrics. See `EXECUTABLE_INVARIANTS_V04.md` and ATK-01..ATK-16 in
+`test_governance_attack_v04.py`.
+
+`AdmissionResult.real_experiment` deliberately remains `BLOCKED` unless a live
+Core/runtime has separately supplied verified evidence for every admission item.
+The in-repository Core used by the attacks is a synthetic contract exerciser.
+
+## Preserved v0.3 interface
 
 This module is a governance sidecar around CanonicalHarnessV11. It preserves the
 canonical probe and one-realization rules and adds these boundaries:

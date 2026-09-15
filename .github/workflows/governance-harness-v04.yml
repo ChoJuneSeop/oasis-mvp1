@@ -1,0 +1,42 @@
+name: Governance Harness v0.4 final closure gate
+
+on:
+  push:
+    branches: [feature/governance-harness-v1]
+    paths:
+      - 'research/governance_harness_v01/**'
+      - 'research/carla_v22_harness_v11/**'
+      - 'research/oasis_core_v11/**'
+      - '.github/workflows/governance-harness-v04.yml'
+  pull_request:
+    paths:
+      - 'research/governance_harness_v01/**'
+      - 'research/carla_v22_harness_v11/**'
+      - 'research/oasis_core_v11/**'
+      - '.github/workflows/governance-harness-v04.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  final-closure-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: ATK-01 through ATK-16 and Governance regressions
+        run: >-
+          python -m unittest
+          research.governance_harness_v01.test_governance_attack_v04
+          research.governance_harness_v01.test_governance_attack
+          research.governance_harness_v01.test_governance_harness -v
+      - name: Canonical Harness regressions
+        run: python -m unittest discover -s research/carla_v22_harness_v11 -p 'test_*.py' -v
+      - name: Core and history regressions
+        run: >-
+          python -m unittest
+          research.oasis_core_v11.test_current_relational_core
+          research.oasis_core_v11.test_history_admission -v
