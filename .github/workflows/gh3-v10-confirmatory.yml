@@ -1,0 +1,136 @@
+name: GH-3 v1.0 Confirmatory
+
+on:
+  push:
+    branches: [experiment/governance-harness-gh3-v10-confirmatory]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  confirmatory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact EXPERIMENT_READY snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: 1d392e39bf1ff64e71eb591988649c8041d025ab
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify exact frozen snapshot
+        run: |
+          test "$(git rev-parse HEAD)" = "1d392e39bf1ff64e71eb591988649c8041d025ab"
+          python -m research.governance_harness_gh3.admission.preflight > /tmp/gh3-preflight.json
+          grep -q '"status": "EXPERIMENT_READY"' /tmp/gh3-preflight.json
+          grep -q '"experiment_executed": false' /tmp/gh3-preflight.json
+
+      - name: Execute frozen Confirmatory workers then independent evaluator
+        run: |
+          mkdir -p /tmp/gh3-confirmatory
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          from research.governance_harness_gh3.evaluator import evaluate
+          from research.governance_harness_gh3.models import ARMS
+          from research.governance_harness_gh3.runner import run_runtime
+          from research.governance_harness_gh3.scenario import build_confirmatory_world
+
+          out = Path('/tmp/gh3-confirmatory')
+          cases = build_confirmatory_world()
+          assert len(cases) == 18, len(cases)
+
+          raw = run_runtime(tuple(case.runtime for case in cases))
+          workers = raw['workers']
+          assert len(workers) == len(ARMS) == 3
+          assert {w['arm'] for w in workers} == set(ARMS)
+          assert all(w['chain_count'] == 18 for w in workers)
+
+          pids = [w['pid'] for w in workers]
+          tokens = [w['worker_token'] for w in workers]
+          fresh_process = len(set(pids)) == len(ARMS) and len(set(tokens)) == len(ARMS)
+          assert fresh_process
+
+          total_chain_runs = 0
+          total_epochs = 0
+          for worker in workers:
+              rows = worker['results']
+              assert len(rows) == 18
+              total_chain_runs += len(rows)
+              for row in rows:
+                  assert row['antecedent_selected'] == row['antecedent_realized']
+                  assert row['recurrence_selected'] == row['recurrence_realized']
+                  assert row['realization_count'] == 2
+                  assert row['recurrence_new_ce_exposed'] is False
+                  assert row['recurrence_decision_eligible_count'] == 1
+                  assert row['antecedent_revalidation_state'] in {'confirmed', 'revised', 'inconclusive'}
+                  assert row['committed_feedback_state'] == row['antecedent_revalidation_state']
+                  total_epochs += row['realization_count']
+          assert total_chain_runs == 54
+          assert total_epochs == 108
+
+          # Scientific truth is joined only after every worker has returned.
+          evaluation = evaluate(cases, workers)
+          for arm, structural in evaluation['structural'].items():
+              assert structural['chain_count'] == 18
+              assert structural['selected_equals_realized'] is True
+              assert structural['two_realizations_per_chain'] is True
+              assert structural['new_ce_decision_reuse'] is False
+              assert structural['baseline_archive_count_stable'] is True
+
+          raw_payload = {
+              'spec_version': 'GH3_EXPERIMENT_V1_0_FINAL',
+              'exact_snapshot_sha': '1d392e39bf1ff64e71eb591988649c8041d025ab',
+              'stage': 'confirmatory',
+              'worker_truth_access': False,
+              'evaluator_join_after_workers': True,
+              'fresh_process': fresh_process,
+              'total_chain_runs': total_chain_runs,
+              'total_decision_realization_epochs': total_epochs,
+              'workers': workers,
+          }
+          raw_bytes = (json.dumps(raw_payload, ensure_ascii=False, indent=2, sort_keys=True) + '\n').encode()
+          raw_sha = hashlib.sha256(raw_bytes).hexdigest()
+          (out / 'GH3_CONFIRMATORY_RAW_V1_0.json').write_bytes(raw_bytes)
+
+          result_payload = {
+              'status': 'CONFIRMATORY_EXECUTION_COMPLETE',
+              'spec_version': 'GH3_EXPERIMENT_V1_0_FINAL',
+              'exact_snapshot_sha': '1d392e39bf1ff64e71eb591988649c8041d025ab',
+              'pilot_evidence_commit': '04b77cd3b780f68adf4b12687758cff7f023c791',
+              'confirmatory_executed': True,
+              'fresh_process': fresh_process,
+              'arm_count': 3,
+              'chains_per_arm': 18,
+              'total_chain_runs': total_chain_runs,
+              'total_decision_realization_epochs': total_epochs,
+              'worker_truth_access': False,
+              'evaluator_join_after_workers': True,
+              'evaluation': evaluation,
+              'raw_sha256': raw_sha,
+              'aggregate_score': None,
+          }
+          result_bytes = (json.dumps(result_payload, ensure_ascii=False, indent=2, sort_keys=True) + '\n').encode()
+          result_sha = hashlib.sha256(result_bytes).hexdigest()
+          (out / 'GH3_CONFIRMATORY_RESULT_V1_0.json').write_bytes(result_bytes)
+          (out / 'SHA256SUMS.txt').write_text(
+              f"{raw_sha}  GH3_CONFIRMATORY_RAW_V1_0.json\n{result_sha}  GH3_CONFIRMATORY_RESULT_V1_0.json\n",
+              encoding='utf-8',
+          )
+          print(json.dumps(result_payload, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Upload Confirmatory evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: gh3-v10-confirmatory-1d392e3
+          path: /tmp/gh3-confirmatory/
+          if-no-files-found: error
+          retention-days: 90
