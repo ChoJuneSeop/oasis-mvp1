@@ -1,0 +1,140 @@
+name: GH-1L v1.0.2 replacement pilot
+
+on:
+  push:
+    branches: [experiment/governance-harness-gh1l-v102-pilot]
+    paths:
+      - '.github/workflows/gh1l-v102-pilot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  replacement-pilot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact v1.0.2 EXPERIMENT_READY snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: 135012775fa1a3fd4c912b4df0f563b75befe781
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify exact frozen execution snapshot
+        run: |
+          test "$(git rev-parse HEAD)" = "135012775fa1a3fd4c912b4df0f563b75befe781"
+          test ! -f research/governance_harness_gh1l/results/PILOT_RESULT.json
+          test ! -f research/governance_harness_gh1l/design/CONFIRMATORY_COUNT_FREEZE.json
+          grep -q 'GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT' research/governance_harness_gh1l/validation/EXPERIMENT_READY.json
+          grep -q '"status": "EXPERIMENT_READY"' research/governance_harness_gh1l/validation/EXPERIMENT_READY.json
+
+      - name: Re-run v1.0.2 preflight immediately before pilot
+        run: |
+          python -m research.governance_harness_gh1l.admission.preflight > /tmp/GH1L_V102_PREFLIGHT.json
+          grep -q '"status": "EXPERIMENT_READY"' /tmp/GH1L_V102_PREFLIGHT.json
+          grep -q 'GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT' /tmp/GH1L_V102_PREFLIGHT.json
+
+      - name: Execute frozen replacement pilot
+        run: >-
+          python -m research.governance_harness_gh1l.runner.run_experiment
+          --stage pilot
+          --output /tmp/PILOT_RESULT_V102.json
+
+      - name: Validate replacement pilot execution and action contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          p = json.loads(Path('/tmp/PILOT_RESULT_V102.json').read_text())
+          assert p['experiment'] == 'GH-1L'
+          assert p['stage'] == 'pilot'
+          assert p['spec_version'] == 'GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT'
+          assert p['block_count'] == 3
+          assert p['run_count'] == 15
+          assert p['horizon'] == 512
+          assert p['run_order'] == ['G1', 'G2', 'G3', 'G4', 'G5']
+          assert p['fresh_process_contract']['pass'] is True
+          assert p['archive_sha256'] == '73ddd1cd810fa25bacb2dda4181a5d63579c657e57ef5f8441cd2f75ceefc8bb'
+
+          # This is a measurement-contract validity condition, not an effect criterion.
+          for arm, metrics in p['arm_metric_means'].items():
+              assert metrics['unsafe_or_invalid_rate'] == 0.0, (arm, metrics)
+
+          metric = 'history_sensitive_resolution_rate_G1_minus_G3'
+          values = p['paired_metrics'][metric]
+          assert len(values) == 3
+          assert all(isinstance(x, (int, float)) for x in values)
+
+          print(json.dumps({
+              'spec_version': p['spec_version'],
+              'block_count': p['block_count'],
+              'run_count': p['run_count'],
+              'horizon': p['horizon'],
+              'archive_sha256': p['archive_sha256'],
+              'fresh_process_contract': p['fresh_process_contract'],
+              'arm_metric_means': p['arm_metric_means'],
+              'paired_metrics': p['paired_metrics'],
+          }, indent=2))
+          PY
+
+      - name: Derive replacement confirmatory count freeze
+        run: >-
+          python -m research.governance_harness_gh1l.runner.freeze_confirmatory_count
+          --pilot /tmp/PILOT_RESULT_V102.json
+          --output /tmp/CONFIRMATORY_COUNT_FREEZE_V102.json
+
+      - name: Validate count-freeze lineage
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('/tmp/CONFIRMATORY_COUNT_FREEZE_V102.json').read_text())
+          assert c['status'] == 'COUNT_FROZEN'
+          assert c['spec_version'] == 'GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT'
+          assert c['pilot_block_count'] == 3
+          assert c['pilot_excluded_from_confirmatory'] is True
+          assert c['confirmatory_blocks'] >= 12
+          print(json.dumps(c, indent=2))
+          PY
+
+      - name: Record immutable hashes and compact summary
+        run: |
+          sha256sum /tmp/PILOT_RESULT_V102.json /tmp/CONFIRMATORY_COUNT_FREEZE_V102.json | tee /tmp/SHA256SUMS_V102.txt
+          python - <<'PY' > /tmp/PILOT_SUMMARY_V102.json
+          import json
+          from pathlib import Path
+          p = json.loads(Path('/tmp/PILOT_RESULT_V102.json').read_text())
+          c = json.loads(Path('/tmp/CONFIRMATORY_COUNT_FREEZE_V102.json').read_text())
+          print(json.dumps({
+              'frozen_code_head': '135012775fa1a3fd4c912b4df0f563b75befe781',
+              'stage': 'replacement-pilot',
+              'spec_version': p['spec_version'],
+              'pilot_blocks': p['block_count'],
+              'pilot_runs': p['run_count'],
+              'fresh_process_contract': p['fresh_process_contract'],
+              'archive_sha256': p['archive_sha256'],
+              'arm_metric_means': p['arm_metric_means'],
+              'paired_metrics': p['paired_metrics'],
+              'count_freeze': c,
+              'prior_v101_pilot_inference': 'INVALIDATED',
+          }, indent=2))
+          PY
+          cat /tmp/PILOT_SUMMARY_V102.json
+
+      - name: Upload replacement pilot evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: gh1l-v102-replacement-pilot-1350127
+          path: |
+            /tmp/PILOT_RESULT_V102.json
+            /tmp/PILOT_SUMMARY_V102.json
+            /tmp/CONFIRMATORY_COUNT_FREEZE_V102.json
+            /tmp/SHA256SUMS_V102.txt
+            /tmp/GH1L_V102_PREFLIGHT.json
+          if-no-files-found: error
+          retention-days: 90
