@@ -1,0 +1,25 @@
+{
+  "manifest_version": "GH1_FREEZE_V1",
+  "hash_type": "git_blob_sha1",
+  "code_basis_commit": "dff7aef74b222198235ce58b636dee77ab340a55",
+  "note": "The freeze manifest and its verification test are intentionally not self-hashed. Subsequent evidence-only commits are permitted only if every frozen artifact below retains the recorded Git blob SHA.",
+  "frozen_artifacts": {
+    "research/governance_harness_v01/GH1_ADMISSION_GATE.md": "58b17b6ff8db5f77a3064fd5eda9b638d1f09168",
+    "research/governance_harness_v01/GH1_EXPERIMENT_SPEC_V1_0_FINAL.md": "675a8ef3e9c97c6e1ce8488dff61e1d564de5758",
+    "research/governance_harness_v01/GH1_EXPERIMENT_DESIGN_V1_0_FINAL.md": "0fea9884ca937993e85baf9410157939ef6f0062",
+    "research/governance_harness_v01/GH1_GAP_DETECTOR_SPEC.json": "14cfc04ee32efe742945ce0be9772e4c3d331bce",
+    "research/governance_harness_v01/GH1_ARCHIVE_MANIFEST.json": "9a4791a7755b5ac94faf9e895ba8217dfcd9b7aa",
+    "research/governance_harness_v01/GH1_SCENARIO_MANIFEST.json": "181761cd6849ebdd142cf16485ef4b269f89e371",
+    "research/governance_harness_v01/GH1_SEED_MANIFEST.json": "3332ddbd52927a8b26296f3ee22de1415611771e",
+    "research/governance_harness_v01/GH1_RUN_ORDER.json": "696fe0c6747317c5f139d4f107950ca7e6c702d9",
+    "research/governance_harness_v01/GH1_METRICS_SCHEMA.json": "5118cc510cf4088eeac4466f348154324022d1b2",
+    "research/governance_harness_v01/GH1_PASS_FAIL_RULES.md": "dedc10c8502615e64892f0241180028df7a54ea8",
+    "research/governance_harness_v01/gh1_preexecution.py": "de66802ac4782e9398b42dbb2d48b90623034328",
+    "research/governance_harness_v01/gh1_process_probe.py": "9a21f54a5e81fcb7cd979865c5e465af9c97056a",
+    "research/governance_harness_v01/harness_v04.py": "7e488a70b88cf02e7adb964f1f4811db270d16b4",
+    "research/oasis_core_v11/current_relational_core.py": "99477917b6539ad7c9f8a7b736ca6cc5ecc204b8",
+    "research/oasis_core_v11/history_admission.py": "13e64be0e0a15f2782bdf634e735556747ddc0d0",
+    "research/oasis_core_v11/carla_domain_bundle_v1.py": "91812a329e08c71ce72834a1138591e4fa92546c",
+    "research/carla_v22_harness_v11/canonical_harness.py": "50ac09ca0cbc917dba68d8d95650a17e0395fe7e"
+  }
+}
