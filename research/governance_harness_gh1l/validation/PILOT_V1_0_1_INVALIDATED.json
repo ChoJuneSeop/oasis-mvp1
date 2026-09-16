@@ -1,0 +1,16 @@
+{
+  "experiment": "GH-1L",
+  "pilot_version": "GH1L_EXPERIMENT_V1_0_1_PREPILOT",
+  "workflow_run_id": 35061975968,
+  "frozen_code_head": "2c0f4386253b050c4c960d29a0b6eac16c83a1fa",
+  "artifact_id": 10433145694,
+  "pilot_result_sha256": "8a7e519666c2352e14ff9b9aa8bb96135c10eb710094a6a4d9f0b268725ef915",
+  "derived_count_freeze_sha256": "05aafd4f4b1bbbbb738bd744c1b9c8011097521606ece01258e0978fdcbde22a",
+  "execution_validity": "PASS",
+  "inferential_validity": "INVALIDATED",
+  "confirmatory_unlock_validity": "INVALIDATED",
+  "reason": "Core emitted canonical possibility IDs such as continue-flow, while the v1.0.1 evaluator/prehistory semantic vocabulary also used continue and hold-course without a frozen canonicalization contract. This invalidated absolute evaluator/safety semantics before confirmatory.",
+  "confirmatory_executed": false,
+  "superseded_by": "GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT",
+  "rule": "Do not use this pilot or its count freeze for confirmatory inference. Preserve only as provenance and operational evidence."
+}
