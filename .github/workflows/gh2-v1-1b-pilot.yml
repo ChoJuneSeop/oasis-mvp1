@@ -1,0 +1,136 @@
+name: GH-2 v1.1b Structural Pilot
+
+on:
+  push:
+    branches:
+      - experiment/governance-harness-gh2-v1-1b-pilot
+  workflow_dispatch:
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact frozen experiment snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: 6d1a6606c0dc06074832474d2b29fe1140e5f0bd
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify exact snapshot
+        run: |
+          test "$(git rev-parse HEAD)" = "6d1a6606c0dc06074832474d2b29fe1140e5f0bd"
+
+      - name: Run structural-only GH-2 v1.1 pilot
+        env:
+          WORKFLOW_HEAD_SHA: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          from research.governance_harness_gh2.models import ARMS
+          from research.governance_harness_gh2.runner import run_runtime
+          from research.governance_harness_gh2.scenario import build_pilot_world
+
+          SNAPSHOT = "6d1a6606c0dc06074832474d2b29fe1140e5f0bd"
+          cases = build_pilot_world()
+          assert len(cases) == 8, len(cases)
+          runtime = tuple(case.runtime for case in cases)
+          result = run_runtime(runtime)
+          workers = result["workers"]
+          assert len(workers) == len(ARMS) == 4
+          assert {w["arm"] for w in workers} == set(ARMS)
+
+          pids = [w["pid"] for w in workers]
+          tokens = [w["worker_token"] for w in workers]
+          assert len(set(pids)) == 4
+          assert len(set(tokens)) == 4
+
+          structural = {}
+          for worker in workers:
+              decisions = worker["decisions"]
+              assert len(decisions) == 8
+              assert worker["realization_count"] == 8
+              for d in decisions:
+                  assert d["candidate_ids"] == ["continue-flow", "yield-space"]
+                  assert d["enacted_selected"] == d["realized_action"]
+                  assert d["realization_count"] == 1
+                  assert d["responsibility"]["selected_obligations"]
+                  assert d["responsibility"]["nonselected_obligations"]
+                  assert "score" not in d["responsibility"]
+                  for p in d["responsibility"]["profiles"]:
+                      assert "score" not in p
+
+              structural[worker["arm"]] = {
+                  "decision_count": len(decisions),
+                  "realization_count": worker["realization_count"],
+                  "selected_equals_realized": True,
+                  "one_realization_per_decision": True,
+              }
+
+          # R4 stale responsibility must be pair-local: first frame fresh, second frame stale from first.
+          r4 = next(w for w in workers if w["arm"] == "R4_STALE")
+          for idx, d in enumerate(r4["decisions"]):
+              if idx % 2 == 0:
+                  assert d["stale_source_frame_id"] is None, (idx, d)
+              else:
+                  assert d["stale_source_frame_id"] == r4["decisions"][idx - 1]["frame_id"], (idx, d)
+
+          # Explicit arm contracts.
+          r1 = next(w for w in workers if w["arm"] == "R1_CURRENT_BOUND")
+          r2 = next(w for w in workers if w["arm"] == "R2_RECORD_ONLY")
+          r3 = next(w for w in workers if w["arm"] == "R3_PERMUTED")
+          assert all(d["responsibility_bound"] is True and d["responsibility"]["source"] == "current" for d in r1["decisions"])
+          assert all(d["responsibility_bound"] is False and d["responsibility"]["source"] == "current" for d in r2["decisions"])
+          assert all(d["responsibility_bound"] is True and d["responsibility"]["source"] == "permuted" for d in r3["decisions"])
+
+          payload = {
+              "experiment": "GH-2",
+              "version": "v1.1",
+              "stage": "PILOT_STRUCTURAL_ONLY",
+              "experiment_snapshot_sha": SNAPSHOT,
+              "workflow_head_sha": os.environ.get("WORKFLOW_HEAD_SHA"),
+              "evaluator_used": False,
+              "confirmatory_metric_computed": False,
+              "pilot_frame_count_per_arm": 8,
+              "arms": list(ARMS),
+              "fresh_process": True,
+              "r4_pair_local_stale": True,
+              "structural": structural,
+              "raw_workers": workers,
+              "status": "STRUCTURAL_PASS",
+          }
+          out = Path("gh2_v11_pilot_structural.json")
+          out.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          digest = hashlib.sha256(out.read_bytes()).hexdigest()
+          Path("gh2_v11_pilot_sha256.txt").write_text(digest + "  " + out.name + "\n", encoding="utf-8")
+          print(json.dumps({"status": "STRUCTURAL_PASS", "sha256": digest, "frames_per_arm": 8, "arms": 4}, indent=2))
+          PY
+
+      - name: Verify pilot contains no confirmatory metric
+        run: |
+          python - <<'PY'
+          import json
+          p = json.load(open('gh2_v11_pilot_structural.json', encoding='utf-8'))
+          assert p['status'] == 'STRUCTURAL_PASS'
+          assert p['evaluator_used'] is False
+          assert p['confirmatory_metric_computed'] is False
+          text = open('gh2_v11_pilot_structural.json', encoding='utf-8').read()
+          assert 'resolution_rate' not in text
+          assert 'R1_minus_R2' not in text
+          PY
+
+      - name: Upload pilot provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: gh2-v1-1-structural-pilot
+          path: |
+            gh2_v11_pilot_structural.json
+            gh2_v11_pilot_sha256.txt
