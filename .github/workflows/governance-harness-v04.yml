@@ -31,6 +31,8 @@ jobs:
         run: python -m unittest research.governance_harness_v01.test_core_governance_admission -v
       - name: GH-1 Detector Validity, RNG isolation and Fresh Process gates
         run: python -m unittest research.governance_harness_v01.test_gh1_preexecution -v
+      - name: GH-1 frozen artifact hash gate
+        run: python -m unittest research.governance_harness_v01.test_gh1_freeze -v
       - name: ATK-01 through ATK-16 and Governance regressions
         run: >-
           python -m unittest
