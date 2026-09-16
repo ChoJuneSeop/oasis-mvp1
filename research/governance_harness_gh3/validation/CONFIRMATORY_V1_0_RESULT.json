@@ -1,0 +1,60 @@
+{
+  "status": "CONFIRMATORY_COMPLETE",
+  "spec_version": "GH3_EXPERIMENT_V1_0_FINAL",
+  "research_principle": "OUTCOME_BASED_REVALIDATION",
+  "exact_experiment_snapshot_sha": "1d392e39bf1ff64e71eb591988649c8041d025ab",
+  "pilot_evidence_commit": "04b77cd3b780f68adf4b12687758cff7f023c791",
+  "confirmatory_workflow_commit": "c998655cbc543416a37a0836cb6e540d8eb48896",
+  "workflow_run_id": 35106684909,
+  "artifact_id": 10450228999,
+  "artifact_name": "gh3-v10-confirmatory-1d392e3",
+  "artifact_zip_sha256": "59142c887fd3c866bb710f71204816997f176257ce13459315a45c82d5cbbf5a",
+  "raw_result_sha256": "3d7a1a48757aa4f79fe80d776faf06a8636db4de5a84d9237c4cfc0aa4424f4f",
+  "fresh_process": true,
+  "worker_truth_access": false,
+  "evaluator_join_after_workers": true,
+  "arm_count": 3,
+  "chains_per_arm": 18,
+  "total_chain_runs": 54,
+  "total_decision_realization_epochs": 108,
+  "link_a_revalidation_state_match": {
+    "F1_ACTIVE_CORRECT": {"matched": 18, "total": 18, "rate": 1.0},
+    "F2_RECORD_ONLY": {"matched": 18, "total": 18, "rate": 1.0},
+    "F3_PERMUTED_STATE": {"matched": 18, "total": 18, "rate": 1.0}
+  },
+  "link_b_primary": {
+    "subset": "REVISED + SAME_SCOPE",
+    "chain_count": 3,
+    "F1_vs_F2_participation_change_count": 3,
+    "F1_vs_F2_participation_change_rate": 1.0,
+    "F1_vs_F2_selection_change_count": 3,
+    "F1_vs_F2_selection_change_rate": 1.0
+  },
+  "stability": {
+    "confirmed_F1_vs_F2_no_change_rate": 1.0,
+    "inconclusive_F1_vs_F2_no_change_rate": 1.0,
+    "revised_shifted_scope_no_global_block_rate": 1.0
+  },
+  "structural": {
+    "all_arms_chain_count": 18,
+    "selected_equals_realized": true,
+    "two_realizations_per_chain": true,
+    "new_completed_experience_decision_reuse": false,
+    "baseline_archive_count_stable": true
+  },
+  "aggregate_score": null,
+  "claim_scope": [
+    "Authoritative post-observation was mapped to the frozen typed revalidation state on every confirmatory antecedent.",
+    "For REVISED feedback in the same frozen relation scope, exposing correctly bound feedback changed both later participation and later realized selection relative to record-only in all three confirmatory observation families.",
+    "CONFIRMED and INCONCLUSIVE feedback did not perturb the later F1-vs-F2 decision path in the frozen matrix.",
+    "REVISED feedback did not act as a permanent/global exclusion when the frozen recurrence scope shifted.",
+    "Permuting the exposed state while preserving stored provenance demonstrates that state content, not mere feedback existence, can alter later governance behavior in the controlled harness."
+  ],
+  "limitations": [
+    "Finite synthetic confirmatory matrix; not a real-world or CARLA generalization claim.",
+    "Newly committed Completed Experience reuse was deliberately disabled, so this experiment isolates revalidation feedback rather than accumulated CE reuse.",
+    "The outcome-to-state mapping is a frozen directional experimental contract, not a learned universal outcome evaluator.",
+    "No aggregate winner score and no claim of general system superiority."
+  ],
+  "post_result_rule_repair": false
+}
