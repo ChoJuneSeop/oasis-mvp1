@@ -1,0 +1,155 @@
+name: GH-1L v1.0.2 frozen confirmatory
+
+on:
+  push:
+    branches: [experiment/governance-harness-gh1l-v102-confirmatory]
+    paths:
+      - '.github/workflows/gh1l-v102-confirmatory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  confirmatory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact count-frozen confirmatory snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: 17d2c7d5e2764e7e3fd4330e3c6f1335e75410c2
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify exact lineage and frozen count
+        run: |
+          test "$(git rev-parse HEAD)" = "17d2c7d5e2764e7e3fd4330e3c6f1335e75410c2"
+          git diff --name-only 135012775fa1a3fd4c912b4df0f563b75befe781 HEAD | sort > /tmp/confirmatory-diff.txt
+          printf '%s\n' \
+            'research/governance_harness_gh1l/design/CONFIRMATORY_COUNT_FREEZE.json' \
+            'research/governance_harness_gh1l/validation/PILOT_V1_0_2_EVIDENCE.json' | sort > /tmp/expected-diff.txt
+          diff -u /tmp/expected-diff.txt /tmp/confirmatory-diff.txt
+          echo 'a4fb9e70f16349a30d2a1c0838e9d04c359109988f98118f1f25a342fb7cd1a5  research/governance_harness_gh1l/design/CONFIRMATORY_COUNT_FREEZE.json' | sha256sum -c -
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/governance_harness_gh1l/design/CONFIRMATORY_COUNT_FREEZE.json').read_text())
+          assert c['status'] == 'COUNT_FROZEN'
+          assert c['spec_version'] == 'GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT'
+          assert c['confirmatory_blocks'] == 12
+          assert c['pilot_block_count'] == 3
+          assert c['pilot_excluded_from_confirmatory'] is True
+          assert c['pilot_result_sha256'] == '2ea71107f03d0f6ace4c9c876fe772cc83224180bfd5ac199749701c1bf8ff0d'
+          PY
+
+      - name: Compile frozen confirmatory modules
+        run: >-
+          python -m compileall -q
+          research/governance_harness_gh1l
+          research/governance_harness_v01
+          research/oasis_core_v11
+
+      - name: Execute frozen confirmatory
+        run: >-
+          python -m research.governance_harness_gh1l.runner.run_experiment
+          --stage confirmatory
+          --output /tmp/CONFIRMATORY_RESULT_V102.json
+
+      - name: Validate confirmatory execution contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('/tmp/CONFIRMATORY_RESULT_V102.json').read_text())
+          assert r['experiment'] == 'GH-1L'
+          assert r['stage'] == 'confirmatory'
+          assert r['spec_version'] == 'GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT'
+          assert r['block_count'] == 12
+          assert r['run_count'] == 60
+          assert r['horizon'] == 512
+          assert r['run_order'] == ['G1', 'G2', 'G3', 'G4', 'G5']
+          assert r['fresh_process_contract']['pass'] is True
+          assert r['pilot_excluded_from_confirmatory'] is True
+          assert r['archive_sha256'] == '73ddd1cd810fa25bacb2dda4181a5d63579c657e57ef5f8441cd2f75ceefc8bb'
+          assert r['confirmatory_count_freeze']['confirmatory_blocks'] == 12
+          assert r['confirmatory_count_freeze']['pilot_result_sha256'] == '2ea71107f03d0f6ace4c9c876fe772cc83224180bfd5ac199749701c1bf8ff0d'
+          for arm, metrics in r['arm_metric_means'].items():
+              assert metrics['unsafe_or_invalid_rate'] == 0.0, (arm, metrics)
+              assert metrics['unresolved_rate'] == 0.0, (arm, metrics)
+          metric = 'history_sensitive_resolution_rate_G1_minus_G3'
+          assert len(r['paired_metrics'][metric]) == 12
+          print(json.dumps({
+              'spec_version': r['spec_version'],
+              'blocks': r['block_count'],
+              'runs': r['run_count'],
+              'fresh_process_contract': r['fresh_process_contract'],
+              'archive_sha256': r['archive_sha256'],
+              'arm_metric_means': r['arm_metric_means'],
+              'paired_metrics': r['paired_metrics'],
+          }, indent=2))
+          PY
+
+      - name: Produce confirmatory analysis summary
+        run: |
+          python - <<'PY' > /tmp/CONFIRMATORY_SUMMARY_V102.json
+          import json, math, statistics
+          from pathlib import Path
+          r = json.loads(Path('/tmp/CONFIRMATORY_RESULT_V102.json').read_text())
+
+          def summarize(values):
+              xs = [float(x) for x in values]
+              n = len(xs)
+              mean = sum(xs) / n
+              sd = statistics.stdev(xs) if n > 1 else 0.0
+              se = sd / math.sqrt(n) if n else 0.0
+              return {
+                  'n': n,
+                  'mean': mean,
+                  'sample_sd': sd,
+                  'normal_approx_95ci': [mean - 1.96 * se, mean + 1.96 * se],
+                  'min': min(xs),
+                  'max': max(xs),
+                  'values': xs,
+              }
+
+          paired = {name: summarize(values) for name, values in r['paired_metrics'].items()}
+          summary = {
+              'experiment': 'GH-1L',
+              'stage': 'confirmatory',
+              'spec_version': r['spec_version'],
+              'frozen_code_head': '135012775fa1a3fd4c912b4df0f563b75befe781',
+              'count_frozen_snapshot': '17d2c7d5e2764e7e3fd4330e3c6f1335e75410c2',
+              'confirmatory_blocks': r['block_count'],
+              'confirmatory_runs': r['run_count'],
+              'pilot_excluded_from_confirmatory': r['pilot_excluded_from_confirmatory'],
+              'fresh_process_contract': r['fresh_process_contract'],
+              'archive_sha256': r['archive_sha256'],
+              'arm_metric_means': r['arm_metric_means'],
+              'paired_effects': paired,
+              'primary_metric': 'history_sensitive_resolution_rate_G1_minus_G3',
+              'primary_target_delta_frozen_preconfirmatory': 0.2,
+              'aggregate_score': None,
+              'interpretation_rule': 'Report confirmatory estimates by contrast. Do not pool pilot, do not retune rules, and do not create an aggregate winner score.'
+          }
+          print(json.dumps(summary, indent=2))
+          PY
+          cat /tmp/CONFIRMATORY_SUMMARY_V102.json
+
+      - name: Record immutable confirmatory hashes
+        run: |
+          sha256sum /tmp/CONFIRMATORY_RESULT_V102.json /tmp/CONFIRMATORY_SUMMARY_V102.json > /tmp/SHA256SUMS_CONFIRMATORY_V102.txt
+          cat /tmp/SHA256SUMS_CONFIRMATORY_V102.txt
+
+      - name: Upload immutable confirmatory evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: gh1l-v102-confirmatory-17d2c7d
+          path: |
+            /tmp/CONFIRMATORY_RESULT_V102.json
+            /tmp/CONFIRMATORY_SUMMARY_V102.json
+            /tmp/SHA256SUMS_CONFIRMATORY_V102.txt
+          if-no-files-found: error
+          retention-days: 90
