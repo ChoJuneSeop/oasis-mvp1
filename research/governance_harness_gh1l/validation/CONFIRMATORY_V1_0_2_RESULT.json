@@ -1,0 +1,87 @@
+{
+  "experiment": "GH-1L",
+  "stage": "confirmatory",
+  "status": "COMPLETE",
+  "spec_version": "GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT",
+  "frozen_code_head": "135012775fa1a3fd4c912b4df0f563b75befe781",
+  "count_frozen_snapshot": "17d2c7d5e2764e7e3fd4330e3c6f1335e75410c2",
+  "workflow_run_id": 35062859122,
+  "artifact": {
+    "id": 10432564886,
+    "name": "gh1l-v102-confirmatory-17d2c7d",
+    "zip_sha256": "07faebef45fba48b992be9eba1a22ec0964029cc98e87b2138f3b7486ad5fc4e",
+    "confirmatory_result_sha256": "a937ebd4bf22977dfbb44b015a136745dd7e378b8d9cb18363fec2880ee1a0e7",
+    "confirmatory_summary_sha256": "07e2436b8764d3c66fb2753006ab60fc5bf3d893a44c0536b1f948b3ac9c7e16"
+  },
+  "execution": {
+    "confirmatory_blocks": 12,
+    "runs": 60,
+    "horizon_per_run": 512,
+    "pilot_excluded": true,
+    "fresh_process_contract": true,
+    "archive_sha256": "73ddd1cd810fa25bacb2dda4181a5d63579c657e57ef5f8441cd2f75ceefc8bb",
+    "unsafe_or_invalid_rate_all_arms": 0.0,
+    "unresolved_rate_all_arms": 0.0
+  },
+  "arm_metric_means": {
+    "G1": {
+      "resolution_rate": 1.0,
+      "history_sensitive_resolution_rate": 1.0,
+      "archive_access_rate": 0.009765625
+    },
+    "G2": {
+      "resolution_rate": 1.0,
+      "history_sensitive_resolution_rate": 1.0,
+      "archive_access_rate": 1.0
+    },
+    "G3": {
+      "resolution_rate": 0.994140625,
+      "history_sensitive_resolution_rate": 0.4,
+      "archive_access_rate": 0.0
+    },
+    "G4": {
+      "resolution_rate": 0.994140625,
+      "history_sensitive_resolution_rate": 0.4,
+      "archive_access_rate": 0.009765625
+    },
+    "G5": {
+      "resolution_rate": 0.9952799479166666,
+      "history_sensitive_resolution_rate": 0.5166666666666667,
+      "archive_access_rate": 0.009765625
+    }
+  },
+  "paired_effects": {
+    "history_sensitive_resolution_rate_G1_minus_G3": {
+      "n": 12,
+      "mean": 0.6,
+      "sample_sd": 0.0,
+      "normal_approx_95ci": [0.6, 0.6],
+      "frozen_target_delta": 0.2,
+      "values": [0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6]
+    },
+    "archive_access_rate_G1_minus_G2": {
+      "n": 12,
+      "mean": -0.990234375,
+      "sample_sd": 0.0,
+      "normal_approx_95ci": [-0.990234375, -0.990234375],
+      "values": [-0.990234375, -0.990234375, -0.990234375, -0.990234375, -0.990234375, -0.990234375, -0.990234375, -0.990234375, -0.990234375, -0.990234375, -0.990234375, -0.990234375]
+    },
+    "history_sensitive_resolution_rate_G1_minus_G4": {
+      "n": 12,
+      "mean": 0.6,
+      "sample_sd": 0.0,
+      "normal_approx_95ci": [0.6, 0.6],
+      "values": [0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6]
+    },
+    "history_sensitive_resolution_rate_G1_minus_G5": {
+      "n": 12,
+      "mean": 0.48333333333333334,
+      "sample_sd": 0.10298573010888742,
+      "normal_approx_95ci": [0.42506367111229815, 0.5416029955543685],
+      "values": [0.6, 0.4, 0.6, 0.4, 0.6, 0.4, 0.4, 0.4, 0.6, 0.4, 0.6, 0.4]
+    }
+  },
+  "aggregate_score": null,
+  "claim_boundary": "The confirmatory result supports contrast-specific conclusions only under the frozen synthetic 512-tick GH-1L world. It does not establish general AI superiority, real-world CARLA performance, responsibility effects, or unrestricted long-term governance efficacy.",
+  "prior_v1_0_1_pilot": "INVALIDATED_FOR_INFERENCE"
+}
