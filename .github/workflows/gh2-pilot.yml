@@ -36,7 +36,7 @@ jobs:
         shell: bash
         run: |
           python - <<'PY'
-          import json, math, statistics
+          import json, statistics
           from pathlib import Path
           from research.governance_harness_gh2.runner import evaluate_block
           from research.governance_harness_gh2.models import ARMS
@@ -66,7 +66,7 @@ jobs:
                   arm_data = block['arms'][arm]
                   metrics[arm].append(float(arm_data['resolution_rate']))
                   for d in arm_data['decisions']:
-                      structural['selected_equals_realized'] &= d['selected_action'] == d['realized_action']
+                      structural['selected_equals_realized'] &= d['enacted_selected'] == d['realized_action']
                       structural['one_realization_per_decision'] &= int(d['realization_count']) == 1
                       cands = tuple(d['candidate_ids'])
                       if reference_candidates is None:
