@@ -9,6 +9,8 @@ from pathlib import Path
 from research.governance_harness_gh1l.admission.preflight import evaluate_gates
 from research.governance_harness_gh1l.models import ARMS, FORBIDDEN_RUNTIME_KEYS
 from research.governance_harness_gh1l.runner.engine import LongHorizonRunner
+from research.governance_harness_gh1l.runner.freeze_confirmatory_count import derive_confirmatory_count
+from research.governance_harness_gh1l.runner.run_experiment import probe_fresh_arm_processes
 from research.governance_harness_gh1l.scenario.generator import (
     SCENARIO_CLASSES, generate_long_world, runtime_stream,
 )
@@ -21,6 +23,8 @@ class GH1LAdmissionTests(unittest.TestCase):
         cls.archive = build_frozen_archive()
         cls.world = generate_long_world()
         cls.runtime = runtime_stream(cls.world)
+        here = Path(__file__).resolve().parents[1]
+        cls.manifest = json.loads((here / "design" / "FREEZE_MANIFEST.json").read_text())
 
     def test_01_prehistory_passed_real_closure(self):
         self.assertTrue(all(x.closure_entry_id for x in self.archive))
@@ -85,7 +89,9 @@ class GH1LAdmissionTests(unittest.TestCase):
 
     def test_12_counterfactual_never_actuates(self):
         case = next(x for x in self.world if x.truth.scenario_class == "history-critical")
-        result = LongHorizonRunner(self.archive).decide("G1", case.frame_id, case.runtime.as_runtime_mapping(), counterfactual=True)
+        result = LongHorizonRunner(self.archive).decide(
+            "G1", case.frame_id, case.runtime.as_runtime_mapping(), counterfactual=True
+        )
         self.assertEqual(result.actuator_count, 0)
         self.assertIsNone(result.realized_action)
 
@@ -97,12 +103,50 @@ class GH1LAdmissionTests(unittest.TestCase):
 
     def test_14_confirmatory_runner_is_locked_before_pilot_count_freeze(self):
         root = Path(__file__).resolve().parents[3]
-        proc = subprocess.run([sys.executable, "-m", "research.governance_harness_gh1l.runner.run_experiment",
-                               "--stage", "confirmatory"], cwd=root, capture_output=True, text=True)
+        proc = subprocess.run(
+            [sys.executable, "-m", "research.governance_harness_gh1l.runner.run_experiment",
+             "--stage", "confirmatory"],
+            cwd=root, capture_output=True, text=True,
+        )
         self.assertNotEqual(proc.returncode, 0)
         self.assertIn("count freeze", proc.stderr)
 
-    def test_15_all_preexecution_gates_pass(self):
+    def test_15_actual_worker_path_uses_fresh_processes(self):
+        evidence = probe_fresh_arm_processes()
+        self.assertTrue(evidence["pass"], evidence)
+        self.assertTrue(evidence["all_workers_clean"])
+        self.assertTrue(evidence["worker_tokens_unique"])
+
+    def test_16_paired_metric_and_pilot_blocks_are_frozen(self):
+        self.assertEqual(tuple(self.manifest["run_order"]), ARMS)
+        self.assertEqual(self.manifest["pilot_blocks"], 3)
+        self.assertEqual(len(self.manifest["pilot_seeds"]), 3)
+        self.assertEqual(
+            self.manifest["primary_paired_metric"],
+            "history_sensitive_resolution_rate_G1_minus_G3",
+        )
+        self.assertTrue(set(self.manifest["history_sensitive_classes"]).issubset(set(SCENARIO_CLASSES)))
+
+    def test_17_confirmatory_count_derivation_is_paired_and_deterministic(self):
+        metric = self.manifest["primary_paired_metric"]
+        pilot = {
+            "experiment": "GH-1L",
+            "stage": "pilot",
+            "spec_version": self.manifest["spec_version"],
+            "fresh_process_contract": {"pass": True},
+            "block_count": self.manifest["pilot_blocks"],
+            "paired_metrics": {metric: [0.0, 0.2, 0.4]},
+        }
+        first = derive_confirmatory_count(pilot, self.manifest)
+        second = derive_confirmatory_count(pilot, self.manifest)
+        self.assertEqual(first, second)
+        self.assertGreaterEqual(
+            first["confirmatory_blocks"],
+            self.manifest["power_analysis"]["min_confirmatory_blocks"],
+        )
+        self.assertEqual(first["primary_paired_metric"], metric)
+
+    def test_18_all_preexecution_gates_pass(self):
         gates = evaluate_gates()
         self.assertTrue(all(x["pass"] for x in gates.values()), json.dumps(gates, indent=2))
 
