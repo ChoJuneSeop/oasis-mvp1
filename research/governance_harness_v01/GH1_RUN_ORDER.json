@@ -1,0 +1,11 @@
+{
+  "spec_version": "GH1_RUN_ORDER_V1",
+  "pilot_excluded_from_confirmatory": true,
+  "arm_order_policy": "pre_generated_balanced_permutation",
+  "pilot_blocks": [
+    ["G1","G2","G3"],
+    ["G2","G3","G1"],
+    ["G3","G1","G2"]
+  ],
+  "confirmatory_order_generation_seed_ref": "GH1_SEED_MANIFEST.json:run_order_rng"
+}
