@@ -1,0 +1,87 @@
+name: GH-3 v1.0 outcome-revalidation pre-execution gate
+
+on:
+  push:
+    branches: [feature/governance-harness-gh3]
+    paths:
+      - 'research/governance_harness_gh3/**'
+      - '.github/workflows/gh3-preexecution.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preexecution:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Compile GH-3 and frozen dependencies
+        run: >-
+          python -m compileall -q
+          research/governance_harness_gh3
+          research/governance_harness_v01
+          research/governance_harness_gh1l
+          research/governance_harness_gh2
+          research/oasis_core_v11
+          research/carla_v22_harness_v11
+
+      - name: Verify GH-1 GH-1L GH-2 and Core remain frozen
+        run: |
+          git diff --exit-code fb3b851413ac621b3d15c8082e2802c5b06d60f6 -- \
+            research/governance_harness_v01 \
+            research/governance_harness_gh1l \
+            research/governance_harness_gh2 \
+            research/oasis_core_v11 \
+            research/carla_v22_harness_v11
+
+      - name: GH-3 admission tests
+        run: python -m unittest research.governance_harness_gh3.admission.test_gh3 -v
+
+      - name: GH-3 structural preflight
+        run: |
+          python -m research.governance_harness_gh3.admission.preflight | tee /tmp/gh3-preflight.json
+          grep -q '"status": "EXPERIMENT_READY"' /tmp/gh3-preflight.json
+          grep -q '"spec_version": "GH3_EXPERIMENT_V1_0_FINAL"' /tmp/gh3-preflight.json
+          grep -q '"experiment_executed": false' /tmp/gh3-preflight.json
+
+      - name: Frozen Governance Harness regressions
+        run: >-
+          python -m unittest
+          research.governance_harness_v01.test_governance_attack_v04
+          research.governance_harness_v01.test_governance_attack
+          research.governance_harness_v01.test_governance_harness -v
+
+      - name: Frozen Core regressions
+        run: >-
+          python -m unittest
+          research.oasis_core_v11.test_current_relational_core
+          research.oasis_core_v11.test_history_admission -v
+
+      - name: Frozen Canonical Harness regressions
+        run: python -m unittest discover -s research/carla_v22_harness_v11 -p 'test_*.py' -v
+
+      - name: Confirm GH-3 scientific outputs do not exist
+        run: |
+          test ! -f research/governance_harness_gh3/results/PILOT_RESULT_V1_0.json
+          test ! -f research/governance_harness_gh3/results/CONFIRMATORY_RESULT_V1_0.json
+
+      - name: Confirm feature branch keeps scientific execution locked
+        run: |
+          python -m research.governance_harness_gh3.runner --stage dry-run > /tmp/gh3-dry.json
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/gh3-dry.json'))
+          assert p['experiment_executed'] is False
+          assert p['evaluator_used'] is False
+          assert p['confirmatory_metric_computed'] is False
+          assert p['fresh_process'] is True
+          PY
