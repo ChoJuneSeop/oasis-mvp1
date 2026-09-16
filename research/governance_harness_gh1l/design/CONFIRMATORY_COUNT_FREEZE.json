@@ -1,0 +1,22 @@
+{
+  "status": "COUNT_FROZEN",
+  "spec_version": "GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT",
+  "primary_paired_metric": "history_sensitive_resolution_rate_G1_minus_G3",
+  "paired_values": [
+    0.6,
+    0.6,
+    0.6
+  ],
+  "paired_variance": 0.0,
+  "alpha_z": 1.96,
+  "power_z": 0.84,
+  "target_delta": 0.2,
+  "min_confirmatory_blocks": 12,
+  "formula": "max(min_blocks, ceil(((z_alpha+z_power)^2*paired_variance)/(target_delta^2)))",
+  "calculated_blocks": 0,
+  "confirmatory_blocks": 12,
+  "pilot_block_count": 3,
+  "pilot_excluded_from_confirmatory": true,
+  "pilot_result_sha256": "2ea71107f03d0f6ace4c9c876fe772cc83224180bfd5ac199749701c1bf8ff0d",
+  "pilot_result_path": "/tmp/PILOT_RESULT_V102.json"
+}
