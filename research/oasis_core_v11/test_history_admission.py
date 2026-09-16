@@ -1,4 +1,5 @@
 import unittest
+from dataclasses import dataclass
 
 from research.g3_2_sidecar.common import RelationElementRef
 from research.g3_2_sidecar.history import HistoryEntry
@@ -54,20 +55,34 @@ class GoodExtractor:
         )
 
 
+@dataclass(frozen=True)
+class Experience:
+    experience_id: str
+    provenance_ref: str
+    completed_tau: float
+    content: dict
+
+
+@dataclass(frozen=True)
+class View:
+    items: tuple[Experience, ...]
+
+
 class HistoryAdmissionTests(unittest.TestCase):
-    def test_closed_realized_entry_enters_future_history(self):
-        core = make_core(())
+    def test_closed_realized_entry_materializes_for_future_participating_view(self):
+        core = make_core()
         bridge = HistoryAdmissionBridge(core=core, extractor=GoodExtractor())
         records = bridge.admit(closed_entry())
         self.assertEqual(len(records), 1)
-        self.assertEqual(len(core.history_records()), 1)
-        next_view = core.open_epoch(observation(), 10.25)
+        self.assertFalse(hasattr(core, "history_records"))
+        experience = Experience("E-new", "prov:E-new", 10.20, {"relation_records": records})
+        next_view = core.open_epoch(observation(), 10.25, View((experience,)))
         key = ("E-new", "rel-closed-approach")
         self.assertIn(key, next_view.role_trace_by_relation)
         self.assertIn("yield", next_view.generated_by_relation[key])
 
-    def test_no_change_or_persistence_outcome_can_still_be_completed_history(self):
-        core = make_core(())
+    def test_no_change_or_persistence_outcome_can_still_materialize(self):
+        core = make_core()
         bridge = HistoryAdmissionBridge(core=core, extractor=GoodExtractor())
         records = bridge.admit(closed_entry(outcome="no material state change; relation persisted until closure"))
         self.assertEqual(records[0].source.experience_id, "E-new")
@@ -78,7 +93,7 @@ class HistoryAdmissionTests(unittest.TestCase):
                 record = super().extract(entry)[0]
                 return (HistoricalRelationRecord(source=RelationElementRef("different-entry", record.source.relation_element_id, entry.relation_end_tau, {}), semantic=record.semantic),)
         with self.assertRaises(HistoryAdmissionError):
-            HistoryAdmissionBridge(make_core(()), WrongIdExtractor()).admit(closed_entry())
+            HistoryAdmissionBridge(make_core(), WrongIdExtractor()).admit(closed_entry())
 
     def test_preclosure_or_late_completion_timestamp_is_rejected(self):
         class WrongTimeExtractor(GoodExtractor):
@@ -86,7 +101,7 @@ class HistoryAdmissionTests(unittest.TestCase):
                 record = super().extract(entry)[0]
                 return (HistoricalRelationRecord(source=RelationElementRef(entry.entry_id, record.source.relation_element_id, entry.relation_end_tau - 0.05, {}), semantic=record.semantic),)
         with self.assertRaises(HistoryAdmissionError):
-            HistoryAdmissionBridge(make_core(()), WrongTimeExtractor()).admit(closed_entry())
+            HistoryAdmissionBridge(make_core(), WrongTimeExtractor()).admit(closed_entry())
 
     def test_recency_or_memory_importance_cannot_be_smuggled_into_semantic_context(self):
         class RecencyExtractor(GoodExtractor):
@@ -108,13 +123,13 @@ class HistoryAdmissionTests(unittest.TestCase):
                     ),
                 )
         with self.assertRaises(HistoryAdmissionError):
-            HistoryAdmissionBridge(make_core(()), RecencyExtractor()).admit(closed_entry())
+            HistoryAdmissionBridge(make_core(), RecencyExtractor()).admit(closed_entry())
 
-    def test_empty_relation_extraction_is_not_saved_as_fake_experience(self):
+    def test_empty_relation_extraction_is_not_materialized_as_fake_experience(self):
         class EmptyExtractor:
             def extract(self, entry): return ()
         with self.assertRaises(HistoryAdmissionError):
-            HistoryAdmissionBridge(make_core(()), EmptyExtractor()).admit(closed_entry())
+            HistoryAdmissionBridge(make_core(), EmptyExtractor()).admit(closed_entry())
 
 
 if __name__ == "__main__":
