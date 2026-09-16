@@ -73,22 +73,18 @@ jobs:
                   for p in d["responsibility"]["profiles"]:
                       assert "score" not in p
 
-          # Every arm must see the identical candidate set at every frame.
           for idx in range(66):
               candidate_sets = {tuple(by_arm_worker[a]["decisions"][idx]["candidate_ids"]) for a in ARMS}
               assert candidate_sets == {("continue-flow", "yield-space")}
 
-          # R1 is responsibility-bound and must enact its responsibility selection.
           for d in by_arm_worker["R1_CURRENT_BOUND"]["decisions"]:
               assert d["responsibility_bound"] is True
               assert d["responsibility"]["source"] == "current"
               assert d["responsibility"]["responsibility_selected"] == d["enacted_selected"]
 
-          # R2 is record-only, R3 is identity-permuted.
           assert all(d["responsibility_bound"] is False for d in by_arm_worker["R2_RECORD_ONLY"]["decisions"])
           assert all(d["responsibility"]["source"] == "permuted" for d in by_arm_worker["R3_PERMUTED"]["decisions"])
 
-          # R4 is stale only within each critical->relief pair and resets at each new pair.
           r4 = by_arm_worker["R4_STALE"]["decisions"]
           for idx, d in enumerate(r4):
               if idx % 2 == 0:
@@ -222,7 +218,11 @@ jobs:
           assert p['experiment_snapshot_sha'] == '6d1a6606c0dc06074832474d2b29fe1140e5f0bd'
           assert p['confirmatory_design']['total_decision_realization_units'] == 264
           assert p['aggregate_score'] is None
-          assert all(p['structural_invariants'].values())
+          for key, value in p['structural_invariants'].items():
+              if key == 'runtime_evaluator_leakage':
+                  assert value is False
+              else:
+                  assert value is True, (key, value)
           assert p['pilot_provenance']['used_for_sample_size'] is False
           assert p['pilot_provenance']['used_for_hypothesis'] is False
           PY
