@@ -1,4 +1,5 @@
 import unittest
+from dataclasses import dataclass
 
 from research.carla_v22_harness_v11.canonical_harness import PresentObservation, VehicleActuation
 from research.g3_2_sidecar.common import RelationElementRef
@@ -49,6 +50,33 @@ def history_record(exp_id: str, rel_id: str, completed_at: float):
             historical_roles=("recognition",),
             possibility_links=("yield",),
         ),
+    )
+
+
+@dataclass(frozen=True)
+class Experience:
+    experience_id: str
+    provenance_ref: str
+    completed_tau: float
+    content: dict
+
+
+@dataclass(frozen=True)
+class View:
+    items: tuple[Experience, ...]
+
+
+def view_for(records):
+    return View(
+        tuple(
+            Experience(
+                r.source.experience_id,
+                f"prov:{r.source.experience_id}",
+                float(r.source.completed_at_tau),
+                {"relation_records": (r,)},
+            )
+            for r in records
+        )
     )
 
 
@@ -168,24 +196,23 @@ class Actuation:
         return VehicleActuation(throttle=0.1, brake=0.0, steer=0.0)
 
 
-def make_core(history, *, present_relation=True, reconstruction=None, relation_operator=None):
+def make_core(*, present_relation=True, reconstruction=None, relation_operator=None, choice_operator=None, actuation_operator=None):
     return CurrentRelationalCoreV11(
         relation_builder=RelationBuilder(present_relation),
         candidate_provider=CandidateProvider(),
         relation_operator=relation_operator or MatchingRelationOperator(),
         reconstruction_operator=reconstruction or NoReconstruction(),
         responsibility_operator=Responsibility(),
-        choice_operator=Choice(),
-        actuation_operator=Actuation(),
-        history=history,
+        choice_operator=choice_operator or Choice(),
+        actuation_operator=actuation_operator or Actuation(),
     )
 
 
 class CoreV11Tests(unittest.TestCase):
     def test_age_is_not_available_to_relation_operator(self):
         op = MatchingRelationOperator()
-        core = make_core((history_record("E-old", "r1", 1.0),), relation_operator=op)
-        core.open_epoch(observation(), TAU)
+        core = make_core(relation_operator=op)
+        core.open_epoch(observation(), TAU, view_for((history_record("E-old", "r1", 1.0),)))
         self.assertTrue(op.seen_past_objects)
         self.assertFalse(hasattr(op.seen_past_objects[0], "completed_at_tau"))
         self.assertFalse(hasattr(op.seen_past_objects[0], "age"))
@@ -194,20 +221,20 @@ class CoreV11Tests(unittest.TestCase):
         a = (history_record("E-a", "r1", 1.0), history_record("E-b", "r2", 9.0))
         b = (history_record("E-a", "r1", 9.0), history_record("E-b", "r2", 1.0))
         self.assertEqual(
-            make_core(a).open_epoch(observation(), TAU).possibility_distribution,
-            make_core(b).open_epoch(observation(), TAU).possibility_distribution,
+            make_core().open_epoch(observation(), TAU, view_for(a)).possibility_distribution,
+            make_core().open_epoch(observation(), TAU, view_for(b)).possibility_distribution,
         )
 
-    def test_history_insertion_order_does_not_change_distribution(self):
+    def test_participating_insertion_order_does_not_change_distribution(self):
         records = (history_record("E-z", "r9", 3.0), history_record("E-a", "r1", 7.0))
         self.assertEqual(
-            make_core(records).open_epoch(observation(), TAU).possibility_distribution,
-            make_core(tuple(reversed(records))).open_epoch(observation(), TAU).possibility_distribution,
+            make_core().open_epoch(observation(), TAU, view_for(records)).possibility_distribution,
+            make_core().open_epoch(observation(), TAU, view_for(tuple(reversed(records)))).possibility_distribution,
         )
 
     def test_no_current_relation_means_no_past_participation(self):
-        core = make_core((history_record("E-old", "r1", 1.0),), present_relation=False)
-        view = core.open_epoch(observation(), TAU)
+        core = make_core(present_relation=False)
+        view = core.open_epoch(observation(), TAU, view_for((history_record("E-old", "r1", 1.0),)))
         self.assertEqual(view.role_trace_by_relation, {})
         self.assertEqual(view.generated_by_relation, {})
         self.assertEqual(view.possibility_distribution, {"proceed": 0.5, "yield": 0.5})
@@ -222,21 +249,23 @@ class CoreV11Tests(unittest.TestCase):
                         role_trace=("generation",),
                     ),
                 )
-        core = make_core((history_record("E-old", "r1", 1.0),), relation_operator=BadOperator())
-        with self.assertRaises(CoreV11InvariantError): core.open_epoch(observation(), TAU)
+        core = make_core(relation_operator=BadOperator())
+        with self.assertRaises(CoreV11InvariantError):
+            core.open_epoch(observation(), TAU, view_for((history_record("E-old", "r1", 1.0),)))
 
     def test_reconstruction_candidate_requires_current_evidence(self):
         class BadReconstruction:
             def reconstruct(self, **kwargs):
                 return ReconstructionResult(additional_candidates=(PossibilityCandidate("invented", ()),))
-        core = make_core((history_record("E-old", "r1", 1.0),), reconstruction=BadReconstruction())
-        with self.assertRaises(CoreV11InvariantError): core.open_epoch(observation(), TAU)
+        core = make_core(reconstruction=BadReconstruction())
+        with self.assertRaises(CoreV11InvariantError):
+            core.open_epoch(observation(), TAU, view_for((history_record("E-old", "r1", 1.0),)))
 
     def test_redundancy_can_make_individual_effect_zero_but_joint_effect_nonzero(self):
         r1 = history_record("E-1", "r1", 1.0)
         r2 = history_record("E-2", "r2", 8.0)
-        core = make_core((r1, r2), reconstruction=RedundancyReconstruction(), relation_operator=SymmetricRedundantRelationOperator())
-        full = core.open_epoch(observation(), TAU).possibility_distribution
+        core = make_core(reconstruction=RedundancyReconstruction(), relation_operator=SymmetricRedundantRelationOperator())
+        full = core.open_epoch(observation(), TAU, view_for((r1, r2))).possibility_distribution
         one_out = core.ablate_relation(observation(), r1.source, TAU)
         other_out = core.ablate_relation(observation(), r2.source, TAU)
         both_out = core.ablate_relation_group(observation(), (r1.source, r2.source), TAU)
@@ -247,8 +276,8 @@ class CoreV11Tests(unittest.TestCase):
         self.assertNotIn("reconstructed-yield", both_out)
 
     def test_responsibility_remains_uvit_vector_not_scalar(self):
-        core = make_core((history_record("E-old", "r1", 1.0),))
-        core.open_epoch(observation(), TAU)
+        core = make_core()
+        core.open_epoch(observation(), TAU, view_for((history_record("E-old", "r1", 1.0),)))
         evaluation = core._last_evaluation
         self.assertIsNotNone(evaluation)
         vector = evaluation.responsibilities["yield"]
@@ -256,15 +285,29 @@ class CoreV11Tests(unittest.TestCase):
         self.assertFalse(hasattr(vector, "score"))
 
     def test_reconstruction_uses_authoritative_tau_not_epoch_derived_time(self):
-        core = make_core((history_record("E-old", "r1", 1.0),), reconstruction=TauRecordingReconstruction())
+        core = make_core(reconstruction=TauRecordingReconstruction())
         tau = 13.7
-        view = core.open_epoch(observation(), tau)
+        view = core.open_epoch(observation(), tau, view_for((history_record("E-old", "r1", 1.0),)))
         self.assertEqual(view.reconstructions[0].observed_at_tau, tau)
         self.assertNotEqual(tau, observation().epoch * 0.05)
 
-    def test_future_history_is_rejected_against_current_tau(self):
-        core = make_core((history_record("E-future", "r1", 11.0),))
-        with self.assertRaises(CoreV11InvariantError): core.open_epoch(observation(), 10.0)
+    def test_future_participating_experience_is_rejected_against_current_tau(self):
+        core = make_core()
+        with self.assertRaises(CoreV11InvariantError):
+            core.open_epoch(observation(), 10.0, view_for((history_record("E-future", "r1", 11.0),)))
+
+    def test_direct_historical_injection_is_rejected(self):
+        with self.assertRaises(CoreV11InvariantError):
+            CurrentRelationalCoreV11(
+                relation_builder=RelationBuilder(),
+                candidate_provider=CandidateProvider(),
+                relation_operator=MatchingRelationOperator(),
+                reconstruction_operator=NoReconstruction(),
+                responsibility_operator=Responsibility(),
+                choice_operator=Choice(),
+                actuation_operator=Actuation(),
+                history=(history_record("E-old", "r1", 1.0),),
+            )
 
 
 if __name__ == "__main__":
