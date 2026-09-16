@@ -1,0 +1,37 @@
+{
+  "experiment": "GH-2",
+  "version": "v1.1",
+  "principle": "Responsibility-centered Governance",
+  "status": "CONFIRMATORY_COMPLETE",
+  "frozen_experiment_snapshot_sha": "6d1a6606c0dc06074832474d2b29fe1140e5f0bd",
+  "pilot": {
+    "status": "STRUCTURAL_PASS",
+    "run_id": 35077799681,
+    "evaluator_used": false,
+    "confirmatory_metric_computed": false
+  },
+  "confirmatory": {
+    "status": "COMPLETE",
+    "canonical_evidence_run_id": 35078074065,
+    "first_completed_experiment_run_id": 35077973030,
+    "first_run_post_validation_status": "FALSE_NEGATIVE_WRAPPER_ERROR",
+    "frames_per_arm": 66,
+    "arms": 4,
+    "total_decision_realization_units": 264,
+    "primary_contrast_R1_minus_R2": 0.5,
+    "secondary_contrast_R1_minus_R3": 1.0,
+    "secondary_contrast_R1_minus_R4": 0.5,
+    "aggregate_score": null
+  },
+  "scientific_closure": {
+    "question": "Does current-context U/I/V/T responsibility binding causally change responsibility-contract-consistent selection relative to responsibility being recorded but not bound?",
+    "answer_within_frozen_scope": "YES",
+    "basis": "R1 and R2 shared current observations, Core possibility sets/distributions, empty history participation, and current responsibility computation; binding status alone separated contract-consistent resolution by 33 of 66 frames. Candidate-identity and stale-context ablations produced distinct prespecified contrasts.",
+    "generalization": "NOT_CLAIMED_BEYOND_FROZEN_SYNTHETIC_CONTRACT"
+  },
+  "frozen_lineage_modified": false,
+  "post_result_rule_tuning": false,
+  "next_principle": "Outcome-based Revalidation",
+  "next_experiment": "GH-3",
+  "next_state": "DESIGN_AND_PREEXECUTION_ONLY_UNTIL_SEPARATELY_FROZEN"
+}
