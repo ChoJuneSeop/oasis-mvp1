@@ -27,6 +27,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: GH-1 actual Core admission ADM-01 through ADM-12
+        run: python -m unittest research.governance_harness_v01.test_core_governance_admission -v
       - name: ATK-01 through ATK-16 and Governance regressions
         run: >-
           python -m unittest
@@ -40,3 +42,5 @@ jobs:
           python -m unittest
           research.oasis_core_v11.test_current_relational_core
           research.oasis_core_v11.test_history_admission -v
+      - name: Compile Governance and Core modules
+        run: python -m compileall -q research/governance_harness_v01 research/oasis_core_v11
