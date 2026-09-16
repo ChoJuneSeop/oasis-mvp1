@@ -24,7 +24,7 @@ jobs:
 
       - name: Verify GH-1 and Core remain unchanged from frozen base
         run: |
-          git diff --exit-code ea9261b15663a95d81919d7de0bce381206a -- research/governance_harness_v01 research/oasis_core_v11
+          git diff --exit-code ea9261b15663a95d819aa9c9c9e5b9e76e9d5352 -- research/governance_harness_v01 research/oasis_core_v11
 
       - name: GH-1L amended admission suite
         run: python -m unittest research.governance_harness_gh1l.admission.test_gh1l -v
