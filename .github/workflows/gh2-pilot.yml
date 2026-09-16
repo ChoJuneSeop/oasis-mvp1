@@ -1,0 +1,137 @@
+name: GH-2 responsibility pilot
+
+on:
+  push:
+    branches:
+      - experiment/governance-harness-gh2-pilot
+
+permissions:
+  contents: read
+
+jobs:
+  pilot:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact EXPERIMENT_READY snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: 981482067f3fca458879bf94b3c4d12e77ed8e95
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify exact frozen snapshot
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD)" = "981482067f3fca458879bf94b3c4d12e77ed8e95"
+          git diff --exit-code 5861b08d6b48f79b88f4f160bbb425690708ccd4 -- research/governance_harness_v01 research/governance_harness_gh1l research/oasis_core_v11
+          python -m research.governance_harness_gh2.admission.preflight > /tmp/preflight.json
+          grep -q '"status": "EXPERIMENT_READY"' /tmp/preflight.json
+          grep -q '"experiment_executed": false' /tmp/preflight.json
+
+      - name: Execute frozen GH-2 pilot
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, math, statistics
+          from pathlib import Path
+          from research.governance_harness_gh2.runner import evaluate_block
+          from research.governance_harness_gh2.models import ARMS
+
+          frozen_sha = '981482067f3fca458879bf94b3c4d12e77ed8e95'
+          seeds = [8201, 8202, 8203]
+          blocks = [evaluate_block(seed) for seed in seeds]
+
+          structural = {
+              'fresh_process_each_block': True,
+              'selected_equals_realized': True,
+              'one_realization_per_decision': True,
+              'candidate_contract_identical': True,
+          }
+          metrics = {arm: [] for arm in ARMS}
+          primary = []
+          secondary_r3 = []
+          secondary_r4 = []
+
+          for block in blocks:
+              pids = [block['arms'][arm]['pid'] for arm in ARMS]
+              tokens = [block['arms'][arm]['worker_token'] for arm in ARMS]
+              structural['fresh_process_each_block'] &= len(pids) == len(set(pids)) and len(tokens) == len(set(tokens))
+
+              reference_candidates = None
+              for arm in ARMS:
+                  arm_data = block['arms'][arm]
+                  metrics[arm].append(float(arm_data['resolution_rate']))
+                  for d in arm_data['decisions']:
+                      structural['selected_equals_realized'] &= d['selected_action'] == d['realized_action']
+                      structural['one_realization_per_decision'] &= int(d['realization_count']) == 1
+                      cands = tuple(d['candidate_ids'])
+                      if reference_candidates is None:
+                          reference_candidates = cands
+                      structural['candidate_contract_identical'] &= cands == reference_candidates == ('continue-flow', 'yield-space')
+
+              r1 = float(block['arms']['R1_CURRENT_BOUND']['resolution_rate'])
+              r2 = float(block['arms']['R2_RECORD_ONLY']['resolution_rate'])
+              r3 = float(block['arms']['R3_PERMUTED']['resolution_rate'])
+              r4 = float(block['arms']['R4_STALE']['resolution_rate'])
+              primary.append(r1-r2)
+              secondary_r3.append(r1-r3)
+              secondary_r4.append(r1-r4)
+
+          def summary(xs):
+              xs = [float(x) for x in xs]
+              return {
+                  'n': len(xs),
+                  'mean': sum(xs)/len(xs),
+                  'sample_sd': statistics.stdev(xs) if len(xs) > 1 else 0.0,
+                  'min': min(xs),
+                  'max': max(xs),
+                  'values': xs,
+              }
+
+          result = {
+              'experiment': 'GH-2',
+              'stage': 'pilot',
+              'spec_version': 'GH2_EXPERIMENT_V1_0_PREEXECUTION',
+              'frozen_snapshot': frozen_sha,
+              'pilot_seeds': seeds,
+              'pilot_blocks': len(blocks),
+              'frames_per_block': 8,
+              'arms': list(ARMS),
+              'pilot_excluded_from_confirmatory': True,
+              'structural': structural,
+              'arm_resolution_rates': {arm: summary(values) for arm, values in metrics.items()},
+              'paired_pilot_metrics': {
+                  'responsibility_sensitive_resolution_rate_R1_minus_R2': summary(primary),
+                  'candidate_identity_resolution_rate_R1_minus_R3': summary(secondary_r3),
+                  'current_context_nonstickiness_R1_minus_R4': summary(secondary_r4),
+              },
+              'raw_blocks': blocks,
+              'confirmatory_count_frozen': False,
+              'confirmatory_locked_reason': 'No numeric confirmatory block-count rule is present in frozen GH-2 FINAL_SPEC/FREEZE_MANIFEST; pilot may not invent one post hoc.',
+              'aggregate_score': None,
+          }
+          if not all(structural.values()):
+              raise SystemExit(f'GH-2 pilot structural failure: {structural}')
+          Path('/tmp/GH2_PILOT_RESULT.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
+          print(json.dumps({k:v for k,v in result.items() if k != 'raw_blocks'}, indent=2))
+          PY
+
+      - name: Hash pilot evidence
+        shell: bash
+        run: |
+          sha256sum /tmp/GH2_PILOT_RESULT.json | tee /tmp/GH2_PILOT_SHA256.txt
+
+      - name: Upload immutable pilot evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: gh2-pilot-9814820
+          path: |
+            /tmp/GH2_PILOT_RESULT.json
+            /tmp/GH2_PILOT_SHA256.txt
+            /tmp/preflight.json
+          if-no-files-found: error
+          retention-days: 90
