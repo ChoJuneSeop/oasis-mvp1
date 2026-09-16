@@ -1,0 +1,21 @@
+{
+  "spec_version": "GH1_ARCHIVE_V1",
+  "decision_eligible_archive": "FROZEN",
+  "result_history_commit": true,
+  "newly_committed_experience_reuse": false,
+  "entries": [
+    {"experience_id":"E01","evaluator_class":"relevant","relation_id":"A"},
+    {"experience_id":"E02","evaluator_class":"relevant","relation_id":"A"},
+    {"experience_id":"E03","evaluator_class":"relevant","relation_id":"A"},
+    {"experience_id":"E04","evaluator_class":"relevant","relation_id":"A"},
+    {"experience_id":"E05","evaluator_class":"surface_similar_relationally_wrong","relation_id":"A"},
+    {"experience_id":"E06","evaluator_class":"surface_similar_relationally_wrong","relation_id":"A"},
+    {"experience_id":"E07","evaluator_class":"surface_similar_relationally_wrong","relation_id":"A"},
+    {"experience_id":"E08","evaluator_class":"surface_similar_relationally_wrong","relation_id":"A"},
+    {"experience_id":"E09","evaluator_class":"irrelevant","relation_id":"B"},
+    {"experience_id":"E10","evaluator_class":"irrelevant","relation_id":"B"},
+    {"experience_id":"E11","evaluator_class":"irrelevant","relation_id":"C"},
+    {"experience_id":"E12","evaluator_class":"irrelevant","relation_id":"C"}
+  ],
+  "runtime_evaluator_class_access": false
+}
