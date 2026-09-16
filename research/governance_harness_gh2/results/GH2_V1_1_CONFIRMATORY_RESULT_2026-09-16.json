@@ -1,0 +1,120 @@
+{
+  "experiment": "GH-2",
+  "version": "v1.1",
+  "principle": "Responsibility-centered Governance",
+  "status": "CONFIRMATORY_COMPLETE",
+  "date": "2026-09-16",
+  "frozen_experiment_snapshot_sha": "6d1a6606c0dc06074832474d2b29fe1140e5f0bd",
+  "design": {
+    "arms": [
+      "R1_CURRENT_BOUND",
+      "R2_RECORD_ONLY",
+      "R3_PERMUTED",
+      "R4_STALE"
+    ],
+    "confirmatory_frames_per_arm": 66,
+    "matched_pairs": 33,
+    "observation_families": 3,
+    "total_decision_realization_units": 264,
+    "pilot_scenarios_reused": false,
+    "aggregate_score": null
+  },
+  "pilot_provenance": {
+    "stage": "STRUCTURAL_ONLY",
+    "run_id": 35077799681,
+    "workflow_head_sha": "c777fa27be9614a207bb1af5aeb213b5c8f0fa88",
+    "raw_result_sha256": "68aee32922e13bb59df0149b85a5a515eca1075671e15a271915b09110484e8f",
+    "artifact_id": 10438353713,
+    "artifact_zip_sha256": "55d3184f7ac5da32412ff49e76ebf02bfcf1e22bf44ded1cfcd9dc627bef12e9",
+    "used_for_sample_size": false,
+    "used_for_hypothesis": false,
+    "status": "STRUCTURAL_PASS"
+  },
+  "confirmatory_provenance": {
+    "first_run": {
+      "run_id": 35077973030,
+      "workflow_head_sha": "bf6c19f4b6798c2c526b4a77f0293d737c7c87f7",
+      "experiment_step": "SUCCESS",
+      "post_validation": "FALSE_NEGATIVE_WRAPPER_ERROR",
+      "raw_result_sha256": "a744a7270a2913ecd7ef8fb0a21dbb9601726dba22212f245f6a8dd850a0254c",
+      "note": "The frozen 264-unit experiment completed. A post-result assertion incorrectly treated runtime_evaluator_leakage=false as failure. No experiment logic, design, scenario, responsibility rule, or frozen snapshot was changed."
+    },
+    "evidence_recovery_run": {
+      "run_id": 35078074065,
+      "job_id": 104735116312,
+      "workflow_head_sha": "a4a3914938ceb90a829386fa4e1992aa967ddf09",
+      "workflow_conclusion": "success",
+      "raw_result_sha256": "d89aa18b301d7c566440e379d92b5d85268a884337269d612b5ab4424aea34d6",
+      "artifact_id": 10439266495,
+      "artifact_zip_sha256": "698247fe2ead6135edc75ce31fea5a05ea247df36ecd607ded317c27241bbca2",
+      "purpose": "exact-snapshot reproduction and evidence recovery only"
+    }
+  },
+  "structural_invariants": {
+    "fresh_process": true,
+    "candidate_sets_identical": true,
+    "selected_equals_realized": true,
+    "one_realization_per_decision": true,
+    "responsibility_non_scalar": true,
+    "r1_bound_to_current_responsibility": true,
+    "r4_pair_local_stale": true,
+    "evaluator_joined_post_worker": true,
+    "runtime_evaluator_leakage": false,
+    "history_participation_control": "EMPTY_FROZEN_ALL_ARMS"
+  },
+  "metrics": {
+    "R1_CURRENT_BOUND": {
+      "resolved_count": 66,
+      "unresolved_count": 0,
+      "resolution_rate": 1.0,
+      "invalid_count": 0
+    },
+    "R2_RECORD_ONLY": {
+      "resolved_count": 33,
+      "unresolved_count": 33,
+      "resolution_rate": 0.5,
+      "invalid_count": 0
+    },
+    "R3_PERMUTED": {
+      "resolved_count": 0,
+      "unresolved_count": 66,
+      "resolution_rate": 0.0,
+      "invalid_count": 0
+    },
+    "R4_STALE": {
+      "resolved_count": 33,
+      "unresolved_count": 33,
+      "resolution_rate": 0.5,
+      "invalid_count": 0
+    }
+  },
+  "contrasts": {
+    "primary_R1_minus_R2": 0.5,
+    "secondary_R1_minus_R3": 1.0,
+    "secondary_R1_minus_R4": 0.5,
+    "R1_vs_R2_selection_change_count": 33,
+    "R1_vs_R2_selection_change_rate": 0.5
+  },
+  "replication_structure": {
+    "all_three_observation_families": {
+      "R1": "22/22",
+      "R2": "11/22",
+      "R3": "0/22",
+      "R4": "11/22"
+    },
+    "each_of_eleven_multi_axis_combinations": {
+      "R1": "6/6",
+      "R2": "3/6",
+      "R3": "0/6",
+      "R4": "3/6"
+    }
+  },
+  "evidence_statement": "Within the complete frozen GH-2 v1.1 66-frame multi-axis matrix, current-context responsibility binding changed selection on 33 of 66 frames relative to record-only and produced responsibility-contract-consistent realization on all 66 frames. Candidate-identity permutation and within-pair stale responsibility produced the separately specified ablation patterns.",
+  "claim_boundary": [
+    "This is a deterministic finite synthetic contract experiment, not a statistical sample of general environments.",
+    "The result establishes the causal role of current-context responsibility binding within the frozen GH-2 contract only.",
+    "It does not establish general task-performance superiority, deployment safety, or superiority over other AI systems.",
+    "No p-value, population generalization, or aggregate winner score is claimed."
+  ],
+  "next_stage": "GH-3_OUTCOME_BASED_REVALIDATION_DESIGN"
+}
