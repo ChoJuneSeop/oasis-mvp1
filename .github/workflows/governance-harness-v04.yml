@@ -29,6 +29,8 @@ jobs:
           python-version: '3.11'
       - name: GH-1 actual Core admission ADM-01 through ADM-12
         run: python -m unittest research.governance_harness_v01.test_core_governance_admission -v
+      - name: GH-1 Detector Validity, RNG isolation and Fresh Process gates
+        run: python -m unittest research.governance_harness_v01.test_gh1_preexecution -v
       - name: ATK-01 through ATK-16 and Governance regressions
         run: >-
           python -m unittest
