@@ -6,6 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from ..action_contract import CANONICAL_CORE_ACTIONS, canonical_action
 from ..evaluator import IndependentEvaluator
 from ..models import ARMS, FORBIDDEN_RUNTIME_KEYS
 from ..runner.engine import LongHorizonRunner
@@ -78,6 +79,28 @@ def evaluate_gates() -> dict[str, dict]:
     leaked = [key for _, row in runtime for key in FORBIDDEN_RUNTIME_KEYS.intersection(row)]
     gates["evaluator_leakage"] = {"pass": not leaked, "leaked_keys": leaked}
 
+    scenario_canonical = {canonical_action(case.truth.expected_action) for case in world}
+    archive_canonical = {canonical_action(item.recommended_action) for item in archive}
+    neutral_case = next(case for case in world if case.truth.scenario_class == "history-neutral")
+    neutral_decision_for_contract = LongHorizonRunner(archive).decide(
+        "G3", neutral_case.frame_id, neutral_case.runtime.as_runtime_mapping()
+    )
+    neutral_eval = IndependentEvaluator((neutral_case.truth,)).evaluate((neutral_decision_for_contract,))
+    gates["action_contract_validity"] = {
+        "pass": (
+            scenario_canonical.issubset(CANONICAL_CORE_ACTIONS)
+            and archive_canonical.issubset(CANONICAL_CORE_ACTIONS)
+            and neutral_decision_for_contract.selected_action == "continue-flow"
+            and neutral_eval.get("resolved") == 1
+            and neutral_eval.get("unsafe_or_invalid") == 0
+        ),
+        "scenario_canonical_actions": sorted(scenario_canonical),
+        "archive_canonical_actions": sorted(archive_canonical),
+        "neutral_selected": neutral_decision_for_contract.selected_action,
+        "neutral_resolved": neutral_eval.get("resolved", 0),
+        "neutral_invalid": neutral_eval.get("unsafe_or_invalid", 0),
+    }
+
     runner = LongHorizonRunner(archive)
     neutral_id, neutral = runtime[0]
     critical = next((x for x in runtime if x[0] == f"F{len(world)//3:04d}"), None)
@@ -97,7 +120,6 @@ def evaluate_gates() -> dict[str, dict]:
     trial_env = [__import__("random").Random(6101).random() for _ in range(3)]
     gates["rng_isolation"] = {"pass": base_env == trial_env, "streams": 6}
 
-    # This now probes the same subprocess worker entry point used by pilot/confirmatory.
     fresh = probe_fresh_arm_processes()
     gates["fresh_process_isolation"] = {
         **fresh,
@@ -124,7 +146,8 @@ def evaluate_gates() -> dict[str, dict]:
     required = (
         "scenario_seed", "horizon", "run_order", "pilot_blocks", "pilot_seeds",
         "primary_paired_metric", "history_sensitive_classes", "power_analysis",
-        "pilot_excluded_from_confirmatory", "confirmatory_locked_until_count_freeze",
+        "action_contract", "pilot_excluded_from_confirmatory",
+        "confirmatory_locked_until_count_freeze",
     )
     manifest_shape_ok = all(key in manifest for key in required)
     paired_contract_ok = (
@@ -135,11 +158,14 @@ def evaluate_gates() -> dict[str, dict]:
         and set(manifest["history_sensitive_classes"]).issubset(set(SCENARIO_CLASSES))
         and float(manifest["power_analysis"]["target_delta"]) > 0.0
         and int(manifest["power_analysis"]["min_confirmatory_blocks"]) >= 1
+        and manifest["action_contract"]["semantic_aliases_frozen_before_pilot"] is True
+        and set(manifest["action_contract"]["canonical_core_actions"]) == set(CANONICAL_CORE_ACTIONS)
     )
     gates["paired_metric_freeze_contract"] = {
         "pass": paired_contract_ok,
         "primary_paired_metric": manifest.get("primary_paired_metric"),
         "pilot_blocks": manifest.get("pilot_blocks"),
+        "pilot_seeds": manifest.get("pilot_seeds"),
     }
     gates["scenario_seed_run_order_freeze"] = {
         "pass": manifest_shape_ok and manifest["pilot_excluded_from_confirmatory"] is True
@@ -148,8 +174,9 @@ def evaluate_gates() -> dict[str, dict]:
         "pass": not COUNT_FREEZE_PATH.exists(),
         "count_freeze_absent": not COUNT_FREEZE_PATH.exists(),
     }
-    gates["pilot_not_yet_executed"] = {
-        "pass": not (HERE / "results" / "PILOT_RESULT.json").exists()
+    gates["replacement_pilot_not_yet_executed"] = {
+        "pass": not (HERE / "results" / "PILOT_RESULT.json").exists(),
+        "invalidated_prior_pilot_recorded": (HERE / "validation" / "PILOT_V1_0_1_INVALIDATED.json").exists(),
     }
     gates["core_unchanged"] = {
         "pass": _git_blob("research/oasis_core_v11/current_relational_core.py")
@@ -166,6 +193,7 @@ def main() -> int:
         "spec_version": json.loads((HERE / "design" / "FREEZE_MANIFEST.json").read_text())["spec_version"],
         "confirmatory_executed": False,
         "pilot_executed": False,
+        "invalidated_diagnostic_pilot_run_id": 35061975968,
         "gates": gates,
     }
     target = HERE / "validation" / "EXPERIMENT_READY.json"
