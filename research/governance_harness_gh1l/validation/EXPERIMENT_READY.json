@@ -1,25 +1,17 @@
 {
   "status": "EXPERIMENT_READY",
-  "spec_version": "GH1L_EXPERIMENT_V1_0_1_PREPILOT",
+  "spec_version": "GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT",
   "confirmatory_executed": false,
   "pilot_executed": false,
+  "invalidated_diagnostic_pilot_run_id": 35061975968,
   "gates": {
-    "gh1_frozen_regression": {
-      "pass": true,
-      "checked": 17
-    },
-    "core_regression": {
-      "pass": true,
-      "summary": ["OK"]
-    },
+    "gh1_frozen_regression": {"pass": true, "checked": 17},
+    "core_regression": {"pass": true, "summary": ["OK"]},
     "archive_hash_freeze": {
       "pass": true,
       "sha256": "73ddd1cd810fa25bacb2dda4181a5d63579c657e57ef5f8441cd2f75ceefc8bb"
     },
-    "closure_precondition": {
-      "pass": true,
-      "completed_experiences": 6
-    },
+    "closure_precondition": {"pass": true, "completed_experiences": 6},
     "scenario_validity": {
       "pass": true,
       "classes": [
@@ -34,61 +26,49 @@
       "matched_history_case": true,
       "horizon": 512
     },
-    "evaluator_leakage": {
+    "evaluator_leakage": {"pass": true, "leaked_keys": []},
+    "action_contract_validity": {
       "pass": true,
-      "leaked_keys": []
+      "scenario_canonical_actions": ["continue-flow", "yield-space"],
+      "archive_canonical_actions": ["continue-flow", "yield-space"],
+      "neutral_selected": "continue-flow",
+      "neutral_resolved": 1,
+      "neutral_invalid": 0
     },
-    "gap_validity": {
-      "pass": true,
-      "has_no": true,
-      "has_yes": true
-    },
-    "rng_isolation": {
-      "pass": true,
-      "streams": 6
-    },
+    "gap_validity": {"pass": true, "has_no": true, "has_yes": true},
+    "rng_isolation": {"pass": true, "streams": 6},
     "fresh_process_isolation": {
       "pass": true,
       "arms": ["G1", "G2", "G3", "G4", "G5"],
       "worker_tokens_unique": true,
       "all_workers_clean": true,
-      "pids": [2341, 2342, 2343, 2344, 2345],
+      "pids": [2282, 2283, 2284, 2285, 2286],
       "execution_path": "research.governance_harness_gh1l.runner.run_experiment"
     },
-    "counterfactual_non_actuation": {
-      "pass": true
-    },
-    "logging_completeness": {
-      "pass": true
-    },
-    "confirmatory_reuse_block": {
-      "pass": true
-    },
+    "counterfactual_non_actuation": {"pass": true},
+    "logging_completeness": {"pass": true},
+    "confirmatory_reuse_block": {"pass": true},
     "paired_metric_freeze_contract": {
       "pass": true,
       "primary_paired_metric": "history_sensitive_resolution_rate_G1_minus_G3",
-      "pilot_blocks": 3
+      "pilot_blocks": 3,
+      "pilot_seeds": [7201, 7202, 7203]
     },
-    "scenario_seed_run_order_freeze": {
-      "pass": true
-    },
-    "confirmatory_lock_precondition": {
+    "scenario_seed_run_order_freeze": {"pass": true},
+    "confirmatory_lock_precondition": {"pass": true, "count_freeze_absent": true},
+    "replacement_pilot_not_yet_executed": {
       "pass": true,
-      "count_freeze_absent": true
+      "invalidated_prior_pilot_recorded": true
     },
-    "pilot_not_yet_executed": {
-      "pass": true
-    },
-    "core_unchanged": {
-      "pass": true
-    }
+    "core_unchanged": {"pass": true}
   },
   "validation_evidence": {
-    "workflow": "GH-1L v1.0.1 pre-pilot gate",
-    "workflow_run_id": 35061797786,
-    "validated_code_head": "857f422a8eb805eb9141d95f9f2e82746a9bbfd3",
-    "passing_tests": 120,
+    "workflow": "GH-1L v1.0.2 action-contract pre-pilot gate",
+    "workflow_run_id": 35062555219,
+    "validated_code_head": "8c746062172b0420583dc4d30a0abd358a884524",
+    "passing_tests": 122,
     "known_baseline_incompatibilities": 1,
-    "new_regressions": 0
+    "new_regressions": 0,
+    "action_contract_regressions_added": 2
   }
 }
