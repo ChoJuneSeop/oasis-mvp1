@@ -1,0 +1,122 @@
+{
+  "spec_version": "GH3_EXPERIMENT_V1_0_FINAL",
+  "lineage_base_commit": "fb3b851413ac621b3d15c8082e2802c5b06d60f6",
+  "gh3_transition_commit": "98d64a044abc109f067c1c348db2f1ba8fc8d7f4",
+  "final_spec_commit": "666404720f0bee95e3bc5b81a83d36400cc16c93",
+  "research_principle": "OUTCOME_BASED_REVALIDATION",
+  "arms": [
+    "F1_ACTIVE_CORRECT",
+    "F2_RECORD_ONLY",
+    "F3_PERMUTED_STATE"
+  ],
+  "state_permutation": {
+    "confirmed": "revised",
+    "revised": "inconclusive",
+    "inconclusive": "confirmed"
+  },
+  "decision_eligible_baseline_experiences_per_chain": 1,
+  "new_completed_experience_decision_reuse": false,
+  "feedback_decision_reuse": true,
+  "same_epoch_feedback_reuse": false,
+  "responsibility_scalarization": false,
+  "pilot": {
+    "purpose": "STRUCTURAL_SANITY_ONLY",
+    "observation_families": ["P1"],
+    "outcome_states": ["confirmed", "revised", "inconclusive"],
+    "recurrence_scopes": ["same_scope"],
+    "chains_per_arm": 3,
+    "decision_realization_epochs_per_arm": 6,
+    "arm_count": 3,
+    "total_decision_realization_epochs": 18,
+    "sample_size_inference": false,
+    "hypothesis_metric_computation": false
+  },
+  "confirmatory": {
+    "size_method": "A_PRIORI_FINITE_MATRIX",
+    "observation_families": ["F1", "F2", "F3"],
+    "outcome_states": ["confirmed", "revised", "inconclusive"],
+    "recurrence_scopes": ["same_scope", "shifted_scope"],
+    "chains_per_arm": 18,
+    "decision_realization_epochs_per_arm": 36,
+    "arm_count": 3,
+    "total_decision_realization_epochs": 108,
+    "pilot_derived_count_freeze": false
+  },
+  "observations": {
+    "P1": {
+      "ego_speed_mps": 1.0,
+      "front_present": true,
+      "front_gap_m": 10.0,
+      "front_closing_mps": 0.5,
+      "local_heading_error_deg": 0.0,
+      "local_density": 2
+    },
+    "F1": {
+      "ego_speed_mps": 1.2,
+      "front_present": true,
+      "front_gap_m": 9.0,
+      "front_closing_mps": 0.4,
+      "local_heading_error_deg": 0.0,
+      "local_density": 1
+    },
+    "F2": {
+      "ego_speed_mps": 0.8,
+      "front_present": true,
+      "front_gap_m": 11.0,
+      "front_closing_mps": 0.7,
+      "local_heading_error_deg": 0.1,
+      "local_density": 2
+    },
+    "F3": {
+      "ego_speed_mps": 1.4,
+      "front_present": true,
+      "front_gap_m": 8.0,
+      "front_closing_mps": 0.3,
+      "local_heading_error_deg": -0.1,
+      "local_density": 3
+    }
+  },
+  "gap_setup": {
+    "pre_sample_speed_increment_mps": 0.6,
+    "uses_existing_current_flow_gap_rule": true
+  },
+  "recurrence_scope": {
+    "same_scope_density_delta": 0,
+    "shifted_scope_density_delta": 1
+  },
+  "post_outcome_construction": {
+    "front_present": false,
+    "confirmed": {
+      "speed_delta_mps": -0.2,
+      "heading_magnitude_delta_deg": -0.05,
+      "heading_floor_magnitude_deg": 0.0
+    },
+    "revised": {
+      "speed_delta_mps": 0.2,
+      "heading_magnitude_delta_deg": 0.2
+    },
+    "inconclusive": {
+      "speed_delta_mps": -0.2,
+      "heading_magnitude_delta_deg": 0.2
+    }
+  },
+  "revalidation_mapping": {
+    "confirmed": "speed_improved AND heading_not_worse",
+    "revised": "NOT speed_improved AND NOT heading_not_worse",
+    "inconclusive": "otherwise"
+  },
+  "primary_metrics": [
+    "revalidation_state_match_rate",
+    "revised_same_scope_F1_vs_F2_participation_change_rate",
+    "revised_same_scope_F1_vs_F2_selection_change_rate"
+  ],
+  "stability_metrics": [
+    "confirmed_F1_vs_F2_no_change_rate",
+    "inconclusive_F1_vs_F2_no_change_rate",
+    "revised_shifted_scope_no_global_block_rate"
+  ],
+  "aggregate_score": null,
+  "pilot_executed": false,
+  "confirmatory_executed": false,
+  "post_result_rule_repair": false
+}
