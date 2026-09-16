@@ -1,10 +1,15 @@
 {
-  "spec_version": "GH1L_EXPERIMENT_V1_0_FINAL",
+  "spec_version": "GH1L_EXPERIMENT_V1_0_1_PREPILOT",
+  "amends": "GH1L_EXPERIMENT_V1_0_FINAL",
   "base_branch": "feature/governance-harness-v1",
   "base_commit": "ea9261b15663a95d819aa9c9c9e5b9e76e9d5352",
+  "prepilot_amendment_parent": "e36ae30f5cf0b1cd9e007642ea050dd71b503bff",
   "scenario_seed": 6101,
   "horizon": 512,
   "run_order": ["G1", "G2", "G3", "G4", "G5"],
+  "pilot_blocks": 3,
+  "pilot_seeds": [7101, 7102, 7103],
+  "confirmatory_seed_base": 910000,
   "rng_seeds": {
     "environment": 6101,
     "core": 6102,
@@ -13,8 +18,25 @@
     "evaluator": 6105,
     "run_order": 6106
   },
+  "primary_paired_metric": "history_sensitive_resolution_rate_G1_minus_G3",
+  "history_sensitive_classes": [
+    "history-critical",
+    "relational-mismatch",
+    "context-reversal",
+    "conflicting-history",
+    "long-re-entry"
+  ],
+  "power_analysis": {
+    "alpha_z": 1.96,
+    "power_z": 0.84,
+    "target_delta": 0.2,
+    "min_confirmatory_blocks": 12,
+    "formula": "max(min_blocks, ceil(((z_alpha+z_power)^2*paired_variance)/(target_delta^2)))"
+  },
   "pilot_excluded_from_confirmatory": true,
   "confirmatory_locked_until_count_freeze": true,
+  "confirmatory_count_freeze_path": "research/governance_harness_gh1l/design/CONFIRMATORY_COUNT_FREEZE.json",
   "confirmatory_executed": false,
+  "pilot_executed": false,
   "post_failure_rule_repair": false
 }
