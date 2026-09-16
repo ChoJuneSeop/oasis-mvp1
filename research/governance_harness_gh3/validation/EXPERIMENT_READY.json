@@ -1,0 +1,78 @@
+{
+  "experiment": "GH-3",
+  "version": "v1.0",
+  "principle": "OUTCOME_BASED_REVALIDATION",
+  "status": "EXPERIMENT_READY",
+  "spec_version": "GH3_EXPERIMENT_V1_0_FINAL",
+  "lineage_base_commit": "fb3b851413ac621b3d15c8082e2802c5b06d60f6",
+  "transition_commit": "98d64a044abc109f067c1c348db2f1ba8fc8d7f4",
+  "final_spec_commit": "666404720f0bee95e3bc5b81a83d36400cc16c93",
+  "preexecution_code_commit": "98bf98ac84a4c9c1bd2b3f6c83acc07faed0b3e9",
+  "preexecution_workflow_run_id": 35082259623,
+  "experiment_executed": false,
+  "pilot_executed": false,
+  "confirmatory_executed": false,
+  "scientific_execution_locked": true,
+  "validation": {
+    "compile": "PASS",
+    "gh3_admission_tests": {
+      "passed": 21,
+      "failed": 0
+    },
+    "governance_harness_regressions": {
+      "passed": 45,
+      "failed": 0
+    },
+    "core_regressions": {
+      "passed": 17,
+      "failed": 0
+    },
+    "canonical_harness_regressions": {
+      "passed": 17,
+      "failed": 0
+    },
+    "total_explicit_tests_passed": 100,
+    "frozen_lineage_unchanged": true,
+    "fresh_process_scientific_arms": true,
+    "runtime_evaluator_leakage": false,
+    "same_epoch_feedback_reuse": false,
+    "new_completed_experience_decision_reuse": false,
+    "responsibility_scalarization": false,
+    "pilot_confirmatory_disjoint": true,
+    "preexecution_hypothesis_metric_peeking": false
+  },
+  "frozen_scientific_arms": [
+    "F1_ACTIVE_CORRECT",
+    "F2_RECORD_ONLY",
+    "F3_PERMUTED_STATE"
+  ],
+  "pilot": {
+    "purpose": "STRUCTURAL_SANITY_ONLY",
+    "chains_per_arm": 3,
+    "decision_realization_epochs_per_arm": 6,
+    "arm_count": 3,
+    "total_decision_realization_epochs": 18,
+    "hypothesis_metric_computation": false,
+    "sample_size_inference": false
+  },
+  "confirmatory": {
+    "size_method": "A_PRIORI_FINITE_MATRIX",
+    "chains_per_arm": 18,
+    "decision_realization_epochs_per_arm": 36,
+    "arm_count": 3,
+    "total_decision_realization_epochs": 108,
+    "pilot_derived_count_freeze": false
+  },
+  "actual_core_candidate_contract": {
+    "required_candidates_present": [
+      "continue-flow",
+      "yield-space"
+    ],
+    "observed_additional_candidates_allowed_by_frozen_spec": [
+      "align-heading-negative",
+      "align-heading-positive"
+    ]
+  },
+  "claim_boundary": "PRE-EXECUTION READINESS ONLY. This record is not empirical evidence for Outcome-based Revalidation.",
+  "next_allowed_action": "GH-3 v1.0 structural Pilot on an exact-snapshot execution branch"
+}
