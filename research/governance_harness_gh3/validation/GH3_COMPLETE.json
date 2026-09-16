@@ -1,0 +1,27 @@
+{
+  "status": "GH3_COMPLETE",
+  "spec_version": "GH3_EXPERIMENT_V1_0_FINAL",
+  "principle": "OUTCOME_BASED_REVALIDATION",
+  "frozen_experiment_snapshot_sha": "1d392e39bf1ff64e71eb591988649c8041d025ab",
+  "pilot_evidence_commit": "04b77cd3b780f68adf4b12687758cff7f023c791",
+  "confirmatory_workflow_commit": "c998655cbc543416a37a0836cb6e540d8eb48896",
+  "confirmatory_result_evidence_commit": "be32da8df0ba91697c2a722710118ed7b6020078",
+  "interpretation_commit": "32413e56e7fae7d7338f86e73644ee93bcc4e225",
+  "primary_confirmatory_run_id": 35106684909,
+  "evidence_status": "ESTABLISHED_WITHIN_FROZEN_SYNTHETIC_SCOPE",
+  "validated_chain": [
+    "authoritative post-observation to typed revalidation",
+    "typed provenance-bound feedback to later related participation",
+    "typed provenance-bound feedback to later realized selection",
+    "context-local non-stickiness of REVISED feedback"
+  ],
+  "not_validated": [
+    "real-world or CARLA generalization",
+    "newly committed Completed Experience reuse",
+    "long-horizon integrated governance accumulation",
+    "universal learned outcome evaluator",
+    "overall system superiority"
+  ],
+  "aggregate_score": null,
+  "post_result_rule_repair": false
+}
