@@ -44,7 +44,9 @@ def _walk_keys(value: Any):
             yield from _walk_keys(child)
 
 
-def _assert_semantic_context_has_no_recency_lockin(record: HistoricalRelationRecord) -> None:
+def _assert_semantic_context_has_no_recency_lockin(
+    record: HistoricalRelationRecord,
+) -> None:
     keys = tuple(_walk_keys(record.semantic.environment_context))
     bad = [
         key
@@ -59,13 +61,15 @@ def _assert_semantic_context_has_no_recency_lockin(record: HistoricalRelationRec
 
 @dataclass
 class HistoryAdmissionBridge:
-    """Admits only closed, actually realized HistoryEntry outputs into Core history.
+    """Validates and materializes closed relation records without mutating the Core.
 
-    The bridge preserves absolute completion time in the RelationElementRef provenance,
-    but rejects attempts to copy recency/importance semantics into the PastRelationSemanticView.
+    Archive ownership belongs to Governance/HistoryAccessPort. This bridge is retained
+    as a domain conversion boundary: it validates that a realized, closed HistoryEntry
+    can be represented as immutable HistoricalRelationRecord values suitable for a
+    future CompletedExperience payload. It never injects those records into the Core.
     """
 
-    core: CurrentRelationalCoreV11
+    core: CurrentRelationalCoreV11 | None
     extractor: CompletedHistoryRelationExtractor
 
     def admit(self, entry: HistoryEntry) -> tuple[HistoricalRelationRecord, ...]:
@@ -89,10 +93,10 @@ class HistoryAdmissionBridge:
                 )
             key = (source.experience_id, source.relation_element_id)
             if key in seen:
-                raise HistoryAdmissionError("duplicate relation element emitted from one completion")
+                raise HistoryAdmissionError(
+                    "duplicate relation element emitted from one completion"
+                )
             seen.add(key)
             _assert_semantic_context_has_no_recency_lockin(record)
 
-        for record in records:
-            self.core.add_history(record)
         return records
