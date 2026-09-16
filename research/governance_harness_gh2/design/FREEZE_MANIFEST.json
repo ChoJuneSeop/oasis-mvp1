@@ -1,19 +1,33 @@
 {
-  "spec_version": "GH2_EXPERIMENT_V1_0_PREEXECUTION",
+  "spec_version": "GH2_EXPERIMENT_V1_1_PREEXECUTION",
   "lineage_base_commit": "5861b08d6b48f79b88f4f160bbb425690708ccd4",
+  "gh2_v1_0_experiment_ready_commit": "981482067f3fca458879bf94b3c4d12e77ed8e95",
+  "gh2_v1_0_pilot_status": "DIAGNOSTIC_ONLY_NOT_CONFIRMATORY_ADMISSIBLE",
   "arms": ["R1_CURRENT_BOUND", "R2_RECORD_ONLY", "R3_PERMUTED", "R4_STALE"],
-  "scenario_classes": [
-    "uncertainty-critical", "uncertainty-relief",
-    "impact-critical", "impact-relief",
-    "vulnerability-critical", "vulnerability-relief",
-    "temporality-critical", "temporality-relief"
+  "pilot_design": {
+    "purpose": "STRUCTURAL_SANITY_ONLY",
+    "single_axis_combinations": ["U", "I", "V", "T"],
+    "observation_families": 1,
+    "matched_pairs": 4,
+    "frames_per_arm": 8,
+    "sample_size_inference": false
+  },
+  "confirmatory_design": {
+    "size_method": "A_PRIORI_FINITE_EXHAUSTIVE_MATRIX",
+    "multi_axis_combinations": ["UI", "UV", "UT", "IV", "IT", "VT", "UIV", "UIT", "UVT", "IVT", "UIVT"],
+    "observation_families": 3,
+    "matched_pairs": 33,
+    "frames_per_arm": 66,
+    "total_decision_realization_units": 264,
+    "pilot_derived_count_freeze": false
+  },
+  "primary_metric": "responsibility_contract_consistent_resolution_R1_minus_R2",
+  "secondary_contrasts": [
+    "R1_MINUS_R3_CANDIDATE_IDENTITY",
+    "R1_MINUS_R4_CURRENT_CONTEXT_NON_STICKINESS"
   ],
-  "pilot_blocks": 3,
-  "pilot_seeds": [8201, 8202, 8203],
-  "confirmatory_seed_base": 920000,
-  "frames_per_block": 8,
-  "primary_metric": "responsibility_sensitive_resolution_rate_R1_minus_R2",
-  "pilot_excluded_from_confirmatory": true,
+  "pilot_confirmatory_scenarios_disjoint": true,
+  "preexecution_metric_peeking_prohibited": true,
   "history_participation": "EMPTY_FROZEN_ALL_ARMS",
   "feedback_decision_reuse": false,
   "new_completed_experience_reuse": false,
