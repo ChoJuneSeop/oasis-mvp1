@@ -1,0 +1,110 @@
+name: GH-1L v1.0.1 frozen pilot
+
+on:
+  push:
+    branches: [experiment/governance-harness-gh1l-pilot]
+    paths:
+      - '.github/workflows/gh1l-pilot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-pilot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact EXPERIMENT_READY snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: 2c0f4386253b050c4c960d29a0b6eac16c83a1fa
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify exact frozen code HEAD
+        run: |
+          test "$(git rev-parse HEAD)" = "2c0f4386253b050c4c960d29a0b6eac16c83a1fa"
+          test ! -f research/governance_harness_gh1l/results/PILOT_RESULT.json
+          test ! -f research/governance_harness_gh1l/design/CONFIRMATORY_COUNT_FREEZE.json
+
+      - name: Re-run preflight immediately before pilot
+        run: |
+          python -m research.governance_harness_gh1l.admission.preflight > /tmp/GH1L_PREFLIGHT.json
+          grep -q '"status": "EXPERIMENT_READY"' /tmp/GH1L_PREFLIGHT.json
+
+      - name: Execute frozen three-block pilot
+        run: >-
+          python -m research.governance_harness_gh1l.runner.run_experiment
+          --stage pilot
+          --output /tmp/PILOT_RESULT.json
+
+      - name: Validate pilot and derive frozen confirmatory count
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path('/tmp/PILOT_RESULT.json').read_text())
+          assert p['experiment'] == 'GH-1L'
+          assert p['stage'] == 'pilot'
+          assert p['spec_version'] == 'GH1L_EXPERIMENT_V1_0_1_PREPILOT'
+          assert p['block_count'] == 3
+          assert p['run_count'] == 15
+          assert p['horizon'] == 512
+          assert p['fresh_process_contract']['pass'] is True
+          assert p['archive_sha256'] == '73ddd1cd810fa25bacb2dda4181a5d63579c657e57ef5f8441cd2f75ceefc8bb'
+          metric = 'history_sensitive_resolution_rate_G1_minus_G3'
+          assert len(p['paired_metrics'][metric]) == 3
+          print(json.dumps({
+              'experiment': p['experiment'],
+              'stage': p['stage'],
+              'spec_version': p['spec_version'],
+              'block_count': p['block_count'],
+              'run_count': p['run_count'],
+              'horizon': p['horizon'],
+              'archive_sha256': p['archive_sha256'],
+              'fresh_process_contract': p['fresh_process_contract'],
+              'arm_metric_means': p['arm_metric_means'],
+              'paired_metrics': p['paired_metrics'],
+          }, indent=2))
+          PY
+          python -m research.governance_harness_gh1l.runner.freeze_confirmatory_count \
+            --pilot /tmp/PILOT_RESULT.json \
+            --output /tmp/CONFIRMATORY_COUNT_FREEZE.json
+
+      - name: Record artifact hashes and compact summary
+        run: |
+          sha256sum /tmp/PILOT_RESULT.json /tmp/CONFIRMATORY_COUNT_FREEZE.json | tee /tmp/SHA256SUMS.txt
+          python - <<'PY' > /tmp/PILOT_SUMMARY.json
+          import json
+          from pathlib import Path
+          p = json.loads(Path('/tmp/PILOT_RESULT.json').read_text())
+          c = json.loads(Path('/tmp/CONFIRMATORY_COUNT_FREEZE.json').read_text())
+          print(json.dumps({
+              'frozen_code_head': '2c0f4386253b050c4c960d29a0b6eac16c83a1fa',
+              'stage': 'pilot',
+              'pilot_blocks': p['block_count'],
+              'pilot_runs': p['run_count'],
+              'fresh_process_contract': p['fresh_process_contract'],
+              'archive_sha256': p['archive_sha256'],
+              'arm_metric_means': p['arm_metric_means'],
+              'paired_metrics': p['paired_metrics'],
+              'count_freeze': c,
+          }, indent=2))
+          PY
+          cat /tmp/PILOT_SUMMARY.json
+
+      - name: Upload immutable pilot evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: gh1l-pilot-evidence-2c0f438
+          path: |
+            /tmp/PILOT_RESULT.json
+            /tmp/PILOT_SUMMARY.json
+            /tmp/CONFIRMATORY_COUNT_FREEZE.json
+            /tmp/SHA256SUMS.txt
+            /tmp/GH1L_PREFLIGHT.json
+          if-no-files-found: error
+          retention-days: 90
