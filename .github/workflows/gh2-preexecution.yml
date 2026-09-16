@@ -1,8 +1,8 @@
-name: GH-2 responsibility pre-execution gate
+name: GH-2 v1.1 responsibility pre-execution gate
 
 on:
   push:
-    branches: [feature/governance-harness-gh2]
+    branches: [feature/governance-harness-gh2-v11]
     paths:
       - 'research/governance_harness_gh2/**'
       - '.github/workflows/gh2-preexecution.yml'
@@ -26,7 +26,7 @@ jobs:
         run: |
           git diff --exit-code 5861b08d6b48f79b88f4f160bbb425690708ccd4 -- research/governance_harness_v01 research/governance_harness_gh1l research/oasis_core_v11
 
-      - name: GH-2 admission tests
+      - name: GH-2 v1.1 admission tests
         run: python -m unittest research.governance_harness_gh2.admission.test_gh2 -v
 
       - name: Frozen Governance Harness regressions
@@ -45,13 +45,14 @@ jobs:
       - name: Frozen Canonical Harness regressions
         run: python -m unittest discover -s research/carla_v22_harness_v11 -p 'test_*.py' -v
 
-      - name: GH-2 preflight
+      - name: GH-2 v1.1 preflight
         run: |
-          python -m research.governance_harness_gh2.admission.preflight | tee /tmp/gh2-preflight.json
-          grep -q '"status": "EXPERIMENT_READY"' /tmp/gh2-preflight.json
-          grep -q '"experiment_executed": false' /tmp/gh2-preflight.json
+          python -m research.governance_harness_gh2.admission.preflight | tee /tmp/gh2-v11-preflight.json
+          grep -q '"status": "EXPERIMENT_READY"' /tmp/gh2-v11-preflight.json
+          grep -q '"spec_version": "GH2_EXPERIMENT_V1_1_PREEXECUTION"' /tmp/gh2-v11-preflight.json
+          grep -q '"experiment_executed": false' /tmp/gh2-v11-preflight.json
 
-      - name: Confirm experiment outputs do not exist
+      - name: Confirm v1.1 experiment outputs do not exist
         run: |
           test ! -f research/governance_harness_gh2/results/PILOT_RESULT.json
           test ! -f research/governance_harness_gh2/results/CONFIRMATORY_RESULT.json

@@ -1,47 +1,55 @@
-# GH-2 — Responsibility-centered Governance
+# GH-2 — Responsibility-centered Governance v1.1
 
-GH-2 starts only after GH-1/GH-1L selective re-participation evidence is frozen. Its scientific question is narrower: **after the current possibility set exists, can a dynamic, current-context U/I/V/T responsibility judgment causally bind selection rather than merely being logged after or beside the decision?**
+GH-2 begins after GH-1/GH-1L selective re-participation evidence is frozen. Its narrow question is: **after the current possibility set exists, can dynamic, current-context U/I/V/T responsibility causally bind selection rather than merely being logged beside the decision?**
 
-This lineage starts from GH-1L confirmatory evidence commit `5861b08d6b48f79b88f4f160bbb425690708ccd4`. It does not modify the frozen GH-1/GH-1L/Core code.
+This lineage starts from the frozen GH-2 v1.0 pre-execution commit `981482067f3fca458879bf94b3c4d12e77ed8e95` and preserves the earlier v1.0 pilot as diagnostic provenance only. It does not modify frozen GH-1, GH-1L, Governance Harness v0.4, or Core code.
 
-The package follows Governance OASIS standard procedure v2.0. Stages 1–8 were completed before implementation; stages 9–10 were then implemented and independently revalidated in CI. Stage 11 (pilot/confirmatory execution) remains intentionally locked and has **not** been run.
+## Why v1.1
 
-GH-2 deliberately freezes historical participation to the same empty participating view across all experimental arms. This does **not** negate GH-1/1L; it removes history as a confound so the causal role of responsibility can be isolated. Integration of selective re-participation + responsibility belongs to a later integrated-governance experiment.
+The v1.0 pilot was executable but unsuitable for confirmatory continuation because:
+- its recorded seeds did not alter the scenario matrix;
+- no confirmatory repetition-count method had been preregistered;
+- pre-execution tests/dry-run had already evaluated the same frozen scenario effect later intended for confirmatory interpretation;
+- R4 stale responsibility could propagate across pair boundaries.
 
-Core principles:
-- responsibility is computed only after the actual current possibility set exists;
-- U/I/V/T is never collapsed into a scalar score;
-- responsibility is current-contextual, candidate-specific, and non-sticky;
-- selected and nonselected obligations are both preserved;
-- production arm selection is bound to responsibility before realization;
-- experimental controls may intentionally ablate binding, permute candidate responsibility, or reuse stale responsibility, but those arms are explicitly non-production controls;
-- no outcome feedback, new Completed Experience reuse, or post-result rule tuning is admitted in GH-2.
+v1.1 corrects those issues before any v1.1 pilot or confirmatory result exists.
 
-## Frozen experimental arms
+## v1.1 frozen structure
 
-- `R1_CURRENT_BOUND`: current U/I/V/T recomputed and causally bound to selection.
-- `R2_RECORD_ONLY`: identical current responsibility is recorded but not bound; current distribution selects.
-- `R3_PERMUTED`: responsibility profiles are reassigned across candidate identities before binding.
-- `R4_STALE`: previous-frame responsibility is reused when the candidate set matches.
+- `R1_CURRENT_BOUND`: current U/I/V/T recomputed and bound to selection.
+- `R2_RECORD_ONLY`: same current responsibility recorded but not bound.
+- `R3_PERMUTED`: burden profiles reassigned across candidate identities before binding.
+- `R4_STALE`: previous responsibility reused only inside the same matched critical→relief pair; reset at every pair boundary.
 
-## Pre-execution status
+Historical participation is frozen to the same empty view in every arm. This isolates responsibility from GH-1/1L selective-reparticipation effects.
 
-- Stages 1–10: complete.
-- Admission tests: 19/19 PASS.
-- Frozen Governance Harness regressions: 45/45 PASS.
-- Frozen Core regressions: 17/17 PASS.
-- Frozen Canonical Harness regressions: 17/17 PASS.
-- Total validated tests: 98 PASS.
-- Fresh-process actual runner path: PASS.
-- Evaluator leakage gate: PASS.
-- Responsibility-after-possibilities gate: PASS.
-- Non-scalar responsibility gate: PASS.
-- GH-1/GH-1L/Core frozen lineage changes: none.
-- Pilot: NOT RUN.
-- Confirmatory: NOT RUN.
-- Experiment executed: FALSE.
+## Pilot
 
-Validated implementation SHA: `a295db380e9595ee42567def37d3db0ce8f30c2a`.
-Validation workflow run: `35064368972` (`SUCCESS`).
+Pilot is structural only:
+- 4 single-axis pairs: U, I, V, T;
+- 8 frames;
+- 4 fresh-process arms;
+- no pilot-derived confirmatory count;
+- no seed-based replication claim;
+- no confirmatory effect interpretation.
 
-Current state: **`EXPERIMENT_READY`**. The next permitted operation is creation of a separate exact-snapshot pilot execution lineage; this branch itself keeps pilot/confirmatory locked.
+## Confirmatory
+
+Confirmatory size is frozen **before pilot** as a finite exhaustive multi-axis matrix:
+- 11 combinations: UI, UV, UT, IV, IT, VT, UIV, UIT, UVT, IVT, UIVT;
+- 3 current-observation families: O1, O2, O3;
+- critical/relief matched pair per combination and observation family;
+- 66 frames per arm;
+- 264 decision-realization units across four arms.
+
+Pilot single-axis scenarios and confirmatory multi-axis scenarios are disjoint.
+
+## Anti-peeking rule
+
+Preflight and admission may verify structural scenario/truth pairing, but they do not run a confirmatory arm against evaluator truth. Dry-run reports only structural invariants: fresh-process isolation, decision/realization counts, selected==realized, one realization per frame, and frozen confirmatory frame count.
+
+## Current pre-execution rule
+
+The branch remains execution-locked. Pilot and confirmatory are permitted only after v1.1 admission/regression/preflight gates pass on an exact immutable snapshot and a separate execution lineage is created.
+
+Current intended state after CI: **`EXPERIMENT_READY`**, with `Pilot: NOT RUN` and `Confirmatory: NOT RUN` for v1.1.
