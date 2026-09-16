@@ -1,77 +1,9 @@
 {
-  "status": "EXPERIMENT_READY",
-  "confirmatory_executed": false,
+  "status": "REVALIDATION_REQUIRED",
+  "spec_version": "GH1L_EXPERIMENT_V1_0_1_PREPILOT",
   "pilot_executed": false,
-  "gates": {
-    "gh1_frozen_regression": {
-      "pass": true,
-      "checked": 17
-    },
-    "core_regression": {
-      "pass": true,
-      "summary": [
-        "OK"
-      ]
-    },
-    "archive_hash_freeze": {
-      "pass": true,
-      "sha256": "73ddd1cd810fa25bacb2dda4181a5d63579c657e57ef5f8441cd2f75ceefc8bb"
-    },
-    "closure_precondition": {
-      "pass": true,
-      "completed_experiences": 6
-    },
-    "scenario_validity": {
-      "pass": true,
-      "classes": [
-        "conflicting-history",
-        "context-reversal",
-        "history-critical",
-        "history-neutral",
-        "long-re-entry",
-        "novel",
-        "relational-mismatch"
-      ],
-      "matched_history_case": true,
-      "horizon": 512
-    },
-    "evaluator_leakage": {
-      "pass": true,
-      "leaked_keys": []
-    },
-    "gap_validity": {
-      "pass": true,
-      "has_no": true,
-      "has_yes": true
-    },
-    "rng_isolation": {
-      "pass": true,
-      "streams": 6
-    },
-    "fresh_process_isolation": {
-      "pass": true,
-      "arms": [
-        "G1",
-        "G2",
-        "G3",
-        "G4",
-        "G5"
-      ]
-    },
-    "counterfactual_non_actuation": {
-      "pass": true
-    },
-    "logging_completeness": {
-      "pass": true
-    },
-    "confirmatory_reuse_block": {
-      "pass": true
-    },
-    "scenario_seed_run_order_freeze": {
-      "pass": true
-    },
-    "core_unchanged": {
-      "pass": true
-    }
-  }
+  "confirmatory_executed": false,
+  "supersedes_readiness_record": "validation/EXPERIMENT_READY_E36AE30.json",
+  "reason": "Pre-pilot audit amended the actual arm execution path to fresh-process workers and froze an arm-level paired pilot/count derivation path. The amended HEAD must pass GH-1L admission, GH-1/Core regression, compile, and preflight before pilot.",
+  "pilot_allowed": false
 }
