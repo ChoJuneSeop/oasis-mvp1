@@ -1,4 +1,4 @@
-name: GH-1L v1.0.1 pre-pilot gate
+name: GH-1L v1.0.2 action-contract pre-pilot gate
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
 
       - name: Verify GH-1 and Core remain unchanged from frozen base
         run: |
-          git diff --exit-code ea9261b15663a95d819aa9c9c9e5b9e76e9d5352 -- research/governance_harness_v01 research/oasis_core_v11
+          git diff --exit-code ea9261b15663a95d81919d7de0bce381206a -- research/governance_harness_v01 research/oasis_core_v11
 
       - name: GH-1L amended admission suite
         run: python -m unittest research.governance_harness_gh1l.admission.test_gh1l -v
@@ -65,15 +65,17 @@ jobs:
           fi
           grep -qi 'history' /tmp/gh1l-known-baseline.log
 
-      - name: Confirm no pilot or confirmatory count freeze exists yet
+      - name: Confirm replacement pilot has not run and count freeze is absent
         run: |
           test ! -f research/governance_harness_gh1l/results/PILOT_RESULT.json
           test ! -f research/governance_harness_gh1l/design/CONFIRMATORY_COUNT_FREEZE.json
+          test -f research/governance_harness_gh1l/validation/PILOT_V1_0_1_INVALIDATED.json
 
-      - name: GH-1L preflight and amended EXPERIMENT_READY evidence
+      - name: GH-1L preflight and EXPERIMENT_READY evidence
         run: |
           python -m research.governance_harness_gh1l.admission.preflight | tee /tmp/gh1l-preflight.json
           grep -q '"status": "EXPERIMENT_READY"' /tmp/gh1l-preflight.json
+          grep -q 'GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT' /tmp/gh1l-preflight.json
           cat research/governance_harness_gh1l/validation/EXPERIMENT_READY.json
 
       - name: Compile GH-1L, GH-1 and Core modules
