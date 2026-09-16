@@ -11,6 +11,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
+from ..action_contract import CANONICAL_CORE_ACTIONS, canonical_action
 from ..evaluator import IndependentEvaluator
 from ..models import ARMS, ArmDecision
 from ..scenario.generator import generate_long_world, runtime_stream
@@ -24,7 +25,6 @@ PYTHON = sys.executable
 MANIFEST_PATH = HERE / "design" / "FREEZE_MANIFEST.json"
 COUNT_FREEZE_PATH = HERE / "design" / "CONFIRMATORY_COUNT_FREEZE.json"
 _PROCESS_ARM_STATE: list[str] = []
-_ALLOWED_ACTIONS = frozenset({"continue", "hold-course", "yield-space"})
 
 
 def _manifest() -> dict[str, Any]:
@@ -46,7 +46,6 @@ def _require_confirmatory_freeze(manifest: dict[str, Any]) -> dict[str, Any]:
 
 
 def _runner_seed(environment_seed: int, manifest: dict[str, Any]) -> int:
-    # Distinct deterministic stream for participation/permutation; no shared RNG object.
     return environment_seed * 10_000 + int(manifest["rng_seeds"]["participation"])
 
 
@@ -76,8 +75,12 @@ def _history_sensitive_metrics(
         if case.truth.scenario_class in history_sensitive_classes
     }
     target = tuple(d for d in decisions if d.frame_id in truth_by_frame)
-    resolved = sum(d.selected_action == truth_by_frame[d.frame_id].expected_action for d in target)
-    unsafe = sum(d.selected_action not in _ALLOWED_ACTIONS for d in target)
+    resolved = sum(
+        canonical_action(d.selected_action)
+        == canonical_action(truth_by_frame[d.frame_id].expected_action)
+        for d in target
+    )
+    unsafe = sum(canonical_action(d.selected_action) not in CANONICAL_CORE_ACTIONS for d in target)
     unresolved = sum(d.selected_action == "unresolved" for d in target)
     total = len(target)
     return {
@@ -107,7 +110,6 @@ def _run_arm(stage: str, arm: str, seed: int, horizon: int, block: int) -> dict[
         for frame_id, runtime in runtime_stream(world)
     )
 
-    # Evaluator truth joins only after every decision for this arm already exists.
     evaluator = IndependentEvaluator(tuple(case.truth for case in world))
     metrics = evaluator.evaluate(decisions)
     total = int(metrics.get("total", 0))
@@ -144,15 +146,7 @@ def _probe_worker(arm: str) -> dict[str, Any]:
     }
 
 
-def _spawn_worker(
-    stage: str,
-    arm: str,
-    seed: int,
-    horizon: int,
-    block: int,
-    *,
-    probe: bool = False,
-) -> dict[str, Any]:
+def _spawn_worker(stage: str, arm: str, seed: int, horizon: int, block: int, *, probe: bool = False) -> dict[str, Any]:
     command = [PYTHON, "-m", "research.governance_harness_gh1l.runner.run_experiment"]
     if probe:
         command += ["--probe-process", "--arm", arm]
@@ -164,9 +158,7 @@ def _spawn_worker(
             "--horizon", str(horizon),
             "--block", str(block),
         ]
-    completed = subprocess.run(
-        command, cwd=ROOT, check=True, capture_output=True, text=True
-    )
+    completed = subprocess.run(command, cwd=ROOT, check=True, capture_output=True, text=True)
     return json.loads(completed.stdout)
 
 
@@ -207,19 +199,10 @@ def _summarize_runs(runs: list[dict[str, Any]], manifest: dict[str, Any]) -> dic
         g3 = by_arm["G3"]["normalized"]
         g4 = by_arm["G4"]["normalized"]
         g5 = by_arm["G5"]["normalized"]
-        paired_primary.append(
-            float(g1["history_sensitive_resolution_rate"])
-            - float(g3["history_sensitive_resolution_rate"])
-        )
+        paired_primary.append(float(g1["history_sensitive_resolution_rate"]) - float(g3["history_sensitive_resolution_rate"]))
         archive_delta.append(float(g1["archive_access_rate"]) - float(g2["archive_access_rate"]))
-        g1_g4_resolution_delta.append(
-            float(g1["history_sensitive_resolution_rate"])
-            - float(g4["history_sensitive_resolution_rate"])
-        )
-        g1_g5_resolution_delta.append(
-            float(g1["history_sensitive_resolution_rate"])
-            - float(g5["history_sensitive_resolution_rate"])
-        )
+        g1_g4_resolution_delta.append(float(g1["history_sensitive_resolution_rate"]) - float(g4["history_sensitive_resolution_rate"]))
+        g1_g5_resolution_delta.append(float(g1["history_sensitive_resolution_rate"]) - float(g5["history_sensitive_resolution_rate"]))
 
     arm_means: dict[str, dict[str, float]] = {}
     for arm in ARMS:
@@ -301,7 +284,6 @@ def _coordinate_stage(stage: str) -> dict[str, Any]:
 
 
 def run_stage(stage: str, seed: int | None = None, horizon: int | None = None) -> dict[str, Any]:
-    """Public coordinator. seed/horizon overrides are intentionally rejected after freeze."""
     manifest = _manifest()
     if seed is not None or (horizon is not None and horizon != int(manifest["horizon"])):
         raise RuntimeError("stage-level seed/horizon overrides are not permitted by the frozen design")
@@ -312,7 +294,6 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--stage", choices=("pilot", "confirmatory"))
     parser.add_argument("--output", type=Path)
-    # Internal worker/probe arguments. The coordinator is the experiment entry point.
     parser.add_argument("--arm", choices=ARMS)
     parser.add_argument("--seed", type=int)
     parser.add_argument("--horizon", type=int)
