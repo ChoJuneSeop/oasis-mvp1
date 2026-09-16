@@ -1,0 +1,150 @@
+name: GH-3 v1.0 structural Pilot
+
+on:
+  push:
+    branches: [experiment/governance-harness-gh3-v10-pilot]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact EXPERIMENT_READY snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: 1d392e39bf1ff64e71eb591988649c8041d025ab
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify exact frozen snapshot
+        run: |
+          test "$(git rev-parse HEAD)" = "1d392e39bf1ff64e71eb591988649c8041d025ab"
+          python -m research.governance_harness_gh3.admission.preflight > /tmp/gh3-preflight.json
+          grep -q '"status": "EXPERIMENT_READY"' /tmp/gh3-preflight.json
+          grep -q '"experiment_executed": false' /tmp/gh3-preflight.json
+
+      - name: Execute frozen structural Pilot without hypothesis metrics
+        run: |
+          mkdir -p /tmp/gh3-pilot
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          from research.governance_harness_gh3.models import ARMS
+          from research.governance_harness_gh3.runner import run_runtime
+          from research.governance_harness_gh3.scenario import build_pilot_world
+
+          out = Path('/tmp/gh3-pilot')
+          cases = build_pilot_world()
+          assert len(cases) == 3, len(cases)
+          raw = run_runtime(tuple(case.runtime for case in cases))
+          workers = raw['workers']
+          assert len(workers) == len(ARMS) == 3
+          assert {w['arm'] for w in workers} == set(ARMS)
+
+          pids = [w['pid'] for w in workers]
+          tokens = [w['worker_token'] for w in workers]
+          fresh_process = len(set(pids)) == len(ARMS) and len(set(tokens)) == len(ARMS)
+          assert fresh_process
+
+          allowed_states = {'confirmed', 'revised', 'inconclusive'}
+          arm_summary = {}
+          total_chain_runs = 0
+          total_epochs = 0
+          for worker in workers:
+              assert worker['chain_count'] == 3
+              rows = worker['results']
+              assert len(rows) == 3
+              total_chain_runs += len(rows)
+              for row in rows:
+                  assert row['antecedent_selected'] == row['antecedent_realized']
+                  assert row['recurrence_selected'] == row['recurrence_realized']
+                  assert row['realization_count'] == 2
+                  assert row['recurrence_new_ce_exposed'] is False
+                  assert row['recurrence_decision_eligible_count'] == 1
+                  assert row['antecedent_revalidation_state'] in allowed_states
+                  assert row['committed_feedback_state'] == row['antecedent_revalidation_state']
+                  total_epochs += row['realization_count']
+              arm_summary[worker['arm']] = {
+                  'chain_count': 3,
+                  'two_realizations_per_chain': True,
+                  'selected_equals_realized': True,
+                  'typed_revalidation': True,
+                  'atomic_feedback_commit_match': True,
+                  'new_ce_decision_reuse': False,
+                  'decision_eligible_baseline_count': 1,
+              }
+
+          assert total_chain_runs == 9
+          assert total_epochs == 18
+
+          raw_payload = {
+              'spec_version': 'GH3_EXPERIMENT_V1_0_FINAL',
+              'exact_snapshot_sha': '1d392e39bf1ff64e71eb591988649c8041d025ab',
+              'stage': 'pilot',
+              'purpose': 'STRUCTURAL_SANITY_ONLY',
+              'evaluator_used': False,
+              'hypothesis_metric_computation': False,
+              'workers': workers,
+          }
+          raw_bytes = (json.dumps(raw_payload, ensure_ascii=False, indent=2, sort_keys=True) + '\n').encode()
+          raw_sha = hashlib.sha256(raw_bytes).hexdigest()
+          (out / 'GH3_PILOT_RAW_V1_0.json').write_bytes(raw_bytes)
+
+          summary = {
+              'status': 'PILOT_STRUCTURAL_PASS',
+              'spec_version': 'GH3_EXPERIMENT_V1_0_FINAL',
+              'exact_snapshot_sha': '1d392e39bf1ff64e71eb591988649c8041d025ab',
+              'pilot_executed': True,
+              'confirmatory_executed': False,
+              'purpose': 'STRUCTURAL_SANITY_ONLY',
+              'evaluator_used': False,
+              'hypothesis_metric_computation': False,
+              'sample_size_inference': False,
+              'fresh_process': fresh_process,
+              'arm_count': 3,
+              'chains_per_arm': 3,
+              'total_chain_runs': total_chain_runs,
+              'total_decision_realization_epochs': total_epochs,
+              'arms': arm_summary,
+              'raw_sha256': raw_sha,
+              'aggregate_score': None,
+          }
+          summary_bytes = (json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + '\n').encode()
+          summary_sha = hashlib.sha256(summary_bytes).hexdigest()
+          (out / 'GH3_PILOT_SUMMARY_V1_0.json').write_bytes(summary_bytes)
+          (out / 'SHA256SUMS.txt').write_text(
+              f"{raw_sha}  GH3_PILOT_RAW_V1_0.json\n{summary_sha}  GH3_PILOT_SUMMARY_V1_0.json\n",
+              encoding='utf-8',
+          )
+          print(json.dumps(summary, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Verify Pilot remains non-inferential
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/gh3-pilot/GH3_PILOT_SUMMARY_V1_0.json'))
+          assert p['status'] == 'PILOT_STRUCTURAL_PASS'
+          assert p['evaluator_used'] is False
+          assert p['hypothesis_metric_computation'] is False
+          assert p['sample_size_inference'] is False
+          assert p['total_decision_realization_epochs'] == 18
+          assert p['confirmatory_executed'] is False
+          PY
+
+      - name: Upload Pilot evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: gh3-v10-structural-pilot-1d392e3
+          path: /tmp/gh3-pilot/
+          if-no-files-found: error
+          retention-days: 90
