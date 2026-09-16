@@ -1,0 +1,82 @@
+name: GH-1L v1.0.1 pre-pilot gate
+
+on:
+  push:
+    branches: [feature/governance-harness-v1l]
+    paths:
+      - 'research/governance_harness_gh1l/**'
+      - '.github/workflows/gh1l-prepilot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prepilot-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify GH-1 and Core remain unchanged from frozen base
+        run: |
+          git diff --exit-code ea9261b15663a95d819aa9c9c9e5b9e76e9d5352 -- research/governance_harness_v01 research/oasis_core_v11
+
+      - name: GH-1L amended admission suite
+        run: python -m unittest research.governance_harness_gh1l.admission.test_gh1l -v
+
+      - name: Frozen GH-1 admission and pre-execution suites
+        run: >-
+          python -m unittest
+          research.governance_harness_v01.test_core_governance_admission
+          research.governance_harness_v01.test_gh1_preexecution
+          research.governance_harness_v01.test_gh1_freeze -v
+
+      - name: Frozen GH-1 governance regression suites
+        run: >-
+          python -m unittest
+          research.governance_harness_v01.test_governance_attack_v04
+          research.governance_harness_v01.test_governance_attack
+          research.governance_harness_v01.test_governance_harness -v
+
+      - name: Canonical Harness regressions
+        run: python -m unittest discover -s research/carla_v22_harness_v11 -p 'test_*.py' -v
+
+      - name: Core relational and history regressions
+        run: >-
+          python -m unittest
+          research.oasis_core_v11.test_current_relational_core
+          research.oasis_core_v11.test_history_admission -v
+
+      - name: Preserve the single documented legacy Core incompatibility
+        shell: bash
+        run: |
+          set +e
+          python -m unittest research.oasis_core_v11.test_carla_domain_bundle_v1.DomainBundleTests.test_bundle_runs_through_canonical_harness -v 2>&1 | tee /tmp/gh1l-known-baseline.log
+          status=${PIPESTATUS[0]}
+          set -e
+          if [ "$status" -eq 0 ]; then
+            echo 'Documented baseline incompatibility unexpectedly disappeared; inspect before changing the record.'
+            exit 1
+          fi
+          grep -qi 'history' /tmp/gh1l-known-baseline.log
+
+      - name: Confirm no pilot or confirmatory count freeze exists yet
+        run: |
+          test ! -f research/governance_harness_gh1l/results/PILOT_RESULT.json
+          test ! -f research/governance_harness_gh1l/design/CONFIRMATORY_COUNT_FREEZE.json
+
+      - name: GH-1L preflight and amended EXPERIMENT_READY evidence
+        run: |
+          python -m research.governance_harness_gh1l.admission.preflight | tee /tmp/gh1l-preflight.json
+          grep -q '"status": "EXPERIMENT_READY"' /tmp/gh1l-preflight.json
+          cat research/governance_harness_gh1l/validation/EXPERIMENT_READY.json
+
+      - name: Compile GH-1L, GH-1 and Core modules
+        run: >-
+          python -m compileall -q
+          research/governance_harness_gh1l
+          research/governance_harness_v01
+          research/oasis_core_v11
