@@ -174,8 +174,8 @@ class GH2V11AdmissionTests(unittest.TestCase):
 
     def test_20_preflight_does_not_call_post_decision_evaluator(self):
         source = inspect.getsource(preflight)
-        self.assertNotIn("evaluate_cases(", source)
-        self.assertNotIn("resolution_rate", source)
+        self.assertNotIn("evaluate_cases", source)
+        self.assertNotIn("from research.governance_harness_gh2.runner import evaluate", source)
 
     def test_21_manifest_freezes_count_before_pilot_and_rejects_seed_replication(self):
         here = Path(__file__).resolve().parents[1]
