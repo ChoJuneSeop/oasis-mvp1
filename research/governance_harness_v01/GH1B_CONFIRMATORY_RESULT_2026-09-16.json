@@ -1,0 +1,34 @@
+{
+  "experiment": "GH-1B",
+  "status": "COMPLETE",
+  "frozen_basis_commit": "71be4d3e58980cb60b45826c9be05b195ae55d15",
+  "runner_sha256": "8a60976a5c2d5fe5c7da5982fd85ee3a82595a2b0826b051b5af517e77d65a6e",
+  "pilot": {
+    "blocks": 3,
+    "runs": 9,
+    "effectiveness_variance": 0.0,
+    "pilot_seeds_excluded_from_confirmatory": true
+  },
+  "confirmatory_freeze": {
+    "target_delta": 0.2,
+    "formula": "max(12, ceil(2*(1.96+0.84)^2*variance/delta^2))",
+    "blocks": 12,
+    "runs": 36
+  },
+  "fresh_process_isolation": true,
+  "arm_metric_means": {
+    "G1": {"recovery_success": 1.0, "recovery_latency": 1.0, "unsafe_or_invalid_action_count": 0.0, "unresolved_episode_count": 0.0, "archive_access_count": 2.0, "records_scanned": 24.0, "archive_bytes_read": 6144.0, "total_op_calls": 22.0, "active_experience_count": 8.0, "active_ratio": 0.6666666666666666},
+    "G2": {"recovery_success": 1.0, "recovery_latency": 1.0, "unsafe_or_invalid_action_count": 0.0, "unresolved_episode_count": 0.0, "archive_access_count": 6.0, "records_scanned": 72.0, "archive_bytes_read": 18432.0, "total_op_calls": 30.0, "active_experience_count": 8.0, "active_ratio": 0.6666666666666666},
+    "G3": {"recovery_success": 1.0, "recovery_latency": 1.0, "unsafe_or_invalid_action_count": 0.0, "unresolved_episode_count": 0.0, "archive_access_count": 0.0, "records_scanned": 0.0, "archive_bytes_read": 0.0, "total_op_calls": 18.0, "active_experience_count": 0.0, "active_ratio": 0.0}
+  },
+  "metric_classifications": {
+    "recovery_success_G1_vs_G3": "NOT_SUPPORTED",
+    "recovery_latency_G1_vs_G3": "NOT_SUPPORTED",
+    "unsafe_actions_G1_vs_G3": "NOT_SUPPORTED",
+    "archive_access_G1_vs_G2": "SUPPORTED",
+    "records_scanned_G1_vs_G2": "SUPPORTED",
+    "archive_bytes_G1_vs_G2": "SUPPORTED"
+  },
+  "aggregate_score": null,
+  "regression_verification": {"tests_run": 90, "failures": 0, "errors": 0, "result": "PASS"}
+}

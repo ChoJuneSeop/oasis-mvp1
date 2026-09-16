@@ -1,0 +1,41 @@
+{
+  "experiment": "GH-1A",
+  "spec_version": "GH1_EXPERIMENT_V1_0_FINAL",
+  "frozen_basis_commit": "71be4d3e58980cb60b45826c9be05b195ae55d15",
+  "runner_sha256": "ce72451119d0b7f5bca5ccc9725c6f8c004857e709ff5ce79cf10148b72d0ede",
+  "run_status": "PASS",
+  "cases": {
+    "A-CASE-1": {
+      "gap": false,
+      "archive_access_count": 0,
+      "records_scanned": 0,
+      "archive_bytes_read": 0,
+      "real_actuation_count": 1,
+      "closure": true
+    },
+    "A-CASE-2": {
+      "gap": true,
+      "participants": ["E01", "E02", "E03", "E04"],
+      "core_exposed_count": 4,
+      "participant_removal_decision_changed": true,
+      "selected_equals_realized": true,
+      "closure": true
+    },
+    "A-CASE-3": {
+      "nonparticipants": ["E05", "E06", "E07", "E08"],
+      "canary_not_exposed": true,
+      "nonparticipant_insertion_decision_changed": false
+    },
+    "A-CASE-4": {
+      "same_experience_participated_then_rejected": true,
+      "first_context_participants": ["E01", "E02", "E03", "E04"],
+      "reversed_context_participants": []
+    }
+  },
+  "regression_verification": {
+    "tests_run": 90,
+    "failures": 0,
+    "errors": 0,
+    "result": "PASS"
+  }
+}
