@@ -18,6 +18,7 @@ from research.oasis_core_v11.carla_relational_domain import (
     CurrentObservationRelationBuilder,
 )
 from research.oasis_core_v11.current_relational_core import (
+    CoreV11InvariantError,
     CurrentRelationalCoreV11,
     HistoricalRelationRecord,
 )
@@ -41,6 +42,10 @@ def build_domain_bundle(
     *,
     controller_coefficients: ControllerCoefficients = ControllerCoefficients(),
 ) -> DomainBundle:
+    if history:
+        raise CoreV11InvariantError(
+            "direct domain-bundle history injection is removed; Governance must supply a participating view"
+        )
     core = CurrentRelationalCoreV11(
         relation_builder=CurrentObservationRelationBuilder(),
         candidate_provider=CurrentFeasibleCandidateGenerator(),
@@ -49,9 +54,11 @@ def build_domain_bundle(
         responsibility_operator=ContinuousUVITResponsibilityOperator(),
         choice_operator=ParetoThenDistributionChoiceOperator(),
         actuation_operator=MemoryIsolatedActuationOperator(controller_coefficients),
-        history=history,
     )
-    admission = HistoryAdmissionBridge(core=core, extractor=ClosedCARLARelationExtractor())
+    admission = HistoryAdmissionBridge(
+        core=core,
+        extractor=ClosedCARLARelationExtractor(),
+    )
     return DomainBundle(
         core=core,
         history_admission=admission,
