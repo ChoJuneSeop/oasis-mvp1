@@ -1,0 +1,239 @@
+name: GH-2 v1.1 confirmatory
+
+on:
+  push:
+    branches: [experiment/governance-harness-gh2-v11-confirmatory]
+    paths:
+      - '.github/workflows/gh2-v11-confirmatory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  confirmatory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: a2fa56a6cbf57d2d633e2af14e8bfa7ee83152c4
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify exact frozen snapshot and admission
+        run: |
+          test "$(git rev-parse HEAD)" = "a2fa56a6cbf57d2d633e2af14e8bfa7ee83152c4"
+          python -m research.governance_harness_gh2.admission.preflight | tee /tmp/gh2-v11-preflight.json
+          grep -q '"status": "EXPERIMENT_READY"' /tmp/gh2-v11-preflight.json
+          grep -q '"finite_matrix_count_frozen"' /tmp/gh2-v11-preflight.json
+          grep -q '"preexecution_no_effect_peeking"' /tmp/gh2-v11-preflight.json
+
+      - name: Run frozen v1.1 confirmatory matrix
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          from research.governance_harness_gh2.models import ARMS
+          from research.governance_harness_gh2.runner import evaluate_cases
+          from research.governance_harness_gh2.scenario import build_confirmatory_world
+
+          SNAPSHOT = "a2fa56a6cbf57d2d633e2af14e8bfa7ee83152c4"
+          PILOT_RUN_ID = 35072892915
+          PILOT_RESULT_SHA256 = "b2603cdee36b3c9a61d20eddafb182fced505206f9c2f874c6738402fd1fea5c"
+          PILOT_ARTIFACT_ID = 10436608694
+
+          cases = build_confirmatory_world()
+          if len(cases) != 66:
+              raise SystemExit(f"confirmatory matrix changed: {len(cases)}")
+          if len({c.truth.pair_id for c in cases}) != 33:
+              raise SystemExit("confirmatory pair count changed")
+
+          result = evaluate_cases(cases)
+          arms = result["arms"]
+          truth = {case.runtime.frame_id: case.truth for case in cases}
+          ordered_frame_ids = [case.runtime.frame_id for case in cases]
+
+          structural = {
+              "exact_frame_count": result["frame_count"] == 66,
+              "all_arms_present": set(arms) == set(ARMS),
+              "fresh_process_across_arms": len({arms[a]["pid"] for a in ARMS}) == len(ARMS)
+                  and len({arms[a]["worker_token"] for a in ARMS}) == len(ARMS),
+              "decision_count_66_each": all(len(arms[a]["decisions"]) == 66 for a in ARMS),
+              "selected_equals_realized": all(
+                  d["enacted_selected"] == d["realized_action"]
+                  for a in ARMS for d in arms[a]["decisions"]
+              ),
+              "single_realization": all(
+                  d["realization_count"] == 1
+                  for a in ARMS for d in arms[a]["decisions"]
+              ),
+              "selection_inside_actual_candidates": all(
+                  d["enacted_selected"] in d["candidate_ids"]
+                  for a in ARMS for d in arms[a]["decisions"]
+              ),
+              "candidate_contract_constant": all(
+                  tuple(d["candidate_ids"]) == ("continue-flow", "yield-space")
+                  for a in ARMS for d in arms[a]["decisions"]
+              ),
+              "r1_current_responsibility_bound": all(
+                  d["responsibility_bound"] is True
+                  and d["responsibility"]["source"] == "current"
+                  and d["responsibility"]["responsibility_selected"] == d["enacted_selected"]
+                  for d in arms["R1_CURRENT_BOUND"]["decisions"]
+              ),
+              "r2_record_only": all(
+                  d["responsibility_bound"] is False
+                  for d in arms["R2_RECORD_ONLY"]["decisions"]
+              ),
+              "r3_permuted_bound": all(
+                  d["responsibility_bound"] is True and d["responsibility"]["source"] == "permuted"
+                  for d in arms["R3_PERMUTED"]["decisions"]
+              ),
+          }
+
+          r4_decisions = arms["R4_STALE"]["decisions"]
+          r4_pair_local = True
+          for i in range(0, len(r4_decisions), 2):
+              critical, relief = r4_decisions[i], r4_decisions[i + 1]
+              r4_pair_local &= critical["stale_source_frame_id"] is None
+              r4_pair_local &= relief["stale_source_frame_id"] == critical["frame_id"]
+          structural["r4_pair_local_stale"] = bool(r4_pair_local)
+          structural_valid = all(structural.values())
+
+          def family_deltas(left_arm, right_arm):
+              return {
+                  family: arms[left_arm]["resolution_by_observation_family"][family]
+                    - arms[right_arm]["resolution_by_observation_family"][family]
+                  for family in ("O1", "O2", "O3")
+              }
+
+          def relief_rate(arm):
+              decisions = {d["frame_id"]: d for d in arms[arm]["decisions"]}
+              values = []
+              per_family = {"O1": [], "O2": [], "O3": []}
+              for frame_id in ordered_frame_ids:
+                  ev = truth[frame_id]
+                  if not ev.scenario_class.endswith("-relief"):
+                      continue
+                  value = int(decisions[frame_id]["realized_action"] == ev.expected_action)
+                  values.append(value)
+                  family = ev.pair_id.split("-")[1]
+                  per_family[family].append(value)
+              return (
+                  sum(values) / len(values),
+                  {family: sum(vals) / len(vals) for family, vals in per_family.items()},
+              )
+
+          def verdict(overall_delta, per_family_delta):
+              if not structural_valid:
+                  return "INCONCLUSIVE"
+              if overall_delta <= 0.0:
+                  return "NOT_SUPPORTED"
+              if all(delta >= 0.0 for delta in per_family_delta.values()):
+                  return "SUPPORTED"
+              return "NO_PREDEFINED_VERDICT"
+
+          r1 = arms["R1_CURRENT_BOUND"]["resolution_rate"]
+          r2 = arms["R2_RECORD_ONLY"]["resolution_rate"]
+          r3 = arms["R3_PERMUTED"]["resolution_rate"]
+          r4 = arms["R4_STALE"]["resolution_rate"]
+
+          primary_family = family_deltas("R1_CURRENT_BOUND", "R2_RECORD_ONLY")
+          identity_family = family_deltas("R1_CURRENT_BOUND", "R3_PERMUTED")
+          primary_delta = r1 - r2
+          identity_delta = r1 - r3
+
+          r1_relief, r1_relief_family = relief_rate("R1_CURRENT_BOUND")
+          r4_relief, r4_relief_family = relief_rate("R4_STALE")
+          nonsticky_delta = r1_relief - r4_relief
+          nonsticky_family = {
+              family: r1_relief_family[family] - r4_relief_family[family]
+              for family in ("O1", "O2", "O3")
+          }
+
+          r1_by_frame = {d["frame_id"]: d for d in arms["R1_CURRENT_BOUND"]["decisions"]}
+          r2_by_frame = {d["frame_id"]: d for d in arms["R2_RECORD_ONLY"]["decisions"]}
+          selection_change_rate = sum(
+              int(r1_by_frame[f]["enacted_selected"] != r2_by_frame[f]["enacted_selected"])
+              for f in ordered_frame_ids
+          ) / len(ordered_frame_ids)
+
+          unresolved = {
+              arm: 1.0 - arms[arm]["resolution_rate"]
+              for arm in ARMS
+          }
+
+          payload = {
+              "experiment": "GH-2",
+              "version": "v1.1",
+              "stage": "CONFIRMATORY_COMPLETE" if structural_valid else "CONFIRMATORY_INVALID",
+              "snapshot_sha": SNAPSHOT,
+              "pilot_provenance": {
+                  "run_id": PILOT_RUN_ID,
+                  "result_sha256": PILOT_RESULT_SHA256,
+                  "artifact_id": PILOT_ARTIFACT_ID,
+                  "effect_metrics_calculated": False,
+                  "confirmatory_count_changed_by_pilot": False,
+              },
+              "matrix": {
+                  "axis_combinations": 11,
+                  "observation_families": ["O1", "O2", "O3"],
+                  "matched_pairs": 33,
+                  "frames_per_arm": 66,
+                  "arms": 4,
+                  "decision_realization_units": 264,
+              },
+              "structural_checks": structural,
+              "structural_valid": structural_valid,
+              "arm_resolution_rates": {arm: arms[arm]["resolution_rate"] for arm in ARMS},
+              "primary_R1_minus_R2": {
+                  "delta": primary_delta,
+                  "by_observation_family": primary_family,
+                  "verdict": verdict(primary_delta, primary_family),
+              },
+              "candidate_identity_R1_minus_R3": {
+                  "delta": identity_delta,
+                  "by_observation_family": identity_family,
+                  "verdict": verdict(identity_delta, identity_family),
+              },
+              "nonstickiness_relief_R1_minus_R4": {
+                  "R1_relief_rate": r1_relief,
+                  "R4_relief_rate": r4_relief,
+                  "delta": nonsticky_delta,
+                  "by_observation_family": nonsticky_family,
+                  "verdict": verdict(nonsticky_delta, nonsticky_family),
+              },
+              "selection_change_rate_R1_vs_R2": selection_change_rate,
+              "invalid_rate": 0.0 if structural_valid else None,
+              "unresolved_rate_by_arm": unresolved,
+              "aggregate_score": None,
+              "claim_boundary": "Frozen synthetic Governance OASIS responsibility contract only; not general safety, deployment fitness, autonomous-driving superiority, or full integrated-governance evidence.",
+          }
+
+          out = Path("research/governance_harness_gh2/results/CONFIRMATORY_V1_1_RESULT.json")
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+          if not structural_valid:
+              raise SystemExit("GH-2 v1.1 structural invariant failure; metrics are INCONCLUSIVE")
+          PY
+
+      - name: Hash confirmatory artifact
+        if: always()
+        run: |
+          if test -f research/governance_harness_gh2/results/CONFIRMATORY_V1_1_RESULT.json; then
+            sha256sum research/governance_harness_gh2/results/CONFIRMATORY_V1_1_RESULT.json | tee /tmp/gh2-v11-confirmatory.sha256
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gh2-v11-confirmatory
+          path: |
+            research/governance_harness_gh2/results/CONFIRMATORY_V1_1_RESULT.json
+            /tmp/gh2-v11-confirmatory.sha256
+          if-no-files-found: error
