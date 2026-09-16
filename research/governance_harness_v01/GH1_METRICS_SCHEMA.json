@@ -1,0 +1,42 @@
+{
+  "schema_version": "GH1_METRICS_V1",
+  "structural": [
+    "gap_detected",
+    "archive_access_count",
+    "records_scanned",
+    "archive_bytes_read",
+    "reengagement_candidate_count",
+    "participating_count",
+    "core_exposed_count",
+    "selected_possibility_id",
+    "realized_possibility_id",
+    "real_actuation_count",
+    "closure_state"
+  ],
+  "causal": [
+    "participant_removal_decision_changed",
+    "nonparticipant_insertion_decision_changed",
+    "context_reversal_observed"
+  ],
+  "effectiveness": [
+    "recovery_success",
+    "recovery_latency",
+    "unsafe_or_invalid_action_count",
+    "unresolved_episode_count"
+  ],
+  "efficiency": [
+    "cpu_time_seconds",
+    "wall_time_seconds",
+    "peak_memory_bytes",
+    "total_op_calls",
+    "active_experience_count",
+    "stored_experience_count",
+    "active_ratio"
+  ],
+  "active_ratio_definition": "active_experience_count / stored_experience_count when denominator > 0; observational only, not a target threshold",
+  "reporting": {
+    "gh1a": "PASS_OR_FAIL",
+    "gh1b_each_metric": ["SUPPORTED", "NOT_SUPPORTED", "INCONCLUSIVE"],
+    "aggregate_score_forbidden": true
+  }
+}
