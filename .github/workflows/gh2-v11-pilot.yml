@@ -1,0 +1,106 @@
+name: GH-2 v1.1 structural pilot
+
+on:
+  push:
+    branches: [experiment/governance-harness-gh2-v11-pilot]
+    paths:
+      - '.github/workflows/gh2-v11-pilot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: a2fa56a6cbf57d2d633e2af14e8bfa7ee83152c4
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify exact frozen snapshot
+        run: |
+          test "$(git rev-parse HEAD)" = "a2fa56a6cbf57d2d633e2af14e8bfa7ee83152c4"
+          python -m research.governance_harness_gh2.admission.preflight | tee /tmp/gh2-v11-preflight.json
+          grep -q '"status": "EXPERIMENT_READY"' /tmp/gh2-v11-preflight.json
+
+      - name: Run v1.1 structural pilot only
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from research.governance_harness_gh2.models import ARMS
+          from research.governance_harness_gh2.runner import run_cases
+          from research.governance_harness_gh2.scenario import build_pilot_world
+
+          SNAPSHOT = "a2fa56a6cbf57d2d633e2af14e8bfa7ee83152c4"
+          cases = build_pilot_world()
+          assert len(cases) == 8
+          block = run_cases(cases)
+          workers = block["workers"]
+          assert {w["arm"] for w in workers} == set(ARMS)
+          pids = [w["pid"] for w in workers]
+          tokens = [w["worker_token"] for w in workers]
+          assert len(pids) == len(set(pids))
+          assert len(tokens) == len(set(tokens))
+
+          arm_summary = {}
+          for worker in workers:
+              decisions = worker["decisions"]
+              assert len(decisions) == 8
+              assert worker["realization_count"] == 8
+              assert all(d["enacted_selected"] == d["realized_action"] for d in decisions)
+              assert all(d["realization_count"] == 1 for d in decisions)
+              arm_summary[worker["arm"]] = {
+                  "decision_count": worker["decision_count"],
+                  "realization_count": worker["realization_count"],
+                  "selected_equals_realized": True,
+                  "single_realization": True,
+                  "pid": worker["pid"],
+                  "worker_token": worker["worker_token"],
+              }
+
+          r4 = next(w for w in workers if w["arm"] == "R4_STALE")
+          for i in range(0, 8, 2):
+              critical, relief = r4["decisions"][i], r4["decisions"][i + 1]
+              assert critical["stale_source_frame_id"] is None
+              assert relief["stale_source_frame_id"] == critical["frame_id"]
+
+          payload = {
+              "experiment": "GH-2",
+              "version": "v1.1",
+              "stage": "STRUCTURAL_PILOT_COMPLETE",
+              "snapshot_sha": SNAPSHOT,
+              "pilot_frames": 8,
+              "pilot_pairs": 4,
+              "arms": list(ARMS),
+              "fresh_process": True,
+              "r4_pair_local_stale": True,
+              "effect_metrics_calculated": False,
+              "evaluator_truth_joined": False,
+              "pilot_may_change_confirmatory_count": False,
+              "confirmatory_frames_per_arm_remains_frozen": 66,
+              "confirmatory_decision_realization_units_remains_frozen": 264,
+              "experiment_design_changed_after_pilot": False,
+              "arm_summary": arm_summary,
+          }
+          out = Path("research/governance_harness_gh2/results/PILOT_V1_1_RESULT.json")
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          print(json.dumps(payload, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Hash pilot artifact
+        run: sha256sum research/governance_harness_gh2/results/PILOT_V1_1_RESULT.json | tee /tmp/gh2-v11-pilot.sha256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gh2-v11-structural-pilot
+          path: |
+            research/governance_harness_gh2/results/PILOT_V1_1_RESULT.json
+            /tmp/gh2-v11-pilot.sha256
+          if-no-files-found: error
