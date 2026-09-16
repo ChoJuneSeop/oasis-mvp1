@@ -1,0 +1,23 @@
+{
+  "spec_version": "GH2_EXPERIMENT_V1_0_PREEXECUTION",
+  "lineage_base_commit": "5861b08d6b48f79b88f4f160bbb425690708ccd4",
+  "arms": ["R1_CURRENT_BOUND", "R2_RECORD_ONLY", "R3_PERMUTED", "R4_STALE"],
+  "scenario_classes": [
+    "uncertainty-critical", "uncertainty-relief",
+    "impact-critical", "impact-relief",
+    "vulnerability-critical", "vulnerability-relief",
+    "temporality-critical", "temporality-relief"
+  ],
+  "pilot_blocks": 3,
+  "pilot_seeds": [8201, 8202, 8203],
+  "confirmatory_seed_base": 920000,
+  "frames_per_block": 8,
+  "primary_metric": "responsibility_sensitive_resolution_rate_R1_minus_R2",
+  "pilot_excluded_from_confirmatory": true,
+  "history_participation": "EMPTY_FROZEN_ALL_ARMS",
+  "feedback_decision_reuse": false,
+  "new_completed_experience_reuse": false,
+  "outcome_revalidation_learning": false,
+  "aggregate_score": null,
+  "experiment_executed": false
+}

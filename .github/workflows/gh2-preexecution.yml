@@ -1,0 +1,65 @@
+name: GH-2 responsibility pre-execution gate
+
+on:
+  push:
+    branches: [feature/governance-harness-gh2]
+    paths:
+      - 'research/governance_harness_gh2/**'
+      - '.github/workflows/gh2-preexecution.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preexecution:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify GH-1 GH-1L and Core remain frozen
+        run: |
+          git diff --exit-code 5861b08d6b48f79b88f4f160bbb425690708ccd4 -- research/governance_harness_v01 research/governance_harness_gh1l research/oasis_core_v11
+
+      - name: GH-2 admission tests
+        run: python -m unittest research.governance_harness_gh2.admission.test_gh2 -v
+
+      - name: Frozen Governance Harness regressions
+        run: >-
+          python -m unittest
+          research.governance_harness_v01.test_governance_attack_v04
+          research.governance_harness_v01.test_governance_attack
+          research.governance_harness_v01.test_governance_harness -v
+
+      - name: Frozen Core regressions
+        run: >-
+          python -m unittest
+          research.oasis_core_v11.test_current_relational_core
+          research.oasis_core_v11.test_history_admission -v
+
+      - name: Frozen Canonical Harness regressions
+        run: python -m unittest discover -s research/carla_v22_harness_v11 -p 'test_*.py' -v
+
+      - name: GH-2 preflight
+        run: |
+          python -m research.governance_harness_gh2.admission.preflight | tee /tmp/gh2-preflight.json
+          grep -q '"status": "EXPERIMENT_READY"' /tmp/gh2-preflight.json
+          grep -q '"experiment_executed": false' /tmp/gh2-preflight.json
+
+      - name: Confirm experiment outputs do not exist
+        run: |
+          test ! -f research/governance_harness_gh2/results/PILOT_RESULT.json
+          test ! -f research/governance_harness_gh2/results/CONFIRMATORY_RESULT.json
+
+      - name: Compile GH-2 and frozen dependencies
+        run: >-
+          python -m compileall -q
+          research/governance_harness_gh2
+          research/governance_harness_v01
+          research/governance_harness_gh1l
+          research/oasis_core_v11
