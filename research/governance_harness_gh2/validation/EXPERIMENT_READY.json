@@ -2,33 +2,39 @@
   "experiment": "GH-2",
   "principle": "Responsibility-centered Governance",
   "status": "EXPERIMENT_READY",
-  "spec_version": "GH2_EXPERIMENT_V1_0_PREEXECUTION",
+  "spec_version": "GH2_EXPERIMENT_V1_1_PREEXECUTION",
   "lineage_base_commit": "5861b08d6b48f79b88f4f160bbb425690708ccd4",
-  "validated_implementation_sha": "a295db380e9595ee42567def37d3db0ce8f30c2a",
-  "workflow_run_id": 35064368972,
+  "v1_0_reference_commit": "981482067f3fca458879bf94b3c4d12e77ed8e95",
+  "validated_implementation_sha": "d2fb242992fd3f119799e78ef7e27c0aad5ff406",
+  "workflow_run_id": 35072735885,
   "workflow_conclusion": "success",
   "experiment_executed": false,
   "pilot_executed": false,
   "confirmatory_executed": false,
+  "v1_0_pilot_status": "DIAGNOSTIC_ONLY_EXCLUDED_FROM_V1_1_CLAIMS",
   "frozen_predecessor_changes": [],
   "test_evidence": {
-    "gh2_admission": {"passed": 19, "failed": 0},
+    "gh2_v1_1_admission": {"passed": 23, "failed": 0},
     "governance_harness_regressions": {"passed": 45, "failed": 0},
     "core_regressions": {"passed": 17, "failed": 0},
     "canonical_harness_regressions": {"passed": 17, "failed": 0},
-    "total_passed": 98,
+    "total_passed": 102,
     "new_regressions": 0
   },
   "preexecution_gates": {
     "freeze_manifest": "PASS",
     "frozen_lineage_unchanged": "PASS",
     "matched_observation_context_reversal": "PASS",
+    "pilot_confirmatory_disjoint": "PASS",
+    "finite_matrix_count_frozen": "PASS",
     "evaluator_leakage": "PASS",
     "actual_core_candidate_contract": "PASS",
     "responsibility_after_possibilities": "PASS",
     "no_scalar_responsibility": "PASS",
+    "r4_pair_local_stale": "PASS",
     "fresh_process_actual_path": "PASS",
     "dry_run_not_experiment": "PASS",
+    "preexecution_no_effect_peeking": "PASS",
     "pilot_absent": "PASS",
     "confirmatory_absent": "PASS",
     "execution_lock": "PASS"
@@ -39,8 +45,23 @@
     "R3_PERMUTED",
     "R4_STALE"
   ],
-  "primary_metric": "responsibility_sensitive_resolution_rate_R1_minus_R2",
+  "pilot": {
+    "mode": "STRUCTURAL_ONLY_SINGLE_AXIS_MATRIX",
+    "frames": 8,
+    "blocks": 1,
+    "seed_is_experimental_factor": false,
+    "may_change_confirmatory_count": false
+  },
+  "confirmatory": {
+    "mode": "PRE_FROZEN_EXHAUSTIVE_MULTI_AXIS_MATRIX",
+    "axis_combinations": 11,
+    "observation_families": 3,
+    "frames_per_arm": 66,
+    "decision_realization_units": 264,
+    "count_method": "PRE_FROZEN_FINITE_MATRIX_NO_PILOT_DERIVATION"
+  },
+  "primary_metric": "responsibility_contract_resolution_rate_R1_minus_R2",
   "history_participation_control": "EMPTY_FROZEN_ALL_ARMS",
   "aggregate_score": null,
-  "next_permitted_stage": "PILOT_EXECUTION_ON_SEPARATE_EXACT_SNAPSHOT_LINEAGE"
+  "next_permitted_stage": "V1_1_PILOT_EXECUTION_ON_SEPARATE_EXACT_SNAPSHOT_LINEAGE"
 }
