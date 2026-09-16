@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass, field
-from contextlib import contextmanager
 from math import isfinite
 from typing import Any, Mapping, Protocol, Sequence
 
@@ -36,6 +36,7 @@ class CurrentRelation:
 @dataclass(frozen=True)
 class PastRelationSemanticView:
     """Semantic view deliberately excludes age/completed_at_tau and raw actor identity."""
+
     subject_role: str
     object_role: str
     relation_type: str
@@ -62,7 +63,9 @@ class PossibilityCandidate:
         if not self.possibility_id:
             raise CoreV11InvariantError("possibility_id is required")
         if not self.current_evidence:
-            raise CoreV11InvariantError("every current possibility must be anchored by current-reality evidence")
+            raise CoreV11InvariantError(
+                "every current possibility must be anchored by current-reality evidence"
+            )
 
 
 @dataclass(frozen=True)
@@ -77,7 +80,9 @@ class RelationContribution:
         if not self.possibility_id:
             raise CoreV11InvariantError("relation contribution requires a possibility")
         if not self.current_relation_ids:
-            raise CoreV11InvariantError("past relation cannot participate without an explicit current-relation anchor")
+            raise CoreV11InvariantError(
+                "past relation cannot participate without an explicit current-relation anchor"
+            )
 
 
 @dataclass(frozen=True)
@@ -113,7 +118,9 @@ class ResponsibilityVector:
                 raise CoreV11InvariantError(f"responsibility {name} must be finite")
         for name, value in self.additional.items():
             if not isfinite(float(value)):
-                raise CoreV11InvariantError(f"additional responsibility {name} must be finite")
+                raise CoreV11InvariantError(
+                    f"additional responsibility {name} must be finite"
+                )
 
 
 @dataclass(frozen=True)
@@ -136,7 +143,11 @@ class CurrentRelationBuilder(Protocol):
 
 
 class CandidateProvider(Protocol):
-    def candidates(self, observation: PresentObservation, current_relations: Sequence[CurrentRelation]) -> Sequence[PossibilityCandidate]: ...
+    def candidates(
+        self,
+        observation: PresentObservation,
+        current_relations: Sequence[CurrentRelation],
+    ) -> Sequence[PossibilityCandidate]: ...
 
 
 class RelationOperator(Protocol):
@@ -187,7 +198,20 @@ class ChoiceOperator(Protocol):
 
 
 class ActuationOperator(Protocol):
-    def actuation(self, *, observation: PresentObservation, selected: PossibilityCandidate) -> VehicleActuation: ...
+    def actuation(
+        self, *, observation: PresentObservation, selected: PossibilityCandidate
+    ) -> VehicleActuation: ...
+
+
+class ParticipatingExperienceLike(Protocol):
+    experience_id: str
+    provenance_ref: str
+    completed_tau: float
+    content: Mapping[str, Any]
+
+
+class ParticipatingViewLike(Protocol):
+    items: Sequence[ParticipatingExperienceLike]
 
 
 class TraceIncidenceDistribution:
@@ -197,32 +221,53 @@ class TraceIncidenceDistribution:
     the current epoch. It is recomputed from scratch after every ablation. It is not a
     permanent memory score, recency weight, quality score, or universal OASIS formula.
     """
+
     @staticmethod
-    def build(candidates: Sequence[PossibilityCandidate], contributions: Sequence[BoundContribution]) -> dict[str, float]:
+    def build(
+        candidates: Sequence[PossibilityCandidate],
+        contributions: Sequence[BoundContribution],
+    ) -> dict[str, float]:
         evidence: dict[str, set[str]] = {
-            c.possibility_id: {f"current:{x}" for x in c.current_evidence} for c in candidates
+            c.possibility_id: {f"current:{x}" for x in c.current_evidence}
+            for c in candidates
         }
         valid = set(evidence)
         for bound in contributions:
             pid = bound.contribution.possibility_id
             if pid not in valid:
                 continue
-            evidence[pid].add(f"past:{bound.source.experience_id}:{bound.source.relation_element_id}")
+            evidence[pid].add(
+                f"past:{bound.source.experience_id}:{bound.source.relation_element_id}"
+            )
         mass = {pid: float(len(tokens)) for pid, tokens in evidence.items()}
         total = sum(mass.values())
         if total <= 0.0:
-            raise CoreV11InvariantError("current possibility distribution has no trace mass")
+            raise CoreV11InvariantError(
+                "current possibility distribution has no trace mass"
+            )
         return {pid: value / total for pid, value in mass.items()}
 
 
 class CurrentRelationalCoreV11:
-    """Current-formalization Core scaffold for G3.2.
+    """Current relational Core with an externally governed experience boundary.
 
-    The Core owns history provenance and orchestration, while domain semantics remain
-    explicit injected operators. Historical timestamps are retained in source records
-    but are never supplied to the relation-participation operator. Authoritative current
-    flow time is supplied separately by the Harness and is never inferred from epoch.
+    The Core never owns an archive. For a governance epoch it receives only the
+    already-filtered participating view, derives immutable relation records for that
+    epoch, and discards those records after realization. The Governance-selected
+    candidate is bound through ``realize_selected`` and cannot be replaced by the
+    compatibility choice operator on that path.
     """
+
+    experimental_contract = {
+        "history_port_only": True,
+        "present_only": True,
+        "no_future": True,
+        "pure_probes": True,
+        "single_realization": True,
+        "closure": True,
+        "atomic_capture": True,
+    }
+    real_core_admission_profile = "GH1_CORE_ADMISSION_V1"
 
     def __init__(
         self,
@@ -236,6 +281,10 @@ class CurrentRelationalCoreV11:
         actuation_operator: ActuationOperator,
         history: Sequence[HistoricalRelationRecord] = (),
     ) -> None:
+        if history:
+            raise CoreV11InvariantError(
+                "direct historical injection is removed; pass only the current participating view"
+            )
         self.relation_builder = relation_builder
         self.candidate_provider = candidate_provider
         self.relation_operator = relation_operator
@@ -243,41 +292,81 @@ class CurrentRelationalCoreV11:
         self.responsibility_operator = responsibility_operator
         self.choice_operator = choice_operator
         self.actuation_operator = actuation_operator
-        self._history: dict[RelationKey, HistoricalRelationRecord] = {}
-        for record in history:
-            self.add_history(record)
         self._last_evaluation: EpochEvaluation | None = None
-        self._governance_allowed_experiences: frozenset[str] | None = None
+        self._epoch_records: tuple[HistoricalRelationRecord, ...] = ()
 
     @staticmethod
     def _source_key(source: RelationElementRef) -> RelationKey:
         return (source.experience_id, source.relation_element_id)
 
-    def add_history(self, record: HistoricalRelationRecord) -> None:
-        self._history[self._source_key(record.source)] = record
+    def _clear_epoch(self) -> None:
+        self._last_evaluation = None
+        self._epoch_records = ()
 
-    def history_records(self) -> tuple[HistoricalRelationRecord, ...]:
-        records=tuple(self._history[k] for k in sorted(self._history))
-        allowed=self._governance_allowed_experiences
-        return records if allowed is None else tuple(r for r in records if r.source.experience_id in allowed)
-
-    @contextmanager
-    def governance_history_scope(self, allowed_experience_ids: frozenset[str]):
-        """Temporarily narrow history capability for a governance epoch."""
-        previous=self._governance_allowed_experiences
-        self._governance_allowed_experiences=frozenset(allowed_experience_ids)
-        self._last_evaluation=None
-        try:
-            yield
-        finally:
-            self._last_evaluation=None
-            self._governance_allowed_experiences=previous
+    def _records_from_view(
+        self,
+        participating_view: ParticipatingViewLike | None,
+        *,
+        tau: float,
+    ) -> tuple[HistoricalRelationRecord, ...]:
+        if participating_view is None:
+            return ()
+        items = tuple(getattr(participating_view, "items", ()))
+        records: list[HistoricalRelationRecord] = []
+        seen: set[RelationKey] = set()
+        for experience in items:
+            experience_id = str(getattr(experience, "experience_id", ""))
+            provenance_ref = str(getattr(experience, "provenance_ref", ""))
+            completed_tau = float(getattr(experience, "completed_tau", float("nan")))
+            content = getattr(experience, "content", None)
+            if not experience_id or not provenance_ref or not isfinite(completed_tau):
+                raise CoreV11InvariantError(
+                    "participating experience lacks valid identity/provenance/completion time"
+                )
+            if completed_tau >= tau:
+                raise CoreV11InvariantError(
+                    "future completed experience cannot participate in the current epoch"
+                )
+            if not isinstance(content, Mapping):
+                raise CoreV11InvariantError(
+                    "participating experience content must be a data mapping"
+                )
+            raw_records = content.get("relation_records", ())
+            if raw_records is None:
+                raw_records = ()
+            if not isinstance(raw_records, (tuple, list)):
+                raise CoreV11InvariantError(
+                    "relation_records must be a finite sequence of HistoricalRelationRecord values"
+                )
+            for record in raw_records:
+                if not isinstance(record, HistoricalRelationRecord):
+                    raise CoreV11InvariantError(
+                        "participating experience emitted an invalid relation record"
+                    )
+                source = record.source
+                if source.experience_id != experience_id:
+                    raise CoreV11InvariantError(
+                        "participating relation lineage does not match experience identity"
+                    )
+                if float(source.completed_at_tau) != completed_tau:
+                    raise CoreV11InvariantError(
+                        "participating relation completion time does not match experience closure"
+                    )
+                key = self._source_key(source)
+                if key in seen:
+                    raise CoreV11InvariantError(
+                        "duplicate participating relation element in one epoch"
+                    )
+                seen.add(key)
+                records.append(deepcopy(record))
+        return tuple(records)
 
     def _evaluate(
         self,
         observation: PresentObservation,
         *,
         tau: float,
+        records: Sequence[HistoricalRelationRecord],
         excluded: frozenset[RelationKey] = frozenset(),
     ) -> EpochEvaluation:
         tau = require_tau("tau", tau)
@@ -286,16 +375,20 @@ class CurrentRelationalCoreV11:
         if len(relation_ids) != len(set(relation_ids)):
             raise CoreV11InvariantError("current relation ids must be unique")
 
-        candidates = tuple(self.candidate_provider.candidates(observation, current_relations))
+        candidates = tuple(
+            self.candidate_provider.candidates(observation, current_relations)
+        )
         by_id = {c.possibility_id: c for c in candidates}
         if len(by_id) != len(candidates):
             raise CoreV11InvariantError("candidate possibility ids must be unique")
 
         bound: list[BoundContribution] = []
         candidate_ids = tuple(by_id)
-        for record in self.history_records():
-            if record.source.completed_at_tau > tau:
-                raise CoreV11InvariantError("future historical relation is present in current Core history")
+        for record in records:
+            if record.source.completed_at_tau >= tau:
+                raise CoreV11InvariantError(
+                    "future relation is present in the current participating view"
+                )
             source_key = self._source_key(record.source)
             if source_key in excluded:
                 continue
@@ -310,7 +403,9 @@ class CurrentRelationalCoreV11:
                         "relation operator cannot resurrect an action absent from current candidates; "
                         "new possibilities must be emitted by the reconstruction operator with current evidence"
                     )
-                bound.append(BoundContribution(record.source, record.semantic, contribution))
+                bound.append(
+                    BoundContribution(record.source, record.semantic, contribution)
+                )
 
         reconstruction = self.reconstruction_operator.reconstruct(
             tau=tau,
@@ -329,7 +424,9 @@ class CurrentRelationalCoreV11:
             merged = list(candidates)
             for candidate in reconstruction.additional_candidates:
                 if candidate.possibility_id in by_id:
-                    raise CoreV11InvariantError("reconstruction emitted duplicate possibility id")
+                    raise CoreV11InvariantError(
+                        "reconstruction emitted duplicate possibility id"
+                    )
                 by_id[candidate.possibility_id] = candidate
                 merged.append(candidate)
             candidates = tuple(merged)
@@ -340,7 +437,11 @@ class CurrentRelationalCoreV11:
                 observation=observation,
                 current_relations=current_relations,
                 candidate=candidate,
-                contributions=tuple(x for x in bound if x.contribution.possibility_id == candidate.possibility_id),
+                contributions=tuple(
+                    x
+                    for x in bound
+                    if x.contribution.possibility_id == candidate.possibility_id
+                ),
             )
             for candidate in candidates
         }
@@ -356,21 +457,37 @@ class CurrentRelationalCoreV11:
             responsibilities=responsibilities,
         )
 
-    def open_epoch(self, observation: PresentObservation, tau: float) -> CoreEpochView:
-        evaluation = self._evaluate(observation, tau=tau)
+    def open_epoch(
+        self,
+        observation: PresentObservation,
+        tau: float,
+        participating_view: ParticipatingViewLike | None = None,
+    ) -> CoreEpochView:
+        tau = require_tau("tau", tau)
+        self._clear_epoch()
+        records = self._records_from_view(participating_view, tau=tau)
+        evaluation = self._evaluate(
+            observation,
+            tau=tau,
+            records=records,
+        )
+        self._epoch_records = records
         self._last_evaluation = evaluation
+
         roles: dict[RelationKey, list[str]] = {}
         generated: dict[RelationKey, list[str]] = {}
         for bound in evaluation.contributions:
             key = self._source_key(bound.source)
             roles.setdefault(key, []).extend(bound.contribution.role_trace)
-            generated.setdefault(key, []).extend(bound.contribution.generated_possibilities)
+            generated.setdefault(key, []).extend(
+                bound.contribution.generated_possibilities
+            )
 
         def unique(values: Sequence[str]) -> tuple[str, ...]:
             return tuple(dict.fromkeys(str(x) for x in values if str(x)))
 
         return CoreEpochView(
-            relation_elements=tuple(r.source for r in self.history_records()),
+            relation_elements=tuple(r.source for r in records),
             possibility_distribution=evaluation.possibility_distribution,
             role_trace_by_relation={k: unique(v) for k, v in roles.items()},
             generated_by_relation={k: unique(v) for k, v in generated.items()},
@@ -383,9 +500,12 @@ class CurrentRelationalCoreV11:
         relation: RelationElementRef,
         tau: float,
     ) -> Mapping[str, float]:
+        if self._last_evaluation is None:
+            raise CoreV11InvariantError("ablation requires an open epoch")
         return self._evaluate(
             observation,
             tau=tau,
+            records=self._epoch_records,
             excluded=frozenset({self._source_key(relation)}),
         ).possibility_distribution
 
@@ -395,18 +515,60 @@ class CurrentRelationalCoreV11:
         relations: Sequence[RelationElementRef],
         tau: float,
     ) -> Mapping[str, float]:
+        if self._last_evaluation is None:
+            raise CoreV11InvariantError("ablation requires an open epoch")
         return self._evaluate(
             observation,
             tau=tau,
+            records=self._epoch_records,
             excluded=frozenset(self._source_key(r) for r in relations),
         ).possibility_distribution
 
-    def realize(self, observation: PresentObservation, tau: float) -> Realization:
+    def realize_selected(
+        self,
+        observation: PresentObservation,
+        tau: float,
+        selected_possibility_id: str,
+    ) -> Realization:
         tau = require_tau("tau", tau)
         evaluation = self._last_evaluation
-        if evaluation is None or evaluation.observation != observation or evaluation.tau != tau:
-            evaluation = self._evaluate(observation, tau=tau)
-            self._last_evaluation = evaluation
+        if (
+            evaluation is None
+            or evaluation.observation != observation
+            or evaluation.tau != tau
+        ):
+            raise CoreV11InvariantError(
+                "realize_selected requires the matching currently open epoch"
+            )
+        by_id = {c.possibility_id: c for c in evaluation.candidates}
+        if selected_possibility_id not in by_id:
+            raise CoreV11InvariantError(
+                "Governance selected a possibility absent from the current epoch"
+            )
+        selected = by_id[selected_possibility_id]
+        try:
+            actuation = self.actuation_operator.actuation(
+                observation=observation,
+                selected=selected,
+            )
+            return Realization(
+                selected_possibility_id=selected_possibility_id,
+                actuation=actuation,
+            )
+        finally:
+            self._clear_epoch()
+
+    def realize(self, observation: PresentObservation, tau: float) -> Realization:
+        """Compatibility path outside GH-1; Governance evidence must not use this method."""
+
+        tau = require_tau("tau", tau)
+        evaluation = self._last_evaluation
+        if (
+            evaluation is None
+            or evaluation.observation != observation
+            or evaluation.tau != tau
+        ):
+            raise CoreV11InvariantError("realize requires the matching open epoch")
         selected_id = self.choice_operator.choose(
             observation=observation,
             candidates=evaluation.candidates,
@@ -414,11 +576,4 @@ class CurrentRelationalCoreV11:
             responsibilities=evaluation.responsibilities,
             contributions=evaluation.contributions,
         )
-        by_id = {c.possibility_id: c for c in evaluation.candidates}
-        if selected_id not in by_id:
-            raise CoreV11InvariantError("choice operator returned a non-current possibility")
-        selected = by_id[selected_id]
-        return Realization(
-            selected_possibility_id=selected_id,
-            actuation=self.actuation_operator.actuation(observation=observation, selected=selected),
-        )
+        return self.realize_selected(observation, tau, selected_id)
