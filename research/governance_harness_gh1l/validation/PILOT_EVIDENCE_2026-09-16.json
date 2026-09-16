@@ -1,0 +1,40 @@
+{
+  "experiment": "GH-1L",
+  "stage": "pilot",
+  "status": "COMPLETE",
+  "interpretation_scope": "variance_and_execution_validation_only",
+  "frozen_code_head": "2c0f4386253b050c4c960d29a0b6eac16c83a1fa",
+  "workflow_run_id": 35061975968,
+  "artifact": {
+    "id": 10433145694,
+    "name": "gh1l-pilot-evidence-2c0f438",
+    "zip_sha256": "34e0c2b4eca40f80fc712de87675ffe6e6f1ae8e0e937b7215fa2f2a3af72601",
+    "pilot_result_sha256": "8a7e519666c2352e14ff9b9aa8bb96135c10eb710094a6a4d9f0b268725ef915",
+    "count_freeze_sha256": "05aafd4f4b1bbbbb738bd744c1b9c8011097521606ece01258e0978fdcbde22a"
+  },
+  "execution": {
+    "pilot_blocks": 3,
+    "pilot_runs": 15,
+    "horizon": 512,
+    "fresh_process_contract": true,
+    "archive_sha256": "73ddd1cd810fa25bacb2dda4181a5d63579c657e57ef5f8441cd2f75ceefc8bb"
+  },
+  "primary_paired_metric": {
+    "name": "history_sensitive_resolution_rate_G1_minus_G3",
+    "values": [0.6, 0.6, 0.6],
+    "paired_variance": 0.0
+  },
+  "secondary_paired_metrics": {
+    "archive_access_rate_G1_minus_G2": [-0.990234375, -0.990234375, -0.990234375],
+    "history_sensitive_resolution_rate_G1_minus_G4": [0.0, 0.0, 0.0],
+    "history_sensitive_resolution_rate_G1_minus_G5": [0.0, 0.0, 0.0]
+  },
+  "confirmatory_count_freeze": {
+    "status": "COUNT_FROZEN",
+    "confirmatory_blocks": 12,
+    "calculated_blocks": 0,
+    "minimum_blocks_applied": true,
+    "pilot_excluded_from_confirmatory": true
+  },
+  "claim_boundary": "Pilot values are not confirmatory evidence and must not be used to broaden, repair, or tune GH-1L rules."
+}
