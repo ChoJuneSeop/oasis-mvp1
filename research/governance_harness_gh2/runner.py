@@ -6,7 +6,7 @@ import os
 import subprocess
 import sys
 import uuid
-from dataclasses import asdict
+from dataclasses import asdict, is_dataclass
 from pathlib import Path
 
 from research.governance_harness_v01.harness_v04 import ParticipatingExperienceView
@@ -23,6 +23,18 @@ RESULTS_DIR = HERE / "results"
 
 def _distribution_select(distribution):
     return max(distribution, key=lambda key: (float(distribution[key]), key))
+
+
+def _jsonable(value):
+    if is_dataclass(value):
+        return _jsonable(asdict(value))
+    if isinstance(value, dict):
+        return {str(k): _jsonable(v) for k, v in value.items()}
+    if isinstance(value, (tuple, list)):
+        return [_jsonable(v) for v in value]
+    if isinstance(value, (set, frozenset)):
+        return sorted(_jsonable(v) for v in value)
+    return value
 
 
 def _runtime_to_json(frame: RuntimeFrame) -> dict:
@@ -98,7 +110,7 @@ def run_arm(arm: str, frames: tuple[RuntimeFrame, ...]) -> dict:
         "initial_previous_trace_empty": True,
         "decision_count": len(decisions),
         "realization_count": realization_count,
-        "decisions": [asdict(x) for x in decisions],
+        "decisions": [_jsonable(x) for x in decisions],
     }
 
 
