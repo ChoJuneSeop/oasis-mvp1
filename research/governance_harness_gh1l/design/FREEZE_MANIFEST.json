@@ -1,0 +1,20 @@
+{
+  "spec_version": "GH1L_EXPERIMENT_V1_0_FINAL",
+  "base_branch": "feature/governance-harness-v1",
+  "base_commit": "ea9261b15663a95d819aa9c9c9e5b9e76e9d5352",
+  "scenario_seed": 6101,
+  "horizon": 512,
+  "run_order": ["G1", "G2", "G3", "G4", "G5"],
+  "rng_seeds": {
+    "environment": 6101,
+    "core": 6102,
+    "history": 6103,
+    "participation": 6104,
+    "evaluator": 6105,
+    "run_order": 6106
+  },
+  "pilot_excluded_from_confirmatory": true,
+  "confirmatory_locked_until_count_freeze": true,
+  "confirmatory_executed": false,
+  "post_failure_rule_repair": false
+}
