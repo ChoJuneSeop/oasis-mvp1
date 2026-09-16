@@ -6,7 +6,11 @@ import sys
 import unittest
 from pathlib import Path
 
+from research.governance_harness_gh1l.action_contract import (
+    CANONICAL_CORE_ACTIONS, canonical_action,
+)
 from research.governance_harness_gh1l.admission.preflight import evaluate_gates
+from research.governance_harness_gh1l.evaluator import IndependentEvaluator
 from research.governance_harness_gh1l.models import ARMS, FORBIDDEN_RUNTIME_KEYS
 from research.governance_harness_gh1l.runner.engine import LongHorizonRunner
 from research.governance_harness_gh1l.runner.freeze_confirmatory_count import derive_confirmatory_count
@@ -146,7 +150,25 @@ class GH1LAdmissionTests(unittest.TestCase):
         )
         self.assertEqual(first["primary_paired_metric"], metric)
 
-    def test_18_all_preexecution_gates_pass(self):
+    def test_18_all_scenario_and_archive_actions_map_to_core_ids(self):
+        scenario_actions = {canonical_action(case.truth.expected_action) for case in self.world}
+        archive_actions = {canonical_action(item.recommended_action) for item in self.archive}
+        self.assertTrue(scenario_actions.issubset(CANONICAL_CORE_ACTIONS))
+        self.assertTrue(archive_actions.issubset(CANONICAL_CORE_ACTIONS))
+        self.assertIn("continue-flow", scenario_actions)
+        self.assertIn("yield-space", scenario_actions)
+
+    def test_19_neutral_continue_flow_is_resolved_and_not_invalid(self):
+        case = next(x for x in self.world if x.truth.scenario_class == "history-neutral")
+        decision = LongHorizonRunner(self.archive).decide(
+            "G3", case.frame_id, case.runtime.as_runtime_mapping()
+        )
+        self.assertEqual(decision.selected_action, "continue-flow")
+        metrics = IndependentEvaluator((case.truth,)).evaluate((decision,))
+        self.assertEqual(metrics["resolved"], 1)
+        self.assertEqual(metrics["unsafe_or_invalid"], 0)
+
+    def test_20_all_preexecution_gates_pass(self):
         gates = evaluate_gates()
         self.assertTrue(all(x["pass"] for x in gates.values()), json.dumps(gates, indent=2))
 
