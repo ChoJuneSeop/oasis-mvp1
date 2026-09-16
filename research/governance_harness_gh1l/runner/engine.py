@@ -12,6 +12,7 @@ from research.governance_harness_v01.harness_v04 import (
 from research.governance_harness_v01.gh1a_structural_run import _record
 from research.oasis_core_v11.carla_domain_bundle_v1 import build_domain_bundle
 
+from ..action_contract import canonical_action
 from ..models import ARMS, ArmDecision, Experience, FORBIDDEN_RUNTIME_KEYS
 
 
@@ -100,13 +101,11 @@ class LongHorizonRunner:
         tau = 10_000.0 + int(current["tick"])
         view = core.open_epoch(observation, tau, _to_core_view(participants, tau))
         distribution = dict(view.possibility_distribution)
-        recommendations = [x.recommended_action for x in participants]
+        recommendations = [canonical_action(x.recommended_action) for x in participants]
         if recommendations:
             selected = max(sorted(set(recommendations)), key=recommendations.count)
-        elif current["front_present"] and float(current["ego_speed_mps"]) <= 1.2:
-            selected = "hold-course"
         else:
-            selected = "continue"
+            selected = "continue-flow"
         if selected not in distribution:
             selected = max(distribution, key=distribution.get)
         actuator = NonActuatingActuator()
