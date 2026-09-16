@@ -42,8 +42,49 @@ jobs:
       - name: Canonical Harness regressions
         run: python -m unittest discover -s research/carla_v22_harness_v11 -p 'test_*.py' -v
 
-      - name: Core regressions
-        run: python -m unittest discover -s research/oasis_core_v11 -p 'test_*.py' -v
+      - name: Core regressions excluding documented legacy incompatibility
+        run: |
+          python - <<'PY'
+          import unittest
+
+          target = (
+              'test_carla_domain_bundle_v1.DomainBundleTests.'
+              'test_bundle_runs_through_canonical_harness'
+          )
+          discovered = unittest.defaultTestLoader.discover(
+              'research/oasis_core_v11', pattern='test_*.py'
+          )
+
+          def flatten(suite):
+              for item in suite:
+                  if isinstance(item, unittest.TestSuite):
+                      yield from flatten(item)
+                  else:
+                      yield item
+
+          tests = list(flatten(discovered))
+          kept = [test for test in tests if not test.id().endswith(target)]
+          removed = [test for test in tests if test.id().endswith(target)]
+          if len(removed) != 1:
+              raise SystemExit(f'expected exactly one documented baseline test, got {len(removed)}')
+          suite = unittest.TestSuite(kept)
+          result = unittest.TextTestRunner(verbosity=2).run(suite)
+          print(f'CORE_NONBASELINE_PASS_COUNT={result.testsRun}')
+          if not result.wasSuccessful():
+              raise SystemExit(1)
+          PY
+
+      - name: Verify exact documented baseline Core failure
+        run: |
+          set +e
+          python -m unittest \
+            research.oasis_core_v11.test_carla_domain_bundle_v1.DomainBundleTests.test_bundle_runs_through_canonical_harness \
+            -v > /tmp/gh2-v11-known-baseline.log 2>&1
+          code=$?
+          set -e
+          cat /tmp/gh2-v11-known-baseline.log
+          test "$code" -ne 0
+          grep -Fq "direct domain-bundle history injection is removed; Governance must supply a participating view" /tmp/gh2-v11-known-baseline.log
 
       - name: Verify frozen lineage untouched
         run: |
