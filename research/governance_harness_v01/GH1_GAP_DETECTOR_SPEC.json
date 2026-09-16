@@ -1,0 +1,33 @@
+{
+  "spec_version": "GH1_GAP_DETECTOR_V1",
+  "detector": "current_flow_speed_drop",
+  "allowed_inputs": [
+    "PresentFlowEvidence.samples[].tau",
+    "PresentFlowEvidence.samples[].observation.ego_speed_mps"
+  ],
+  "forbidden_inputs": [
+    "archive",
+    "completed_experience",
+    "feedback",
+    "scenario_label",
+    "anomaly_label",
+    "future_state",
+    "future_trajectory",
+    "seed",
+    "ground_truth",
+    "outcome",
+    "closure"
+  ],
+  "rule": {
+    "speed_drop_threshold_mps": 0.5,
+    "comparison": "previous_current_sample_speed - latest_current_sample_speed >= threshold"
+  },
+  "validation_cases": [
+    {"case_id": "DV-N1", "speeds": [2.0, 2.0], "expected_gap": false},
+    {"case_id": "DV-N2", "speeds": [1.8, 1.6], "expected_gap": false},
+    {"case_id": "DV-A1", "speeds": [2.0, 1.4], "expected_gap": true},
+    {"case_id": "DV-A2", "speeds": [3.0, 2.4], "expected_gap": true},
+    {"case_id": "DV-A3", "speeds": [1.2, 0.6], "expected_gap": true}
+  ],
+  "validity_purpose": "Reject always-YES, always-NO, or semantically invalid detectors before confirmatory execution; not a detector-performance claim."
+}
