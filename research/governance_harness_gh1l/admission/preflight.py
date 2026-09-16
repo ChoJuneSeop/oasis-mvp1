@@ -9,6 +9,7 @@ from pathlib import Path
 from ..evaluator import IndependentEvaluator
 from ..models import ARMS, FORBIDDEN_RUNTIME_KEYS
 from ..runner.engine import LongHorizonRunner
+from ..runner.run_experiment import COUNT_FREEZE_PATH, probe_fresh_arm_processes
 from ..scenario.generator import SCENARIO_CLASSES, generate_long_world, runtime_stream
 from ..scenario.prehistory import archive_hash, build_frozen_archive
 
@@ -26,20 +27,6 @@ def _git_blob(path: str) -> str:
     return subprocess.check_output(["git", "hash-object", path], cwd=ROOT, text=True).strip()
 
 
-def _fresh_processes() -> bool:
-    seen = []
-    for arm in ARMS:
-        raw = subprocess.check_output([
-            sys.executable, "-m",
-            "research.governance_harness_gh1l.admission.process_probe", arm,
-        ], cwd=ROOT, text=True)
-        seen.append(json.loads(raw))
-    return (len({x["pid"] for x in seen}) == len(ARMS)
-            and all(x["before"] == [] and x["after"] == [x["arm"]] for x in seen)
-            and len({x["environment_probe"] for x in seen}) == 1
-            and len({x["core_probe"] for x in seen}) == 1)
-
-
 def evaluate_gates() -> dict[str, dict]:
     gates: dict[str, dict] = {}
     freeze = json.loads((GH1 / "GH1_FREEZE_MANIFEST.json").read_text())
@@ -51,15 +38,21 @@ def evaluate_gates() -> dict[str, dict]:
         "research.oasis_core_v11.test_current_relational_core",
         "research.governance_harness_v01.test_core_governance_admission",
     ], cwd=ROOT, capture_output=True, text=True)
-    gates["core_regression"] = {"pass": core_tests.returncode == 0,
-                                "summary": core_tests.stderr.strip().splitlines()[-1:]}
+    gates["core_regression"] = {
+        "pass": core_tests.returncode == 0,
+        "summary": core_tests.stderr.strip().splitlines()[-1:],
+    }
 
     archive = build_frozen_archive()
     hashes = {arm: archive_hash(tuple(archive)) for arm in ARMS}
-    gates["archive_hash_freeze"] = {"pass": len(set(hashes.values())) == 1,
-                                    "sha256": next(iter(hashes.values()))}
-    gates["closure_precondition"] = {"pass": all(x.closure_entry_id and x.provenance_ref.startswith("closure:") for x in archive),
-                                     "completed_experiences": len(archive)}
+    gates["archive_hash_freeze"] = {
+        "pass": len(set(hashes.values())) == 1,
+        "sha256": next(iter(hashes.values())),
+    }
+    gates["closure_precondition"] = {
+        "pass": all(x.closure_entry_id and x.provenance_ref.startswith("closure:") for x in archive),
+        "completed_experiences": len(archive),
+    }
 
     world = generate_long_world()
     classes = {x.truth.scenario_class for x in world}
@@ -67,13 +60,20 @@ def evaluate_gates() -> dict[str, dict]:
     for case in world:
         if case.truth.matched_pair_id:
             pairs.setdefault(case.truth.matched_pair_id, []).append(case.runtime)
-    matched = any(len(v) == 2 and v[0].ego_speed_mps == v[1].ego_speed_mps
-                  and v[0].front_present == v[1].front_present
-                  and v[0].front_distance_m == v[1].front_distance_m
-                  and v[0].relation_id != v[1].relation_id for v in pairs.values())
-    gates["scenario_validity"] = {"pass": classes == set(SCENARIO_CLASSES) and matched,
-                                  "classes": sorted(classes), "matched_history_case": matched,
-                                  "horizon": len(world)}
+    matched = any(
+        len(v) == 2
+        and v[0].ego_speed_mps == v[1].ego_speed_mps
+        and v[0].front_present == v[1].front_present
+        and v[0].front_distance_m == v[1].front_distance_m
+        and v[0].relation_id != v[1].relation_id
+        for v in pairs.values()
+    )
+    gates["scenario_validity"] = {
+        "pass": classes == set(SCENARIO_CLASSES) and matched,
+        "classes": sorted(classes),
+        "matched_history_case": matched,
+        "horizon": len(world),
+    }
     runtime = runtime_stream(world)
     leaked = [key for _, row in runtime for key in FORBIDDEN_RUNTIME_KEYS.intersection(row)]
     gates["evaluator_leakage"] = {"pass": not leaked, "leaked_keys": leaked}
@@ -84,34 +84,77 @@ def evaluate_gates() -> dict[str, dict]:
     neutral_decision = runner.decide("G1", neutral_id, neutral)
     critical_runner = LongHorizonRunner(archive)
     critical_decision = critical_runner.decide("G1", critical[0], critical[1])
-    gates["gap_validity"] = {"pass": not neutral_decision.gap and critical_decision.gap,
-                             "has_no": not neutral_decision.gap, "has_yes": critical_decision.gap}
+    gates["gap_validity"] = {
+        "pass": not neutral_decision.gap and critical_decision.gap,
+        "has_no": not neutral_decision.gap,
+        "has_yes": critical_decision.gap,
+    }
 
     base_env = [__import__("random").Random(6101).random() for _ in range(3)]
     history_rng = __import__("random").Random(6103)
-    for _ in range(100): history_rng.random()
+    for _ in range(100):
+        history_rng.random()
     trial_env = [__import__("random").Random(6101).random() for _ in range(3)]
     gates["rng_isolation"] = {"pass": base_env == trial_env, "streams": 6}
-    gates["fresh_process_isolation"] = {"pass": _fresh_processes(), "arms": list(ARMS)}
+
+    # This now probes the same subprocess worker entry point used by pilot/confirmatory.
+    fresh = probe_fresh_arm_processes()
+    gates["fresh_process_isolation"] = {
+        **fresh,
+        "execution_path": "research.governance_harness_gh1l.runner.run_experiment",
+    }
 
     probe_case = next(x for x in world if x.truth.scenario_class == "history-critical")
     probe_runtime = probe_case.runtime.as_runtime_mapping()
     cf_runner = LongHorizonRunner(archive)
     cf = cf_runner.decide("G1", probe_case.frame_id, probe_runtime, counterfactual=True)
-    gates["counterfactual_non_actuation"] = {"pass": cf.realized_action is None and cf.actuator_count == 0}
+    gates["counterfactual_non_actuation"] = {
+        "pass": cf.realized_action is None and cf.actuator_count == 0
+    }
     gates["logging_completeness"] = {"pass": IndependentEvaluator.complete_log(cf)}
 
     freeze_before = archive_hash(runner.archive)
     runner.record_confirmatory_closure("synthetic-check")
     freeze_after = archive_hash(runner.archive)
-    gates["confirmatory_reuse_block"] = {"pass": freeze_before == freeze_after and len(runner.confirmatory_commits) == 1}
+    gates["confirmatory_reuse_block"] = {
+        "pass": freeze_before == freeze_after and len(runner.confirmatory_commits) == 1
+    }
 
     manifest = json.loads((HERE / "design" / "FREEZE_MANIFEST.json").read_text())
-    required = ("scenario_seed", "horizon", "run_order", "pilot_excluded_from_confirmatory")
-    gates["scenario_seed_run_order_freeze"] = {"pass": all(key in manifest for key in required)
-                                               and manifest["pilot_excluded_from_confirmatory"] is True}
-    gates["core_unchanged"] = {"pass": _git_blob("research/oasis_core_v11/current_relational_core.py")
-                               == freeze["frozen_artifacts"]["research/oasis_core_v11/current_relational_core.py"]}
+    required = (
+        "scenario_seed", "horizon", "run_order", "pilot_blocks", "pilot_seeds",
+        "primary_paired_metric", "history_sensitive_classes", "power_analysis",
+        "pilot_excluded_from_confirmatory", "confirmatory_locked_until_count_freeze",
+    )
+    manifest_shape_ok = all(key in manifest for key in required)
+    paired_contract_ok = (
+        manifest_shape_ok
+        and tuple(manifest["run_order"]) == ARMS
+        and len(manifest["pilot_seeds"]) == int(manifest["pilot_blocks"])
+        and manifest["primary_paired_metric"] == "history_sensitive_resolution_rate_G1_minus_G3"
+        and set(manifest["history_sensitive_classes"]).issubset(set(SCENARIO_CLASSES))
+        and float(manifest["power_analysis"]["target_delta"]) > 0.0
+        and int(manifest["power_analysis"]["min_confirmatory_blocks"]) >= 1
+    )
+    gates["paired_metric_freeze_contract"] = {
+        "pass": paired_contract_ok,
+        "primary_paired_metric": manifest.get("primary_paired_metric"),
+        "pilot_blocks": manifest.get("pilot_blocks"),
+    }
+    gates["scenario_seed_run_order_freeze"] = {
+        "pass": manifest_shape_ok and manifest["pilot_excluded_from_confirmatory"] is True
+    }
+    gates["confirmatory_lock_precondition"] = {
+        "pass": not COUNT_FREEZE_PATH.exists(),
+        "count_freeze_absent": not COUNT_FREEZE_PATH.exists(),
+    }
+    gates["pilot_not_yet_executed"] = {
+        "pass": not (HERE / "results" / "PILOT_RESULT.json").exists()
+    }
+    gates["core_unchanged"] = {
+        "pass": _git_blob("research/oasis_core_v11/current_relational_core.py")
+        == freeze["frozen_artifacts"]["research/oasis_core_v11/current_relational_core.py"]
+    }
     return gates
 
 
@@ -120,6 +163,7 @@ def main() -> int:
     ready = all(value["pass"] for value in gates.values())
     payload = {
         "status": "EXPERIMENT_READY" if ready else "ADMISSION_FAIL",
+        "spec_version": json.loads((HERE / "design" / "FREEZE_MANIFEST.json").read_text())["spec_version"],
         "confirmatory_executed": False,
         "pilot_executed": False,
         "gates": gates,
