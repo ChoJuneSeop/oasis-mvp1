@@ -1,0 +1,55 @@
+name: GH-2 v1.1 Pre-execution Validation
+
+on:
+  push:
+    branches:
+      - feature/governance-harness-gh2-v1-1
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Compile GH-2 v1.1
+        run: |
+          python -m py_compile \
+            research/governance_harness_gh2/models.py \
+            research/governance_harness_gh2/scenario.py \
+            research/governance_harness_gh2/responsibility.py \
+            research/governance_harness_gh2/runner.py \
+            research/governance_harness_gh2/admission/preflight.py \
+            research/governance_harness_gh2/admission/test_gh2.py
+
+      - name: GH-2 v1.1 admission tests
+        run: python -m unittest discover -s research/governance_harness_gh2/admission -p 'test_*.py' -v
+
+      - name: GH-2 v1.1 preflight
+        run: python -m research.governance_harness_gh2.admission.preflight
+
+      - name: Governance Harness regressions
+        run: python -m unittest discover -s research/governance_harness_v01 -p 'test_*.py' -v
+
+      - name: Canonical Harness regressions
+        run: python -m unittest discover -s research/carla_v22_harness_v11 -p 'test_*.py' -v
+
+      - name: Core regressions
+        run: python -m unittest discover -s research/oasis_core_v11 -p 'test_*.py' -v
+
+      - name: Verify frozen lineage untouched
+        run: |
+          test -z "$(git diff --name-only 5861b08d6b48f79b88f4f160bbb425690708ccd4 HEAD -- research/governance_harness_v01 research/governance_harness_gh1l research/oasis_core_v11)"
+
+      - name: Verify v1.1 execution outputs absent
+        run: |
+          test ! -f research/governance_harness_gh2/results/PILOT_RESULT_V1_1.json
+          test ! -f research/governance_harness_gh2/results/CONFIRMATORY_RESULT_V1_1.json
