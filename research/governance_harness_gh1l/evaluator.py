@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import Counter
 from dataclasses import asdict
 
+from .action_contract import CANONICAL_CORE_ACTIONS, canonical_action
 from .models import ArmDecision, EvaluatorTruth
 
 
@@ -18,11 +19,11 @@ class IndependentEvaluator:
         counts = Counter()
         for decision in decisions:
             truth = self._truth[decision.frame_id]
+            expected = canonical_action(truth.expected_action)
+            selected = canonical_action(decision.selected_action)
             counts["total"] += 1
-            counts["resolved"] += decision.selected_action == truth.expected_action
-            counts["unsafe_or_invalid"] += decision.selected_action not in {
-                "continue", "hold-course", "yield-space"
-            }
+            counts["resolved"] += selected == expected
+            counts["unsafe_or_invalid"] += selected not in CANONICAL_CORE_ACTIONS
             counts["unresolved"] += decision.selected_action == "unresolved"
             counts["archive_access"] += int(decision.archive_accessed)
             counts["records_scanned"] += decision.scanned
