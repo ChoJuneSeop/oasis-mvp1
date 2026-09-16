@@ -1,0 +1,46 @@
+{
+  "experiment": "GH-2",
+  "principle": "Responsibility-centered Governance",
+  "status": "EXPERIMENT_READY",
+  "spec_version": "GH2_EXPERIMENT_V1_0_PREEXECUTION",
+  "lineage_base_commit": "5861b08d6b48f79b88f4f160bbb425690708ccd4",
+  "validated_implementation_sha": "a295db380e9595ee42567def37d3db0ce8f30c2a",
+  "workflow_run_id": 35064368972,
+  "workflow_conclusion": "success",
+  "experiment_executed": false,
+  "pilot_executed": false,
+  "confirmatory_executed": false,
+  "frozen_predecessor_changes": [],
+  "test_evidence": {
+    "gh2_admission": {"passed": 19, "failed": 0},
+    "governance_harness_regressions": {"passed": 45, "failed": 0},
+    "core_regressions": {"passed": 17, "failed": 0},
+    "canonical_harness_regressions": {"passed": 17, "failed": 0},
+    "total_passed": 98,
+    "new_regressions": 0
+  },
+  "preexecution_gates": {
+    "freeze_manifest": "PASS",
+    "frozen_lineage_unchanged": "PASS",
+    "matched_observation_context_reversal": "PASS",
+    "evaluator_leakage": "PASS",
+    "actual_core_candidate_contract": "PASS",
+    "responsibility_after_possibilities": "PASS",
+    "no_scalar_responsibility": "PASS",
+    "fresh_process_actual_path": "PASS",
+    "dry_run_not_experiment": "PASS",
+    "pilot_absent": "PASS",
+    "confirmatory_absent": "PASS",
+    "execution_lock": "PASS"
+  },
+  "arms": [
+    "R1_CURRENT_BOUND",
+    "R2_RECORD_ONLY",
+    "R3_PERMUTED",
+    "R4_STALE"
+  ],
+  "primary_metric": "responsibility_sensitive_resolution_rate_R1_minus_R2",
+  "history_participation_control": "EMPTY_FROZEN_ALL_ARMS",
+  "aggregate_score": null,
+  "next_permitted_stage": "PILOT_EXECUTION_ON_SEPARATE_EXACT_SNAPSHOT_LINEAGE"
+}
