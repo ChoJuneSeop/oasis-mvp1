@@ -1,0 +1,70 @@
+{
+  "spec_version": "GH4_EXPERIMENT_V1_0_FINAL",
+  "lineage_base_commit": "5b0783ca03a262eacbbfbaad212f55663e5f79be",
+  "transition_commit": "41f4e4b3c4718b410388cfd85d5746ed712ace70",
+  "final_spec_commit": "56233c682d9ed768ff15b262d6d194307173e4b4",
+  "research_principle": "INTEGRATED_LONG_HORIZON_GOVERNANCE",
+  "arms": [
+    "H1_FULL_INTEGRATED",
+    "H2_FROZEN_NEW_CE",
+    "H3_FEEDBACK_RECORD_ONLY",
+    "H4_RESPONSIBILITY_RECORD_ONLY",
+    "H5_NONSELECTIVE_HISTORY"
+  ],
+  "baseline_relations": {
+    "GH4-REL-A": 1,
+    "GH4-REL-B": 2,
+    "GH4-REL-C": 3
+  },
+  "pilot": {
+    "purpose": "STRUCTURAL_SANITY_ONLY",
+    "epochs_per_arm": 12,
+    "arm_count": 5,
+    "total_decision_realization_epochs": 60,
+    "scientific_evaluator_used": false,
+    "sample_size_inference": false
+  },
+  "confirmatory": {
+    "size_method": "A_PRIORI_FINITE_SEQUENTIAL_MATRIX",
+    "rounds": 4,
+    "relations": 3,
+    "observation_families": 4,
+    "gap_modes": 2,
+    "epochs_per_arm": 96,
+    "arm_count": 5,
+    "total_decision_realization_epochs": 480,
+    "pilot_derived_count_freeze": false
+  },
+  "observation_families": {
+    "F1_CLEAR": {"ego_speed_mps": 1.4, "front_gap_m": 12.0, "front_closing_mps": 0.1, "local_heading_error_deg": 0.0, "local_density": 1},
+    "F2_SHARED": {"ego_speed_mps": 1.1, "front_gap_m": 9.5, "front_closing_mps": 0.4, "local_heading_error_deg": 0.05, "local_density": 2},
+    "F3_EXPOSED": {"ego_speed_mps": 0.9, "front_gap_m": 7.0, "front_closing_mps": 0.8, "local_heading_error_deg": 0.2, "local_density": 3},
+    "F4_MIXED": {"ego_speed_mps": 1.2, "front_gap_m": 8.5, "front_closing_mps": 0.6, "local_heading_error_deg": -0.1, "local_density": 2}
+  },
+  "gap": {
+    "threshold": 0.5,
+    "yes_pre_speed_increment": 0.6,
+    "no_pre_speed_increment": 0.1
+  },
+  "new_completed_experience": {
+    "same_epoch_decision_reuse": false,
+    "later_epoch_decision_reuse": true,
+    "requires_completed_tau_strictly_less_than_decision_tau": true,
+    "permanent_scalar_weight": false
+  },
+  "responsibility": {
+    "axes": ["U", "I", "V", "T"],
+    "scalarization": false,
+    "selection_rule": "PARETO_SET_DOMINANCE_THEN_FROZEN_CANDIDATE_ORDER"
+  },
+  "primary_pairwise_contrasts": [
+    "H1_vs_H2_new_CE_eligibility",
+    "H1_vs_H3_feedback_exposure",
+    "H1_vs_H4_responsibility_binding",
+    "H1_vs_H5_selective_participation"
+  ],
+  "aggregate_score": null,
+  "pilot_executed": false,
+  "confirmatory_executed": false,
+  "post_result_rule_repair": false
+}
