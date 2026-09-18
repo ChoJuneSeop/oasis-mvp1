@@ -45,7 +45,7 @@ def compute_expected_bindings(package_dir: Path = PACKAGE_DIR) -> dict[str, str]
         ),
         "reference_recorder_build_hash": _composite_hash(
             package_dir,
-            ("adapter.py", "artifact_io.py", "canonical.py", "fixtures.py", "models.py", "ledger.py", "preflight.py", "profile_io.py"),
+            ("adapter.py", "artifact_io.py", "canonical.py", "fixtures.py", "integrated_choice_adapter.py", "models.py", "ledger.py", "preflight.py", "profile_io.py"),
             domain="A2_REFERENCE_RECORDER_BUILD_V1",
         ),
         "evaluator_build_hash": _composite_hash(

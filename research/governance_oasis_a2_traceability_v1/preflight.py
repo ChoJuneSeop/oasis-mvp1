@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import FrozenInstanceError, replace
 from pathlib import Path
+import hashlib
 import tempfile
 
 from research.oasis_experiment_freeze_harness_v1.harness import ExperimentFreezeHarness
@@ -15,6 +16,11 @@ from research.oasis_experiment_freeze_harness_v1.models import (
 from .artifact_io import write_immutable_json
 from .fixtures import validate_fixture_isolation
 from .instrumentation import SystemTraceBuilder
+from .integrated_choice_adapter import (
+    PRODUCTION_CHOICE_BLOB_SHA,
+    PRODUCTION_CHOICE_CALL,
+    PRODUCTION_CHOICE_PATH,
+)
 from .ledger import LedgerIntegrityError, ReferenceLedger
 from .models import (
     A2ExecutionProfile,
@@ -39,6 +45,7 @@ REQUIRED_CHECKS = {
     "fixture_isolation": CheckCategory.CROSS_ARM,
     "negative_control_coverage": CheckCategory.CROSS_ARM,
     "hash_chain_integrity": CheckCategory.ADVERSARIAL,
+    "production_choice_boundary": CheckCategory.FREEZE,
 }
 
 
@@ -183,6 +190,30 @@ def _attack_tests(profile: A2ExecutionProfile, fixture: ArmFixture) -> dict[str,
     }
 
 
+
+def _git_blob_sha(path: Path) -> str:
+    data = path.read_bytes()
+    header = f"blob {len(data)}\\0".encode("ascii")
+    return hashlib.sha1(header + data).hexdigest()
+
+
+def _production_choice_boundary_status(repo_root: Path) -> tuple[bool, tuple[str, ...]]:
+    source_path = repo_root / PRODUCTION_CHOICE_PATH
+    if not source_path.is_file():
+        return False, (f"missing production choice source={PRODUCTION_CHOICE_PATH}",)
+    actual_blob = _git_blob_sha(source_path)
+    text = source_path.read_text(encoding="utf-8")
+    call_present = PRODUCTION_CHOICE_CALL in text
+    ok = actual_blob == PRODUCTION_CHOICE_BLOB_SHA and call_present
+    evidence = (
+        f"path={PRODUCTION_CHOICE_PATH}",
+        f"expected_blob={PRODUCTION_CHOICE_BLOB_SHA}",
+        f"actual_blob={actual_blob}",
+        f"exact_choice_call_present={call_present}",
+    )
+    return ok, evidence
+
+
 def run_preflight(
     *,
     profile: A2ExecutionProfile,
@@ -208,6 +239,17 @@ def run_preflight(
         )
     )
     checks.append(_result("source_freeze", source_ok, "Exact frozen source/profile bindings are present."))
+
+    repo_root = Path(__file__).resolve().parents[2]
+    production_boundary_ok, production_boundary_evidence = _production_choice_boundary_status(repo_root)
+    checks.append(
+        _result(
+            "production_choice_boundary",
+            production_boundary_ok,
+            "Reference instrumentation is bound to the exact frozen IntegratedChoiceCore preference boundary.",
+            evidence=production_boundary_evidence,
+        )
+    )
 
     by_contrast: dict[str, list[ArmFixture]] = {}
     for fixture in fixtures:
@@ -271,6 +313,7 @@ def run_preflight(
     reference_plane_source = (
         (package_dir / "adapter.py").read_text(encoding="utf-8")
         + (package_dir / "ledger.py").read_text(encoding="utf-8")
+        + (package_dir / "integrated_choice_adapter.py").read_text(encoding="utf-8")
     )
     static_independence = (
         "from .instrumentation import" not in reference_plane_source

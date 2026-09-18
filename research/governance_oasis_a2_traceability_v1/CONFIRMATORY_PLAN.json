@@ -62,7 +62,8 @@
     "decision_invocation_binding",
     "fixture_isolation",
     "negative_control_coverage",
-    "hash_chain_integrity"
+    "hash_chain_integrity",
+    "production_choice_boundary"
   ],
   "result_states": [
     "SUPPORTS",

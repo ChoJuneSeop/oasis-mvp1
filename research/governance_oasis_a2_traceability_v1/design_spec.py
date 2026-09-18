@@ -21,6 +21,7 @@ A2_SPECIFIC_EXECUTION_CHECK_IDS = (
     "fixture_isolation",
     "negative_control_coverage",
     "hash_chain_integrity",
+    "production_choice_boundary",
 )
 
 
