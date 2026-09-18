@@ -1,0 +1,84 @@
+{
+  "schema": "governance-oasis-gh4-integrated-confirmatory-validation-record-v1",
+  "experiment_id": "GH4_FLOW_PRESERVING_INTEGRATED_CONFIRMATORY_V1",
+  "evidence_level": "INTEGRATED_CONFIRMATORY",
+  "execution_sha": "22b2716095df95aaf3998273be135d220582053b",
+  "confirmatory_workflow": {
+    "run_id": 35403562192,
+    "job_id": 105788485403,
+    "conclusion": "success"
+  },
+  "artifact": {
+    "artifact_id": 10571990059,
+    "name": "governance-oasis-gh4-integrated-35403562192-1",
+    "digest": "sha256:5cf3c180543576e2af14f927dc371492753f9e43a39b7ef485abb9a1c94502cf"
+  },
+  "frozen_source_blobs": {
+    "research/governance_oasis_gh4_integrated_v1/design_spec.py": "45e1136a457bc4866e37b0b6e3ed82b5040dcb9a",
+    "research/governance_oasis_gh4_integrated_v1/CONFIRMATORY_PLAN.json": "8b11aefb102dc3aefbfe5b3f03bad2d47ce5ebb5",
+    "research/governance_oasis_gh4_integrated_v1/scenario.py": "98b6cc61beca7f64d4cf292f216b17e4f2e0f457",
+    "research/governance_oasis_gh4_integrated_v1/decision_worker.py": "04c393253e6b5935a6d5745d0b286b1d27d2b7c1",
+    "research/governance_oasis_gh4_integrated_v1/orchestrator.py": "17d4e081595e43fd2391c984508d65fae3f46170",
+    "research/governance_oasis_gh4_integrated_v1/evaluator.py": "688b48af176e9cb21d64e349c898e3aa947c444e",
+    "research/governance_oasis_gh4_integrated_v1/preflight.py": "fb8ad7aa65a40de2aa967c0599fb3d4dbb19f448"
+  },
+  "preexecution": {
+    "proof_ready": true,
+    "freeze_ready": true,
+    "unresolved_design_checks": [],
+    "unresolved_execution_checks": [],
+    "all_six_axes_prior_supported": true
+  },
+  "matrix": {
+    "pilot_family": "P",
+    "confirmatory_families": [
+      "F1",
+      "F2",
+      "F3"
+    ],
+    "arms": 11,
+    "epochs_per_arm": 11,
+    "confirmatory_arm_epoch_units": 363,
+    "decision_realization_units": 363
+  },
+  "structural": {
+    "all_arms_present": true,
+    "one_realization_per_epoch": true,
+    "no_future_or_evaluator_truth_to_worker": true,
+    "append_only_archive": true,
+    "seed_identity_order_provenance_immutable": true,
+    "strict_temporal_order": true,
+    "fresh_decision_process_tokens": true,
+    "no_scalar_memory_weight": true,
+    "participation_provenance_complete": true,
+    "responsibility_non_scalar_runtime": true,
+    "selected_nonselected_obligations_runtime": true
+  },
+  "results": {
+    "outcome": "SUPPORTS",
+    "failures": [],
+    "current_flow_first_gate": 3,
+    "initial_experience_behavior_change": 3,
+    "post_outcome_adverse_separation": 3,
+    "same_scope_recovery_behavior": 3,
+    "recovery_effectiveness": 3,
+    "decision_linked_revised_commit": 3,
+    "exogenous_not_revised": 3,
+    "exogenous_no_recovery": 3,
+    "changed_scope_locality": 3,
+    "unrelated_relation_locality": 3,
+    "unrelated_reparticipation": 3,
+    "identity_trace_divergence": 3,
+    "relation_trace_divergence": 3,
+    "order_trace_divergence": 6,
+    "conflict_latest_divergence": 3,
+    "conflict_both_preserved_selective": 3,
+    "responsibility_binding_divergence": 3,
+    "responsibility_content_divergence": 3,
+    "responsibility_obligations_preserved": 3,
+    "long_horizon_accumulation": 3
+  },
+  "claim_boundary": "Finite deterministic synthetic integrated flow-preservation evidence only; not real-world deployment, safety, CARLA, population-generalization, normative-correctness, or universal-superiority proof.",
+  "complete_not_equal_supports": true,
+  "post_result_rule_retuning": false
+}
