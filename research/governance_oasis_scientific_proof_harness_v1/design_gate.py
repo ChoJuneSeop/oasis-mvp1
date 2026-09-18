@@ -309,6 +309,36 @@ def _preregistration_and_boundary(design: ExperimentDesign) -> DesignCheck:
     )
 
 
+def _history_integrity(design: ExperimentDesign) -> DesignCheck:
+    ok = (
+        design.production_history_append_only
+        and design.production_no_permanent_memory_weight
+        and design.production_no_destructive_no
+        and design.ablation_mutations_declared
+    )
+    return (
+        _pass(
+            "crosscut_history_integrity",
+            (
+                "Production Governance preserves append-only history, forbids "
+                "permanent memory weights and destructive NO semantics, while "
+                "all comparator mutations are explicitly declared."
+            ),
+        )
+        if ok
+        else _fail(
+            "crosscut_history_integrity",
+            "History semantics are not protected from destructive or undeclared mutation.",
+            evidence=(
+                f"production_history_append_only={design.production_history_append_only}",
+                f"production_no_permanent_memory_weight={design.production_no_permanent_memory_weight}",
+                f"production_no_destructive_no={design.production_no_destructive_no}",
+                f"ablation_mutations_declared={design.ablation_mutations_declared}",
+            ),
+        )
+    )
+
+
 def _provenance_chain(design: ExperimentDesign) -> DesignCheck:
     chain = tuple(x.upper() for x in design.provenance_chain)
     required_tokens = ("COMPLETED_EXPERIENCE", "PARTICIPATION", "DECISION", "REALIZATION", "OUTCOME")
@@ -615,6 +645,7 @@ def validate_design(design: ExperimentDesign) -> ProofDesignReport:
         _evaluator_independence(design),
         _outcome_evidence_boundary(design),
         _preregistration_and_boundary(design),
+        _history_integrity(design),
         _provenance_chain(design),
     ]
 
