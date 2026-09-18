@@ -6,7 +6,9 @@
     {
       "evidence_id": "E-GH1L-A1",
       "experiment_id": "GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT",
-      "axes": ["A1_BEHAVIOR_CHANGE_EFFECTIVENESS"],
+      "axes": [
+        "A1_BEHAVIOR_CHANGE_EFFECTIVENESS"
+      ],
       "level": "CONFIRMATORY",
       "design_report_passed": true,
       "result_status": "COMPLETE",
@@ -24,12 +26,21 @@
         "G1-vs-G3 behavior-path effect",
         "G1-vs-G4 selective participation contrast",
         "G1-vs-G5 experience identity specificity"
-      ]
+      ],
+      "verified_obligations": [
+        "behavior_endpoint",
+        "effectiveness_endpoint",
+        "mechanism_removal_contrast",
+        "same_current_context_across_contrast"
+      ],
+      "review_method": "retrospective source-bounded review against Governance OASIS Scientific Proof Harness v1 axis obligations"
     },
     {
       "evidence_id": "E-GH1L-A2-PARTIAL",
       "experiment_id": "GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT",
-      "axes": ["A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY"],
+      "axes": [
+        "A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY"
+      ],
       "level": "CONFIRMATORY",
       "design_report_passed": false,
       "result_status": "COMPLETE",
@@ -44,12 +55,20 @@
       "counts_toward_axis_proof": false,
       "notes": [
         "Useful supporting evidence but insufficient for full A2 under the current proof contract"
-      ]
+      ],
+      "verified_obligations": [
+        "provenance_chain",
+        "experience_identity_control",
+        "mechanism_removal_contrast"
+      ],
+      "review_method": "claim-boundary review; not eligible for axis closure"
     },
     {
       "evidence_id": "E-GH2-A3",
       "experiment_id": "GH2_V1_1",
-      "axes": ["A3_RESPONSIBILITY_SENSITIVITY"],
+      "axes": [
+        "A3_RESPONSIBILITY_SENSITIVITY"
+      ],
       "level": "CONFIRMATORY",
       "design_report_passed": true,
       "result_status": "COMPLETE",
@@ -66,12 +85,21 @@
         "CURRENT_BOUND vs RECORD_ONLY",
         "PERMUTED and STALE responsibility controls",
         "non-scalar U/I/V/T and selected==realized invariants"
-      ]
+      ],
+      "verified_obligations": [
+        "responsibility_record_only_control",
+        "responsibility_content_control",
+        "responsibility_non_scalar",
+        "selected_nonselected_obligations"
+      ],
+      "review_method": "retrospective source-bounded review against Governance OASIS Scientific Proof Harness v1 axis obligations"
     },
     {
       "evidence_id": "E-GH3-A4-PARTIAL",
       "experiment_id": "GH3_V1_0",
-      "axes": ["A4_OVERGENERALIZATION_PREVENTION"],
+      "axes": [
+        "A4_OVERGENERALIZATION_PREVENTION"
+      ],
       "level": "CONFIRMATORY",
       "design_report_passed": false,
       "result_status": "COMPLETE",
@@ -86,12 +114,20 @@
       "counts_toward_axis_proof": false,
       "notes": [
         "Supporting scope-locality evidence, not full A4 closure"
-      ]
+      ],
+      "verified_obligations": [
+        "same_scope_control",
+        "changed_scope_control",
+        "no_global_exclusion"
+      ],
+      "review_method": "claim-boundary review; not eligible for axis closure"
     },
     {
       "evidence_id": "E-GH3-A6-PARTIAL",
       "experiment_id": "GH3_V1_0",
-      "axes": ["A6_WRONG_BEHAVIOR_RECOVERY"],
+      "axes": [
+        "A6_WRONG_BEHAVIOR_RECOVERY"
+      ],
       "level": "CONFIRMATORY",
       "design_report_passed": false,
       "result_status": "COMPLETE",
@@ -106,7 +142,13 @@
       "counts_toward_axis_proof": false,
       "notes": [
         "Revalidation mechanism evidence is necessary but not sufficient for recovery"
-      ]
+      ],
+      "verified_obligations": [
+        "post_outcome_contradictory_evidence",
+        "later_recurrence",
+        "revalidation_ablation"
+      ],
+      "review_method": "claim-boundary review; not eligible for axis closure"
     },
     {
       "evidence_id": "E-CBRA-FAILURE-A4-A6-DESIGN",
@@ -128,7 +170,9 @@
       "counts_toward_axis_proof": false,
       "notes": [
         "Contains same/changed/unrelated contexts and delayed checkpoints but cannot count before execution and recovery-specific redesign"
-      ]
+      ],
+      "verified_obligations": [],
+      "review_method": "claim-boundary review; not eligible for axis closure"
     },
     {
       "evidence_id": "E-RUN5-CARLA-STRUCTURAL",
@@ -147,7 +191,9 @@
       "counts_toward_axis_proof": false,
       "notes": [
         "Useful execution-validity work but intentionally excluded from Governance proof coverage"
-      ]
+      ],
+      "verified_obligations": [],
+      "review_method": "claim-boundary review; not eligible for axis closure"
     },
     {
       "evidence_id": "E-GH4-INTEGRATION-DESIGN",
@@ -172,7 +218,9 @@
       "counts_toward_axis_proof": false,
       "notes": [
         "Required final integration evidence remains open"
-      ]
+      ],
+      "verified_obligations": [],
+      "review_method": "claim-boundary review; not eligible for axis closure"
     }
   ]
 }
