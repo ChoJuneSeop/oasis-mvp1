@@ -42,6 +42,23 @@ class PortfolioGateTests(unittest.TestCase):
         self.assertFalse(run5.counts_toward_axis_proof)
         self.assertEqual(run5.axes, ())
 
+    def test_integrated_evidence_cannot_replace_axis_specific_confirmatory(self):
+        integrated = EvidenceRecord(
+            evidence_id="E-INTEGRATED-ONLY",
+            experiment_id="GH4-INTEGRATED",
+            axes=tuple(AxisId),
+            level=EvidenceLevel.INTEGRATED_CONFIRMATORY,
+            design_report_passed=True,
+            result_status="COMPLETE",
+            source_refs=("integrated-spec", "integrated-result"),
+            claim_boundary=("finite integrated scope",),
+            counts_toward_axis_proof=True,
+        )
+        report = audit_portfolio(program_id="TEST", evidence=(integrated,))
+        self.assertFalse(report.proof_complete)
+        self.assertEqual(set(report.weak_axes), {axis.value for axis in AxisId})
+        self.assertEqual(report.integration_evidence_ids, ("E-INTEGRATED-ONLY",))
+
     def test_program_can_close_only_with_all_axis_confirmatory_and_integration(self):
         records = []
         for axis in AxisId:
