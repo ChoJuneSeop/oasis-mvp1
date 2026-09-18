@@ -35,7 +35,8 @@ def validate_program_sequence(
             target = design.targeted_axes[0].value
             if target != portfolio.next_required_axis:
                 replication = bool(design.metadata.get("replication_of_closed_axis"))
-                if not replication:
+                target_is_supported = target in set(portfolio.supported_axes)
+                if not (replication and target_is_supported):
                     blockers.append(
                         f"official_axis_sequence_requires={portfolio.next_required_axis};"
                         f"requested={target}"
