@@ -3,7 +3,13 @@ from __future__ import annotations
 from pathlib import Path
 import unittest
 
-from research.oasis_experiment_freeze_harness_v1.models import GateReport, GateState
+from research.oasis_experiment_freeze_harness_v1.models import (
+    CheckCategory,
+    CheckResult,
+    CheckStatus,
+    GateReport,
+    GateState,
+)
 
 from .io import load_evidence_registry
 from .models import AxisId
@@ -16,12 +22,22 @@ HERE = Path(__file__).resolve().parent
 
 
 def execution_for(design, *, profile_id: str | None = None, required=None, ready=True):
+    required_ids = tuple(required or design.required_execution_check_ids)
+    checks = tuple(
+        CheckResult(
+            check_id=check_id,
+            category=CheckCategory.EXECUTION,
+            status=CheckStatus.PASS if ready else CheckStatus.FAIL,
+            summary=check_id,
+        )
+        for check_id in required_ids
+    )
     return GateReport(
         profile_id=profile_id or design.execution_profile_id,
         state=GateState.FREEZE_READY if ready else GateState.DRAFT,
-        checks=(),
-        required_check_ids=tuple(required or design.required_execution_check_ids),
-        unresolved_check_ids=() if ready else ("runtime_gate",),
+        checks=checks,
+        required_check_ids=required_ids,
+        unresolved_check_ids=() if ready else tuple(required_ids),
         missing_check_ids=(),
         duplicate_check_ids=(),
         freeze_ready=ready,
