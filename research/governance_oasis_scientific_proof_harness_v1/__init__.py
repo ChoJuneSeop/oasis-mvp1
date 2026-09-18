@@ -7,6 +7,7 @@ from .models import (
     DesignCheck,
     DesignStatus,
     ExperimentDesign,
+    ExperimentReadinessReport,
     EvidenceLevel,
     EvidenceRecord,
     PortfolioReport,
@@ -18,6 +19,7 @@ from .design_gate import validate_design
 from .portfolio_gate import audit_portfolio
 from .program_sequence import validate_program_sequence
 from .three_lens_gate import three_lens_review
+from .readiness_gate import evaluate_experiment_readiness
 
 __all__ = [
     "AxisId",
@@ -26,6 +28,7 @@ __all__ = [
     "DesignCheck",
     "DesignStatus",
     "ExperimentDesign",
+    "ExperimentReadinessReport",
     "EvidenceLevel",
     "EvidenceRecord",
     "PortfolioReport",
@@ -36,4 +39,5 @@ __all__ = [
     "audit_portfolio",
     "validate_program_sequence",
     "three_lens_review",
+    "evaluate_experiment_readiness",
 ]
