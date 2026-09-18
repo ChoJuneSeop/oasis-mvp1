@@ -1,11 +1,11 @@
 {
-  "status": "BLOCKED_PENDING_RUNTIME_IDENTITIES",
+  "status": "BLOCKED_PENDING_3_RUNTIME_IDENTITIES",
   "pilot_spec": "GOVERNANCE_CBRA_CARLA_PILOT_V1_0_FINAL",
   "required": {
     "carla_host_environment_actuator": {
-      "path": null,
-      "commit_sha": null,
-      "sha256": null
+      "path": "research/carla_v22_harness_v11/carla_runtime_adapter_v1.py",
+      "commit_sha": "bc70fe96d397eb963e2fbc4397a0bc3634d573f7",
+      "sha256": "9d10a5af565405c9d05463879fa2616330e9960e01e3320ce56b30f0b6331e6d"
     },
     "oasis_core_adapter": {
       "path": null,
