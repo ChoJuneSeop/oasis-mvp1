@@ -3,7 +3,7 @@ name: Governance CBRA CARLA Pilot v1 freeze
 on:
   push:
     branches:
-      - experiment/governance-cbra-carla-pilot-v1-run4-freeze
+      - experiment/governance-cbra-carla-pilot-v1-run5-freeze
   workflow_dispatch:
 
 permissions:
@@ -33,6 +33,8 @@ jobs:
         run: python -m unittest -v research.governance_cbra_carla_pilot_v1.test_run3_freeze
       - name: Run4 freeze integrity
         run: python -m unittest -v research.governance_cbra_carla_pilot_v1.test_run4_freeze
+      - name: Run5 freeze integrity
+        run: python -m unittest -v research.governance_cbra_carla_pilot_v1.test_run5_freeze
       - name: Mapping regression
         run: python -m unittest -v research.governance_cbra_carla_mapping_v1.test_mapping
       - name: Efficiency contract regression
