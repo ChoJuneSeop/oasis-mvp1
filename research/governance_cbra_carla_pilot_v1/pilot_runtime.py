@@ -697,6 +697,7 @@ class PilotScene:
         result = {
             "kind": kind,
             "spawn_index": int(self.admitted_spawn_index),
+            "topology_distances_m": list(self.admitted_topology_distances_m),
             "baseline_front_present": bool(baseline.front_present),
             "staged_front_present": bool(staged.front_present),
             "staged_front_kind": staged.front_kind,
