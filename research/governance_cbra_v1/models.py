@@ -75,14 +75,15 @@ class ResponsibilityProvenance:
 class DecisionProvenanceSnapshot:
     entry_id: str
     relation_id: str
+    scope_key: str
     decision_tau: float
     closure_tau: float
     participation: tuple[ParticipationProvenance, ...]
     responsibility: ResponsibilityProvenance
 
     def __post_init__(self):
-        if not self.entry_id or not self.relation_id:
-            raise ValueError("CBRA snapshot requires entry and relation identity")
+        if not self.entry_id or not self.relation_id or not self.scope_key:
+            raise ValueError("CBRA snapshot requires entry, relation, and scope identity")
         if self.closure_tau < self.decision_tau:
             raise ValueError("Closure cannot precede the decision")
         ids = tuple(x.experience_id for x in self.participation)
@@ -92,6 +93,10 @@ class DecisionProvenanceSnapshot:
 
 @dataclass(frozen=True)
 class TargetEvidence:
+    evidence_id: str
+    observed_tau: float
+    relation_id: str
+    scope_key: str
     target_kind: TargetKind
     target_id: str
     direction: EvidenceDirection
@@ -100,6 +105,10 @@ class TargetEvidence:
     note: str = ""
 
     def __post_init__(self):
+        if not self.evidence_id:
+            raise ValueError("CBRA evidence requires evidence_id")
+        if not self.relation_id or not self.scope_key:
+            raise ValueError("CBRA evidence requires relation and scope identity")
         if not self.target_id:
             raise ValueError("CBRA evidence requires a target id")
         if not self.evidence_refs:
@@ -121,6 +130,7 @@ class RevalidationFinding:
 class RevalidationCheckpoint:
     entry_id: str
     relation_id: str
+    scope_key: str
     observed_tau: float
     ordinal: int
     participation_findings: tuple[RevalidationFinding, ...]
@@ -128,4 +138,5 @@ class RevalidationCheckpoint:
     nonselected_choice_findings: tuple[RevalidationFinding, ...]
     responsibility_findings: tuple[RevalidationFinding, ...]
     overall_attribution: AttributionKind
+    evidence_ids: tuple[str, ...]
     evidence_refs: tuple[str, ...]
