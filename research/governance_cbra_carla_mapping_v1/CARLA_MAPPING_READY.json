@@ -1,9 +1,9 @@
 {
-  "status": "CARLA_MAPPING_READY",
+  "status": "CARLA_MAPPING_READY_WITH_EFFICIENCY_ENERGY_VALIDATION",
   "mapping_version": "GOVERNANCE_CBRA_CARLA_MAPPING_V1_0",
-  "frozen_mapping_snapshot_sha": "b9ebe492ebfa0c055a221f6634461e90da826eb0",
-  "validation_run_id": 35331408039,
-  "validation_job_id": 105556357088,
+  "frozen_mapping_snapshot_sha": "8ad407e967b3f1d1943fb674b263d7de716cb805",
+  "validation_run_id": 35332218700,
+  "validation_job_id": 105558896943,
   "source_lineages": {
     "governance_cbra_closure": "70615d25c855ac0f06ac8ce36d6cc54c1ab1dfc8",
     "canonical_carla_branch": "canonical/carla-v22-harness-v1.1-g32",
@@ -16,7 +16,8 @@
     "canonical_carla_regression": true,
     "cbra_regression": true,
     "governance_regression": true,
-    "formal_error_checks_closed": 10
+    "formal_error_checks_closed": 10,
+    "efficiency_scheduling_contract": true
   },
   "reflection_mapping": {
     "free_form_reflection": false,
@@ -62,6 +63,8 @@
       "joules_per_closure"
     ],
     "aggregate_efficiency_score": null,
-    "real_measurement_executed": false
+    "real_measurement_executed": false,
+    "validation_run_id": 35332218700,
+    "scheduling_contract_pass": true
   }
 }
