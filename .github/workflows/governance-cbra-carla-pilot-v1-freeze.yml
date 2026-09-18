@@ -26,6 +26,8 @@ jobs:
         run: python -m unittest -v research.governance_cbra_carla_pilot_v1.test_pilot_runner
       - name: Pilot pre-execution attack suite
         run: python -m unittest -v research.governance_cbra_carla_pilot_v1.test_pilot_preexec
+      - name: Run3 freeze integrity
+        run: python -m unittest -v research.governance_cbra_carla_pilot_v1.test_run3_freeze
       - name: Mapping regression
         run: python -m unittest -v research.governance_cbra_carla_mapping_v1.test_mapping
       - name: Efficiency contract regression
