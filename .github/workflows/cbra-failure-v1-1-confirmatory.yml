@@ -1,0 +1,54 @@
+name: CBRA failure v1.1 Confirmatory
+
+on:
+  push:
+    branches: [experiment/cbra-failure-v1-1-confirmatory]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  confirmatory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: be6d3a88e60aba44f74738a8524bf0138f1613d1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify frozen snapshot
+        run: test "$(git rev-parse HEAD)" = "be6d3a88e60aba44f74738a8524bf0138f1613d1"
+      - name: Run Confirmatory
+        run: python -m research.governance_cbra_failure_exp_v1.runner --stage confirmatory > cbra_failure_v11_confirmatory.json
+      - name: Validate frozen output contract
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open("cbra_failure_v11_confirmatory.json"))
+          assert x["spec_version"]=="CBRA_FAILURE_CE_V1_1_FINAL"
+          assert x["stage"]=="confirmatory"
+          assert x["scientific_evaluator_used"] is True
+          assert x["aggregate_score"] is None
+          assert x["truth_case_count"]==60
+          assert x["family_initial_scopes"]==[1,2,3,4]
+          s=x["structural"]
+          assert s["fresh_process"]
+          assert s["arm_count"]==3
+          assert s["case_count_per_arm"]==60
+          assert s["governance_checkpoint_contract"]
+          assert s["general_harness_has_no_cbra"]
+          assert s["as_of_gate_present"]
+          assert s["counterfactual_claimed"] is False
+          assert s["confirmatory_family_scope_variation"]
+          assert set(x["metrics"])=={"GOV_CBRA","GOV_RECORD_ONLY","GENERAL_HARNESS"}
+          PY
+      - name: Hash Confirmatory evidence
+        run: sha256sum cbra_failure_v11_confirmatory.json > cbra_failure_v11_confirmatory.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cbra-failure-v11-confirmatory
+          path: |
+            cbra_failure_v11_confirmatory.json
+            cbra_failure_v11_confirmatory.sha256
