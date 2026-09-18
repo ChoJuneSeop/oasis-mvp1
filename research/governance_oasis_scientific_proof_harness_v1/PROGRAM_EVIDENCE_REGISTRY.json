@@ -56,7 +56,8 @@
       ],
       "counts_toward_axis_proof": false,
       "notes": [
-        "Useful supporting evidence but insufficient for full A2 under the current proof contract"
+        "Identity specificity and provenance are supported.",
+        "Separate relation-history and order-history ablations are absent, so A2 remains open."
       ],
       "verified_obligations": [
         "provenance_chain",
@@ -149,10 +150,12 @@
       ],
       "counts_toward_axis_proof": false,
       "notes": [
-        "Revalidation mechanism evidence is necessary but not sufficient for recovery"
+        "GH-3 supports post-Closure outcome-based revalidation and later decision change.",
+        "It does not establish that prior CE causally induced an adverse behavior under a post-outcome wrongness criterion, so it cannot close A6."
       ],
       "verified_obligations": [
-        "post_outcome_contradictory_evidence",
+        "authoritative_outcome_observation",
+        "post_outcome_contradiction_endpoint",
         "later_recurrence",
         "revalidation_ablation"
       ],
