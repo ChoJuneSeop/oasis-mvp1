@@ -27,6 +27,14 @@ jobs:
           python -m compileall -q research/governance_oasis_scientific_proof_harness_v1
           python -m compileall -q research/oasis_experiment_freeze_harness_v1
 
+      - name: Print A2 expected profile bindings
+        run: |
+          python - <<'PY'
+          import json
+          from research.governance_oasis_a2_traceability_v1.profile_io import compute_expected_bindings
+          print(json.dumps(compute_expected_bindings(), sort_keys=True))
+          PY
+
       - name: Prove frozen scientific harness did not drift
         run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_freeze_integrity
 
