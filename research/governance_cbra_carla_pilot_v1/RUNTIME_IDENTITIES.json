@@ -1,0 +1,27 @@
+{
+  "status": "BLOCKED_PENDING_RUNTIME_IDENTITIES",
+  "pilot_spec": "GOVERNANCE_CBRA_CARLA_PILOT_V1_0_FINAL",
+  "required": {
+    "carla_host_environment_actuator": {
+      "path": null,
+      "commit_sha": null,
+      "sha256": null
+    },
+    "oasis_core_adapter": {
+      "path": null,
+      "commit_sha": null,
+      "sha256": null
+    },
+    "observation_gateway": {
+      "path": null,
+      "commit_sha": null,
+      "sha256": null
+    },
+    "independent_evaluator": {
+      "path": null,
+      "commit_sha": null,
+      "sha256": null
+    }
+  },
+  "execution_permitted": false
+}
