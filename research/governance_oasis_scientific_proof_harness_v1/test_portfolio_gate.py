@@ -71,6 +71,7 @@ class PortfolioGateTests(unittest.TestCase):
         self.assertFalse(report.proof_complete)
         self.assertEqual(set(report.weak_axes), {axis.value for axis in AxisId})
         self.assertEqual(report.integration_evidence_ids, ("E-INTEGRATED-ONLY",))
+        self.assertTrue(report.integration_supported)
 
     def test_completed_null_result_does_not_count_as_proof_support(self):
         axis = AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS
@@ -131,6 +132,7 @@ class PortfolioGateTests(unittest.TestCase):
                     source_refs=("frozen-spec", "result"),
                     claim_boundary=("finite scope",),
                     counts_toward_axis_proof=True,
+                    claim_outcome=ClaimOutcome.SUPPORTS,
                     verified_obligations=AXIS_CONTRACTS[axis].mandatory_obligations,
                     review_method="test axis review",
                     result_rule_ref="frozen-result-rule",
@@ -147,6 +149,7 @@ class PortfolioGateTests(unittest.TestCase):
                 source_refs=("integrated-spec", "integrated-result"),
                 claim_boundary=("finite integrated scope",),
                 counts_toward_axis_proof=True,
+                claim_outcome=ClaimOutcome.SUPPORTS,
                 verified_obligations=tuple(
                     sorted(
                         {
@@ -157,7 +160,7 @@ class PortfolioGateTests(unittest.TestCase):
                     )
                 ),
                 review_method="test integrated review",
-            result_rule_ref="frozen-result-rule",
+                result_rule_ref="frozen-result-rule",
             )
         )
         report = audit_portfolio(program_id="TEST", evidence=records)
@@ -165,6 +168,8 @@ class PortfolioGateTests(unittest.TestCase):
         self.assertEqual(report.missing_axes, ())
         self.assertEqual(report.weak_axes, ())
         self.assertEqual(report.integration_evidence_ids, ("E-INTEGRATED",))
+        self.assertTrue(report.integration_supported)
+        self.assertEqual(set(report.supported_axes), {axis.value for axis in AxisId})
 
 
 if __name__ == "__main__":
