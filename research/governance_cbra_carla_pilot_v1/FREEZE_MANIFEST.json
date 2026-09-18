@@ -1,0 +1,31 @@
+{
+  "status": "PILOT_DESIGN_FROZEN",
+  "spec_version": "GOVERNANCE_CBRA_CARLA_PILOT_V1_0_FINAL",
+  "freeze_base_commit": "7f8ef30551d1fe19997edd4c3915daa0fed5c74a",
+  "validated_mapping_snapshot": "8ad407e967b3f1d1943fb674b263d7de716cb805",
+  "arms": [
+    "GENERAL_HARNESS",
+    "GOVERNANCE_NO_CBRA",
+    "GOVERNANCE_PLUS_CBRA"
+  ],
+  "failure_classes": [
+    "SUCCESS_CONTROL",
+    "PARTICIPATION_COMMISSION_FAILURE",
+    "PARTICIPATION_OMISSION_FAILURE",
+    "RESPONSIBILITY_AXIS_FAILURE",
+    "EXOGENOUS_FAILURE",
+    "DELAYED_FAILURE"
+  ],
+  "reentry_contexts": [
+    "SAME_SCOPE",
+    "CHANGED_SCOPE",
+    "UNRELATED_RELATION"
+  ],
+  "minimum_case_arm_units": 54,
+  "pilot_structural_only": true,
+  "scientific_superiority_metric_enabled": false,
+  "aggregate_score": null,
+  "post_result_rule_tuning": false,
+  "runtime_identity_gate_required": true,
+  "real_carla_executed": false
+}
