@@ -12,6 +12,7 @@ def proof(ready: bool) -> ProofDesignReport:
     return ProofDesignReport(
         experiment_id="X",
         execution_profile_id="EXEC_X",
+        required_execution_check_ids=("world_isolation", "single_realization"),
         checks=(),
         targeted_axes=(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS,),
         proof_ready=ready,
@@ -24,7 +25,7 @@ def freeze(ready: bool) -> GateReport:
         profile_id="EXEC_X",
         state=GateState.FREEZE_READY if ready else GateState.DRAFT,
         checks=(),
-        required_check_ids=(),
+        required_check_ids=("world_isolation", "single_realization"),
         unresolved_check_ids=() if ready else ("execution",),
         missing_check_ids=(),
         duplicate_check_ids=(),
@@ -48,6 +49,23 @@ class CombinedReadinessTests(unittest.TestCase):
         )
         report = combine_readiness(p, wrong)
         self.assertFalse(report.execution_profile_matches)
+        self.assertFalse(report.experiment_ready)
+
+    def test_missing_required_execution_check_blocks_combined_readiness(self):
+        p = proof(True)
+        f = freeze(True)
+        incomplete = GateReport(
+            profile_id=f.profile_id,
+            state=f.state,
+            checks=f.checks,
+            required_check_ids=("world_isolation",),
+            unresolved_check_ids=(),
+            missing_check_ids=(),
+            duplicate_check_ids=(),
+            freeze_ready=True,
+        )
+        report = combine_readiness(p, incomplete)
+        self.assertFalse(report.execution_contract_matches)
         self.assertFalse(report.experiment_ready)
 
     def test_both_scientific_and_execution_gates_are_required(self):
