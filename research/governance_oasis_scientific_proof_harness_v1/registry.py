@@ -149,3 +149,28 @@ PROGRAM_INTEGRATION_REQUIREMENTS = (
     "provenance_continuity",
     "claim_boundaries_preserved",
 )
+
+
+CLAIM_AXIS_MAP: dict[str, AxisId | None] = {
+    "GO-A1-C1": AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS,
+    "GO-A1-C2": AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS,
+    "GO-A2-C1": AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY,
+    "GO-A2-C2": AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY,
+    "GO-A3-C1": AxisId.A3_RESPONSIBILITY_SENSITIVITY,
+    "GO-A4-C1": AxisId.A4_OVERGENERALIZATION_PREVENTION,
+    "GO-A5-C1": AxisId.A5_CONFLICTING_EXPERIENCE_HANDLING,
+    "GO-A6-C1": AxisId.A6_WRONG_BEHAVIOR_RECOVERY,
+    "GO-INTEGRATED-C1": None,
+}
+
+CLAIM_DESCRIPTIONS: dict[str, str] = {
+    "GO-A1-C1": "Completed Experience or post-outcome governance evidence causally changes a later realized decision path.",
+    "GO-A1-C2": "The induced behavior change is visible in a prespecified effectiveness endpoint, not merely a structural trace.",
+    "GO-A2-C1": "The contribution of a specific Completed Experience identity is provenance-traceable and causally distinguishable.",
+    "GO-A2-C2": "Relation/process/order history contributes beyond an unordered set of remembered items.",
+    "GO-A3-C1": "Dynamic U/I/V/T responsibility is causally bound to choice rather than merely recorded.",
+    "GO-A4-C1": "Prior experience/revalidation influence remains relation-context local and does not become global exclusion.",
+    "GO-A5-C1": "Conflicting Completed Experiences are preserved and resolved contextually without destructive scalar overwrite.",
+    "GO-A6-C1": "A realized wrong behavior change can be revised by later real outcome evidence and later related behavior can recover.",
+    "GO-INTEGRATED-C1": "The six governance functions coexist in one flow-preserving integrated experiment without violating temporal causality or single realization.",
+}
