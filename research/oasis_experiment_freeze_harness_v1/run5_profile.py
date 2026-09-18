@@ -198,20 +198,17 @@ def _scope_ambient_contamination(root: Path, ref: str) -> CheckResult:
     spawn = _node_source(runtime, function_name="_spawn_ego")
     admission = _node_source(runtime, function_name="admit_relation_cycle")
     density_in_scope = "local_density" in scope
-    density_gated = (
-        "local_density" in spawn
-        and (
-            "local_density != 0" in spawn
-            or "local_density == 0" in spawn
-            or "observation.local_density" in spawn and "continue" in spawn
-        )
-    ) or (
-        "local_density" in admission
-        and (
-            "local_density != 0" in admission
-            or "local_density == 0" in admission
-        )
-    )
+
+    def has_density_guard(source: str) -> bool:
+        tree = ast.parse(source)
+        for node in ast.walk(tree):
+            if isinstance(node, ast.If):
+                test = ast.get_source_segment(source, node.test) or ""
+                if "local_density" in test:
+                    return True
+        return False
+
+    density_gated = has_density_guard(spawn) or has_density_guard(admission)
     passed = (not density_in_scope) or density_gated
     return _result(
         "scope_ambient_contamination",
