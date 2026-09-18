@@ -43,7 +43,7 @@ def _derive_state(items: tuple[TargetEvidence, ...]) -> tuple[RevalidationState,
             RevalidationState.INCONCLUSIVE,
             AttributionKind.UNRESOLVED,
             (),
-            "no later evidence for this target",
+            "no context-eligible later evidence for this target",
         )
 
     attribution = _overall_attribution(items)
@@ -58,20 +58,21 @@ def _derive_state(items: tuple[TargetEvidence, ...]) -> tuple[RevalidationState,
         return RevalidationState.CONFIRMED, attribution, refs, "decision-linked later evidence supports the original judgment"
     if not decision_linked and all(x.attribution is AttributionKind.EXOGENOUS for x in items):
         return RevalidationState.INCONCLUSIVE, attribution, refs, "exogenous evidence does not by itself revise the original judgment"
-    return RevalidationState.INCONCLUSIVE, attribution, refs, "later evidence is mixed, unresolved, or non-causal for this judgment"
+    return RevalidationState.INCONCLUSIVE, attribution, refs, "later evidence is mixed, unresolved, indeterminate, or non-causal for this judgment"
 
 
 class ContinuousBidirectionalRevalidationAxis:
-    """Append-only monitoring axis for post-Closure governance provenance.
+    """Append-only post-Closure monitoring over immutable Governance provenance.
 
-    CBRA never mutates the original decision. It emits ordered revalidation
-    checkpoints. Nonparticipation and nonselection are evaluated only for
-    evidence consistency; no counterfactual outcome is invented.
+    CBRA never mutates the original decision. It emits ordered checkpoints.
+    Nonparticipation and nonselection are evaluated only for evidentiary
+    consistency; no unrealized counterfactual outcome is invented.
     """
 
     def __init__(self, snapshot: DecisionProvenanceSnapshot):
         self.snapshot = snapshot
         self._records: list[RevalidationCheckpoint] = []
+        self._seen_target_evidence: set[tuple[str, TargetKind, str]] = set()
 
     def _valid_targets(self) -> set[tuple[TargetKind, str]]:
         targets = {
@@ -96,18 +97,26 @@ class ContinuousBidirectionalRevalidationAxis:
             return AssessmentBasis.EVIDENCE_CONSISTENCY
         return AssessmentBasis.DIRECT_REALIZED
 
+    def _context_eligible(self, item: TargetEvidence) -> bool:
+        return item.relation_id == self.snapshot.relation_id and item.scope_key == self.snapshot.scope_key
+
     def _finding(
         self,
         kind: TargetKind,
         target_id: str,
         grouped: dict[tuple[TargetKind, str], tuple[TargetEvidence, ...]],
     ) -> RevalidationFinding:
-        items = grouped.get((kind, target_id), ())
-        state, attribution, refs, note = _derive_state(items)
+        all_items = grouped.get((kind, target_id), ())
+        eligible = tuple(x for x in all_items if self._context_eligible(x))
+        state, attribution, refs, note = _derive_state(eligible)
+        excluded = len(all_items) - len(eligible)
+        if excluded:
+            note = f"{note}; {excluded} relation/scope-mismatched evidence item(s) preserved but non-decisive"
         basis = self._basis(kind, target_id)
         if basis is AssessmentBasis.EVIDENCE_CONSISTENCY:
-            note = f"{note}; counterfactual outcome is not inferred"
-        return RevalidationFinding(kind, target_id, state, basis, attribution, refs, note)
+            note = f"{note}; state applies only to original rationale consistency; counterfactual outcome is not inferred"
+        all_refs = tuple(dict.fromkeys(ref for item in all_items for ref in item.evidence_refs))
+        return RevalidationFinding(kind, target_id, state, basis, attribution, all_refs or refs, note)
 
     def observe(
         self,
@@ -119,11 +128,24 @@ class ContinuousBidirectionalRevalidationAxis:
             raise ValueError("CBRA monitoring checkpoint must occur after Closure")
         if self._records and observed_tau <= self._records[-1].observed_tau:
             raise ValueError("CBRA monitoring time must increase monotonically")
+        if not evidence:
+            raise ValueError("CBRA checkpoint requires at least one provenance-linked evidence item")
 
         valid = self._valid_targets()
         invalid = tuple((x.target_kind, x.target_id) for x in evidence if (x.target_kind, x.target_id) not in valid)
         if invalid:
             raise ValueError(f"CBRA evidence targets are not in original provenance: {invalid}")
+
+        incoming_keys: list[tuple[str, TargetKind, str]] = []
+        for item in evidence:
+            if item.observed_tau <= self.snapshot.closure_tau:
+                raise ValueError("CBRA evidence must be observed after Closure")
+            if item.observed_tau > observed_tau:
+                raise ValueError("CBRA checkpoint cannot contain future evidence")
+            key = (item.evidence_id, item.target_kind, item.target_id)
+            if key in self._seen_target_evidence or key in incoming_keys:
+                raise ValueError(f"duplicate CBRA event-target evidence: {key}")
+            incoming_keys.append(key)
 
         bucket: dict[tuple[TargetKind, str], list[TargetEvidence]] = defaultdict(list)
         for item in evidence:
@@ -148,9 +170,11 @@ class ContinuousBidirectionalRevalidationAxis:
             for kind, target_id in RESPONSIBILITY_TARGETS
         )
         refs = tuple(dict.fromkeys(ref for item in evidence for ref in item.evidence_refs))
+        evidence_ids = tuple(dict.fromkeys(item.evidence_id for item in evidence))
         checkpoint = RevalidationCheckpoint(
             entry_id=self.snapshot.entry_id,
             relation_id=self.snapshot.relation_id,
+            scope_key=self.snapshot.scope_key,
             observed_tau=float(observed_tau),
             ordinal=len(self._records) + 1,
             participation_findings=participation,
@@ -158,11 +182,17 @@ class ContinuousBidirectionalRevalidationAxis:
             nonselected_choice_findings=nonselected,
             responsibility_findings=responsibility,
             overall_attribution=_overall_attribution(evidence),
+            evidence_ids=evidence_ids,
             evidence_refs=refs,
         )
         self._records.append(checkpoint)
+        self._seen_target_evidence.update(incoming_keys)
         return checkpoint
 
     def history(self) -> tuple[RevalidationCheckpoint, ...]:
-        """Return ordered checkpoints. Deliberately no scalar/latest-state collapse."""
+        """Return the immutable ordered checkpoint sequence; no scalar/latest-state collapse."""
         return tuple(self._records)
+
+    def history_as_of(self, decision_tau: float) -> tuple[RevalidationCheckpoint, ...]:
+        """Safe future-decision read: only checkpoints strictly earlier than decision_tau."""
+        return tuple(x for x in self._records if x.observed_tau < float(decision_tau))
