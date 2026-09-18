@@ -46,6 +46,13 @@ def three_lens_review(
     )
 
     execution_blockers = list(execution_report.unresolved_check_ids)
+    if proof_report.execution_profile_id != execution_report.profile_id:
+        execution_blockers.append(
+            "execution_profile_mismatch:"
+            + proof_report.execution_profile_id
+            + "!="
+            + execution_report.profile_id
+        )
     execution_blockers.extend(execution_report.missing_check_ids)
     execution_blockers.extend(execution_report.duplicate_check_ids)
     if not execution_report.freeze_ready and not execution_blockers:
