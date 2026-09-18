@@ -62,6 +62,8 @@ class ExperimentDesign:
     contrasts: tuple[CausalContrast, ...]
     independent_evaluator: bool
     evaluator_blinded_to: tuple[str, ...]
+    authoritative_outcome_observation: bool
+    decision_worker_forbidden_inputs: tuple[str, ...]
     provenance_chain: tuple[str, ...]
     replication_plan: str
     claim_boundary: tuple[str, ...]
