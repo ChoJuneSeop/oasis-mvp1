@@ -14,6 +14,7 @@ from .design_spec import build_design
 from .evaluator import aggregate_axis, evaluate_run
 from .fixtures import build_default_fixtures, load_frozen_fixtures, validate_fixture_isolation
 from .instrumentation import SystemTraceBuilder
+from .confirmatory_runner import validate_production_dimension_isolation
 from .ledger import LedgerIntegrityError, ReferenceLedger
 from .models import (
     A2ExecutionProfile,
@@ -132,6 +133,35 @@ class A2TraceabilityTests(unittest.TestCase):
         report = run_preflight(profile=load_execution_profile(), fixtures=load_frozen_fixtures())
         self.assertTrue(report.freeze_ready, report.unresolved_check_ids)
         self.assertEqual(len(report.checks), len(report.required_check_ids))
+
+    def test_production_dimension_isolation(self):
+        validate_production_dimension_isolation()
+
+    def test_consumption_digest_mismatch_is_invalid(self):
+        fixture = next(x for x in build_default_fixtures() if x.arm_id == "I0")
+        trace, ledger = _matched_run(fixture, suffix="digest-mismatch")
+        consumed_index = next(
+            i for i, event in enumerate(ledger._events)
+            if event.event_type.value == "DECISION_INPUT_CONSUMED"
+        )
+        event = ledger._events[consumed_index]
+        ledger._events[consumed_index] = replace(
+            event,
+            payload_digest="different-consumption-digest",
+            event_hash="",
+        )
+        # Rebuild downstream chain hashes so the scientific evaluator sees an internally
+        # hash-valid ledger whose candidate and consumption provenance disagree.
+        rebuilt = []
+        previous = ""
+        for raw in ledger._events:
+            updated = replace(raw, previous_event_hash=previous, event_hash="")
+            updated = replace(updated, event_hash=updated.computed_hash())
+            rebuilt.append(updated)
+            previous = updated.event_hash
+        ledger._events = rebuilt
+        result = evaluate_run(fixture=fixture, system_trace=trace, reference_ledger=ledger)
+        self.assertEqual(result.outcome, ClaimOutcome.INVALID)
 
     def test_all_default_arms_match_independent_reference_plane(self):
         results = []
