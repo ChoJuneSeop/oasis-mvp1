@@ -1,14 +1,21 @@
 {
-  "spec_version":"CBRA_FAILURE_CE_V1_FINAL",
-  "axis_snapshot_base":"45905bf69b9a28fd08a9646fa3ee4d412efe0ac0",
+  "spec_version":"CBRA_FAILURE_CE_V1_1_FINAL",
+  "restart_base_commit":"5531fef20ce096f7f59e41756ff76fea50638f83",
+  "v1_0_status":"DIAGNOSTIC_ONLY_NOT_SCIENTIFICALLY_ADMISSIBLE",
+  "v1_1_corrections":[
+    "GENERAL_HARNESS does not instantiate CBRA",
+    "F1-F4 alter runtime scope",
+    "delayed failure uses two ordered post-Closure checkpoints"
+  ],
   "arms":["GOV_CBRA","GOV_RECORD_ONLY","GENERAL_HARNESS"],
   "failure_classes":5,
   "reentry_contexts":3,
   "pilot_cases_per_arm":15,
-  "confirmatory_families":4,
+  "confirmatory_families":{"F1":1,"F2":2,"F3":3,"F4":4},
   "confirmatory_cases_per_arm":60,
   "confirmatory_total_case_arm_units":180,
   "aggregate_score":null,
   "pilot_may_tune_confirmatory":false,
+  "v1_0_results_used_for_rule_tuning":false,
   "post_result_rule_repair":false
 }
