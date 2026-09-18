@@ -146,6 +146,13 @@
         "exogenous evidence cannot be relabeled as decision-linked",
         "unrelated relation cannot inherit recovery feedback",
         "zero difference remains a valid result"
+      ],
+      "held_constant": [
+        "same antecedent Completed Experience and provenance",
+        "same current-flow observations before the revalidation intervention",
+        "same Core, possibility set, participation rule, and responsibility rule",
+        "same outcome observation stream",
+        "same independent evaluator"
       ]
     },
     {
