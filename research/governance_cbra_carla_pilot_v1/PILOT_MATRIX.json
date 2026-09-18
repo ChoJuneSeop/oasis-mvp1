@@ -1,0 +1,585 @@
+{
+  "protocol_id": "GOVERNANCE-CBRA-CARLA-PILOT-V1",
+  "status": "FROZEN_BEFORE_FIRST_PILOT_UNIT",
+  "structural_only": true,
+  "confirmatory": false,
+  "carla_version": "0.9.16",
+  "map": "Town10HD_Opt",
+  "synchronous_mode": true,
+  "fixed_delta_seconds": 0.05,
+  "no_rendering_mode": true,
+  "render_mode": "RenderOffScreen",
+  "weather": "ClearNoon",
+  "scenario_policy": {
+    "ego_plus_max_dynamic_counterpart": 1,
+    "initial_counterpart_kind": "vehicle",
+    "same_scope_kind": "vehicle",
+    "changed_scope_kind": "pedestrian",
+    "unrelated_scope_kind": "vehicle",
+    "current_flow_gap_staging": "host-observed ego speed decrease between two current samples",
+    "participation_rule": "current front relation present and non-opening; no scenario/failure label enters decision-time Governance",
+    "failure_evidence_visibility": "independent post-Closure evaluator side only"
+  },
+  "arms": [
+    "GENERAL_HARNESS",
+    "GOVERNANCE_NO_CBRA",
+    "GOVERNANCE_PLUS_CBRA"
+  ],
+  "failure_classes": [
+    "SUCCESS_CONTROL",
+    "PARTICIPATION_COMMISSION_FAILURE",
+    "PARTICIPATION_OMISSION_FAILURE",
+    "RESPONSIBILITY_AXIS_FAILURE",
+    "EXOGENOUS_FAILURE",
+    "DELAYED_FAILURE"
+  ],
+  "reentry_contexts": [
+    "SAME_SCOPE",
+    "CHANGED_SCOPE",
+    "UNRELATED_RELATION"
+  ],
+  "minimum_case_arm_units": 54,
+  "unit_count": 54,
+  "units": [
+    {
+      "unit_id": "U001_SUCCESS_CONTROL_SAME_SCOPE_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940001,
+      "npc_count": 1,
+      "seed_relation_id": "REL:01",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U002_SUCCESS_CONTROL_SAME_SCOPE_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940001,
+      "npc_count": 1,
+      "seed_relation_id": "REL:01",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U003_SUCCESS_CONTROL_SAME_SCOPE_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940001,
+      "npc_count": 1,
+      "seed_relation_id": "REL:01",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U004_SUCCESS_CONTROL_CHANGED_SCOPE_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940002,
+      "npc_count": 1,
+      "seed_relation_id": "REL:02",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U005_SUCCESS_CONTROL_CHANGED_SCOPE_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940002,
+      "npc_count": 1,
+      "seed_relation_id": "REL:02",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U006_SUCCESS_CONTROL_CHANGED_SCOPE_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940002,
+      "npc_count": 1,
+      "seed_relation_id": "REL:02",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U007_SUCCESS_CONTROL_UNRELATED_RELATION_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940003,
+      "npc_count": 1,
+      "seed_relation_id": "REL:03",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U008_SUCCESS_CONTROL_UNRELATED_RELATION_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940003,
+      "npc_count": 1,
+      "seed_relation_id": "REL:03",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U009_SUCCESS_CONTROL_UNRELATED_RELATION_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940003,
+      "npc_count": 1,
+      "seed_relation_id": "REL:03",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U010_PARTICIPATION_COMMISSION_FAILURE_SAME_SCOPE_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940004,
+      "npc_count": 1,
+      "seed_relation_id": "REL:04",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U011_PARTICIPATION_COMMISSION_FAILURE_SAME_SCOPE_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940004,
+      "npc_count": 1,
+      "seed_relation_id": "REL:04",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U012_PARTICIPATION_COMMISSION_FAILURE_SAME_SCOPE_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940004,
+      "npc_count": 1,
+      "seed_relation_id": "REL:04",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U013_PARTICIPATION_COMMISSION_FAILURE_CHANGED_SCOPE_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940005,
+      "npc_count": 1,
+      "seed_relation_id": "REL:05",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U014_PARTICIPATION_COMMISSION_FAILURE_CHANGED_SCOPE_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940005,
+      "npc_count": 1,
+      "seed_relation_id": "REL:05",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U015_PARTICIPATION_COMMISSION_FAILURE_CHANGED_SCOPE_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940005,
+      "npc_count": 1,
+      "seed_relation_id": "REL:05",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U016_PARTICIPATION_COMMISSION_FAILURE_UNRELATED_RELATION_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940006,
+      "npc_count": 1,
+      "seed_relation_id": "REL:06",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U017_PARTICIPATION_COMMISSION_FAILURE_UNRELATED_RELATION_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940006,
+      "npc_count": 1,
+      "seed_relation_id": "REL:06",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U018_PARTICIPATION_COMMISSION_FAILURE_UNRELATED_RELATION_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940006,
+      "npc_count": 1,
+      "seed_relation_id": "REL:06",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U019_PARTICIPATION_OMISSION_FAILURE_SAME_SCOPE_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940007,
+      "npc_count": 1,
+      "seed_relation_id": "REL:07",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U020_PARTICIPATION_OMISSION_FAILURE_SAME_SCOPE_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940007,
+      "npc_count": 1,
+      "seed_relation_id": "REL:07",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U021_PARTICIPATION_OMISSION_FAILURE_SAME_SCOPE_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940007,
+      "npc_count": 1,
+      "seed_relation_id": "REL:07",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U022_PARTICIPATION_OMISSION_FAILURE_CHANGED_SCOPE_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940008,
+      "npc_count": 1,
+      "seed_relation_id": "REL:08",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U023_PARTICIPATION_OMISSION_FAILURE_CHANGED_SCOPE_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940008,
+      "npc_count": 1,
+      "seed_relation_id": "REL:08",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U024_PARTICIPATION_OMISSION_FAILURE_CHANGED_SCOPE_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940008,
+      "npc_count": 1,
+      "seed_relation_id": "REL:08",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U025_PARTICIPATION_OMISSION_FAILURE_UNRELATED_RELATION_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940009,
+      "npc_count": 1,
+      "seed_relation_id": "REL:09",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U026_PARTICIPATION_OMISSION_FAILURE_UNRELATED_RELATION_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940009,
+      "npc_count": 1,
+      "seed_relation_id": "REL:09",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U027_PARTICIPATION_OMISSION_FAILURE_UNRELATED_RELATION_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940009,
+      "npc_count": 1,
+      "seed_relation_id": "REL:09",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U028_RESPONSIBILITY_AXIS_FAILURE_SAME_SCOPE_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940010,
+      "npc_count": 1,
+      "seed_relation_id": "REL:10",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U029_RESPONSIBILITY_AXIS_FAILURE_SAME_SCOPE_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940010,
+      "npc_count": 1,
+      "seed_relation_id": "REL:10",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U030_RESPONSIBILITY_AXIS_FAILURE_SAME_SCOPE_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940010,
+      "npc_count": 1,
+      "seed_relation_id": "REL:10",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U031_RESPONSIBILITY_AXIS_FAILURE_CHANGED_SCOPE_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940011,
+      "npc_count": 1,
+      "seed_relation_id": "REL:11",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U032_RESPONSIBILITY_AXIS_FAILURE_CHANGED_SCOPE_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940011,
+      "npc_count": 1,
+      "seed_relation_id": "REL:11",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U033_RESPONSIBILITY_AXIS_FAILURE_CHANGED_SCOPE_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940011,
+      "npc_count": 1,
+      "seed_relation_id": "REL:11",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U034_RESPONSIBILITY_AXIS_FAILURE_UNRELATED_RELATION_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940012,
+      "npc_count": 1,
+      "seed_relation_id": "REL:12",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U035_RESPONSIBILITY_AXIS_FAILURE_UNRELATED_RELATION_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940012,
+      "npc_count": 1,
+      "seed_relation_id": "REL:12",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U036_RESPONSIBILITY_AXIS_FAILURE_UNRELATED_RELATION_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940012,
+      "npc_count": 1,
+      "seed_relation_id": "REL:12",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U037_EXOGENOUS_FAILURE_SAME_SCOPE_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940013,
+      "npc_count": 1,
+      "seed_relation_id": "REL:13",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U038_EXOGENOUS_FAILURE_SAME_SCOPE_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940013,
+      "npc_count": 1,
+      "seed_relation_id": "REL:13",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U039_EXOGENOUS_FAILURE_SAME_SCOPE_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940013,
+      "npc_count": 1,
+      "seed_relation_id": "REL:13",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U040_EXOGENOUS_FAILURE_CHANGED_SCOPE_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940014,
+      "npc_count": 1,
+      "seed_relation_id": "REL:14",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U041_EXOGENOUS_FAILURE_CHANGED_SCOPE_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940014,
+      "npc_count": 1,
+      "seed_relation_id": "REL:14",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U042_EXOGENOUS_FAILURE_CHANGED_SCOPE_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940014,
+      "npc_count": 1,
+      "seed_relation_id": "REL:14",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U043_EXOGENOUS_FAILURE_UNRELATED_RELATION_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940015,
+      "npc_count": 1,
+      "seed_relation_id": "REL:15",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U044_EXOGENOUS_FAILURE_UNRELATED_RELATION_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940015,
+      "npc_count": 1,
+      "seed_relation_id": "REL:15",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U045_EXOGENOUS_FAILURE_UNRELATED_RELATION_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940015,
+      "npc_count": 1,
+      "seed_relation_id": "REL:15",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U046_DELAYED_FAILURE_SAME_SCOPE_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940016,
+      "npc_count": 1,
+      "seed_relation_id": "REL:16",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U047_DELAYED_FAILURE_SAME_SCOPE_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940016,
+      "npc_count": 1,
+      "seed_relation_id": "REL:16",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U048_DELAYED_FAILURE_SAME_SCOPE_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "SAME_SCOPE",
+      "seed": 940016,
+      "npc_count": 1,
+      "seed_relation_id": "REL:16",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U049_DELAYED_FAILURE_CHANGED_SCOPE_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940017,
+      "npc_count": 1,
+      "seed_relation_id": "REL:17",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U050_DELAYED_FAILURE_CHANGED_SCOPE_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940017,
+      "npc_count": 1,
+      "seed_relation_id": "REL:17",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U051_DELAYED_FAILURE_CHANGED_SCOPE_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "CHANGED_SCOPE",
+      "seed": 940017,
+      "npc_count": 1,
+      "seed_relation_id": "REL:17",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U052_DELAYED_FAILURE_UNRELATED_RELATION_GENERAL_HARNESS",
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940018,
+      "npc_count": 1,
+      "seed_relation_id": "REL:18",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U053_DELAYED_FAILURE_UNRELATED_RELATION_GOVERNANCE_NO_CBRA",
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940018,
+      "npc_count": 1,
+      "seed_relation_id": "REL:18",
+      "max_closure_ticks": 8
+    },
+    {
+      "unit_id": "U054_DELAYED_FAILURE_UNRELATED_RELATION_GOVERNANCE_PLUS_CBRA",
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "UNRELATED_RELATION",
+      "seed": 940018,
+      "npc_count": 1,
+      "seed_relation_id": "REL:18",
+      "max_closure_ticks": 8
+    }
+  ]
+}
