@@ -33,7 +33,9 @@
         "mechanism_removal_contrast",
         "same_current_context_across_contrast"
       ],
-      "review_method": "retrospective source-bounded review against Governance OASIS Scientific Proof Harness v1 axis obligations"
+      "review_method": "retrospective source-bounded review against Governance OASIS Scientific Proof Harness v1 axis obligations",
+      "claim_outcome": "SUPPORTS",
+      "result_rule_ref": "research/governance_harness_gh1l/design/FINAL_SPEC.md#Frozen execution contract"
     },
     {
       "evidence_id": "E-GH1L-A2-PARTIAL",
@@ -61,7 +63,9 @@
         "experience_identity_control",
         "mechanism_removal_contrast"
       ],
-      "review_method": "claim-boundary review; not eligible for axis closure"
+      "review_method": "claim-boundary review; not eligible for axis closure",
+      "claim_outcome": "SUPPORTS",
+      "result_rule_ref": "research/governance_harness_gh1l/design/FINAL_SPEC.md#Frozen invariants"
     },
     {
       "evidence_id": "E-GH2-A3",
@@ -92,7 +96,9 @@
         "responsibility_non_scalar",
         "selected_nonselected_obligations"
       ],
-      "review_method": "retrospective source-bounded review against Governance OASIS Scientific Proof Harness v1 axis obligations"
+      "review_method": "retrospective source-bounded review against Governance OASIS Scientific Proof Harness v1 axis obligations",
+      "claim_outcome": "SUPPORTS",
+      "result_rule_ref": "research/governance_harness_gh2/README.md#v1.1 confirmatory"
     },
     {
       "evidence_id": "E-GH3-A4-PARTIAL",
@@ -120,7 +126,9 @@
         "changed_scope_control",
         "no_global_exclusion"
       ],
-      "review_method": "claim-boundary review; not eligible for axis closure"
+      "review_method": "claim-boundary review; not eligible for axis closure",
+      "claim_outcome": "SUPPORTS",
+      "result_rule_ref": "research/governance_harness_gh3/design/FINAL_SPEC.md#Stability controls"
     },
     {
       "evidence_id": "E-GH3-A6-PARTIAL",
@@ -148,7 +156,9 @@
         "later_recurrence",
         "revalidation_ablation"
       ],
-      "review_method": "claim-boundary review; not eligible for axis closure"
+      "review_method": "claim-boundary review; not eligible for axis closure",
+      "claim_outcome": "SUPPORTS",
+      "result_rule_ref": "research/governance_harness_gh3/design/FINAL_SPEC.md#Link B primary"
     },
     {
       "evidence_id": "E-CBRA-FAILURE-A4-A6-DESIGN",
@@ -172,7 +182,9 @@
         "Contains same/changed/unrelated contexts and delayed checkpoints but cannot count before execution and recovery-specific redesign"
       ],
       "verified_obligations": [],
-      "review_method": "claim-boundary review; not eligible for axis closure"
+      "review_method": "claim-boundary review; not eligible for axis closure",
+      "claim_outcome": "UNTESTED",
+      "result_rule_ref": "research/governance_cbra_failure_exp_v1/FINAL_SPEC.md"
     },
     {
       "evidence_id": "E-RUN5-CARLA-STRUCTURAL",
@@ -193,7 +205,9 @@
         "Useful execution-validity work but intentionally excluded from Governance proof coverage"
       ],
       "verified_obligations": [],
-      "review_method": "claim-boundary review; not eligible for axis closure"
+      "review_method": "claim-boundary review; not eligible for axis closure",
+      "claim_outcome": "UNTESTED",
+      "result_rule_ref": "research/governance_cbra_carla_pilot_v1/RUN5_FREEZE_SPEC.md"
     },
     {
       "evidence_id": "E-GH4-INTEGRATION-DESIGN",
@@ -220,7 +234,9 @@
         "Required final integration evidence remains open"
       ],
       "verified_obligations": [],
-      "review_method": "claim-boundary review; not eligible for axis closure"
+      "review_method": "claim-boundary review; not eligible for axis closure",
+      "claim_outcome": "UNTESTED",
+      "result_rule_ref": "research/governance_harness_gh4/TRANSITION_FROM_GH3.md"
     }
   ]
 }
