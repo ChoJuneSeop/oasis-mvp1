@@ -17,7 +17,16 @@ from .three_lens_gate import three_lens_review
 def execution_report(
     ready: bool,
     profile_id: str,
-    required_check_ids=("world_isolation", "cross_arm_identity", "future_leakage", "single_realization", "source_freeze"),
+    required_check_ids=(
+        "source_freeze",
+        "world_isolation",
+        "cross_arm_identity",
+        "future_leakage",
+        "evaluator_postjoin",
+        "single_realization",
+        "provenance_integrity",
+        "output_immutability",
+    ),
 ) -> GateReport:
     return GateReport(
         profile_id=profile_id,
