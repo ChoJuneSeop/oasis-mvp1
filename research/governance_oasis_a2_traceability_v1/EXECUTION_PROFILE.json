@@ -8,7 +8,7 @@
   "harness_freeze_commit": "be6ec29f934e9e7b30199f0cb3c1286a94538477",
   "pre_realization_seal_required": true,
   "profile_id": "GO_A2_TRACEABILITY_EXECUTION_V1",
-  "reference_recorder_build_hash": "a3652d4e7381c52984f169dd0755c45cb09f47a4945044eff5f3605261f46e1a",
+  "reference_recorder_build_hash": "371df0deffd971383bab9edbe2db88431f290fcc35f44843c5f6301cc07a66b4",
   "single_realization": true,
   "source_freeze_commit": "721f9cacbabb5457628ead61aa97bc3da9e364c4",
   "system_trace_build_hash": "ed241f719ab2b538d94c69f72a68f0b65b95143da565c21855543c8f385a7ba3",
