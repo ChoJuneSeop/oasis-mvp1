@@ -39,9 +39,29 @@ def make_design(axis: AxisId) -> ExperimentDesign:
     )
     contrasts = [contrast]
     if axis is AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY:
-        contrasts.append(
+        contrasts = [
+            CausalContrast(
+                contrast_id="C1",
+                treatment="RELATION_INTACT",
+                control="RELATION_ABLATED",
+                targeted_mechanism="relation process history",
+                held_constant=("current_observation", "core", "possibility_set", "experience_id_set"),
+                observable_ids=("realized_choice", "outcome"),
+                falsification_condition="Removing only relation-process history produces no distinguishable contribution under the frozen current context.",
+                mechanism_removed_or_permuted=True,
+            ),
             CausalContrast(
                 contrast_id="C2",
+                treatment="ORDER_INTACT",
+                control="ORDER_ABLATED",
+                targeted_mechanism="order history",
+                held_constant=("current_observation", "core", "possibility_set", "experience_id_set"),
+                observable_ids=("realized_choice", "outcome"),
+                falsification_condition="Removing only order history produces no distinguishable contribution under the frozen current context.",
+                mechanism_removed_or_permuted=True,
+            ),
+            CausalContrast(
+                contrast_id="C3",
                 treatment="IDENTITY_INTACT",
                 control="IDENTITY_PERMUTED",
                 targeted_mechanism="experience identity",
@@ -49,8 +69,8 @@ def make_design(axis: AxisId) -> ExperimentDesign:
                 observable_ids=("realized_choice", "outcome"),
                 falsification_condition="Identity permutation produces no distinguishable contribution under the frozen relation context.",
                 mechanism_removed_or_permuted=True,
-            )
-        )
+            ),
+        ]
     elif axis is AxisId.A3_RESPONSIBILITY_SENSITIVITY:
         contrasts = [
             CausalContrast(
@@ -224,12 +244,12 @@ class ScientificProofDesignGateTests(unittest.TestCase):
         report = validate_design(design)
         self.assertIn("axis_a2_experience_traceability", report.unresolved_check_ids)
 
-    def test_a2_identity_and_relation_order_need_distinct_contrasts(self):
+    def test_a2_identity_relation_and_order_need_three_distinct_contrasts(self):
         design = make_design(AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY)
         merged = CausalContrast(
             contrast_id="MERGED",
-            treatment="IDENTITY_AND_RELATION_INTACT",
-            control="IDENTITY_AND_RELATION_ABLATED",
+            treatment="IDENTITY_RELATION_ORDER_INTACT",
+            control="IDENTITY_RELATION_ORDER_ABLATED",
             targeted_mechanism="experience identity relation order",
             held_constant=("current_observation", "core", "possibility_set"),
             observable_ids=("realized_choice", "outcome"),
@@ -237,6 +257,23 @@ class ScientificProofDesignGateTests(unittest.TestCase):
             mechanism_removed_or_permuted=True,
         )
         design = replace(design, contrasts=(merged,))
+        report = validate_design(design)
+        self.assertIn("axis_a2_experience_traceability", report.unresolved_check_ids)
+
+    def test_a2_relation_and_order_cannot_share_one_contrast(self):
+        design = make_design(AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY)
+        merged_history = CausalContrast(
+            contrast_id="HISTORY",
+            treatment="RELATION_ORDER_INTACT",
+            control="RELATION_ORDER_ABLATED",
+            targeted_mechanism="relation order history",
+            held_constant=("current_observation", "core", "possibility_set"),
+            observable_ids=("realized_choice", "outcome"),
+            falsification_condition="Merged relation/order contrast produces no effect.",
+            mechanism_removed_or_permuted=True,
+        )
+        identity = design.contrasts[-1]
+        design = replace(design, contrasts=(merged_history, identity))
         report = validate_design(design)
         self.assertIn("axis_a2_experience_traceability", report.unresolved_check_ids)
 
