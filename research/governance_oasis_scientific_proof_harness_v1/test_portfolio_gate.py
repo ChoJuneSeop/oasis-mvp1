@@ -6,6 +6,7 @@ import unittest
 from .io import load_evidence_registry
 from .models import AxisId, EvidenceLevel, EvidenceRecord
 from .portfolio_gate import audit_portfolio
+from .registry import AXIS_CONTRACTS
 
 
 HERE = Path(__file__).resolve().parent
@@ -53,6 +54,16 @@ class PortfolioGateTests(unittest.TestCase):
             source_refs=("integrated-spec", "integrated-result"),
             claim_boundary=("finite integrated scope",),
             counts_toward_axis_proof=True,
+            verified_obligations=tuple(
+                sorted(
+                    {
+                        obligation
+                        for axis in AxisId
+                        for obligation in AXIS_CONTRACTS[axis].mandatory_obligations
+                    }
+                )
+            ),
+            review_method="test integrated review",
         )
         report = audit_portfolio(program_id="TEST", evidence=(integrated,))
         self.assertFalse(report.proof_complete)
@@ -73,6 +84,8 @@ class PortfolioGateTests(unittest.TestCase):
                     source_refs=("frozen-spec", "result"),
                     claim_boundary=("finite scope",),
                     counts_toward_axis_proof=True,
+                    verified_obligations=AXIS_CONTRACTS[axis].mandatory_obligations,
+                    review_method="test axis review",
                 )
             )
         records.append(
@@ -86,6 +99,16 @@ class PortfolioGateTests(unittest.TestCase):
                 source_refs=("integrated-spec", "integrated-result"),
                 claim_boundary=("finite integrated scope",),
                 counts_toward_axis_proof=True,
+                verified_obligations=tuple(
+                    sorted(
+                        {
+                            obligation
+                            for axis in AxisId
+                            for obligation in AXIS_CONTRACTS[axis].mandatory_obligations
+                        }
+                    )
+                ),
+                review_method="test integrated review",
             )
         )
         report = audit_portfolio(program_id="TEST", evidence=records)
