@@ -396,13 +396,13 @@ def _axis_a1(design: ExperimentDesign) -> DesignCheck:
 def _axis_a2(design: ExperimentDesign) -> DesignCheck:
     axis = AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY
     identity_ids = set(_matching_contrast_ids(design, "identity"))
-    relation_order_ids = set(
-        _matching_contrast_ids(design, "order", "relation")
-    )
-    distinct_contrasts = bool(
-        identity_ids
-        and relation_order_ids
-        and any(a != b for a in identity_ids for b in relation_order_ids)
+    relation_ids = set(_matching_contrast_ids(design, "relation"))
+    order_ids = set(_matching_contrast_ids(design, "order"))
+    distinct_contrasts = any(
+        len({identity_id, relation_id, order_id}) == 3
+        for identity_id in identity_ids
+        for relation_id in relation_ids
+        for order_id in order_ids
     )
     ok = (
         design.experience_identity_control
@@ -427,8 +427,9 @@ def _axis_a2(design: ExperimentDesign) -> DesignCheck:
                 f"relation_order_ablation={design.relation_order_ablation}",
                 f"participation_yes_no_provenance={design.participation_yes_no_provenance}",
                 f"identity_contrast_ids={sorted(identity_ids)}",
-                f"relation_order_contrast_ids={sorted(relation_order_ids)}",
-                f"distinct_contrasts={distinct_contrasts}",
+                f"relation_contrast_ids={sorted(relation_ids)}",
+                f"order_contrast_ids={sorted(order_ids)}",
+                f"three_distinct_contrasts={distinct_contrasts}",
                 f"provenance_length={len(design.provenance_chain)}",
             ),
         )
