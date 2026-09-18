@@ -53,6 +53,9 @@ jobs:
       - name: Serialized execution-report anti-forgery checks
         run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_execution_report_io
 
+      - name: Frozen scientific-harness integrity
+        run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_freeze_integrity
+
       - name: Lower execution-harness regression
         run: python -m unittest -v research.oasis_experiment_freeze_harness_v1.test_harness
 
