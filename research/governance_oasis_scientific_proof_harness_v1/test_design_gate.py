@@ -163,8 +163,8 @@ def make_design(axis: AxisId) -> ExperimentDesign:
             "Independent post-realization evaluator marks the authoritative outcome "
             "adverse under the frozen directional criterion."
         ),
-        wrong_change_realized=True,
-        post_outcome_contradictory_evidence=True,
+        adverse_change_realization_endpoint=True,
+        post_outcome_contradiction_endpoint=True,
         recovery_epochs=3,
         recovery_endpoint=True,
         post_outcome_revalidation_control=True,
@@ -333,10 +333,10 @@ class ScientificProofDesignGateTests(unittest.TestCase):
         report = validate_design(design)
         self.assertIn("axis_a6_wrong_behavior_recovery", report.unresolved_check_ids)
 
-    def test_a6_requires_realized_wrong_change_then_later_recovery(self):
+    def test_a6_requires_adverse_change_and_recovery_endpoints_without_assuming_result(self):
         design = replace(
             make_design(AxisId.A6_WRONG_BEHAVIOR_RECOVERY),
-            wrong_change_realized=False,
+            adverse_change_realization_endpoint=False,
             recovery_epochs=2,
         )
         report = validate_design(design)
