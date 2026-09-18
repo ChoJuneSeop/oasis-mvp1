@@ -1,0 +1,50 @@
+name: CBRA failure v1.1 Pilot
+
+on:
+  push:
+    branches: [experiment/cbra-failure-v1-1-pilot]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: be6d3a88e60aba44f74738a8524bf0138f1613d1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify frozen snapshot
+        run: test "$(git rev-parse HEAD)" = "be6d3a88e60aba44f74738a8524bf0138f1613d1"
+      - name: Run structural Pilot
+        run: python -m research.governance_cbra_failure_exp_v1.runner --stage pilot > cbra_failure_v11_pilot.json
+      - name: Validate structural Pilot only
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open("cbra_failure_v11_pilot.json"))
+          assert x["stage"]=="pilot"
+          assert x["scientific_evaluator_used"] is False
+          assert "metrics" not in x
+          assert x["aggregate_score"] is None
+          s=x["structural"]
+          assert s["fresh_process"]
+          assert s["arm_count"]==3
+          assert s["case_count_per_arm"]==15
+          assert s["governance_checkpoint_contract"]
+          assert s["general_harness_has_no_cbra"]
+          assert s["as_of_gate_present"]
+          assert s["counterfactual_claimed"] is False
+          PY
+      - name: Hash Pilot evidence
+        run: sha256sum cbra_failure_v11_pilot.json > cbra_failure_v11_pilot.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cbra-failure-v11-pilot
+          path: |
+            cbra_failure_v11_pilot.json
+            cbra_failure_v11_pilot.sha256
