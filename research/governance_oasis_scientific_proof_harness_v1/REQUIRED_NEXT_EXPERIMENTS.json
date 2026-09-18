@@ -1,0 +1,192 @@
+{
+  "program_id": "GOVERNANCE_OASIS_SIX_AXIS_PROOF_PROGRAM_V1",
+  "status": "PROSPECTIVE_REQUIREMENTS_NOT_FROZEN",
+  "sequencing_rule": "Use existing valid evidence where claim coverage is complete; design only the unresolved causal obligations, then run one integrated flow-preserving confirmatory experiment.",
+  "existing_closed_axes": [
+    {
+      "axis": "A1_BEHAVIOR_CHANGE_EFFECTIVENESS",
+      "evidence": "GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT"
+    },
+    {
+      "axis": "A3_RESPONSIBILITY_SENSITIVITY",
+      "evidence": "GH2_V1_1"
+    }
+  ],
+  "required_next_experiments": [
+    {
+      "experiment_id": "GO_A2_RELATION_ORDER_TRACEABILITY_V1",
+      "axis": "A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY",
+      "scientific_question": "Does relation/process/order history contribute to later participation and realized choice beyond the same unordered Completed Experience set?",
+      "minimum_arms": [
+        "INTACT_RELATION_ORDER",
+        "ORDER_ABLATED_SAME_CE_SET",
+        "RELATION_ABLATED_SAME_CE_SET",
+        "IDENTITY_PERMUTED_SAME_COUNT"
+      ],
+      "held_constant": [
+        "same current-flow observations",
+        "same Completed Experience multiset/content",
+        "same Core and possibility set",
+        "same responsibility rule",
+        "same evaluator"
+      ],
+      "primary_observables": [
+        "experience participation identities",
+        "YES/NO provenance",
+        "selected and realized possibility",
+        "prespecified effectiveness endpoint"
+      ],
+      "mandatory_invariants": [
+        "no future information",
+        "no CE deletion",
+        "ablation changes only declared relation/order or identity field",
+        "full provenance chain preserved",
+        "zero difference remains a valid result"
+      ]
+    },
+    {
+      "experiment_id": "GO_A4_SCOPE_LOCALITY_V1",
+      "axis": "A4_OVERGENERALIZATION_PREVENTION",
+      "scientific_question": "Does scope-bound participation/revalidation prevent a prior judgment from becoming a global exclusion while preserving legitimate same-scope influence?",
+      "minimum_arms": [
+        "SCOPE_LOCAL_PRODUCTION",
+        "SCOPE_GUARD_ABLATED",
+        "RECORD_ONLY"
+      ],
+      "required_contexts": [
+        "SAME_SCOPE",
+        "CHANGED_SCOPE",
+        "UNRELATED_RELATION"
+      ],
+      "held_constant": [
+        "same committed provenance",
+        "same later current observation within each matched context",
+        "same Core and responsibility policy",
+        "same evaluator"
+      ],
+      "primary_observables": [
+        "later participation YES/NO",
+        "global exclusion incidence",
+        "selected and realized possibility",
+        "provenance visibility by context"
+      ],
+      "mandatory_invariants": [
+        "NO/REVISED is never destructive deletion",
+        "unrelated relation cannot inherit scoped feedback",
+        "same-scope influence may remain",
+        "zero difference remains a valid result"
+      ]
+    },
+    {
+      "experiment_id": "GO_A5_CONFLICT_HANDLING_V1",
+      "axis": "A5_CONFLICTING_EXPERIENCE_HANDLING",
+      "scientific_question": "When multiple Completed Experiences support conflicting later actions, can Governance preserve both histories and resolve participation from the current relation without scalar overwrite or latest-wins collapse?",
+      "minimum_arms": [
+        "PROVENANCE_PRESERVING_CONTEXTUAL",
+        "ORDER_ERASED",
+        "RELATION_PROVENANCE_PERMUTED",
+        "LATEST_ONLY_ABLATION"
+      ],
+      "minimum_conflicting_completed_experiences": 2,
+      "held_constant": [
+        "same conflicting CE content set",
+        "same current-flow observation",
+        "same possibility set",
+        "same responsibility rule",
+        "same evaluator"
+      ],
+      "primary_observables": [
+        "which CE participates",
+        "which CE is NO with preserved provenance",
+        "selected and realized possibility",
+        "conflict-resolution provenance chain"
+      ],
+      "mandatory_invariants": [
+        "no scalar memory weight",
+        "no destructive overwrite",
+        "both conflicting CEs remain inspectable",
+        "order/provenance mutation occurs only in declared ablation arms",
+        "zero difference remains a valid result"
+      ]
+    },
+    {
+      "experiment_id": "GO_A6_WRONG_CHANGE_RECOVERY_V1",
+      "axis": "A6_WRONG_BEHAVIOR_RECOVERY",
+      "scientific_question": "After a prior Completed Experience actually induces a wrong realized behavior, can later post-outcome evidence revise the bound judgment and produce later related behavioral recovery?",
+      "minimum_arms": [
+        "REVALIDATION_EXPOSED",
+        "REVALIDATION_RECORD_ONLY",
+        "EXOGENOUS_ATTRIBUTION_CONTROL"
+      ],
+      "required_contexts": [
+        "SAME_SCOPE",
+        "UNRELATED_RELATION"
+      ],
+      "minimum_temporal_epochs": 3,
+      "required_temporal_chain": [
+        "prior CE exists",
+        "CE participates",
+        "wrong later behavior is actually realized",
+        "authoritative post-outcome observation contradicts the bound judgment",
+        "Closure",
+        "provenance-bound revalidation commit",
+        "later current relation",
+        "later behavior recovery observation"
+      ],
+      "primary_observables": [
+        "wrong-change realization",
+        "revalidation target and attribution",
+        "later participation revision",
+        "later selected/realized action",
+        "recovery endpoint"
+      ],
+      "mandatory_invariants": [
+        "same-epoch feedback forbidden",
+        "counterfactual recovery cannot count",
+        "exogenous evidence cannot be relabeled as decision-linked",
+        "unrelated relation cannot inherit recovery feedback",
+        "zero difference remains a valid result"
+      ]
+    },
+    {
+      "experiment_id": "GH4_FLOW_PRESERVING_INTEGRATED_CONFIRMATORY",
+      "axis": "INTEGRATED",
+      "prerequisite_axes": [
+        "A1_BEHAVIOR_CHANGE_EFFECTIVENESS",
+        "A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY",
+        "A3_RESPONSIBILITY_SENSITIVITY",
+        "A4_OVERGENERALIZATION_PREVENTION",
+        "A5_CONFLICTING_EXPERIENCE_HANDLING",
+        "A6_WRONG_BEHAVIOR_RECOVERY"
+      ],
+      "scientific_question": "Do the six verified governance functions coexist in one long-horizon flow without violating temporal causality, provenance continuity, current-flow-first gating, or single realization?",
+      "required_flow": [
+        "CURRENT_FLOW",
+        "RELATION_PROCESS",
+        "SELECTIVE_PARTICIPATION",
+        "POSSIBILITY_SET",
+        "U_I_V_T_RESPONSIBILITY",
+        "SINGLE_REALIZATION",
+        "POST_OUTCOME_OBSERVATION",
+        "CLOSURE",
+        "REVALIDATION",
+        "LATER_SELECTIVE_REUSE"
+      ],
+      "mandatory_scenario_features": [
+        "long-horizon accumulation",
+        "context shifts",
+        "unrelated relations",
+        "conflicting Completed Experiences",
+        "wrong-change and recovery sequence",
+        "responsibility-sensitive decisions"
+      ],
+      "mandatory_invariants": [
+        "no future information",
+        "one realization per epoch",
+        "no permanent scalar memory weight",
+        "NO provenance preserved",
+        "post-result retuning forbidden"
+      ]
+    }
+  ]
+}
