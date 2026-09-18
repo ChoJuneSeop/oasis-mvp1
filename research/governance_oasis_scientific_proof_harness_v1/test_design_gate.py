@@ -64,6 +64,7 @@ def make_design(axis: AxisId) -> ExperimentDesign:
         contrasts=tuple(contrasts),
         independent_evaluator=True,
         evaluator_blinded_to=("future_state", "expected_label"),
+        evaluator_truth_joined_after_worker_sealed=True,
         authoritative_outcome_observation=True,
         decision_worker_forbidden_inputs=(
             "future_state",
@@ -80,6 +81,9 @@ def make_design(axis: AxisId) -> ExperimentDesign:
         replication_plan="Frozen finite confirmatory matrix with disjoint pilot and no result-derived retuning.",
         claim_boundary=("finite frozen mechanism scope", "no universal superiority claim"),
         pre_registered=True,
+        confirmatory_size_or_matrix_rule_pre_registered=True,
+        pilot_confirmatory_disjoint=True,
+        post_result_retuning_forbidden=True,
         future_leakage_guard=True,
         no_aggregate_winner_score=True,
         integrated_flow_baseline=True,
@@ -174,6 +178,38 @@ class ScientificProofDesignGateTests(unittest.TestCase):
         )
         report = validate_design(design)
         self.assertIn("axis_a6_wrong_behavior_recovery", report.unresolved_check_ids)
+
+    def test_confirmatory_matrix_or_size_rule_must_be_preregistered(self):
+        design = replace(
+            make_design(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS),
+            confirmatory_size_or_matrix_rule_pre_registered=False,
+        )
+        report = validate_design(design)
+        self.assertIn("crosscut_preregistration_boundary", report.unresolved_check_ids)
+
+    def test_pilot_and_confirmatory_must_be_disjoint(self):
+        design = replace(
+            make_design(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS),
+            pilot_confirmatory_disjoint=False,
+        )
+        report = validate_design(design)
+        self.assertIn("crosscut_preregistration_boundary", report.unresolved_check_ids)
+
+    def test_post_result_retuning_must_be_forbidden(self):
+        design = replace(
+            make_design(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS),
+            post_result_retuning_forbidden=False,
+        )
+        report = validate_design(design)
+        self.assertIn("crosscut_preregistration_boundary", report.unresolved_check_ids)
+
+    def test_evaluator_truth_must_join_only_after_worker_output_is_sealed(self):
+        design = replace(
+            make_design(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS),
+            evaluator_truth_joined_after_worker_sealed=False,
+        )
+        report = validate_design(design)
+        self.assertIn("crosscut_evaluator_independence", report.unresolved_check_ids)
 
     def test_supplied_label_cannot_substitute_for_authoritative_outcome(self):
         design = replace(
