@@ -132,11 +132,11 @@ def run_arm(family:Family, arm:Arm)->dict[str,Any]:
             "POSSIBILITY_DISTRIBUTION":_epoch_tau(epoch.index,5),
             "RESPONSIBILITY":_epoch_tau(epoch.index,6),
             "DECISION":_epoch_tau(epoch.index,7),
-            "SINGLE_REALIZATION":_epoch_tau(epoch.index,7)+1,
-            "POST_OUTCOME_OBSERVATION":_epoch_tau(epoch.index,8),
-            "CLOSURE":_epoch_tau(epoch.index,9),
-            "REVALIDATION":_epoch_tau(epoch.index,10),
-            "COMMIT":_epoch_tau(epoch.index,11),
+            "SINGLE_REALIZATION":_epoch_tau(epoch.index,8),
+            "POST_OUTCOME_OBSERVATION":_epoch_tau(epoch.index,9),
+            "CLOSURE":_epoch_tau(epoch.index,10),
+            "REVALIDATION":_epoch_tau(epoch.index,11),
+            "COMMIT":_epoch_tau(epoch.index,12),
         }
 
         observation=_authoritative_observation(epoch,row["realized"])
