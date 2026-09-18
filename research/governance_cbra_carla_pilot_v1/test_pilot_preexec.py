@@ -33,6 +33,7 @@ from .pilot_runtime import (
     PilotHistoryAccessPort,
     PilotParticipation,
     PilotResponsibility,
+    PilotScene,
     cbra_feedback_from_checkpoint,
     scope_signature,
 )
@@ -126,6 +127,15 @@ class PilotPreExecutionAttackTests(unittest.TestCase):
                 ]
                 self.assertEqual({u["arm"] for u in group}, set(ARMS))
                 self.assertEqual(len({u["seed"] for u in group}), 1)
+
+    def test_pilot_configures_frozen_carla_mode_before_runtime_validation(self):
+        source = inspect.getsource(PilotScene.__init__)
+        apply_index = source.index("self.world.apply_settings(settings)")
+        validate_index = source.index("validate_runtime_identity(runtime_identity")
+        self.assertLess(apply_index, validate_index)
+        self.assertIn("settings.synchronous_mode = True", source)
+        self.assertIn("settings.fixed_delta_seconds = FIXED_DELTA_SECONDS", source)
+        self.assertIn("settings.no_rendering_mode = True", source)
 
     def test_failure_label_cannot_enter_governance_operators(self):
         participation_src = inspect.getsource(PilotParticipation.assess)
