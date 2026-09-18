@@ -1,0 +1,17 @@
+{
+  "ce_registry_hash": "bf6d543d1f20186e1e7646744f021cc94321031edfe6d8ef7d60a5b85c99ca81",
+  "confirmatory_plan_hash": "2a278544fc30dce1af9cafbee4a35caf4e8add6b05eda2f16536f59993fc21f5",
+  "evaluator_build_hash": "6e83bb2ba322e4c9c18e8cad1fb157cd3b0352ec39940e292830eaacb3ee8c8b",
+  "evaluator_postjoin": true,
+  "experiment_definition_hash": "e04963f07f7f24669c3ef6f27eaf5974eae7ba1bef57d55d836ff81d3106318e",
+  "future_information_prohibited": true,
+  "harness_freeze_commit": "be6ec29f934e9e7b30199f0cb3c1286a94538477",
+  "pre_realization_seal_required": true,
+  "profile_id": "GO_A2_TRACEABILITY_EXECUTION_V1",
+  "reference_recorder_build_hash": "889dc1328ed3ec7fca28e0077156810838c2b3006c34aea9b273884202d7d36d",
+  "single_realization": true,
+  "source_freeze_commit": "721f9cacbabb5457628ead61aa97bc3da9e364c4",
+  "system_trace_build_hash": "ed241f719ab2b538d94c69f72a68f0b65b95143da565c21855543c8f385a7ba3",
+  "worker_build_hash": "e05794ac364b70bef5d25a008c02867f0b105ced3bebfcffff1162cc84ec90e6",
+  "world_snapshot_hash": "35e9f85781da36fd00eef98d8a0f12cb99449c2f31bdc75b2909404b6bac8e4e"
+}
