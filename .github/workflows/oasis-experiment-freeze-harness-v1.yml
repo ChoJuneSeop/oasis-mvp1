@@ -1,0 +1,44 @@
+name: OASIS Experiment Freeze Harness v1
+
+on:
+  push:
+    branches:
+      - feature/oasis-experiment-freeze-harness-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  harness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile harness
+        run: python -m compileall -q research/oasis_experiment_freeze_harness_v1
+      - name: State-machine tests
+        run: python -m unittest -v research.oasis_experiment_freeze_harness_v1.test_harness
+      - name: Run5 profile attack tests
+        run: python -m unittest -v research.oasis_experiment_freeze_harness_v1.test_run5_profile
+      - name: Emit current Run5 audit report
+        run: |
+          python -m research.oasis_experiment_freeze_harness_v1 \
+            --profile run5 \
+            --target-ref HEAD \
+            --audit-only \
+            --report .harness/run5-audit.json
+      - name: Prove current Run5 remains execution-blocked
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path(".harness/run5-audit.json").read_text())
+          assert p["freeze_ready"] is False
+          assert p["state"] == "DRAFT"
+          assert p["unresolved_check_ids"]
+          PY
