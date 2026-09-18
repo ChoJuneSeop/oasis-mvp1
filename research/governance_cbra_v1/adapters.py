@@ -7,12 +7,16 @@ from .models import (
 )
 
 
-def snapshot_from_governance_provenance(provenance) -> DecisionProvenanceSnapshot:
-    """Normalize Governance v0.4 or legacy provenance into the CBRA contract.
+def snapshot_from_governance_provenance(provenance, *, scope_key: str) -> DecisionProvenanceSnapshot:
+    """Normalize committed Governance provenance into the CBRA contract.
 
-    This adapter copies only already-committed provenance. It does not inspect
-    future observations and does not change the source Governance record.
+    scope_key must be supplied by the domain at adaptation time. CBRA does not
+    infer a scope from future observations. The source Governance record is
+    copied and never mutated.
     """
+    if not scope_key:
+        raise ValueError("CBRA adapter requires an explicit committed scope_key")
+
     reengagement = getattr(provenance, "original_reengagement", None)
     if reengagement is None:
         reengagement = getattr(provenance, "reengagement_audit", None)
@@ -67,6 +71,7 @@ def snapshot_from_governance_provenance(provenance) -> DecisionProvenanceSnapsho
     return DecisionProvenanceSnapshot(
         entry_id=str(provenance.entry_id),
         relation_id=str(relation_id),
+        scope_key=str(scope_key),
         decision_tau=float(decision_tau),
         closure_tau=float(closure_tau),
         participation=participation,
