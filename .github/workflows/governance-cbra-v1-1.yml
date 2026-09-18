@@ -20,5 +20,7 @@ jobs:
         run: python -m compileall -q research/governance_cbra_v1
       - name: Run corrected CBRA invariants
         run: python -m unittest -v research.governance_cbra_v1.validation.test_axis
+      - name: Run current-review projection tests
+        run: python -m unittest -v research.governance_cbra_v1.validation.test_review
       - name: Run existing Governance v0.4 attack regression
         run: python -m unittest -v research.governance_harness_v01.test_governance_attack_v04
