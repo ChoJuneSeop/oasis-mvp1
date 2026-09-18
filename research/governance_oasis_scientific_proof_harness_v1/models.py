@@ -250,3 +250,23 @@ class ThreeLensReviewReport:
             "causal_blockers": list(self.causal_blockers),
             "execution_blockers": list(self.execution_blockers),
         }
+
+
+@dataclass(frozen=True)
+class ExperimentReadinessReport:
+    experiment_id: str
+    scientific_design_ready: bool
+    sequence_ready: bool
+    three_lens_ready: bool
+    experiment_ready: bool
+    blockers: tuple[str, ...]
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "experiment_id": self.experiment_id,
+            "scientific_design_ready": self.scientific_design_ready,
+            "sequence_ready": self.sequence_ready,
+            "three_lens_ready": self.three_lens_ready,
+            "experiment_ready": self.experiment_ready,
+            "blockers": list(self.blockers),
+        }
