@@ -157,6 +157,10 @@ class PortfolioGateTests(unittest.TestCase):
                 design_report_passed=True,
                 result_status="COMPLETE",
                 source_refs=("integrated-spec", "integrated-result"),
+                source_git_blobs=(
+                    ("integrated-spec", "blob-spec"),
+                    ("integrated-result", "blob-result"),
+                ),
                 claim_boundary=("finite integrated scope",),
                 counts_toward_axis_proof=True,
                 claim_outcome=ClaimOutcome.SUPPORTS,
