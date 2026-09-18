@@ -1,0 +1,39 @@
+name: Governance CBRA CARLA Pilot v1 freeze
+
+on:
+  push:
+    branches: [experiment/governance-cbra-carla-pilot-v1-freeze]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile Pilot freeze
+        run: python -m compileall -q research/governance_cbra_carla_pilot_v1
+      - name: Validate Pilot freeze
+        run: python -m unittest -v research.governance_cbra_carla_pilot_v1.test_freeze
+      - name: Mapping regression
+        run: python -m unittest -v research.governance_cbra_carla_mapping_v1.test_mapping
+      - name: Efficiency contract regression
+        run: python -m unittest -v research.governance_cbra_carla_mapping_v1.test_efficiency_contract
+      - name: Canonical CARLA regression
+        run: python -m unittest -v research.carla_v22_canonical.validation_v1_1
+      - name: CBRA regression
+        run: python -m unittest -v research.governance_cbra_v1.validation.test_axis
+      - name: Governance regression
+        run: python -m unittest -v research.governance_harness_v01.test_governance_attack_v04
+      - name: Assert real execution remains blocked
+        run: |
+          set +e
+          python -m research.governance_cbra_carla_pilot_v1.execution_gate
+          code=$?
+          set -e
+          test "$code" -eq 2
