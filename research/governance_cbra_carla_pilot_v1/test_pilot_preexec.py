@@ -147,7 +147,7 @@ class PilotPreExecutionAttackTests(unittest.TestCase):
         governance = source.index("harness.execute_decision_epoch(")
         self.assertLess(admission, general)
         self.assertLess(admission, governance)
-        self.assertEqual(RUN_BASIS, "RUN3_CLOSURE_ADMISSION_FREEZE_V1")
+        self.assertEqual(RUN_BASIS, "RUN4_GATEWAY_APPROVED_COUNTERPART_FREEZE_V1")
 
     def test_run3_clean_lane_and_closure_rehearsal_are_fail_closed(self):
         spawn_source = inspect.getsource(PilotScene._spawn_ego)
@@ -159,6 +159,18 @@ class PilotPreExecutionAttackTests(unittest.TestCase):
         self.assertIn("if closed.front_present", cycle_source)
         self.assertIn("ScenarioAdmissionError", cycle_source)
         self.assertNotIn("failure_class", cycle_source)
+
+    def test_run4_counterpart_requires_gateway_approval_at_frozen_distances(self):
+        source = inspect.getsource(PilotScene.spawn_counterpart)
+        self.assertIn("distances = (18.0, 22.0, 26.0, 30.0, 34.0)", source)
+        self.assertIn("observed.front_present and observed.front_kind == kind", source)
+        self.assertIn("actor.destroy()", source)
+        self.assertIn("gateway-front-relation-not-approved", source)
+        self.assertIn("ScenarioAdmissionError", source)
+        self.assertNotIn("failure_class", source)
+        self.assertNotIn("SUCCESS_CONTROL", source)
+        self.assertNotIn("EXOGENOUS_FAILURE", source)
+        self.assertNotIn("DELAYED_FAILURE", source)
 
     def test_failure_label_cannot_enter_governance_operators(self):
         participation_src = inspect.getsource(PilotParticipation.assess)
