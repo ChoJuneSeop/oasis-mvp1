@@ -152,3 +152,19 @@ Every class must be tested under same-scope, changed-scope, and unrelated-relati
 - no duplicate event replay as new evidence;
 - no invented counterfactual result for NO/nonselected paths;
 - no post-result threshold tuning.
+
+## Efficiency and power validation
+
+CARLA validation also includes a deployment-efficiency comparison under the separate frozen specification:
+`research/governance_cbra_carla_mapping_v1/EFFICIENCY_ENERGY_VALIDATION_SPEC.md`.
+
+Normative operational rule:
+
+- the real-time Governance decision path is the hot path;
+- CBRA is an event-driven post-Closure side path;
+- CBRA is not required to execute every CARLA tick;
+- CBRA may not receive evaluator/energy telemetry as decision-time input;
+- GENERAL_HARNESS vs GOVERNANCE_NO_CBRA vs GOVERNANCE_PLUS_CBRA must be measured on matched runtime conditions;
+- latency, utilization, storage, archive access, and energy are reported separately with no aggregate efficiency score.
+
+A scientific CARLA Pilot is not considered complete unless functional invariants and the prespecified efficiency telemetry are both recorded.
