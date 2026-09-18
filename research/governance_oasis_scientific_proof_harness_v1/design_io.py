@@ -39,6 +39,9 @@ def load_design(path: Path) -> ExperimentDesign:
         contrasts=contrasts,
         independent_evaluator=bool(raw["independent_evaluator"]),
         evaluator_blinded_to=tuple(str(x) for x in raw.get("evaluator_blinded_to", ())),
+        evaluator_truth_joined_after_worker_sealed=bool(
+            raw["evaluator_truth_joined_after_worker_sealed"]
+        ),
         authoritative_outcome_observation=bool(raw["authoritative_outcome_observation"]),
         decision_worker_forbidden_inputs=tuple(
             str(x) for x in raw.get("decision_worker_forbidden_inputs", ())
@@ -47,6 +50,11 @@ def load_design(path: Path) -> ExperimentDesign:
         replication_plan=str(raw["replication_plan"]),
         claim_boundary=tuple(str(x) for x in raw.get("claim_boundary", ())),
         pre_registered=bool(raw["pre_registered"]),
+        confirmatory_size_or_matrix_rule_pre_registered=bool(
+            raw["confirmatory_size_or_matrix_rule_pre_registered"]
+        ),
+        pilot_confirmatory_disjoint=bool(raw["pilot_confirmatory_disjoint"]),
+        post_result_retuning_forbidden=bool(raw["post_result_retuning_forbidden"]),
         future_leakage_guard=bool(raw["future_leakage_guard"]),
         no_aggregate_winner_score=bool(raw["no_aggregate_winner_score"]),
         integrated_flow_baseline=bool(raw["integrated_flow_baseline"]),
