@@ -4,6 +4,7 @@ from collections import defaultdict
 from typing import Iterable
 
 from .models import AxisId, EvidenceLevel, EvidenceRecord, PortfolioReport
+from .registry import AXIS_CONTRACTS
 
 
 def audit_portfolio(
@@ -34,6 +35,7 @@ def audit_portfolio(
             missing.append(axis.value)
             continue
 
+        required_obligations = set(AXIS_CONTRACTS[axis].mandatory_obligations)
         qualifying = [
             item
             for item in empirical_records
@@ -41,6 +43,8 @@ def audit_portfolio(
             and item.design_report_passed
             and item.result_status == "COMPLETE"
             and item.level is EvidenceLevel.CONFIRMATORY
+            and required_obligations.issubset(set(item.verified_obligations))
+            and bool(item.review_method.strip())
         ]
         if not qualifying:
             weak.append(axis.value)
@@ -53,6 +57,13 @@ def audit_portfolio(
         and item.result_status == "COMPLETE"
         and item.level is EvidenceLevel.INTEGRATED_CONFIRMATORY
         and set(item.axes) == set(AxisId)
+        and bool(item.review_method.strip())
+        and all(
+            set(AXIS_CONTRACTS[axis].mandatory_obligations).issubset(
+                set(item.verified_obligations)
+            )
+            for axis in AxisId
+        )
     )
 
     blockers = []
