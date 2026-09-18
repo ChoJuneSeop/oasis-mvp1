@@ -1,0 +1,52 @@
+{
+  "spec_version": "CBRA_FAILURE_CE_V1_FINAL",
+  "axis_base_commit": "2b9754e3ef7007a79f616d4e73174d715afa894d",
+  "arms": [
+    "G1_GOV_CBRA",
+    "G2_GOV_CBRA_RECORD_ONLY",
+    "G3_GENERAL_CANONICAL"
+  ],
+  "failure_classes": [
+    "PARTICIPATION_COMMISSION",
+    "PARTICIPATION_OMISSION",
+    "RESPONSIBILITY_U",
+    "EXOGENOUS",
+    "DELAYED_CHOICE_FAILURE"
+  ],
+  "reentry_contexts": [
+    "SAME_SCOPE",
+    "CHANGED_SCOPE",
+    "UNRELATED_RELATION"
+  ],
+  "pilot": {
+    "purpose": "STRUCTURAL_SANITY_ONLY",
+    "chains": 6,
+    "decisions_per_chain": 2,
+    "decisions_per_arm": 12,
+    "arm_count": 3,
+    "total_decision_realization_epochs": 36,
+    "scientific_contrasts_computed": false,
+    "can_change_confirmatory": false
+  },
+  "confirmatory": {
+    "size_method": "A_PRIORI_FINITE_MATRIX",
+    "failure_classes": 5,
+    "contexts": 3,
+    "observation_families": 3,
+    "chains_per_arm": 45,
+    "decisions_per_chain": 2,
+    "decisions_per_arm": 90,
+    "arm_count": 3,
+    "total_decision_realization_epochs": 270,
+    "pilot_derived_size": false
+  },
+  "candidate_ids": ["continue-flow", "yield-space"],
+  "responsibility_scalarization": false,
+  "immediate_governance_revalidation_is_failure_signal": false,
+  "cbra_reads_only_history_as_of": true,
+  "general_harness": "CanonicalHarnessV11",
+  "aggregate_score": null,
+  "pilot_executed": false,
+  "confirmatory_executed": false,
+  "post_result_rule_tuning": false
+}
