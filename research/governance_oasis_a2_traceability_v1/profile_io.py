@@ -43,10 +43,32 @@ def compute_expected_bindings(package_dir: Path = PACKAGE_DIR) -> dict[str, str]
             ("canonical.py", "models.py", "instrumentation.py"),
             domain="A2_SYSTEM_TRACE_BUILD_V1",
         ),
-        "reference_recorder_build_hash": _composite_hash(
-            package_dir,
-            ("adapter.py", "artifact_io.py", "canonical.py", "fixtures.py", "integrated_choice_adapter.py", "models.py", "ledger.py", "preflight.py", "profile_io.py"),
-            domain="A2_REFERENCE_RECORDER_BUILD_V1",
+        "reference_recorder_build_hash": domain_digest(
+            "A2_REFERENCE_RECORDER_BUILD_V1",
+            {
+                "package": _composite_hash(
+                    package_dir,
+                    (
+                        "adapter.py",
+                        "artifact_io.py",
+                        "canonical.py",
+                        "confirmatory_runner.py",
+                        "fixtures.py",
+                        "integrated_choice_adapter.py",
+                        "models.py",
+                        "ledger.py",
+                        "preflight.py",
+                        "profile_io.py",
+                    ),
+                    domain="A2_REFERENCE_RECORDER_PACKAGE_V1",
+                ),
+                "confirmatory_workflow_sha256": _sha256_file(
+                    package_dir.parents[1]
+                    / ".github"
+                    / "workflows"
+                    / "governance-oasis-a2-confirmatory-v1.yml"
+                ),
+            },
         ),
         "evaluator_build_hash": _composite_hash(
             package_dir,
