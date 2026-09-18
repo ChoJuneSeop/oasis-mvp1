@@ -8,7 +8,7 @@ from research.governance_cbra_v1.models import (
     ResponsibilityProvenance, TargetEvidence, TargetKind,
 )
 from research.governance_harness_v01.harness import RevalidationState
-from .scenario import build_pilot_world, build_confirmatory_world, RuntimeCase
+from .scenario import build_pilot_world, build_confirmatory_world, RuntimeCase, FailureClass, ReentryContext
 
 ARMS=("GOV_CBRA","GOV_RECORD_ONLY","GENERAL_HARNESS")
 
@@ -100,9 +100,28 @@ def run_case(arm:str,case:RuntimeCase)->dict:
     }
 
 
+def _decode_runtime(x):
+    return RuntimeCase(
+        case_id=str(x["case_id"]),
+        failure_class=FailureClass(x["failure_class"]),
+        reentry_context=ReentryContext(x["reentry_context"]),
+        family=str(x["family"]),
+        initial_relation=str(x["initial_relation"]),
+        reentry_relation=str(x["reentry_relation"]),
+        initial_scope=int(x["initial_scope"]),
+        reentry_scope=int(x["reentry_scope"]),
+        initial_participate=bool(x["initial_participate"]),
+        evidence_target_kind=TargetKind(x["evidence_target_kind"]),
+        evidence_target_id=str(x["evidence_target_id"]),
+        evidence_direction=EvidenceDirection(x["evidence_direction"]),
+        attribution=AttributionKind(x["attribution"]),
+        delayed=bool(x["delayed"]),
+    )
+
+
 def _worker():
     payload=json.load(sys.stdin); arm=payload["arm"]
-    cases=[RuntimeCase(**x) for x in payload["cases"]]
+    cases=[_decode_runtime(x) for x in payload["cases"]]
     rows=[run_case(arm,c) for c in cases]
     json.dump({"arm":arm,"pid":os.getpid(),"worker_token":str(uuid.uuid4()),"rows":rows},sys.stdout)
 
