@@ -1,0 +1,69 @@
+{
+  "schema": "governance-oasis-gh4-integrated-confirmatory-plan-v1",
+  "experiment_id": "GH4_FLOW_PRESERVING_INTEGRATED_CONFIRMATORY_V1",
+  "evidence_level": "INTEGRATED_CONFIRMATORY",
+  "axes": [
+    "A1_BEHAVIOR_CHANGE_EFFECTIVENESS",
+    "A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY",
+    "A3_RESPONSIBILITY_SENSITIVITY",
+    "A4_OVERGENERALIZATION_PREVENTION",
+    "A5_CONFLICTING_EXPERIENCE_HANDLING",
+    "A6_WRONG_BEHAVIOR_RECOVERY"
+  ],
+  "arms": [
+    "FULL_FLOW",
+    "INITIAL_EXPERIENCE_HIDDEN",
+    "IDENTITY_PERMUTED",
+    "RELATION_ABLATED",
+    "ORDER_ABLATED",
+    "RESPONSIBILITY_RECORD_ONLY",
+    "RESPONSIBILITY_PERMUTED",
+    "SCOPE_GUARD_ABLATED",
+    "CONFLICT_LATEST_ONLY",
+    "REVALIDATION_RECORD_ONLY",
+    "EXOGENOUS_ATTRIBUTION_CONTROL"
+  ],
+  "long_horizon_epochs": [
+    "E0 CURRENT-FIRST HISTORY GATE",
+    "E1 WRONG CHANGE",
+    "E2 SAME-SCOPE RECOVERY",
+    "E3 CHANGED SCOPE",
+    "E4 UNRELATED RELATION",
+    "E5 IDENTITY TRACE",
+    "E6 RELATION TRACE",
+    "E7 ORDER EARLY",
+    "E8 ORDER LATE",
+    "E9 CONFLICT",
+    "E10 RESPONSIBILITY"
+  ],
+  "pilot": {
+    "families": [
+      "P"
+    ],
+    "arm_epoch_units": 121,
+    "scientific_metrics": false
+  },
+  "confirmatory": {
+    "families": [
+      "F1",
+      "F2",
+      "F3"
+    ],
+    "arms": 11,
+    "epochs": 11,
+    "decision_realization_units": 363
+  },
+  "support_rule": "FULL_FLOW must satisfy every preregistered integrated invariant and each targeted ablation must diverge on its prespecified discriminative epoch(s); any structural invalidity yields INVALID.",
+  "invalidation_rules": [
+    "future outcome, wrongness, expected label, or evaluator truth reaches a decision worker",
+    "any epoch has zero or multiple realizations",
+    "seed CE identity/order/relation provenance mutates",
+    "archive is not append-only",
+    "current-flow-first gate accesses history when history_needed is false",
+    "responsibility collapses to a scalar",
+    "post-result retuning occurs"
+  ],
+  "claim_boundary": "Finite deterministic synthetic integrated flow-preservation evidence only; not real-world deployment proof.",
+  "no_aggregate_winner_score": true,
+  "post_result_retuning_forbidden": true
+}
