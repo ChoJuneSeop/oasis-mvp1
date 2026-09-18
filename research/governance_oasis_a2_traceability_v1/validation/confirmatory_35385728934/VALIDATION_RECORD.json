@@ -1,0 +1,36 @@
+{
+  "schema": "governance-oasis-a2-confirmatory-validation-record-v1",
+  "experiment_id": "GO_A2_RELATION_ORDER_TRACEABILITY_V1",
+  "batch_id": "35385728934-1",
+  "execution_sha": "81a483b6196cb2280d5b649b58ef9b13da624f9c",
+  "preexecution_verified_sha": "fcea202f79005551d3d6cdd1c98d11c774e3bb48",
+  "traceability_ci": {
+    "run_id": 35385728748,
+    "conclusion": "success"
+  },
+  "confirmatory_workflow": {
+    "run_id": 35385728934,
+    "conclusion": "success"
+  },
+  "artifact": {
+    "artifact_id": 10563912486,
+    "name": "governance-oasis-a2-confirmatory-35385728934-1",
+    "digest": "sha256:36d0d3adf50b4f57f2550e3ead1ebcf889183d78cd104947e22e5abb96682255",
+    "file_hashes": {
+      "A2-AXIS.json": "5f022ffa23bd03f36a6aade441d410e18e43fa8346d03b4b6a57514f33409550",
+      "A2-I.json": "10e209a1cbbd8ce40150ae861eb7830dcf6f6fbde8fa3c3225ebe155ae4a55f8",
+      "A2-R.json": "67b685d7f0570a656b62b984f0a39a688fb0e753139a5710450cb5541c06d41d",
+      "A2-O.json": "41df2def70054f231ab7f924764098b43bec517273d5ce8b47ece7be9a9dedda",
+      "A2-N.json": "b4be649ca816eae3bac7e4e928e5de2e65d36c79e13ae4cd79725d4435ef6d4d"
+    }
+  },
+  "preflight": {
+    "proof_ready": true,
+    "freeze_ready": true,
+    "production_dimensions_isolated": true,
+    "profile_id": "GO_A2_TRACEABILITY_EXECUTION_V1"
+  },
+  "result": "SUPPORTS",
+  "scope": "Controlled confirmatory execution through frozen production CurrentContextChoice preference boundary; not universal deployment proof.",
+  "complete_not_equal_supports": true
+}
