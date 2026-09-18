@@ -44,7 +44,7 @@ def extract_consumed_envelopes(context: Any) -> tuple[DecisionInputEnvelope, ...
     reconstructions = tuple(getattr(evaluation, "reconstructions", ()) or ())
 
     buckets: dict[str, dict[str, Any]] = {}
-    ordered_source_pairs: list[tuple[str, str]] = []
+    ordered_relation_elements: list[str] = []
     first_seen: list[str] = []
 
     def bucket_for(source: Any) -> tuple[str, dict[str, Any]]:
@@ -52,9 +52,8 @@ def extract_consumed_envelopes(context: Any) -> tuple[DecisionInputEnvelope, ...
         relation_element_id = str(getattr(source, "relation_element_id", ""))
         if not experience_id or not relation_element_id:
             raise ValueError("CE source lacks experience/relation identity")
-        pair = (experience_id, relation_element_id)
-        if pair not in ordered_source_pairs:
-            ordered_source_pairs.append(pair)
+        if relation_element_id not in ordered_relation_elements:
+            ordered_relation_elements.append(relation_element_id)
         if experience_id not in buckets:
             first_seen.append(experience_id)
             buckets[experience_id] = {
@@ -74,7 +73,6 @@ def extract_consumed_envelopes(context: Any) -> tuple[DecisionInputEnvelope, ...
         bucket["semantics"].append(_plain(semantic))
         bucket["relations"].append(
             {
-                "experience_id": experience_id,
                 "relation_element_id": str(getattr(source, "relation_element_id")),
                 "relation_descriptor": _plain(getattr(source, "relation_descriptor", {})),
                 "possibility_id": str(getattr(contribution, "possibility_id", "")),
@@ -97,7 +95,6 @@ def extract_consumed_envelopes(context: Any) -> tuple[DecisionInputEnvelope, ...
             experience_id, bucket = bucket_for(source)
             bucket["reconstructions"].append(
                 {
-                    "experience_id": experience_id,
                     "relation_element_id": str(getattr(source, "relation_element_id")),
                     "possibility_id": str(getattr(reconstruction, "possibility_id", "")),
                     "distribution_effect": getattr(link, "distribution_effect", None),
@@ -118,7 +115,7 @@ def extract_consumed_envelopes(context: Any) -> tuple[DecisionInputEnvelope, ...
 
     order_digest = domain_digest(
         "A2_INTEGRATED_CHOICE_ORDER_V1",
-        ordered_source_pairs,
+        ordered_relation_elements,
     )
     envelopes = []
     for experience_id in first_seen:
