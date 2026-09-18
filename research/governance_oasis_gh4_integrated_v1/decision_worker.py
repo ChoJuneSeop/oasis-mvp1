@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
+import uuid
 from dataclasses import asdict, dataclass
 from typing import Any
 
@@ -189,6 +191,8 @@ def decide(payload:dict[str,Any])->dict[str,Any]:
         "realized":selected,
         "realization_count":1,
         "received_forbidden_future_or_evaluator_truth":received_forbidden,
+        "worker_pid":os.getpid(),
+        "worker_seal_token":str(uuid.uuid4()),
         "pre_realization_stages":[
             "CURRENT_FLOW","RELATION_PROCESS","HISTORY_NEED_GATE","PARTICIPATION",
             "POSSIBILITY_DISTRIBUTION","RESPONSIBILITY","DECISION","SINGLE_REALIZATION",
