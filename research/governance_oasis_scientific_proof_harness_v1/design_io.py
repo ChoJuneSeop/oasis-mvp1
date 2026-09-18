@@ -59,6 +59,12 @@ def load_design(path: Path) -> ExperimentDesign:
         future_leakage_guard=bool(raw["future_leakage_guard"]),
         no_aggregate_winner_score=bool(raw["no_aggregate_winner_score"]),
         integrated_flow_baseline=bool(raw["integrated_flow_baseline"]),
+        production_history_append_only=bool(raw["production_history_append_only"]),
+        production_no_permanent_memory_weight=bool(
+            raw["production_no_permanent_memory_weight"]
+        ),
+        production_no_destructive_no=bool(raw["production_no_destructive_no"]),
+        ablation_mutations_declared=bool(raw["ablation_mutations_declared"]),
         relation_context_controls=tuple(str(x) for x in raw.get("relation_context_controls", ())),
         responsibility_controls=tuple(str(x) for x in raw.get("responsibility_controls", ())),
         responsibility_non_scalar=bool(raw.get("responsibility_non_scalar", False)),
