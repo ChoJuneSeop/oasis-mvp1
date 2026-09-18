@@ -1,0 +1,21 @@
+{
+  "axis_outcome": "SUPPORTS",
+  "batch_id": "35385728934-1",
+  "complete_not_equal_supports": true,
+  "contrast_outcomes": {
+    "A2-I": "SUPPORTS",
+    "A2-N": "SUPPORTS",
+    "A2-O": "SUPPORTS",
+    "A2-R": "SUPPORTS"
+  },
+  "experiment_complete": true,
+  "experiment_id": "GO_A2_RELATION_ORDER_TRACEABILITY_V1",
+  "github_sha": "81a483b6196cb2280d5b649b58ef9b13da624f9c",
+  "schema": "governance-oasis-a2-confirmatory-axis-result-v1",
+  "sequence": [
+    "A2-I",
+    "A2-R",
+    "A2-O",
+    "A2-N"
+  ]
+}
