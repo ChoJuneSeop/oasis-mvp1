@@ -64,6 +64,12 @@ def make_design(axis: AxisId) -> ExperimentDesign:
         contrasts=tuple(contrasts),
         independent_evaluator=True,
         evaluator_blinded_to=("future_state", "expected_label"),
+        authoritative_outcome_observation=True,
+        decision_worker_forbidden_inputs=(
+            "future_state",
+            "expected_label",
+            "evaluator_outcome",
+        ),
         provenance_chain=(
             "COMPLETED_EXPERIENCE",
             "PARTICIPATION",
@@ -168,6 +174,22 @@ class ScientificProofDesignGateTests(unittest.TestCase):
         )
         report = validate_design(design)
         self.assertIn("axis_a6_wrong_behavior_recovery", report.unresolved_check_ids)
+
+    def test_supplied_label_cannot_substitute_for_authoritative_outcome(self):
+        design = replace(
+            make_design(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS),
+            authoritative_outcome_observation=False,
+        )
+        report = validate_design(design)
+        self.assertIn("crosscut_outcome_evidence_boundary", report.unresolved_check_ids)
+
+    def test_decision_worker_must_forbid_evaluator_truth_inputs(self):
+        design = replace(
+            make_design(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS),
+            decision_worker_forbidden_inputs=("future_state",),
+        )
+        report = validate_design(design)
+        self.assertIn("crosscut_outcome_evidence_boundary", report.unresolved_check_ids)
 
     def test_future_leakage_guard_cannot_be_omitted(self):
         design = replace(
