@@ -36,3 +36,5 @@ governance. It is not a real-world safety or general superiority claim.
 
 No A3 re-run is required merely because A2 has now closed. A new A3 run would be
 a replication of an already supported axis, not the next missing proof step.
+
+CI verification is required before this sequence closure is treated as canonical.
