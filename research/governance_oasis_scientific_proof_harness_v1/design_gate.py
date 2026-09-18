@@ -58,7 +58,9 @@ def _matching_contrast_ids(
 
 
 def _mechanism_contrast(design: ExperimentDesign, keyword: str | None = None) -> bool:
-    return bool(_matching_contrast_ids(design, *(()) if keyword is None else (keyword,)))
+    if keyword is None:
+        return bool(_matching_contrast_ids(design))
+    return bool(_matching_contrast_ids(design, keyword))
 
 
 def _contrast_integrity(design: ExperimentDesign) -> DesignCheck:
