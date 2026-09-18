@@ -1,0 +1,14 @@
+{
+  "spec_version":"CBRA_FAILURE_CE_V1_FINAL",
+  "axis_snapshot_base":"45905bf69b9a28fd08a9646fa3ee4d412efe0ac0",
+  "arms":["GOV_CBRA","GOV_RECORD_ONLY","GENERAL_HARNESS"],
+  "failure_classes":5,
+  "reentry_contexts":3,
+  "pilot_cases_per_arm":15,
+  "confirmatory_families":4,
+  "confirmatory_cases_per_arm":60,
+  "confirmatory_total_case_arm_units":180,
+  "aggregate_score":null,
+  "pilot_may_tune_confirmatory":false,
+  "post_result_rule_repair":false
+}
