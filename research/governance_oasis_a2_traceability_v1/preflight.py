@@ -193,7 +193,7 @@ def _attack_tests(profile: A2ExecutionProfile, fixture: ArmFixture) -> dict[str,
 
 def _git_blob_sha(path: Path) -> str:
     data = path.read_bytes()
-    header = f"blob {len(data)}\\0".encode("ascii")
+    header = f"blob {len(data)}".encode("ascii") + b"\\0"
     return hashlib.sha1(header + data).hexdigest()
 
 
