@@ -34,10 +34,7 @@ def audit_portfolio(
             if item.counts_toward_axis_proof
             and item.design_report_passed
             and item.result_status == "COMPLETE"
-            and item.level in {
-                EvidenceLevel.CONFIRMATORY,
-                EvidenceLevel.INTEGRATED_CONFIRMATORY,
-            }
+            and item.level is EvidenceLevel.CONFIRMATORY
         ]
         if not qualifying:
             weak.append(axis.value)
