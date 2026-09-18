@@ -59,6 +59,7 @@ class CausalContrast:
 @dataclass(frozen=True)
 class ExperimentDesign:
     experiment_id: str
+    execution_profile_id: str
     purpose: str
     targeted_axes: tuple[AxisId, ...]
     claim_ids: tuple[str, ...]
@@ -133,6 +134,7 @@ class DesignCheck:
 @dataclass(frozen=True)
 class ProofDesignReport:
     experiment_id: str
+    execution_profile_id: str
     checks: tuple[DesignCheck, ...]
     targeted_axes: tuple[AxisId, ...]
     proof_ready: bool
@@ -141,6 +143,7 @@ class ProofDesignReport:
     def as_dict(self) -> dict[str, Any]:
         return {
             "experiment_id": self.experiment_id,
+            "execution_profile_id": self.execution_profile_id,
             "checks": [item.as_dict() for item in self.checks],
             "targeted_axes": [axis.value for axis in self.targeted_axes],
             "proof_ready": self.proof_ready,
