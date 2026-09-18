@@ -13,6 +13,7 @@ class CombinedReadinessReport:
     expected_execution_profile_id: str
     actual_execution_profile_id: str
     execution_profile_matches: bool
+    execution_contract_matches: bool
     scientific_design_ready: bool
     execution_integrity_ready: bool
     experiment_ready: bool
@@ -24,6 +25,7 @@ class CombinedReadinessReport:
             "expected_execution_profile_id": self.expected_execution_profile_id,
             "actual_execution_profile_id": self.actual_execution_profile_id,
             "execution_profile_matches": self.execution_profile_matches,
+            "execution_contract_matches": self.execution_contract_matches,
             "scientific_design_ready": self.scientific_design_ready,
             "execution_integrity_ready": self.execution_integrity_ready,
             "experiment_ready": self.experiment_ready,
@@ -46,6 +48,18 @@ def combine_readiness(
             + "!="
             + freeze_report.profile_id
         )
+
+    missing_execution_checks = sorted(
+        set(proof_report.required_execution_check_ids)
+        - set(freeze_report.required_check_ids)
+    )
+    execution_contract_matches = not missing_execution_checks
+    if missing_execution_checks:
+        blockers.append(
+            "execution_profile_missing_required_checks:"
+            + ",".join(missing_execution_checks)
+        )
+
     if not proof_report.proof_ready:
         blockers.append(
             "scientific_proof_design_blocked:"
@@ -61,6 +75,7 @@ def combine_readiness(
         expected_execution_profile_id=proof_report.execution_profile_id,
         actual_execution_profile_id=freeze_report.profile_id,
         execution_profile_matches=profile_matches,
+        execution_contract_matches=execution_contract_matches,
         scientific_design_ready=proof_report.proof_ready,
         execution_integrity_ready=freeze_report.freeze_ready,
         experiment_ready=not blockers,
