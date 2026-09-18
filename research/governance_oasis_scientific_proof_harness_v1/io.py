@@ -21,6 +21,10 @@ def load_evidence_registry(path: Path) -> tuple[str, tuple[EvidenceRecord, ...]]
                 source_refs=tuple(str(x) for x in raw.get("source_refs", ())),
                 claim_boundary=tuple(str(x) for x in raw.get("claim_boundary", ())),
                 counts_toward_axis_proof=bool(raw["counts_toward_axis_proof"]),
+                verified_obligations=tuple(
+                    str(x) for x in raw.get("verified_obligations", ())
+                ),
+                review_method=str(raw.get("review_method", "")),
                 notes=tuple(str(x) for x in raw.get("notes", ())),
             )
         )
