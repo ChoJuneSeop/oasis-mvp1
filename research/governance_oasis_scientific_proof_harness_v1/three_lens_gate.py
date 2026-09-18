@@ -7,6 +7,7 @@ from .models import ProofDesignReport, ThreeLensReviewReport
 
 DEFINITION_CHECKS = {
     "crosscut_claim_alignment",
+    "crosscut_execution_contract_declared",
     "crosscut_falsifiability",
     "crosscut_preregistration_boundary",
     "crosscut_history_integrity",
