@@ -1,0 +1,36 @@
+{
+  "status":"CARLA_MAPPING_READY",
+  "mapping_version":"GOVERNANCE_CBRA_CARLA_MAPPING_V1_0",
+  "frozen_mapping_snapshot_sha":"b9ebe492ebfa0c055a221f6634461e90da826eb0",
+  "validation_run_id":35331408039,
+  "validation_job_id":105556357088,
+  "source_lineages":{
+    "governance_cbra_closure":"70615d25c855ac0f06ac8ce36d6cc54c1ab1dfc8",
+    "canonical_carla_branch":"canonical/carla-v22-harness-v1.1-g32",
+    "canonical_harness_blob_sha":"5fb087fce0ae67ee4e905813bd7304c496921211",
+    "canonical_harness_sha256":"fe57064e10fd870ba9c3cf1ba0f5b95dc5a2bdd1337ae1b905a2f79bc450ce18"
+  },
+  "validation":{
+    "compile":true,
+    "mapping_admission_tests":true,
+    "canonical_carla_regression":true,
+    "cbra_regression":true,
+    "governance_regression":true,
+    "formal_error_checks_closed":10
+  },
+  "reflection_mapping":{
+    "free_form_reflection":false,
+    "provenance_bound_revalidation":true,
+    "yes_no_preserved":true,
+    "selected_nonselected_preserved":true,
+    "responsibility_uvit_separate":true,
+    "obligation_level_traceability":true,
+    "exogenous_attribution_separate":true,
+    "append_only_checkpoints":true,
+    "strict_as_of_gate":true,
+    "scalar_latest_state_collapse":false
+  },
+  "real_carla_scientific_pilot_executed":false,
+  "real_carla_execution_gate":"REQUIRES_FROZEN_RUNTIME_SOURCE_IDENTITIES_FOR_HOST_CORE_ADAPTER_OBSERVATION_GATEWAY_EVALUATOR",
+  "aggregate_score":null
+}
