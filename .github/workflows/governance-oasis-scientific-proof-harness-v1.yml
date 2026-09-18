@@ -1,0 +1,68 @@
+name: Governance OASIS Scientific Proof Harness v1
+
+on:
+  push:
+    branches:
+      - feature/governance-oasis-scientific-proof-harness-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  proof-harness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Compile scientific and execution harnesses
+        run: |
+          python -m compileall -q research/governance_oasis_scientific_proof_harness_v1
+          python -m compileall -q research/oasis_experiment_freeze_harness_v1
+
+      - name: Scientific design adversarial tests
+        run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_design_gate
+
+      - name: Portfolio closure tests
+        run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_portfolio_gate
+
+      - name: Claim and evidence registry integrity
+        run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_registry_integrity
+
+      - name: Required experiment-plan integrity
+        run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_plan_integrity
+
+      - name: Scientific plus execution combined gate
+        run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_combined_gate
+
+      - name: Lower execution-harness regression
+        run: python -m unittest -v research.oasis_experiment_freeze_harness_v1.test_harness
+
+      - name: Emit current Governance proof portfolio audit
+        run: |
+          mkdir -p .proof
+          python -m research.governance_oasis_scientific_proof_harness_v1 \
+            --portfolio \
+            --audit-only \
+            --report .proof/current_portfolio.json
+
+      - name: Prove current program is not falsely marked proof-complete
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          p = json.loads(Path(".proof/current_portfolio.json").read_text())
+          assert p["proof_complete"] is False
+          assert "A5_CONFLICTING_EXPERIENCE_HANDLING" in p["missing_axes"]
+          assert "A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY" in p["weak_axes"]
+          assert "A4_OVERGENERALIZATION_PREVENTION" in p["weak_axes"]
+          assert "A6_WRONG_BEHAVIOR_RECOVERY" in p["weak_axes"]
+          assert p["integration_evidence_ids"] == []
+          PY
