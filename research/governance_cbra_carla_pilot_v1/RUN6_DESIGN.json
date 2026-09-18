@@ -1,0 +1,1578 @@
+{
+  "design_id": "GOVERNANCE_CBRA_CARLA_RUN6_REPLICATION_DESIGN_V1",
+  "status": "DESIGN_ONLY_NOT_FROZEN_FOR_EXECUTION",
+  "purpose": "prospective independent-seed replication of a valid Run5 structural CARLA Pilot without changing Governance, CBRA, Gateway, Closure, or scene-admission semantics",
+  "entry_gate": {
+    "run5_registered_units": 54,
+    "run5_completed_units_required": 54,
+    "run5_preexecution_invalid_required": 0,
+    "run5_runtime_lost_required": false,
+    "run5_process_errors_required": 0,
+    "run5_unit_failures_required": 0,
+    "run5_results_may_not_select_or_modify_run6_seeds": true
+  },
+  "inherited_without_change": {
+    "carla_version": "0.9.16",
+    "map": "Town10HD_Opt",
+    "synchronous_mode": true,
+    "fixed_delta_seconds": 0.05,
+    "no_rendering_mode": true,
+    "render_off_screen": true,
+    "candidate_distances_m": [
+      18,
+      22,
+      26,
+      30,
+      34
+    ],
+    "gateway_relation_definition": "strict same road_id + same lane_id + longitudinal front",
+    "run5_topology_admission": true,
+    "clean_lane_admission": true,
+    "gateway_approved_counterpart_admission": true,
+    "arms": [
+      "GENERAL_HARNESS",
+      "GOVERNANCE_NO_CBRA",
+      "GOVERNANCE_PLUS_CBRA"
+    ],
+    "failure_classes": [
+      "SUCCESS_CONTROL",
+      "PARTICIPATION_COMMISSION_FAILURE",
+      "PARTICIPATION_OMISSION_FAILURE",
+      "RESPONSIBILITY_AXIS_FAILURE",
+      "EXOGENOUS_FAILURE",
+      "DELAYED_FAILURE"
+    ],
+    "reentry_contexts": [
+      "SAME_SCOPE",
+      "CHANGED_SCOPE",
+      "UNRELATED_RELATION"
+    ],
+    "decision_thresholds_unchanged": true,
+    "responsibility_policy_unchanged": true,
+    "cbra_policy_unchanged": true,
+    "closure_rule_unchanged": true
+  },
+  "replication": {
+    "independent_seed_blocks": [
+      "R1",
+      "R2",
+      "R3"
+    ],
+    "scenarios_per_block": 18,
+    "arms_per_scenario": 3,
+    "units_per_block": 54,
+    "total_units": 162,
+    "arm_seed_pairing": "all three arms share the same seed within each failure-class × relation-context × replicate cell",
+    "seed_blocks": [
+      {
+        "replicate_id": "R1",
+        "seed_prefix": 950000
+      },
+      {
+        "replicate_id": "R2",
+        "seed_prefix": 960000
+      },
+      {
+        "replicate_id": "R3",
+        "seed_prefix": 970000
+      }
+    ],
+    "original_run5_seed_range_excluded": "940001-940018"
+  },
+  "primary_mechanism_endpoints": [
+    "participation YES/NO provenance is preserved and context-local",
+    "responsibility U/I/V/T provenance remains bound to selected and nonselected choices",
+    "CBRA opens only after Closure and remains strict-as-of",
+    "decision-linked contradictory evidence can revise its bound target only within eligible relation scope",
+    "exogenous contradictory evidence does not become decision-linked revision",
+    "unrelated relation does not inherit CBRA revision",
+    "delayed failure preserves ordered multiple checkpoints without latest-state collapse"
+  ],
+  "analysis_plan": {
+    "unit_of_pairing": "same replicate + same seed + same failure class + same relation context across three arms",
+    "summarize_by": [
+      "replicate_id",
+      "failure_class",
+      "reentry_context",
+      "arm"
+    ],
+    "report_counts_and_rates": true,
+    "report_exact_binomial_intervals_where_applicable": true,
+    "report_decision_latency_percentiles": true,
+    "report_energy_only_when_measured": true,
+    "unavailable_energy_remains": "UNAVAILABLE",
+    "aggregate_score": false,
+    "arm_ranking": false,
+    "universal_superiority_claim": false
+  },
+  "stopping_and_integrity": {
+    "no_result_based_seed_replacement": true,
+    "no_result_based_distance_change": true,
+    "no_result_based_threshold_change": true,
+    "no_result_based_gateway_change": true,
+    "no_result_based_policy_change": true,
+    "failed_units_preserved": true,
+    "no_overwrite_or_resume": true,
+    "runtime_loss_stops_matrix": true
+  },
+  "units": [
+    {
+      "ordinal": 1,
+      "replicate_id": "R1",
+      "scenario_index": 1,
+      "seed": 950001,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 2,
+      "replicate_id": "R1",
+      "scenario_index": 1,
+      "seed": 950001,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 3,
+      "replicate_id": "R1",
+      "scenario_index": 1,
+      "seed": 950001,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 4,
+      "replicate_id": "R1",
+      "scenario_index": 2,
+      "seed": 950002,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 5,
+      "replicate_id": "R1",
+      "scenario_index": 2,
+      "seed": 950002,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 6,
+      "replicate_id": "R1",
+      "scenario_index": 2,
+      "seed": 950002,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 7,
+      "replicate_id": "R1",
+      "scenario_index": 3,
+      "seed": 950003,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 8,
+      "replicate_id": "R1",
+      "scenario_index": 3,
+      "seed": 950003,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 9,
+      "replicate_id": "R1",
+      "scenario_index": 3,
+      "seed": 950003,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 10,
+      "replicate_id": "R1",
+      "scenario_index": 4,
+      "seed": 950004,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 11,
+      "replicate_id": "R1",
+      "scenario_index": 4,
+      "seed": 950004,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 12,
+      "replicate_id": "R1",
+      "scenario_index": 4,
+      "seed": 950004,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 13,
+      "replicate_id": "R1",
+      "scenario_index": 5,
+      "seed": 950005,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 14,
+      "replicate_id": "R1",
+      "scenario_index": 5,
+      "seed": 950005,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 15,
+      "replicate_id": "R1",
+      "scenario_index": 5,
+      "seed": 950005,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 16,
+      "replicate_id": "R1",
+      "scenario_index": 6,
+      "seed": 950006,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 17,
+      "replicate_id": "R1",
+      "scenario_index": 6,
+      "seed": 950006,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 18,
+      "replicate_id": "R1",
+      "scenario_index": 6,
+      "seed": 950006,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 19,
+      "replicate_id": "R1",
+      "scenario_index": 7,
+      "seed": 950007,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 20,
+      "replicate_id": "R1",
+      "scenario_index": 7,
+      "seed": 950007,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 21,
+      "replicate_id": "R1",
+      "scenario_index": 7,
+      "seed": 950007,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 22,
+      "replicate_id": "R1",
+      "scenario_index": 8,
+      "seed": 950008,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 23,
+      "replicate_id": "R1",
+      "scenario_index": 8,
+      "seed": 950008,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 24,
+      "replicate_id": "R1",
+      "scenario_index": 8,
+      "seed": 950008,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 25,
+      "replicate_id": "R1",
+      "scenario_index": 9,
+      "seed": 950009,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 26,
+      "replicate_id": "R1",
+      "scenario_index": 9,
+      "seed": 950009,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 27,
+      "replicate_id": "R1",
+      "scenario_index": 9,
+      "seed": 950009,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 28,
+      "replicate_id": "R1",
+      "scenario_index": 10,
+      "seed": 950010,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 29,
+      "replicate_id": "R1",
+      "scenario_index": 10,
+      "seed": 950010,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 30,
+      "replicate_id": "R1",
+      "scenario_index": 10,
+      "seed": 950010,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 31,
+      "replicate_id": "R1",
+      "scenario_index": 11,
+      "seed": 950011,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 32,
+      "replicate_id": "R1",
+      "scenario_index": 11,
+      "seed": 950011,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 33,
+      "replicate_id": "R1",
+      "scenario_index": 11,
+      "seed": 950011,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 34,
+      "replicate_id": "R1",
+      "scenario_index": 12,
+      "seed": 950012,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 35,
+      "replicate_id": "R1",
+      "scenario_index": 12,
+      "seed": 950012,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 36,
+      "replicate_id": "R1",
+      "scenario_index": 12,
+      "seed": 950012,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 37,
+      "replicate_id": "R1",
+      "scenario_index": 13,
+      "seed": 950013,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 38,
+      "replicate_id": "R1",
+      "scenario_index": 13,
+      "seed": 950013,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 39,
+      "replicate_id": "R1",
+      "scenario_index": 13,
+      "seed": 950013,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 40,
+      "replicate_id": "R1",
+      "scenario_index": 14,
+      "seed": 950014,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 41,
+      "replicate_id": "R1",
+      "scenario_index": 14,
+      "seed": 950014,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 42,
+      "replicate_id": "R1",
+      "scenario_index": 14,
+      "seed": 950014,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 43,
+      "replicate_id": "R1",
+      "scenario_index": 15,
+      "seed": 950015,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 44,
+      "replicate_id": "R1",
+      "scenario_index": 15,
+      "seed": 950015,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 45,
+      "replicate_id": "R1",
+      "scenario_index": 15,
+      "seed": 950015,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 46,
+      "replicate_id": "R1",
+      "scenario_index": 16,
+      "seed": 950016,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 47,
+      "replicate_id": "R1",
+      "scenario_index": 16,
+      "seed": 950016,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 48,
+      "replicate_id": "R1",
+      "scenario_index": 16,
+      "seed": 950016,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 49,
+      "replicate_id": "R1",
+      "scenario_index": 17,
+      "seed": 950017,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 50,
+      "replicate_id": "R1",
+      "scenario_index": 17,
+      "seed": 950017,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 51,
+      "replicate_id": "R1",
+      "scenario_index": 17,
+      "seed": 950017,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 52,
+      "replicate_id": "R1",
+      "scenario_index": 18,
+      "seed": 950018,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 53,
+      "replicate_id": "R1",
+      "scenario_index": 18,
+      "seed": 950018,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 54,
+      "replicate_id": "R1",
+      "scenario_index": 18,
+      "seed": 950018,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 55,
+      "replicate_id": "R2",
+      "scenario_index": 1,
+      "seed": 960001,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 56,
+      "replicate_id": "R2",
+      "scenario_index": 1,
+      "seed": 960001,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 57,
+      "replicate_id": "R2",
+      "scenario_index": 1,
+      "seed": 960001,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 58,
+      "replicate_id": "R2",
+      "scenario_index": 2,
+      "seed": 960002,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 59,
+      "replicate_id": "R2",
+      "scenario_index": 2,
+      "seed": 960002,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 60,
+      "replicate_id": "R2",
+      "scenario_index": 2,
+      "seed": 960002,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 61,
+      "replicate_id": "R2",
+      "scenario_index": 3,
+      "seed": 960003,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 62,
+      "replicate_id": "R2",
+      "scenario_index": 3,
+      "seed": 960003,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 63,
+      "replicate_id": "R2",
+      "scenario_index": 3,
+      "seed": 960003,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 64,
+      "replicate_id": "R2",
+      "scenario_index": 4,
+      "seed": 960004,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 65,
+      "replicate_id": "R2",
+      "scenario_index": 4,
+      "seed": 960004,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 66,
+      "replicate_id": "R2",
+      "scenario_index": 4,
+      "seed": 960004,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 67,
+      "replicate_id": "R2",
+      "scenario_index": 5,
+      "seed": 960005,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 68,
+      "replicate_id": "R2",
+      "scenario_index": 5,
+      "seed": 960005,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 69,
+      "replicate_id": "R2",
+      "scenario_index": 5,
+      "seed": 960005,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 70,
+      "replicate_id": "R2",
+      "scenario_index": 6,
+      "seed": 960006,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 71,
+      "replicate_id": "R2",
+      "scenario_index": 6,
+      "seed": 960006,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 72,
+      "replicate_id": "R2",
+      "scenario_index": 6,
+      "seed": 960006,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 73,
+      "replicate_id": "R2",
+      "scenario_index": 7,
+      "seed": 960007,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 74,
+      "replicate_id": "R2",
+      "scenario_index": 7,
+      "seed": 960007,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 75,
+      "replicate_id": "R2",
+      "scenario_index": 7,
+      "seed": 960007,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 76,
+      "replicate_id": "R2",
+      "scenario_index": 8,
+      "seed": 960008,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 77,
+      "replicate_id": "R2",
+      "scenario_index": 8,
+      "seed": 960008,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 78,
+      "replicate_id": "R2",
+      "scenario_index": 8,
+      "seed": 960008,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 79,
+      "replicate_id": "R2",
+      "scenario_index": 9,
+      "seed": 960009,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 80,
+      "replicate_id": "R2",
+      "scenario_index": 9,
+      "seed": 960009,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 81,
+      "replicate_id": "R2",
+      "scenario_index": 9,
+      "seed": 960009,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 82,
+      "replicate_id": "R2",
+      "scenario_index": 10,
+      "seed": 960010,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 83,
+      "replicate_id": "R2",
+      "scenario_index": 10,
+      "seed": 960010,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 84,
+      "replicate_id": "R2",
+      "scenario_index": 10,
+      "seed": 960010,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 85,
+      "replicate_id": "R2",
+      "scenario_index": 11,
+      "seed": 960011,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 86,
+      "replicate_id": "R2",
+      "scenario_index": 11,
+      "seed": 960011,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 87,
+      "replicate_id": "R2",
+      "scenario_index": 11,
+      "seed": 960011,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 88,
+      "replicate_id": "R2",
+      "scenario_index": 12,
+      "seed": 960012,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 89,
+      "replicate_id": "R2",
+      "scenario_index": 12,
+      "seed": 960012,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 90,
+      "replicate_id": "R2",
+      "scenario_index": 12,
+      "seed": 960012,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 91,
+      "replicate_id": "R2",
+      "scenario_index": 13,
+      "seed": 960013,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 92,
+      "replicate_id": "R2",
+      "scenario_index": 13,
+      "seed": 960013,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 93,
+      "replicate_id": "R2",
+      "scenario_index": 13,
+      "seed": 960013,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 94,
+      "replicate_id": "R2",
+      "scenario_index": 14,
+      "seed": 960014,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 95,
+      "replicate_id": "R2",
+      "scenario_index": 14,
+      "seed": 960014,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 96,
+      "replicate_id": "R2",
+      "scenario_index": 14,
+      "seed": 960014,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 97,
+      "replicate_id": "R2",
+      "scenario_index": 15,
+      "seed": 960015,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 98,
+      "replicate_id": "R2",
+      "scenario_index": 15,
+      "seed": 960015,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 99,
+      "replicate_id": "R2",
+      "scenario_index": 15,
+      "seed": 960015,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 100,
+      "replicate_id": "R2",
+      "scenario_index": 16,
+      "seed": 960016,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 101,
+      "replicate_id": "R2",
+      "scenario_index": 16,
+      "seed": 960016,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 102,
+      "replicate_id": "R2",
+      "scenario_index": 16,
+      "seed": 960016,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 103,
+      "replicate_id": "R2",
+      "scenario_index": 17,
+      "seed": 960017,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 104,
+      "replicate_id": "R2",
+      "scenario_index": 17,
+      "seed": 960017,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 105,
+      "replicate_id": "R2",
+      "scenario_index": 17,
+      "seed": 960017,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 106,
+      "replicate_id": "R2",
+      "scenario_index": 18,
+      "seed": 960018,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 107,
+      "replicate_id": "R2",
+      "scenario_index": 18,
+      "seed": 960018,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 108,
+      "replicate_id": "R2",
+      "scenario_index": 18,
+      "seed": 960018,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 109,
+      "replicate_id": "R3",
+      "scenario_index": 1,
+      "seed": 970001,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 110,
+      "replicate_id": "R3",
+      "scenario_index": 1,
+      "seed": 970001,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 111,
+      "replicate_id": "R3",
+      "scenario_index": 1,
+      "seed": 970001,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 112,
+      "replicate_id": "R3",
+      "scenario_index": 2,
+      "seed": 970002,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 113,
+      "replicate_id": "R3",
+      "scenario_index": 2,
+      "seed": 970002,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 114,
+      "replicate_id": "R3",
+      "scenario_index": 2,
+      "seed": 970002,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 115,
+      "replicate_id": "R3",
+      "scenario_index": 3,
+      "seed": 970003,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 116,
+      "replicate_id": "R3",
+      "scenario_index": 3,
+      "seed": 970003,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 117,
+      "replicate_id": "R3",
+      "scenario_index": 3,
+      "seed": 970003,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "SUCCESS_CONTROL",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 118,
+      "replicate_id": "R3",
+      "scenario_index": 4,
+      "seed": 970004,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 119,
+      "replicate_id": "R3",
+      "scenario_index": 4,
+      "seed": 970004,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 120,
+      "replicate_id": "R3",
+      "scenario_index": 4,
+      "seed": 970004,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 121,
+      "replicate_id": "R3",
+      "scenario_index": 5,
+      "seed": 970005,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 122,
+      "replicate_id": "R3",
+      "scenario_index": 5,
+      "seed": 970005,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 123,
+      "replicate_id": "R3",
+      "scenario_index": 5,
+      "seed": 970005,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 124,
+      "replicate_id": "R3",
+      "scenario_index": 6,
+      "seed": 970006,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 125,
+      "replicate_id": "R3",
+      "scenario_index": 6,
+      "seed": 970006,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 126,
+      "replicate_id": "R3",
+      "scenario_index": 6,
+      "seed": 970006,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_COMMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 127,
+      "replicate_id": "R3",
+      "scenario_index": 7,
+      "seed": 970007,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 128,
+      "replicate_id": "R3",
+      "scenario_index": 7,
+      "seed": 970007,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 129,
+      "replicate_id": "R3",
+      "scenario_index": 7,
+      "seed": 970007,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 130,
+      "replicate_id": "R3",
+      "scenario_index": 8,
+      "seed": 970008,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 131,
+      "replicate_id": "R3",
+      "scenario_index": 8,
+      "seed": 970008,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 132,
+      "replicate_id": "R3",
+      "scenario_index": 8,
+      "seed": 970008,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 133,
+      "replicate_id": "R3",
+      "scenario_index": 9,
+      "seed": 970009,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 134,
+      "replicate_id": "R3",
+      "scenario_index": 9,
+      "seed": 970009,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 135,
+      "replicate_id": "R3",
+      "scenario_index": 9,
+      "seed": 970009,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "PARTICIPATION_OMISSION_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 136,
+      "replicate_id": "R3",
+      "scenario_index": 10,
+      "seed": 970010,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 137,
+      "replicate_id": "R3",
+      "scenario_index": 10,
+      "seed": 970010,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 138,
+      "replicate_id": "R3",
+      "scenario_index": 10,
+      "seed": 970010,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 139,
+      "replicate_id": "R3",
+      "scenario_index": 11,
+      "seed": 970011,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 140,
+      "replicate_id": "R3",
+      "scenario_index": 11,
+      "seed": 970011,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 141,
+      "replicate_id": "R3",
+      "scenario_index": 11,
+      "seed": 970011,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 142,
+      "replicate_id": "R3",
+      "scenario_index": 12,
+      "seed": 970012,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 143,
+      "replicate_id": "R3",
+      "scenario_index": 12,
+      "seed": 970012,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 144,
+      "replicate_id": "R3",
+      "scenario_index": 12,
+      "seed": 970012,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "RESPONSIBILITY_AXIS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 145,
+      "replicate_id": "R3",
+      "scenario_index": 13,
+      "seed": 970013,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 146,
+      "replicate_id": "R3",
+      "scenario_index": 13,
+      "seed": 970013,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 147,
+      "replicate_id": "R3",
+      "scenario_index": 13,
+      "seed": 970013,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 148,
+      "replicate_id": "R3",
+      "scenario_index": 14,
+      "seed": 970014,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 149,
+      "replicate_id": "R3",
+      "scenario_index": 14,
+      "seed": 970014,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 150,
+      "replicate_id": "R3",
+      "scenario_index": 14,
+      "seed": 970014,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 151,
+      "replicate_id": "R3",
+      "scenario_index": 15,
+      "seed": 970015,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 152,
+      "replicate_id": "R3",
+      "scenario_index": 15,
+      "seed": 970015,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 153,
+      "replicate_id": "R3",
+      "scenario_index": 15,
+      "seed": 970015,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "EXOGENOUS_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 154,
+      "replicate_id": "R3",
+      "scenario_index": 16,
+      "seed": 970016,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 155,
+      "replicate_id": "R3",
+      "scenario_index": 16,
+      "seed": 970016,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 156,
+      "replicate_id": "R3",
+      "scenario_index": 16,
+      "seed": 970016,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "SAME_SCOPE"
+    },
+    {
+      "ordinal": 157,
+      "replicate_id": "R3",
+      "scenario_index": 17,
+      "seed": 970017,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 158,
+      "replicate_id": "R3",
+      "scenario_index": 17,
+      "seed": 970017,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 159,
+      "replicate_id": "R3",
+      "scenario_index": 17,
+      "seed": 970017,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "CHANGED_SCOPE"
+    },
+    {
+      "ordinal": 160,
+      "replicate_id": "R3",
+      "scenario_index": 18,
+      "seed": 970018,
+      "arm": "GENERAL_HARNESS",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 161,
+      "replicate_id": "R3",
+      "scenario_index": 18,
+      "seed": 970018,
+      "arm": "GOVERNANCE_NO_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    },
+    {
+      "ordinal": 162,
+      "replicate_id": "R3",
+      "scenario_index": 18,
+      "seed": 970018,
+      "arm": "GOVERNANCE_PLUS_CBRA",
+      "failure_class": "DELAYED_FAILURE",
+      "reentry_context": "UNRELATED_RELATION"
+    }
+  ]
+}
