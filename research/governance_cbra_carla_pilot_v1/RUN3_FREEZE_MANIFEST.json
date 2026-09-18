@@ -1,7 +1,7 @@
 {
   "freeze_id": "GOVERNANCE_CBRA_CARLA_PILOT_RUN3_FREEZE_V1",
   "status": "FROZEN_BEFORE_RUN3_EXECUTION",
-  "source_freeze_commit": "b1203f7d3d1e6cac4895a09444defbc9bf31fee2",
+  "source_freeze_commit": "434128626c78e7b97be3c20669895807d38070d7",
   "branch_before_run3_branch_cut": "experiment/governance-cbra-carla-pilot-v1-freeze",
   "preserved_prior_runs": {
     "run1": {
@@ -75,8 +75,7 @@
   "frozen_source_git_blobs": {
     "research/governance_cbra_carla_pilot_v1/PILOT_MATRIX.json": "be6f3192fe316776e7f9915f6e318f47e03e5f1b",
     "research/governance_cbra_carla_pilot_v1/pilot_runtime.py": "6bf6d20d42ea44465017c65a789efa7bcc96a189",
-    "research/governance_cbra_carla_pilot_v1/pilot_runner.py": "7f311e0b1a933ec8f75ee1320bf760b97fb3e17e",
-    "research/governance_cbra_carla_pilot_v1/test_pilot_preexec.py": "d16abe83802e459357c9776be1a931c8493957bc"
+    "research/governance_cbra_carla_pilot_v1/pilot_runner.py": "dca2c64eb0f85287e3d4fc9e22eef41aaa9aded9"
   },
   "claim_boundary": {
     "structural_pilot_only": true,
