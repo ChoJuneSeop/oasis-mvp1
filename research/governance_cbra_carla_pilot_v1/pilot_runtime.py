@@ -307,7 +307,32 @@ class PilotCARLAHost:
         return AtomicFlowSnapshot(
             tau=float(self.flow.current_tau()),
             observation=obs,
-            current_reality=dict(self.flow.current_reality()),
+            current_reality={
+                "front_state": (
+                    "absent"
+                    if not obs.front_present
+                    else (
+                        "closing"
+                        if obs.front_closing_mps > 0.0
+                        else (
+                            "opening"
+                            if obs.front_closing_mps < 0.0
+                            else "no-relative-motion"
+                        )
+                    )
+                ),
+                "front_kind": obs.front_kind,
+                "lane_heading_state": (
+                    "aligned"
+                    if obs.local_heading_error_deg == 0.0
+                    else (
+                        "positive-offset"
+                        if obs.local_heading_error_deg > 0.0
+                        else "negative-offset"
+                    )
+                ),
+                "local_participation_count": obs.local_density,
+            },
             version=int(self.version),
             fingerprint=self.flow.flow_fingerprint(),
             relation_id=self.relation_id,
@@ -391,6 +416,19 @@ class PilotScene:
         rng = random.Random(self.seed)
         order = list(range(len(points)))
         rng.shuffle(order)
+        # Exclude dead-end spawn points up front so the frozen one-counterpart
+        # scenario can always be staged without post-result spawn substitution.
+        viable = []
+        world_map = self.world.get_map()
+        for index in order:
+            wp = world_map.get_waypoint(points[index].location)
+            if wp is not None and list(wp.next(18.0)):
+                viable.append(index)
+        if not viable:
+            raise CoreV11InvariantError(
+                "CARLA map has no viable Pilot ego spawn with forward relation space"
+            )
+        order = viable
         ids = self._four_wheel_vehicle_ids()
         preferred = (
             "vehicle.tesla.model3"
