@@ -37,6 +37,10 @@ def _qualifies_for_axis(record: EvidenceRecord, axis: AxisId) -> bool:
         and required.issubset(set(record.verified_obligations))
         and bool(record.review_method.strip())
         and bool(record.result_rule_ref.strip())
+        and bool(record.source_refs)
+        and set(record.source_refs)
+        == {path for path, _blob in record.source_git_blobs}
+        and all(bool(blob.strip()) for _path, blob in record.source_git_blobs)
     )
 
 
@@ -105,6 +109,10 @@ def audit_portfolio(
         }
         and bool(item.review_method.strip())
         and bool(item.result_rule_ref.strip())
+        and bool(item.source_refs)
+        and set(item.source_refs)
+        == {path for path, _blob in item.source_git_blobs}
+        and all(bool(blob.strip()) for _path, blob in item.source_git_blobs)
         and all(
             set(AXIS_CONTRACTS[axis].mandatory_obligations).issubset(
                 set(item.verified_obligations)
