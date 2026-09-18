@@ -479,6 +479,45 @@ class ScientificProofDesignGateTests(unittest.TestCase):
         report = validate_design(design)
         self.assertIn("crosscut_outcome_evidence_boundary", report.unresolved_check_ids)
 
+    def test_flow_preservation_requires_history_need_gate(self):
+        design = make_design(AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY)
+        temporal = tuple(
+            x for x in design.temporal_order if x != "HISTORY_NEED_GATE"
+        )
+        design = replace(design, temporal_order=temporal)
+        report = validate_design(design)
+        self.assertIn("crosscut_temporal_causality", report.unresolved_check_ids)
+
+    def test_flow_preservation_requires_post_closure_revalidation_stage(self):
+        design = make_design(AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY)
+        temporal = tuple(x for x in design.temporal_order if x != "REVALIDATION")
+        design = replace(design, temporal_order=temporal)
+        report = validate_design(design)
+        self.assertIn("crosscut_temporal_causality", report.unresolved_check_ids)
+
+    def test_contrast_must_hold_core_or_possibility_path_constant(self):
+        design = make_design(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS)
+        bad = replace(
+            design.contrasts[0],
+            held_constant=("current_observation", "scenario_order"),
+        )
+        design = replace(design, contrasts=(bad,))
+        report = validate_design(design)
+        self.assertIn(
+            "crosscut_causal_contrast_integrity",
+            report.unresolved_check_ids,
+        )
+
+    def test_duplicate_contrast_ids_are_blocked(self):
+        design = make_design(AxisId.A3_RESPONSIBILITY_SENSITIVITY)
+        duplicate = replace(design.contrasts[1], contrast_id=design.contrasts[0].contrast_id)
+        design = replace(design, contrasts=(design.contrasts[0], duplicate))
+        report = validate_design(design)
+        self.assertIn(
+            "crosscut_causal_contrast_integrity",
+            report.unresolved_check_ids,
+        )
+
     def test_future_leakage_guard_cannot_be_omitted(self):
         design = replace(
             make_design(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS),
@@ -494,6 +533,17 @@ class ScientificProofDesignGateTests(unittest.TestCase):
         )
         report = validate_design(design)
         self.assertIn("crosscut_evaluator_independence", report.unresolved_check_ids)
+
+    def test_integrated_design_requires_integrated_claim_and_all_axis_claims(self):
+        base = make_design(AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY)
+        design = replace(
+            base,
+            evidence_level=EvidenceLevel.INTEGRATED_CONFIRMATORY,
+            targeted_axes=tuple(AxisId),
+            claim_ids=("GO-INTEGRATED-C1",),
+        )
+        report = validate_design(design)
+        self.assertIn("crosscut_claim_alignment", report.unresolved_check_ids)
 
     def test_claim_cannot_target_wrong_axis(self):
         design = replace(
