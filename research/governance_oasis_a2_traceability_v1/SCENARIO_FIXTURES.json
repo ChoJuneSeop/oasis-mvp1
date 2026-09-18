@@ -1,0 +1,137 @@
+{
+  "experiment_id": "GO_A2_RELATION_ORDER_TRACEABILITY_V1",
+  "fixtures": [
+    {
+      "arm_id": "I0",
+      "contrast_id": "A2-I",
+      "core_hash": "7a14de686ae8516a9f5e3aea8d482293601cd4cbf211151eb6a28ee57a04c9b4",
+      "current_observation_hash": "b718c78d79820acf32bdaa4dcdf7fb6000edfed4bf252242fe3216adec745fee",
+      "identity_binding": [
+        "CE-A"
+      ],
+      "negative_stage": null,
+      "order_digest": "9dc4ed0f0c08b2be32e12bcda3a717b9882dc3aa2c75d52880d925c1790c002e",
+      "payload_semantic_hash": "392592b4f91d04f823e44e6838d7ce7059c0b42d66c47ddb23a47d7d5c29ad72",
+      "possibility_set_hash": "c448be5a9895166c1c488964996969e364c348027f048d9ffcd6a0c76f1200ad",
+      "relation_digest": "60bcf5f01c8f048d90c01921d1bf103430dcf374b52dac437041e0b85844764a"
+    },
+    {
+      "arm_id": "I1",
+      "contrast_id": "A2-I",
+      "core_hash": "7a14de686ae8516a9f5e3aea8d482293601cd4cbf211151eb6a28ee57a04c9b4",
+      "current_observation_hash": "b718c78d79820acf32bdaa4dcdf7fb6000edfed4bf252242fe3216adec745fee",
+      "identity_binding": [
+        "CE-B"
+      ],
+      "negative_stage": null,
+      "order_digest": "9dc4ed0f0c08b2be32e12bcda3a717b9882dc3aa2c75d52880d925c1790c002e",
+      "payload_semantic_hash": "392592b4f91d04f823e44e6838d7ce7059c0b42d66c47ddb23a47d7d5c29ad72",
+      "possibility_set_hash": "c448be5a9895166c1c488964996969e364c348027f048d9ffcd6a0c76f1200ad",
+      "relation_digest": "60bcf5f01c8f048d90c01921d1bf103430dcf374b52dac437041e0b85844764a"
+    },
+    {
+      "arm_id": "R0",
+      "contrast_id": "A2-R",
+      "core_hash": "7a14de686ae8516a9f5e3aea8d482293601cd4cbf211151eb6a28ee57a04c9b4",
+      "current_observation_hash": "b718c78d79820acf32bdaa4dcdf7fb6000edfed4bf252242fe3216adec745fee",
+      "identity_binding": [
+        "CE-R"
+      ],
+      "negative_stage": null,
+      "order_digest": "9dc4ed0f0c08b2be32e12bcda3a717b9882dc3aa2c75d52880d925c1790c002e",
+      "payload_semantic_hash": "392592b4f91d04f823e44e6838d7ce7059c0b42d66c47ddb23a47d7d5c29ad72",
+      "possibility_set_hash": "c448be5a9895166c1c488964996969e364c348027f048d9ffcd6a0c76f1200ad",
+      "relation_digest": "60bcf5f01c8f048d90c01921d1bf103430dcf374b52dac437041e0b85844764a"
+    },
+    {
+      "arm_id": "R1",
+      "contrast_id": "A2-R",
+      "core_hash": "7a14de686ae8516a9f5e3aea8d482293601cd4cbf211151eb6a28ee57a04c9b4",
+      "current_observation_hash": "b718c78d79820acf32bdaa4dcdf7fb6000edfed4bf252242fe3216adec745fee",
+      "identity_binding": [
+        "CE-R"
+      ],
+      "negative_stage": null,
+      "order_digest": "9dc4ed0f0c08b2be32e12bcda3a717b9882dc3aa2c75d52880d925c1790c002e",
+      "payload_semantic_hash": "392592b4f91d04f823e44e6838d7ce7059c0b42d66c47ddb23a47d7d5c29ad72",
+      "possibility_set_hash": "c448be5a9895166c1c488964996969e364c348027f048d9ffcd6a0c76f1200ad",
+      "relation_digest": "dfdc5037ebe4453120282e19e8e7f318d56aae7d2fdbc46a91d181de42e628bf"
+    },
+    {
+      "arm_id": "O0",
+      "contrast_id": "A2-O",
+      "core_hash": "7a14de686ae8516a9f5e3aea8d482293601cd4cbf211151eb6a28ee57a04c9b4",
+      "current_observation_hash": "b718c78d79820acf32bdaa4dcdf7fb6000edfed4bf252242fe3216adec745fee",
+      "identity_binding": [
+        "CE-1",
+        "CE-2",
+        "CE-3"
+      ],
+      "negative_stage": null,
+      "order_digest": "9dc4ed0f0c08b2be32e12bcda3a717b9882dc3aa2c75d52880d925c1790c002e",
+      "payload_semantic_hash": "392592b4f91d04f823e44e6838d7ce7059c0b42d66c47ddb23a47d7d5c29ad72",
+      "possibility_set_hash": "c448be5a9895166c1c488964996969e364c348027f048d9ffcd6a0c76f1200ad",
+      "relation_digest": "60bcf5f01c8f048d90c01921d1bf103430dcf374b52dac437041e0b85844764a"
+    },
+    {
+      "arm_id": "O1",
+      "contrast_id": "A2-O",
+      "core_hash": "7a14de686ae8516a9f5e3aea8d482293601cd4cbf211151eb6a28ee57a04c9b4",
+      "current_observation_hash": "b718c78d79820acf32bdaa4dcdf7fb6000edfed4bf252242fe3216adec745fee",
+      "identity_binding": [
+        "CE-1",
+        "CE-2",
+        "CE-3"
+      ],
+      "negative_stage": null,
+      "order_digest": "1bb520a3ff7546c0e4078e121c95bbb4e1b52da33ff7a5de67eebf69ce2a353e",
+      "payload_semantic_hash": "392592b4f91d04f823e44e6838d7ce7059c0b42d66c47ddb23a47d7d5c29ad72",
+      "possibility_set_hash": "c448be5a9895166c1c488964996969e364c348027f048d9ffcd6a0c76f1200ad",
+      "relation_digest": "60bcf5f01c8f048d90c01921d1bf103430dcf374b52dac437041e0b85844764a"
+    },
+    {
+      "arm_id": "N1",
+      "contrast_id": "A2-N",
+      "core_hash": "7a14de686ae8516a9f5e3aea8d482293601cd4cbf211151eb6a28ee57a04c9b4",
+      "current_observation_hash": "b718c78d79820acf32bdaa4dcdf7fb6000edfed4bf252242fe3216adec745fee",
+      "identity_binding": [
+        "CE-DECOY"
+      ],
+      "negative_stage": "N1_REVALIDATION_NO",
+      "order_digest": "9dc4ed0f0c08b2be32e12bcda3a717b9882dc3aa2c75d52880d925c1790c002e",
+      "payload_semantic_hash": "392592b4f91d04f823e44e6838d7ce7059c0b42d66c47ddb23a47d7d5c29ad72",
+      "possibility_set_hash": "c448be5a9895166c1c488964996969e364c348027f048d9ffcd6a0c76f1200ad",
+      "relation_digest": "60bcf5f01c8f048d90c01921d1bf103430dcf374b52dac437041e0b85844764a"
+    },
+    {
+      "arm_id": "N2",
+      "contrast_id": "A2-N",
+      "core_hash": "7a14de686ae8516a9f5e3aea8d482293601cd4cbf211151eb6a28ee57a04c9b4",
+      "current_observation_hash": "b718c78d79820acf32bdaa4dcdf7fb6000edfed4bf252242fe3216adec745fee",
+      "identity_binding": [
+        "CE-DECOY"
+      ],
+      "negative_stage": "N2_NOT_PARTICIPATED",
+      "order_digest": "9dc4ed0f0c08b2be32e12bcda3a717b9882dc3aa2c75d52880d925c1790c002e",
+      "payload_semantic_hash": "392592b4f91d04f823e44e6838d7ce7059c0b42d66c47ddb23a47d7d5c29ad72",
+      "possibility_set_hash": "c448be5a9895166c1c488964996969e364c348027f048d9ffcd6a0c76f1200ad",
+      "relation_digest": "60bcf5f01c8f048d90c01921d1bf103430dcf374b52dac437041e0b85844764a"
+    },
+    {
+      "arm_id": "N3",
+      "contrast_id": "A2-N",
+      "core_hash": "7a14de686ae8516a9f5e3aea8d482293601cd4cbf211151eb6a28ee57a04c9b4",
+      "current_observation_hash": "b718c78d79820acf32bdaa4dcdf7fb6000edfed4bf252242fe3216adec745fee",
+      "identity_binding": [
+        "CE-DECOY"
+      ],
+      "negative_stage": "N3_PARTICIPATED_NOT_CONSUMED",
+      "order_digest": "9dc4ed0f0c08b2be32e12bcda3a717b9882dc3aa2c75d52880d925c1790c002e",
+      "payload_semantic_hash": "392592b4f91d04f823e44e6838d7ce7059c0b42d66c47ddb23a47d7d5c29ad72",
+      "possibility_set_hash": "c448be5a9895166c1c488964996969e364c348027f048d9ffcd6a0c76f1200ad",
+      "relation_digest": "60bcf5f01c8f048d90c01921d1bf103430dcf374b52dac437041e0b85844764a"
+    }
+  ],
+  "schema": "governance-oasis-a2-scenario-fixtures-v1",
+  "source_freeze_commit": "721f9cacbabb5457628ead61aa97bc3da9e364c4"
+}
