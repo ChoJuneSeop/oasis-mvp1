@@ -59,6 +59,11 @@ def _contrast_integrity(design: ExperimentDesign) -> DesignCheck:
             bad.append(f"{item.contrast_id}: targeted_mechanism missing")
         if not item.held_constant:
             bad.append(f"{item.contrast_id}: held_constant empty")
+        held_text = " ".join(item.held_constant).lower()
+        if not ("current" in held_text or "observation" in held_text):
+            bad.append(f"{item.contrast_id}: current context not explicitly held constant")
+        if not ("core" in held_text or "possibility" in held_text):
+            bad.append(f"{item.contrast_id}: Core/possibility path not explicitly held constant")
         if not item.observable_ids:
             bad.append(f"{item.contrast_id}: observable_ids empty")
         unknown_observables = sorted(set(item.observable_ids) - set(design.observables))
@@ -185,6 +190,34 @@ def _evaluator_independence(design: ExperimentDesign) -> DesignCheck:
             evidence=(
                 f"independent_evaluator={design.independent_evaluator}",
                 f"evaluator_blinded_to={list(design.evaluator_blinded_to)}",
+            ),
+        )
+    )
+
+
+def _outcome_evidence_boundary(design: ExperimentDesign) -> DesignCheck:
+    forbidden = {x.lower() for x in design.decision_worker_forbidden_inputs}
+    future_hidden = any("future" in x for x in forbidden)
+    expected_hidden = any("expected" in x or "label" in x or "truth" in x for x in forbidden)
+    evaluator_hidden = any("evaluator" in x or "outcome" in x for x in forbidden)
+    ok = (
+        design.authoritative_outcome_observation
+        and future_hidden
+        and expected_hidden
+        and evaluator_hidden
+    )
+    return (
+        _pass(
+            "crosscut_outcome_evidence_boundary",
+            "Scientific outcomes come from authoritative post-realization observation and evaluator/future truth is forbidden from decision workers.",
+        )
+        if ok
+        else _fail(
+            "crosscut_outcome_evidence_boundary",
+            "The design could mistake a supplied label for a realized outcome or leak post-outcome truth into the decision path.",
+            evidence=(
+                f"authoritative_outcome_observation={design.authoritative_outcome_observation}",
+                f"decision_worker_forbidden_inputs={list(design.decision_worker_forbidden_inputs)}",
             ),
         )
     )
@@ -453,6 +486,7 @@ def validate_design(design: ExperimentDesign) -> ProofDesignReport:
         _contrast_integrity(design),
         _temporal_causality(design),
         _evaluator_independence(design),
+        _outcome_evidence_boundary(design),
         _preregistration_and_boundary(design),
         _provenance_chain(design),
     ]
