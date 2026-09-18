@@ -1,7 +1,7 @@
 {
   "freeze_id": "GOVERNANCE_OASIS_SCIENTIFIC_PROOF_HARNESS_V1_FREEZE",
   "status": "FROZEN_AFTER_MULTI_ROUND_SELF_AUDIT",
-  "source_freeze_commit": "492abce3523be58dee7bdcb6c9bcb21aec3e6af9",
+  "source_freeze_commit": "721f9cacbabb5457628ead61aa97bc3da9e364c4",
   "source_regression_workflow_run": 35380880132,
   "purpose": "Authorize only experiments that are scientifically capable of testing a registered Governance OASIS claim and that also pass exact execution/freeze integrity gates.",
   "official_axes": [
@@ -67,10 +67,11 @@
     "research/governance_oasis_scientific_proof_harness_v1/test_registry_integrity.py": "1b4f937c3072d9772d08fb8201599c381cefd200",
     "research/governance_oasis_scientific_proof_harness_v1/test_three_lens_gate.py": "795e14a7c9ff7674f183af87b7586c2fe613213c",
     "research/governance_oasis_scientific_proof_harness_v1/three_lens_gate.py": "66f169ba9ef7e5c5dc34c0b0f0b69c9977797bb9",
-    ".github/workflows/governance-oasis-scientific-proof-harness-v1.yml": "9fe64b7900ebb4c037880c302c74ba0328f2d383",
+    ".github/workflows/governance-oasis-scientific-proof-harness-v1.yml": "f812c1153a7ab9d06c94c5a22de1c50c1bbbbbed",
     "research/oasis_experiment_freeze_harness_v1/models.py": "ce7f481b1ebc0ec12fc6f32ab3f5ca3ffbdd9ce5",
     "research/oasis_experiment_freeze_harness_v1/harness.py": "a15d58ddd3197f91018f668be3bc9d095e347560",
-    "research/oasis_experiment_freeze_harness_v1/HARNESS_SPEC.md": "7a29ffbadddd5bb267cbd17255e93d67e224f49c"
+    "research/oasis_experiment_freeze_harness_v1/HARNESS_SPEC.md": "7a29ffbadddd5bb267cbd17255e93d67e224f49c",
+    "research/governance_oasis_scientific_proof_harness_v1/test_freeze_integrity.py": "944be7450244eecac80dfa3048ecbd234fdda023"
   },
-  "post_freeze_rule": "Any drift in a frozen source, dependency contract, workflow, claim registry, evidence registry, or attack test invalidates this v1 freeze and requires a new reviewed freeze."
+  "post_freeze_rule": "Any drift in a frozen source, dependency contract, workflow, claim/evidence registry, or attack/freeze-integrity test invalidates this v1 freeze and requires a new reviewed freeze."
 }
