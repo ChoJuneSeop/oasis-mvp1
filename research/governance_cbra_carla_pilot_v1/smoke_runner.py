@@ -16,7 +16,6 @@ from research.g3_organic_carla_01.protocol import (
 from research.g3_organic_carla_01.live_runner import (
     build_scene_plan,
     spawn_scene,
-    prepare_live_world,
     _cleanup,
 )
 from research.g3_organic_carla_01.run_audit import RunAuditLedger
@@ -131,7 +130,41 @@ def run_smoke(
 
         client = carla.Client(str(host), int(port))
         client.set_timeout(30.0)
-        world, traffic_manager = prepare_live_world(client, smoke_protocol, seed=seed)
+
+        # Smoke runs must never reload an already-correct world. The canonical
+        # preregistered runner deliberately issues a pre-first-tick load_world(),
+        # but on constrained Windows GPUs that reload can allocate rendering
+        # resources before no_rendering_mode is re-applied. For this diagnostic
+        # smoke path we bind to the current host world and fail closed if it is
+        # not already the frozen map.
+        client_version = str(client.get_client_version())
+        server_version = str(client.get_server_version())
+        if client_version != EXPECTED_CARLA_VERSION or server_version != EXPECTED_CARLA_VERSION:
+            raise CoreV11InvariantError(
+                f"CARLA version must be {EXPECTED_CARLA_VERSION}, "
+                f"got client={client_version!r}, server={server_version!r}"
+            )
+        if client_version != server_version:
+            raise CoreV11InvariantError("CARLA client/server versions differ")
+
+        world = client.get_world()
+        current_map = str(world.get_map().name).rsplit("/", 1)[-1]
+        expected_map = str(smoke_protocol["environment"]["map"])
+        if current_map != expected_map:
+            raise CoreV11InvariantError(
+                f"smoke runner will not reload CARLA world: expected {expected_map}, got {current_map}"
+            )
+
+        settings = world.get_settings()
+        settings.synchronous_mode = True
+        settings.fixed_delta_seconds = float(smoke_protocol["environment"]["fixed_delta_seconds"])
+        settings.no_rendering_mode = True
+        world.apply_settings(settings)
+
+        tm_port = int(smoke_protocol["environment"]["traffic_manager_port"])
+        traffic_manager = client.get_trafficmanager(tm_port)
+        traffic_manager.set_synchronous_mode(True)
+        traffic_manager.set_random_device_seed(seed)
 
         settings = world.get_settings()
         if settings.no_rendering_mode is not True:
