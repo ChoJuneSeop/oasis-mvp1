@@ -1,0 +1,72 @@
+name: Governance OASIS A2 Confirmatory v1
+
+on:
+  push:
+    branches:
+      - experiment/governance-oasis-a2-traceability-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  a2-confirmatory:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[A2-CONFIRMATORY]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify frozen harness and A2 readiness
+        run: |
+          python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_freeze_integrity
+          python -m unittest -v research.governance_oasis_a2_traceability_v1.test_a2_traceability
+          python -m research.governance_oasis_a2_traceability_v1
+
+      - name: A2-I identity trace
+        run: |
+          mkdir -p a2-confirmatory-results
+          python -m research.governance_oasis_a2_traceability_v1.confirmatory_runner \
+            --contrast A2-I \
+            --batch-id "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --output a2-confirmatory-results/A2-I.json
+
+      - name: A2-R relation-process trace
+        run: |
+          python -m research.governance_oasis_a2_traceability_v1.confirmatory_runner \
+            --contrast A2-R \
+            --batch-id "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --output a2-confirmatory-results/A2-R.json
+
+      - name: A2-O order-history trace
+        run: |
+          python -m research.governance_oasis_a2_traceability_v1.confirmatory_runner \
+            --contrast A2-O \
+            --batch-id "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --output a2-confirmatory-results/A2-O.json
+
+      - name: A2-N false-attribution controls
+        run: |
+          python -m research.governance_oasis_a2_traceability_v1.confirmatory_runner \
+            --contrast A2-N \
+            --batch-id "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --output a2-confirmatory-results/A2-N.json
+
+      - name: Aggregate A2 axis
+        run: |
+          python -m research.governance_oasis_a2_traceability_v1.confirmatory_runner \
+            --aggregate-dir a2-confirmatory-results \
+            --aggregate-output a2-confirmatory-results/A2-AXIS.json
+
+      - name: Upload sealed A2 confirmatory artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: governance-oasis-a2-confirmatory-${{ github.run_id }}-${{ github.run_attempt }}
+          path: a2-confirmatory-results/*.json
+          if-no-files-found: error
+          retention-days: 90
