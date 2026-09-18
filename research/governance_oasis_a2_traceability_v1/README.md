@@ -113,7 +113,13 @@ execution checks plus:
 - decision-invocation binding;
 - fixture isolation;
 - N1/N2/N3 coverage;
-- hash-chain integrity.
+- hash-chain integrity;
+- production choice-boundary identity.
+
+The production choice-boundary check binds the reference instrumentation to
+`research/choice_responsibility_v01/integration.py` at Git blob
+`cc49c976db4494d7d25a2c6347fd80f651b3e056`, including the exact
+`preference_operator.choose(context=..., eligible_ids=...)` call boundary.
 
 Run:
 
