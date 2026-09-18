@@ -48,7 +48,7 @@ FIXED_DELTA_SECONDS = 0.05
 
 
 class ScenarioAdmissionError(RuntimeError):
-    """Pre-execution CARLA scene failed the frozen Run3 admission contract."""
+    """Pre-execution CARLA scene failed the frozen Run4 admission contract."""
 
 
 def scope_signature(observation: PresentObservation) -> tuple[bool, str, int]:
@@ -562,6 +562,14 @@ class PilotScene:
         self.host.tick()
 
     def spawn_counterpart(self, kind: str = "vehicle"):
+        """Spawn only a counterpart that the approved Gateway actually recognizes.
+
+        Run4 keeps the frozen candidate distances unchanged. Physical actor spawn is
+        not sufficient: after each successful spawn, the authoritative present-state
+        Gateway must report front_present=True and the expected front_kind. A failed
+        candidate is destroyed before the next already-frozen distance is tried.
+        No failure label, evaluator result, or post-outcome evidence is consulted.
+        """
         self.remove_counterpart()
         world_map = self.world.get_map()
         wp = world_map.get_waypoint(self.ego.get_location())
@@ -569,20 +577,66 @@ class PilotScene:
             raise CoreV11InvariantError("ego has no waypoint for Pilot counterpart")
         bp = self._counterpart_blueprint(kind)
         distances = (18.0, 22.0, 26.0, 30.0, 34.0)
+        rejected: list[dict[str, object]] = []
         for distance in distances:
             nxt = list(wp.next(distance))
             if not nxt:
+                rejected.append(
+                    {"distance_m": float(distance), "reason": "no-forward-waypoint"}
+                )
                 continue
             transform = nxt[0].transform
             transform.location.z += 0.35 if kind == "vehicle" else 0.8
             actor = self.world.try_spawn_actor(bp, transform)
-            if actor is not None:
-                self.counterpart = actor
+            if actor is None:
+                rejected.append(
+                    {"distance_m": float(distance), "reason": "physical-spawn-failed"}
+                )
+                continue
+
+            self.counterpart = actor
+            self.host.mark_host_mutation()
+            self.host.tick()
+            observed = PresentObservation.from_mapping(
+                self.host.present_observation()
+            )
+            if observed.front_present and observed.front_kind == kind:
+                self.last_counterpart_admission = {
+                    "kind": kind,
+                    "distance_m": float(distance),
+                    "front_present": True,
+                    "front_kind": observed.front_kind,
+                    "front_gap_m": float(observed.front_gap_m),
+                    "rejected_candidates": tuple(rejected),
+                }
+                return actor
+
+            rejected.append(
+                {
+                    "distance_m": float(distance),
+                    "reason": "gateway-front-relation-not-approved",
+                    "observed_front_present": bool(observed.front_present),
+                    "observed_front_kind": observed.front_kind,
+                    "observed_front_gap_m": float(observed.front_gap_m),
+                }
+            )
+            try:
+                actor.destroy()
+            finally:
+                self.counterpart = None
                 self.host.mark_host_mutation()
                 self.host.tick()
-                return actor
-        raise CoreV11InvariantError(
-            f"unable to spawn {kind} counterpart on current lane"
+
+        self.last_counterpart_admission = {
+            "kind": kind,
+            "distance_m": None,
+            "front_present": False,
+            "front_kind": "none",
+            "rejected_candidates": tuple(rejected),
+        }
+        raise ScenarioAdmissionError(
+            f"{kind} counterpart did not form an approved front relation "
+            "at any frozen candidate distance"
         )
 
     def admit_relation_cycle(self, kind: str) -> dict[str, object]:
