@@ -1,0 +1,17 @@
+{
+  "status":"PILOT_STRUCTURAL_PASS",
+  "frozen_experiment_snapshot_sha":"067bf002296f7eb524d99337c66fc28703543226",
+  "workflow_run_id":35327869597,
+  "job_id":105545078069,
+  "artifact_id":10539542688,
+  "artifact_zip_sha256":"54fd89a473a6c7d220621a05fc33ae48582276e6ff45b59cb6e8ce617f0a42ec",
+  "pilot_json_sha256":"c902ac30495b111c42c5ed8aff16b66ab059b2b6edcf006a8c375c45ca8fee41",
+  "case_count_per_arm":15,
+  "arm_count":3,
+  "fresh_process":true,
+  "checkpoint_exactly_one":true,
+  "as_of_gate_exactly_one":true,
+  "counterfactual_claimed":false,
+  "scientific_evaluator_used":false,
+  "pilot_used_to_tune_confirmatory":false
+}
