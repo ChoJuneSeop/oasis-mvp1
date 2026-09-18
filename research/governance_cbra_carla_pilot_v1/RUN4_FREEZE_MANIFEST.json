@@ -1,0 +1,109 @@
+{
+  "freeze_id": "GOVERNANCE_CBRA_CARLA_PILOT_RUN4_FREEZE_V1",
+  "status": "FROZEN_BEFORE_RUN4_EXECUTION",
+  "source_freeze_commit": "9b69d7ba3ce8c73f9a939658aa65a8fa12ba33f3",
+  "branch_before_run4_branch_cut": "experiment/governance-cbra-carla-pilot-v1-run3-freeze",
+  "preserved_prior_runs": {
+    "run1": {
+      "status": "PRE_EXECUTION_RUNTIME_CONFIGURATION_FAILURE",
+      "overwrite_forbidden": true
+    },
+    "run2": {
+      "status": "PRESERVED_DIAGNOSTIC_EXECUTION",
+      "overwrite_forbidden": true
+    },
+    "run3": {
+      "status": "PRE_EXECUTION_INVALID",
+      "passed_units": 15,
+      "preexecution_invalid_units": 39,
+      "invalid_cause_count": 39,
+      "invalid_cause": "vehicle counterpart did not form an approved front relation",
+      "interpretation": "scene-construction mismatch between physical spawn success and approved Gateway front-relation recognition",
+      "overwrite_forbidden": true
+    }
+  },
+  "unchanged_scientific_design": {
+    "matrix_units": 54,
+    "matrix_git_blob": "be6f3192fe316776e7f9915f6e318f47e03e5f1b",
+    "arms": [
+      "GENERAL_HARNESS",
+      "GOVERNANCE_NO_CBRA",
+      "GOVERNANCE_PLUS_CBRA"
+    ],
+    "failure_classes": [
+      "SUCCESS_CONTROL",
+      "PARTICIPATION_COMMISSION_FAILURE",
+      "PARTICIPATION_OMISSION_FAILURE",
+      "RESPONSIBILITY_AXIS_FAILURE",
+      "EXOGENOUS_FAILURE",
+      "DELAYED_FAILURE"
+    ],
+    "reentry_contexts": [
+      "SAME_SCOPE",
+      "CHANGED_SCOPE",
+      "UNRELATED_RELATION"
+    ],
+    "seeds_unchanged": true,
+    "failure_labels_unchanged": true,
+    "decision_thresholds_unchanged": true,
+    "responsibility_policy_unchanged": true,
+    "cbra_policy_unchanged": true,
+    "closure_rule_unchanged": true,
+    "post_result_retuning": false,
+    "aggregate_score": null
+  },
+  "run4_addition_only": {
+    "layer": "PRE_EXECUTION_SCENE_CONSTRUCTION",
+    "experimental_evidence": false,
+    "problem_corrected": "physical actor spawn success was previously accepted before approved Gateway front-relation recognition",
+    "frozen_candidate_distances_m": [
+      18,
+      22,
+      26,
+      30,
+      34
+    ],
+    "candidate_distance_set_unchanged": true,
+    "approval_requires": {
+      "physical_spawn_success": true,
+      "gateway_front_present": true,
+      "gateway_front_kind_matches_requested_kind": true
+    },
+    "rejected_candidate_action": "destroy actor, advance one host tick, try next already-frozen candidate distance",
+    "exhaustion_status": "PRE_EXECUTION_SCENARIO_INVALID",
+    "no_new_candidate_distance_after_run3": true,
+    "no_seed_substitution": true,
+    "no_threshold_substitution": true,
+    "no_policy_substitution": true,
+    "no_failure_label_visibility": true,
+    "no_evaluator_truth_visibility": true,
+    "no_post_result_repair": true
+  },
+  "inherited_run3_admission": {
+    "deterministic_seed_shuffled_clean_lane_search": true,
+    "baseline_requires_front_present": false,
+    "staged_counterpart_requires_front_present": true,
+    "staged_front_kind_must_match": true,
+    "counterpart_removal_requires_front_present": false,
+    "changed_scope_requires_vehicle_and_pedestrian_rehearsal": true
+  },
+  "runtime": {
+    "carla_version": "0.9.16",
+    "map": "Town10HD_Opt",
+    "synchronous_mode": true,
+    "fixed_delta_seconds": 0.05,
+    "no_rendering_mode": true,
+    "render_off_screen": true
+  },
+  "frozen_source_git_blobs": {
+    "research/governance_cbra_carla_pilot_v1/PILOT_MATRIX.json": "be6f3192fe316776e7f9915f6e318f47e03e5f1b",
+    "research/governance_cbra_carla_pilot_v1/pilot_runtime.py": "c49b8f98fe135981d5dcfe3a53bb9a6bfd2522bb",
+    "research/governance_cbra_carla_pilot_v1/pilot_runner.py": "d4b92e95ebc3ff68cc4f42dfcfe12f47b827b26f"
+  },
+  "claim_boundary": {
+    "structural_pilot_only": true,
+    "confirmatory": false,
+    "superiority_claim": false,
+    "real_world_safety_claim": false
+  }
+}
