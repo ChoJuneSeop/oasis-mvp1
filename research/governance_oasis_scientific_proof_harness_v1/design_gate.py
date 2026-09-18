@@ -107,6 +107,28 @@ def _contrast_integrity(design: ExperimentDesign) -> DesignCheck:
     )
 
 
+def _execution_contract_declared(design: ExperimentDesign) -> DesignCheck:
+    ids = tuple(x for x in design.required_execution_check_ids if x.strip())
+    duplicates = sorted(k for k, n in Counter(ids).items() if n > 1)
+    ok = bool(design.execution_profile_id.strip()) and bool(ids) and not duplicates
+    return (
+        _pass(
+            "crosscut_execution_contract_declared",
+            "Scientific design names one execution profile and its required fail-closed checks.",
+        )
+        if ok
+        else _fail(
+            "crosscut_execution_contract_declared",
+            "Execution profile binding or required execution-check contract is incomplete.",
+            evidence=(
+                f"execution_profile_id={design.execution_profile_id!r}",
+                f"required_execution_check_ids={list(ids)}",
+                f"duplicates={duplicates}",
+            ),
+        )
+    )
+
+
 def _falsifiability(design: ExperimentDesign) -> DesignCheck:
     missing = []
     if not design.purpose.strip():
@@ -640,6 +662,7 @@ AXIS_CHECKS = {
 def validate_design(design: ExperimentDesign) -> ProofDesignReport:
     checks: list[DesignCheck] = [
         _claim_alignment(design),
+        _execution_contract_declared(design),
         _falsifiability(design),
         _contrast_integrity(design),
         _temporal_causality(design),
@@ -680,6 +703,7 @@ def validate_design(design: ExperimentDesign) -> ProofDesignReport:
     return ProofDesignReport(
         experiment_id=design.experiment_id,
         execution_profile_id=design.execution_profile_id,
+        required_execution_check_ids=design.required_execution_check_ids,
         checks=tuple(checks),
         targeted_axes=design.targeted_axes,
         proof_ready=not unresolved,
