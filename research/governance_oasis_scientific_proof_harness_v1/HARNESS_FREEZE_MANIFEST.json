@@ -1,0 +1,76 @@
+{
+  "freeze_id": "GOVERNANCE_OASIS_SCIENTIFIC_PROOF_HARNESS_V1_FREEZE",
+  "status": "FROZEN_AFTER_MULTI_ROUND_SELF_AUDIT",
+  "source_freeze_commit": "492abce3523be58dee7bdcb6c9bcb21aec3e6af9",
+  "source_regression_workflow_run": 35380880132,
+  "purpose": "Authorize only experiments that are scientifically capable of testing a registered Governance OASIS claim and that also pass exact execution/freeze integrity gates.",
+  "official_axes": [
+    "A1_BEHAVIOR_CHANGE_EFFECTIVENESS",
+    "A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY",
+    "A3_RESPONSIBILITY_SENSITIVITY",
+    "A4_OVERGENERALIZATION_PREVENTION",
+    "A5_CONFLICTING_EXPERIENCE_HANDLING",
+    "A6_WRONG_BEHAVIOR_RECOVERY"
+  ],
+  "official_sequence": "A1→A2→A3→A4→A5→A6",
+  "current_program_state": {
+    "supported_axes": [
+      "A1_BEHAVIOR_CHANGE_EFFECTIVENESS",
+      "A3_RESPONSIBILITY_SENSITIVITY"
+    ],
+    "next_required_axis": "A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY",
+    "proof_complete": false,
+    "integrated_confirmatory_evidence": false
+  },
+  "mandatory_layers": [
+    "scientific_claim_and_falsifiability",
+    "axis_specific_causal_contrasts",
+    "definition_causal_execution_three_lens_review",
+    "official_axis_sequence",
+    "exact_execution_profile_binding",
+    "concrete_execution_check_results",
+    "evidence_source_git_blob_anchors",
+    "claim_outcome_not_merely_completion",
+    "integrated_flow_preserving_confirmatory_after_all_axes"
+  ],
+  "claim_boundary": [
+    "A green harness CI validates the harness rules and attacks, not Governance OASIS itself.",
+    "Structural/Pilot/DESIGN_ONLY evidence cannot close an axis.",
+    "Null or DOES_NOT_SUPPORT confirmatory results remain valid evidence but do not become proof support.",
+    "Existing later-axis evidence does not permit skipping the first unsupported official axis."
+  ],
+  "frozen_source_git_blobs": {
+    "research/governance_oasis_scientific_proof_harness_v1/PROGRAM_EVIDENCE_REGISTRY.json": "189b9b1e578f8a9da6a642b17cc1d011c0d3b084",
+    "research/governance_oasis_scientific_proof_harness_v1/PROOF_PROGRAM_SPEC.md": "5bb617a2217503285eefe63956b7d5966fb6a504",
+    "research/governance_oasis_scientific_proof_harness_v1/REQUIRED_NEXT_EXPERIMENTS.json": "7b9d42a6f22d0cd59e72e9578824045b7acd3fc5",
+    "research/governance_oasis_scientific_proof_harness_v1/SELF_AUDIT.md": "a8b3ae57a61f1ee2477340d959b19cf3c5ecf4c8",
+    "research/governance_oasis_scientific_proof_harness_v1/__init__.py": "b0aaf79d8d749b06eaa63e76106149d51706cbb6",
+    "research/governance_oasis_scientific_proof_harness_v1/__main__.py": "eb53e2f31b2f703ad32ef64b8a41faa3e7d18e08",
+    "research/governance_oasis_scientific_proof_harness_v1/cli.py": "3735a03c2ef58be6bb87c9d44b02ed6bdab7e56f",
+    "research/governance_oasis_scientific_proof_harness_v1/combined_gate.py": "87d4cbca148f185f8b49ae778c323935a1b750e6",
+    "research/governance_oasis_scientific_proof_harness_v1/design_gate.py": "d71bd9c780f3d007fcf70d0db2ea917d0a74e654",
+    "research/governance_oasis_scientific_proof_harness_v1/design_io.py": "a0d80f20a28183a1c8e316c51d7ac92c16557888",
+    "research/governance_oasis_scientific_proof_harness_v1/execution_report_io.py": "ebb89a988d2c86a99bb07e7a1c51d9262548ea82",
+    "research/governance_oasis_scientific_proof_harness_v1/io.py": "9149f277a24484626d5a2575f7730484f9d1ca45",
+    "research/governance_oasis_scientific_proof_harness_v1/models.py": "f78cc38ace79464bcd022dc9bfdccf48d4e6a28c",
+    "research/governance_oasis_scientific_proof_harness_v1/portfolio_gate.py": "dacc579e513e67b91e4703217c050c4307bf3cbe",
+    "research/governance_oasis_scientific_proof_harness_v1/program_sequence.py": "1d71aecc167041baa2388a1c241fb68cbaf6f407",
+    "research/governance_oasis_scientific_proof_harness_v1/readiness_gate.py": "1ac27006b7df9b68f54a5e1cb4eab1710e41cfea",
+    "research/governance_oasis_scientific_proof_harness_v1/registry.py": "0097338a6fdfb655bd00c14e63f367fe9976ee09",
+    "research/governance_oasis_scientific_proof_harness_v1/test_combined_gate.py": "91674e7f179bd786d61af9643c057b04a2bb3f46",
+    "research/governance_oasis_scientific_proof_harness_v1/test_design_gate.py": "f2aa4ca22bb464f790666f96d3416cbd85fe4cdd",
+    "research/governance_oasis_scientific_proof_harness_v1/test_execution_report_io.py": "e2faa870293f50c77cdeb444a53d2a032d7a6cb6",
+    "research/governance_oasis_scientific_proof_harness_v1/test_plan_integrity.py": "9d2ed4ecf7e3f1208b974e914c4e209c5cba8a6e",
+    "research/governance_oasis_scientific_proof_harness_v1/test_portfolio_gate.py": "262dd84e52957527000df23e4df7aef57ba60590",
+    "research/governance_oasis_scientific_proof_harness_v1/test_program_sequence.py": "8353fe96af3ed82f2b1b4ebf51ce6b0da19ce7d1",
+    "research/governance_oasis_scientific_proof_harness_v1/test_readiness_gate.py": "e04d8aaa5e21beaa2cd9cde86cf677c06cf4f62e",
+    "research/governance_oasis_scientific_proof_harness_v1/test_registry_integrity.py": "1b4f937c3072d9772d08fb8201599c381cefd200",
+    "research/governance_oasis_scientific_proof_harness_v1/test_three_lens_gate.py": "795e14a7c9ff7674f183af87b7586c2fe613213c",
+    "research/governance_oasis_scientific_proof_harness_v1/three_lens_gate.py": "66f169ba9ef7e5c5dc34c0b0f0b69c9977797bb9",
+    ".github/workflows/governance-oasis-scientific-proof-harness-v1.yml": "9fe64b7900ebb4c037880c302c74ba0328f2d383",
+    "research/oasis_experiment_freeze_harness_v1/models.py": "ce7f481b1ebc0ec12fc6f32ab3f5ca3ffbdd9ce5",
+    "research/oasis_experiment_freeze_harness_v1/harness.py": "a15d58ddd3197f91018f668be3bc9d095e347560",
+    "research/oasis_experiment_freeze_harness_v1/HARNESS_SPEC.md": "7a29ffbadddd5bb267cbd17255e93d67e224f49c"
+  },
+  "post_freeze_rule": "Any drift in a frozen source, dependency contract, workflow, claim registry, evidence registry, or attack test invalidates this v1 freeze and requires a new reviewed freeze."
+}
