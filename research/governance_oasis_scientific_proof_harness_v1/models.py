@@ -196,3 +196,47 @@ class PortfolioReport:
             "proof_complete": self.proof_complete,
             "blockers": list(self.blockers),
         }
+
+
+@dataclass(frozen=True)
+class ProgramSequenceReport:
+    program_id: str
+    requested_experiment_id: str
+    next_required_axis: str | None
+    targeted_axes: tuple[str, ...]
+    sequence_ready: bool
+    blockers: tuple[str, ...]
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "program_id": self.program_id,
+            "requested_experiment_id": self.requested_experiment_id,
+            "next_required_axis": self.next_required_axis,
+            "targeted_axes": list(self.targeted_axes),
+            "sequence_ready": self.sequence_ready,
+            "blockers": list(self.blockers),
+        }
+
+
+@dataclass(frozen=True)
+class ThreeLensReviewReport:
+    experiment_id: str
+    definition_pass: bool
+    causal_pass: bool
+    execution_pass: bool
+    all_three_pass: bool
+    definition_blockers: tuple[str, ...]
+    causal_blockers: tuple[str, ...]
+    execution_blockers: tuple[str, ...]
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "experiment_id": self.experiment_id,
+            "definition_pass": self.definition_pass,
+            "causal_pass": self.causal_pass,
+            "execution_pass": self.execution_pass,
+            "all_three_pass": self.all_three_pass,
+            "definition_blockers": list(self.definition_blockers),
+            "causal_blockers": list(self.causal_blockers),
+            "execution_blockers": list(self.execution_blockers),
+        }
