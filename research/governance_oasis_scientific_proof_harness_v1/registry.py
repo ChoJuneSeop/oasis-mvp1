@@ -44,6 +44,7 @@ AXIS_CONTRACTS: dict[AxisId, AxisContract] = {
             "provenance_chain",
             "experience_identity_control",
             "relation_order_ablation",
+            "participation_yes_no_provenance",
             "mechanism_removal_contrast",
         ),
         prohibited_shortcuts=(
@@ -96,7 +97,9 @@ AXIS_CONTRACTS: dict[AxisId, AxisContract] = {
         ),
         mandatory_obligations=(
             "multiple_conflicting_completed_experiences",
+            "conflict_operational_definition",
             "conflict_order_preserved",
+            "participation_yes_no_provenance",
             "no_scalar_conflict_overwrite",
             "conflict_specific_causal_contrast",
         ),
@@ -115,6 +118,10 @@ AXIS_CONTRACTS: dict[AxisId, AxisContract] = {
         ),
         mandatory_obligations=(
             "wrong_change_realized",
+            "wrongness_defined_post_outcome",
+            "authoritative_outcome_observation",
+            "decision_linked_and_exogenous_attribution_controls",
+            "same_scope_and_unrelated_relation_controls",
             "post_outcome_contradictory_evidence",
             "later_recurrence",
             "recovery_endpoint",
@@ -171,6 +178,6 @@ CLAIM_DESCRIPTIONS: dict[str, str] = {
     "GO-A3-C1": "Dynamic U/I/V/T responsibility is causally bound to choice rather than merely recorded.",
     "GO-A4-C1": "Prior experience/revalidation influence remains relation-context local and does not become global exclusion.",
     "GO-A5-C1": "Conflicting Completed Experiences are preserved and resolved contextually without destructive scalar overwrite.",
-    "GO-A6-C1": "A realized wrong behavior change can be revised by later real outcome evidence and later related behavior can recover.",
+    "GO-A6-C1": "A behavior change induced by prior experience can be classified as adverse only after authoritative outcome observation, provenance-bound revalidated, and later related behavior can recover.",
     "GO-INTEGRATED-C1": "The six governance functions coexist in one flow-preserving integrated experiment without violating temporal causality or single realization.",
 }
