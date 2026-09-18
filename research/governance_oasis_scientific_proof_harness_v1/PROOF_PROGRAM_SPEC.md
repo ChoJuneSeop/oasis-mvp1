@@ -13,6 +13,14 @@
 
 둘 중 하나라도 실패하면 실험은 \`EXPERIMENT_READY\`가 아니다.
 
+각 실험은 다시 **정의 / 인과 / 실행**의 세 관점에서 모두 PASS해야 한다.
+
+- 정의 검사: claim 정합성, 반증 가능성, 사전등록, provenance, claim boundary.
+- 인과 검사: targeted mechanism, 독립 대조군/ablation, 시간방향, evaluator blind, axis-specific causal link.
+- 실행 검사: 해당 실험에 바인딩된 정확한 execution profile의 freeze/integrity gate.
+
+다른 실험의 execution report를 재사용하여 통과시키는 것은 금지한다. Scientific design은 반드시 자신의 \`execution_profile_id\`와 일치하는 실행 하네스만 사용할 수 있다.
+
 ---
 
 ## 증명 대상 6축
@@ -34,9 +42,11 @@
 
 ## 공통 인과 계약
 
-과학적 증거로 인정되는 실험은 최소한 다음 시간방향을 보존해야 한다.
+과학적 증거로 인정되는 실험은 최소한 다음 흐름·시간방향을 보존해야 한다.
 
-\`CURRENT_FLOW -> DECISION -> SINGLE_REALIZATION -> POST_OUTCOME_OBSERVATION -> CLOSURE -> COMMIT -> LATER_CURRENT_FLOW -> LATER_DECISION\`
+\`CURRENT_FLOW -> RELATION_PROCESS -> PARTICIPATION -> POSSIBILITY_SET -> RESPONSIBILITY -> DECISION -> SINGLE_REALIZATION -> POST_OUTCOME_OBSERVATION -> CLOSURE -> REVALIDATION -> COMMIT -> LATER_CURRENT_FLOW -> LATER_RELATION_PROCESS -> LATER_PARTICIPATION -> LATER_POSSIBILITY_SET -> LATER_RESPONSIBILITY -> LATER_DECISION -> LATER_SINGLE_REALIZATION\`
+
+축별 ablation은 이 흐름을 삭제하는 것이 아니라 **해당 기제만 제거·치환하고 나머지 흐름을 고정**하는 방식으로 수행한다.
 
 미래 결과, evaluator truth, expected label 또는 사후 outcome이 이전 decision에 도달하면 해당 실행은 무효다.
 
@@ -156,22 +166,27 @@ GH-3의 shifted-scope non-stickiness는 부분 증거다. unrelated-relation까�
 
 질문:
 
-> 과거 경험 때문에 잘못된 행동변화가 실제로 발생한 뒤, 후속 현실 결과가 판단을 재검증하고 이후 관련 관계에서 행동 구조가 복구되는가?
+> prior Completed Experience가 실제 행동변화를 유발한 뒤, **그 행동이 잘못되었다는 평가는 오직 현실화 이후 authoritative outcome observation에서만** 형성되고, 그 사후 근거가 provenance-bound revalidation을 거쳐 이후 관련 관계의 행동 구조를 복구시키는가?
 
 최소 시간 구조:
 
 1. prior CE가 존재;
-2. 그 CE가 참여하여 실제 잘못된 later behavior change가 현실화;
-3. 그 행동의 post-outcome observation이 Closure 이후 contradictory evidence를 형성;
-4. provenance-bound revalidation이 commit;
-5. 더 나중의 관련 current relation에서 behavior recovery를 관측.
+2. CE exposed vs hidden 대조로 CE가 초기 행동변화를 실제로 유발했는지 확인;
+3. 행동은 wrongness label 없이 현실화;
+4. authoritative post-outcome observation 생성;
+5. worker output 봉인 후 독립 evaluator가 사전등록된 adverse-outcome rule을 적용;
+6. Closure 및 attribution(DECISION_LINKED / EXOGENOUS) 보존;
+7. provenance-bound revalidation commit;
+8. 더 나중의 관련 current relation에서 behavior recovery 관측.
 
 필수 control:
 
-- revalidation hidden/record-only;
+- initial CE exposed vs hidden causal contrast;
+- revalidation exposed vs record-only contrast;
 - exogenous attribution control;
 - unrelated relation control;
-- same-epoch feedback 금지.
+- same-epoch feedback 금지;
+- decision worker에 wrongness/evaluator truth 입력 금지.
 
 GH-3은 revalidation이 later decision을 바꿀 수 있음을 보였지만, 먼저 잘못된 behavior change 자체를 현실화하고 그 후 복구하는 전체 체인은 검증하지 않았으므로 A6 완료로 계산하지 않는다.
 
@@ -201,11 +216,23 @@ GH-4는 이 통합 단계에 해당하지만 현재 \`DESIGN_NOT_STARTED\`이므
 
 ---
 
+## 증거 완료와 주장 지지는 구분한다
+
+실험이 정상 종료되었다는 사실과 거버넌스 OASIS의 주장을 지지한다는 사실은 동일하지 않다.
+
+Confirmatory 결과는 \`SUPPORTS\`, \`DOES_NOT_SUPPORT\`, \`INCONCLUSIVE\`, \`INVALID\`로 구분한다. \`COMPLETE\`만으로 축을 닫을 수 없다. 0 차이/null 결과는 유효한 과학적 결과로 보존하지만 proof support로 변환하지 않는다. 상반된 qualifying confirmatory 결과가 동시에 존재하면 해당 축은 자동으로 inconclusive 처리한다.
+
+## 공식 순차 진행
+
+공식 6축 순서는 유지한다. 기존에 후순위 축의 유효한 증거가 이미 존재하더라도 앞선 미완료 축을 건너뛰어 프로그램 단계를 진척시키지 않는다.
+
+현재 포트폴리오에서 A1과 A3의 제한된 synthetic confirmatory support는 보존하지만, 공식 다음 증명축은 첫 미완료 축인 **A2 경험 기여 추적성**이다. A2가 닫히기 전 신규 A4/A5/A6 confirmatory를 공식 진행축으로 승격할 수 없다. 후순위 기존 evidence는 provenance로 보존한다.
+
 ## 현재 증거 포트폴리오의 보수적 판정
 
-- A1 행동변화 및 효과성: confirmatory evidence 존재.
-- A2 경험 기여 추적성: 부분 증거, relation/order ablation 미완료.
-- A3 책임 민감도: confirmatory evidence 존재.
+- A1 행동변화 및 효과성: frozen synthetic scope에서 confirmatory support 존재.
+- A2 경험 기여 추적성: 부분 증거, relation/order ablation 미완료 — **공식 다음 축**.
+- A3 책임 민감도: frozen synthetic scope에서 confirmatory support 존재하나 A2를 건너뛴 프로그램 진척으로 취급하지 않음.
 - A4 과잉 일반화 방지: 부분 증거, unrelated-relation confirmatory control 미완료.
 - A5 충돌 경험 처리: 미실험.
 - A6 잘못된 행동변화 복구: 부분 기제 증거만 존재, full recovery chain 미실험.
