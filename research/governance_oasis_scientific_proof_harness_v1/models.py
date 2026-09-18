@@ -29,6 +29,14 @@ class EvidenceLevel(str, Enum):
     INTEGRATED_CONFIRMATORY = "INTEGRATED_CONFIRMATORY"
 
 
+class ClaimOutcome(str, Enum):
+    UNTESTED = "UNTESTED"
+    SUPPORTS = "SUPPORTS"
+    DOES_NOT_SUPPORT = "DOES_NOT_SUPPORT"
+    INCONCLUSIVE = "INCONCLUSIVE"
+    INVALID = "INVALID"
+
+
 @dataclass(frozen=True)
 class CausalContrast:
     contrast_id: str
@@ -81,13 +89,18 @@ class ExperimentDesign:
     selected_nonselected_obligations: bool = False
     experience_identity_control: bool = False
     relation_order_ablation: bool = False
+    participation_yes_no_provenance: bool = False
     same_current_context_across_contrast: bool = False
     behavior_endpoint: bool = False
     effectiveness_endpoint: bool = False
     conflicting_experience_count: int = 0
+    conflict_operational_definition: str = ""
     conflict_order_preserved: bool = False
     no_scalar_conflict_overwrite: bool = False
     no_global_exclusion_control: bool = False
+    attribution_controls: tuple[str, ...] = ()
+    wrongness_defined_only_post_outcome: bool = False
+    adverse_outcome_criterion: str = ""
     wrong_change_realized: bool = False
     post_outcome_contradictory_evidence: bool = False
     recovery_epochs: int = 0
@@ -146,8 +159,10 @@ class EvidenceRecord:
     source_refs: tuple[str, ...]
     claim_boundary: tuple[str, ...]
     counts_toward_axis_proof: bool
+    claim_outcome: ClaimOutcome
     verified_obligations: tuple[str, ...]
     review_method: str
+    result_rule_ref: str
     notes: tuple[str, ...] = ()
 
 
@@ -157,7 +172,12 @@ class PortfolioReport:
     axis_coverage: dict[str, tuple[str, ...]]
     missing_axes: tuple[str, ...]
     weak_axes: tuple[str, ...]
+    unsupported_axes: tuple[str, ...]
+    inconclusive_axes: tuple[str, ...]
+    supported_axes: tuple[str, ...]
+    next_required_axis: str | None
     integration_evidence_ids: tuple[str, ...]
+    integration_supported: bool
     proof_complete: bool
     blockers: tuple[str, ...]
 
@@ -167,7 +187,12 @@ class PortfolioReport:
             "axis_coverage": {k: list(v) for k, v in self.axis_coverage.items()},
             "missing_axes": list(self.missing_axes),
             "weak_axes": list(self.weak_axes),
+            "unsupported_axes": list(self.unsupported_axes),
+            "inconclusive_axes": list(self.inconclusive_axes),
+            "supported_axes": list(self.supported_axes),
+            "next_required_axis": self.next_required_axis,
             "integration_evidence_ids": list(self.integration_evidence_ids),
+            "integration_supported": self.integration_supported,
             "proof_complete": self.proof_complete,
             "blockers": list(self.blockers),
         }
