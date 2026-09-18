@@ -62,12 +62,16 @@ class ExperimentDesign:
     contrasts: tuple[CausalContrast, ...]
     independent_evaluator: bool
     evaluator_blinded_to: tuple[str, ...]
+    evaluator_truth_joined_after_worker_sealed: bool
     authoritative_outcome_observation: bool
     decision_worker_forbidden_inputs: tuple[str, ...]
     provenance_chain: tuple[str, ...]
     replication_plan: str
     claim_boundary: tuple[str, ...]
     pre_registered: bool
+    confirmatory_size_or_matrix_rule_pre_registered: bool
+    pilot_confirmatory_disjoint: bool
+    post_result_retuning_forbidden: bool
     future_leakage_guard: bool
     no_aggregate_winner_score: bool
     integrated_flow_baseline: bool
