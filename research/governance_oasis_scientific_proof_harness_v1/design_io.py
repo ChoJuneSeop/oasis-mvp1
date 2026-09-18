@@ -89,8 +89,12 @@ def load_design(path: Path) -> ExperimentDesign:
             raw.get("wrongness_defined_only_post_outcome", False)
         ),
         adverse_outcome_criterion=str(raw.get("adverse_outcome_criterion", "")),
-        wrong_change_realized=bool(raw.get("wrong_change_realized", False)),
-        post_outcome_contradictory_evidence=bool(raw.get("post_outcome_contradictory_evidence", False)),
+        adverse_change_realization_endpoint=bool(
+            raw.get("adverse_change_realization_endpoint", False)
+        ),
+        post_outcome_contradiction_endpoint=bool(
+            raw.get("post_outcome_contradiction_endpoint", False)
+        ),
         recovery_epochs=int(raw.get("recovery_epochs", 0)),
         recovery_endpoint=bool(raw.get("recovery_endpoint", False)),
         post_outcome_revalidation_control=bool(raw.get("post_outcome_revalidation_control", False)),
