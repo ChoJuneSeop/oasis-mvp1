@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import subprocess
 import unittest
 
 from .models import AxisId, EvidenceLevel
@@ -63,6 +64,37 @@ class ProofRegistryIntegrityTests(unittest.TestCase):
             with self.subTest(evidence_id=record["evidence_id"]):
                 self.assertIn(record["claim_outcome"], allowed)
                 self.assertTrue(record["result_rule_ref"].strip())
+
+    def test_every_evidence_source_is_bound_to_its_exact_git_blob(self):
+        data = json.loads(
+            (HERE / "PROGRAM_EVIDENCE_REGISTRY.json").read_text(encoding="utf-8")
+        )
+        for record in data["records"]:
+            anchors = dict(record["source_git_blobs"])
+            self.assertEqual(set(anchors), set(record["source_refs"]))
+            for source in record["source_refs"]:
+                actual = subprocess.check_output(
+                    ["git", "rev-parse", f"HEAD:{source}"],
+                    cwd=ROOT,
+                    text=True,
+                ).strip()
+                self.assertEqual(
+                    actual,
+                    anchors[source],
+                    (record["evidence_id"], source, actual, anchors[source]),
+                )
+
+    def test_result_rule_file_is_among_anchored_sources(self):
+        data = json.loads(
+            (HERE / "PROGRAM_EVIDENCE_REGISTRY.json").read_text(encoding="utf-8")
+        )
+        for record in data["records"]:
+            rule_path = record["result_rule_ref"].split("#", 1)[0]
+            self.assertIn(
+                rule_path,
+                record["source_refs"],
+                (record["evidence_id"], rule_path),
+            )
 
     def test_nonconfirmatory_levels_cannot_be_marked_as_axis_proof(self):
         data = json.loads(
