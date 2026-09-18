@@ -120,6 +120,13 @@ def make_design(axis: AxisId) -> ExperimentDesign:
     return ExperimentDesign(
         experiment_id=f"TEST_{axis.value}",
         execution_profile_id=f"EXEC_{axis.value}",
+        required_execution_check_ids=(
+            "world_isolation",
+            "cross_arm_identity",
+            "future_leakage",
+            "single_realization",
+            "source_freeze",
+        ),
         purpose="Falsifiable Governance OASIS mechanism test",
         targeted_axes=(axis,),
         claim_ids=(CLAIM_BY_AXIS[axis],),
@@ -210,6 +217,17 @@ class ScientificProofDesignGateTests(unittest.TestCase):
         self.assertEqual(
             by_id["crosscut_scientific_evidence_level"].status,
             DesignStatus.BLOCKED,
+        )
+
+    def test_scientific_design_must_declare_execution_checks(self):
+        design = replace(
+            make_design(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS),
+            required_execution_check_ids=(),
+        )
+        report = validate_design(design)
+        self.assertIn(
+            "crosscut_execution_contract_declared",
+            report.unresolved_check_ids,
         )
 
     def test_production_history_semantics_cannot_be_weakened(self):
