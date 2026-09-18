@@ -47,6 +47,15 @@ def three_lens_review(
     )
 
     execution_blockers = list(execution_report.unresolved_check_ids)
+    declared_execution_checks = set(execution_report.required_check_ids)
+    missing_scientific_execution_checks = sorted(
+        set(proof_report.required_execution_check_ids) - declared_execution_checks
+    )
+    if missing_scientific_execution_checks:
+        execution_blockers.append(
+            "execution_profile_missing_required_checks:"
+            + ",".join(missing_scientific_execution_checks)
+        )
     if proof_report.execution_profile_id != execution_report.profile_id:
         execution_blockers.append(
             "execution_profile_mismatch:"
