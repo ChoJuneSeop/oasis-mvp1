@@ -175,7 +175,11 @@ def _evaluator_independence(design: ExperimentDesign) -> DesignCheck:
             any("future" in x for x in blind)
             and any("expected" in x or "label" in x or "truth" in x for x in blind)
         )
-        ok = design.independent_evaluator and required_blindness
+        ok = (
+            design.independent_evaluator
+            and required_blindness
+            and design.evaluator_truth_joined_after_worker_sealed
+        )
     else:
         ok = design.independent_evaluator or design.structural_only
     return (
@@ -190,6 +194,7 @@ def _evaluator_independence(design: ExperimentDesign) -> DesignCheck:
             evidence=(
                 f"independent_evaluator={design.independent_evaluator}",
                 f"evaluator_blinded_to={list(design.evaluator_blinded_to)}",
+                f"evaluator_truth_joined_after_worker_sealed={design.evaluator_truth_joined_after_worker_sealed}",
             ),
         )
     )
@@ -224,8 +229,21 @@ def _outcome_evidence_boundary(design: ExperimentDesign) -> DesignCheck:
 
 
 def _preregistration_and_boundary(design: ExperimentDesign) -> DesignCheck:
+    confirmatory = design.evidence_level in {
+        EvidenceLevel.CONFIRMATORY,
+        EvidenceLevel.INTEGRATED_CONFIRMATORY,
+    }
+    freeze_plan_ok = (
+        not confirmatory
+        or (
+            design.confirmatory_size_or_matrix_rule_pre_registered
+            and design.pilot_confirmatory_disjoint
+            and design.post_result_retuning_forbidden
+        )
+    )
     ok = (
         design.pre_registered
+        and freeze_plan_ok
         and bool(design.replication_plan.strip())
         and bool(design.claim_boundary)
         and design.no_aggregate_winner_score
@@ -242,6 +260,9 @@ def _preregistration_and_boundary(design: ExperimentDesign) -> DesignCheck:
             "Pre-registration or interpretation boundary is incomplete.",
             evidence=(
                 f"pre_registered={design.pre_registered}",
+                f"confirmatory_size_or_matrix_rule_pre_registered={design.confirmatory_size_or_matrix_rule_pre_registered}",
+                f"pilot_confirmatory_disjoint={design.pilot_confirmatory_disjoint}",
+                f"post_result_retuning_forbidden={design.post_result_retuning_forbidden}",
                 f"replication_plan_present={bool(design.replication_plan.strip())}",
                 f"claim_boundary_present={bool(design.claim_boundary)}",
                 f"no_aggregate_winner_score={design.no_aggregate_winner_score}",
