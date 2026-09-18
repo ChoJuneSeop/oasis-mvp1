@@ -1,6 +1,6 @@
 # Governance OASIS Scientific Proof Harness v1 — Self Audit
 
-Status: **REDESIGN COMPLETE / FINAL REGRESSION REQUIRED**
+Status: **REDESIGN COMPLETE / MULTI-ROUND ATTACK REVIEW PASSED / FREEZE CANDIDATE**
 
 This document records the error checks applied to the harness itself. The audit target is not CARLA runtime performance. It is whether the harness can prevent an experiment that is irrelevant, causally ambiguous, overclaimed, or weakly executed from being treated as Governance OASIS evidence.
 
@@ -128,6 +128,16 @@ Experiment-specific profiles may add more checks but may not remove these.
 
 **Correction:** the canonical readiness gate now combines scientific design, official axis sequence, definition/causal/execution three-lens review, exact profile identity and execution-check coverage. The canonical CLI mode is --ready-check.
 
+### E-05 — serialized execution reports could self-assert readiness
+**Found:** a JSON report could declare `freeze_ready=true` and list required check IDs without carrying the concrete PASS results that produced that declaration.
+
+**Correction:** execution-report loading now reconstructs concrete check results, recomputes missing/duplicate/unresolved status, and refuses readiness unless every required check has exactly one concrete PASS result. The three-lens gate independently verifies the same condition.
+
+### E-06 — evidence documents could drift after retrospective qualification
+**Found:** source paths and review notes alone did not prevent later edits to historical specifications/results from silently changing what the evidence registry referred to.
+
+**Correction:** every evidence record now carries exact Git blob identities for every source reference. CI verifies `HEAD:path` against those immutable blob anchors and requires the result-rule file to be among the anchored sources.
+
 ## Portfolio audit after redesign
 
 The conservative current state is intentionally not “proof complete”:
@@ -145,3 +155,17 @@ Official next axis: **A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY**.
 ## Interpretation boundary
 
 A green harness CI proves only that the harness rules and attack tests are internally consistent. It does not prove Governance OASIS itself. Governance OASIS scientific support can advance only through experiments that pass this harness and then produce qualifying confirmatory results under their frozen claim boundaries.
+
+
+## Final harness-level error-check result
+
+The redesign has now been attacked from four directions:
+
+1. **definition/purpose** — wrong claim, missing claim, weak pre-registration, structural-only evidence, official-axis sequence bypass;
+2. **causal** — merged ablations, relation/order conflation, responsibility logging without binding, scope spillover shortcuts, undefined conflict, outcome-label leakage, A6 result presupposition, missing initial-cause/recovery links, reverse/same-epoch causality;
+3. **execution** — wrong profile reuse, weak execution contracts, declared check IDs without concrete results, duplicate/missing/non-PASS execution checks, source/freeze integrity;
+4. **evidence/portfolio** — null-result overclaim, conflicting confirmatory evidence, design-only overcounting, integrated-evidence substitution, result-rule provenance, historical source drift.
+
+Current regression result on the branch is green after these attacks.
+
+This does **not** mean the harness is mathematically incapable of future defects. It means there are currently no known unresolved blocking defects in the implemented attack suite. Any newly discovered defect demotes this harness from freeze-candidate status and must be repaired before an experiment is authorized.
