@@ -1,0 +1,33 @@
+{
+  "schema": "governance-oasis-a4-confirmatory-plan-v1",
+  "experiment_id": "GO_A4_SCOPE_LOCALITY_V1",
+  "axis": "A4_OVERGENERALIZATION_PREVENTION",
+  "claim": "GO-A4-C1",
+  "arms": [
+    "SCOPE_LOCAL_PRODUCTION",
+    "SCOPE_GUARD_ABLATED",
+    "RECORD_ONLY"
+  ],
+  "contexts": [
+    "SAME_SCOPE",
+    "CHANGED_SCOPE",
+    "UNRELATED_RELATION"
+  ],
+  "families": [
+    "F1",
+    "F2",
+    "F3"
+  ],
+  "decision_realization_units": 27,
+  "support_rule": "Production must preserve same-scope influence, show zero inappropriate exclusion in all changed/unrelated cases, and differ from scope-guard ablation while every unrelated case remains base-eligible.",
+  "invalidation_rules": [
+    "future/evaluator leakage",
+    "archive CE deletion",
+    "selected != realized",
+    "more than one realization",
+    "missing participation provenance",
+    "unrelated base eligibility absent"
+  ],
+  "no_aggregate_winner_score": true,
+  "post_result_retuning_forbidden": true
+}
