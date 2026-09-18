@@ -35,7 +35,11 @@
       ],
       "review_method": "retrospective source-bounded review against Governance OASIS Scientific Proof Harness v1 axis obligations",
       "claim_outcome": "SUPPORTS",
-      "result_rule_ref": "research/governance_harness_gh1l/design/FINAL_SPEC.md#Frozen execution contract"
+      "result_rule_ref": "research/governance_harness_gh1l/design/FINAL_SPEC.md#Frozen execution contract",
+      "source_git_blobs": {
+        "research/governance_harness_gh1l/design/FINAL_SPEC.md": "766c76706ddaa3dfcea822dbef467699d383aeb9",
+        "research/governance_harness_gh1l/results/GH1L_CONFIRMATORY_RESULT_2026-09-16.md": "754087e5ece0c56acad299c68b7ee5ea579e451b"
+      }
     },
     {
       "evidence_id": "E-GH1L-A2-PARTIAL",
@@ -66,7 +70,11 @@
       ],
       "review_method": "claim-boundary review; not eligible for axis closure",
       "claim_outcome": "SUPPORTS",
-      "result_rule_ref": "research/governance_harness_gh1l/design/FINAL_SPEC.md#Frozen invariants"
+      "result_rule_ref": "research/governance_harness_gh1l/design/FINAL_SPEC.md#Frozen invariants",
+      "source_git_blobs": {
+        "research/governance_harness_gh1l/design/FINAL_SPEC.md": "766c76706ddaa3dfcea822dbef467699d383aeb9",
+        "research/governance_harness_gh1l/results/GH1L_CONFIRMATORY_RESULT_2026-09-16.md": "754087e5ece0c56acad299c68b7ee5ea579e451b"
+      }
     },
     {
       "evidence_id": "E-GH2-A3",
@@ -99,7 +107,11 @@
       ],
       "review_method": "retrospective source-bounded review against Governance OASIS Scientific Proof Harness v1 axis obligations",
       "claim_outcome": "SUPPORTS",
-      "result_rule_ref": "research/governance_harness_gh2/README.md#v1.1 confirmatory"
+      "result_rule_ref": "research/governance_harness_gh2/README.md#v1.1 confirmatory",
+      "source_git_blobs": {
+        "research/governance_harness_gh2/README.md": "b031326a56daa4c00b5260e6ee68217e828d8b6f",
+        "research/governance_harness_gh2/results/GH2_V1_1_CONFIRMATORY_INTERPRETATION.md": "a7e54c3c72545dbe7ac6600d2c57295e41e77580"
+      }
     },
     {
       "evidence_id": "E-GH3-A4-PARTIAL",
@@ -129,7 +141,11 @@
       ],
       "review_method": "claim-boundary review; not eligible for axis closure",
       "claim_outcome": "SUPPORTS",
-      "result_rule_ref": "research/governance_harness_gh3/design/FINAL_SPEC.md#Stability controls"
+      "result_rule_ref": "research/governance_harness_gh3/design/FINAL_SPEC.md#Stability controls",
+      "source_git_blobs": {
+        "research/governance_harness_gh3/design/FINAL_SPEC.md": "9b0a653fb8149c5e5831b0f80cd3718629233992",
+        "research/governance_harness_gh3/results/GH3_CONFIRMATORY_RESULT_2026-09-16.md": "38dc3f2bc4ca964d99cae68aa9a80d0064623fdf"
+      }
     },
     {
       "evidence_id": "E-GH3-A6-PARTIAL",
@@ -161,7 +177,11 @@
       ],
       "review_method": "claim-boundary review; not eligible for axis closure",
       "claim_outcome": "SUPPORTS",
-      "result_rule_ref": "research/governance_harness_gh3/design/FINAL_SPEC.md#Link B primary"
+      "result_rule_ref": "research/governance_harness_gh3/design/FINAL_SPEC.md#Link B primary",
+      "source_git_blobs": {
+        "research/governance_harness_gh3/design/FINAL_SPEC.md": "9b0a653fb8149c5e5831b0f80cd3718629233992",
+        "research/governance_harness_gh3/results/GH3_CONFIRMATORY_RESULT_2026-09-16.md": "38dc3f2bc4ca964d99cae68aa9a80d0064623fdf"
+      }
     },
     {
       "evidence_id": "E-CBRA-FAILURE-A4-A6-DESIGN",
@@ -187,7 +207,10 @@
       "verified_obligations": [],
       "review_method": "claim-boundary review; not eligible for axis closure",
       "claim_outcome": "UNTESTED",
-      "result_rule_ref": "research/governance_cbra_failure_exp_v1/FINAL_SPEC.md"
+      "result_rule_ref": "research/governance_cbra_failure_exp_v1/FINAL_SPEC.md",
+      "source_git_blobs": {
+        "research/governance_cbra_failure_exp_v1/FINAL_SPEC.md": "b0a942e762404b318f672e9fbca9e7bf79de1a28"
+      }
     },
     {
       "evidence_id": "E-RUN5-CARLA-STRUCTURAL",
@@ -210,7 +233,10 @@
       "verified_obligations": [],
       "review_method": "claim-boundary review; not eligible for axis closure",
       "claim_outcome": "UNTESTED",
-      "result_rule_ref": "research/governance_cbra_carla_pilot_v1/RUN5_FREEZE_SPEC.md"
+      "result_rule_ref": "research/governance_cbra_carla_pilot_v1/RUN5_FREEZE_SPEC.md",
+      "source_git_blobs": {
+        "research/governance_cbra_carla_pilot_v1/RUN5_FREEZE_SPEC.md": "ab7563e3cd4e05fd770c3d64cb0fc7ae93d09187"
+      }
     },
     {
       "evidence_id": "E-GH4-INTEGRATION-DESIGN",
@@ -239,7 +265,10 @@
       "verified_obligations": [],
       "review_method": "claim-boundary review; not eligible for axis closure",
       "claim_outcome": "UNTESTED",
-      "result_rule_ref": "research/governance_harness_gh4/TRANSITION_FROM_GH3.md"
+      "result_rule_ref": "research/governance_harness_gh4/TRANSITION_FROM_GH3.md",
+      "source_git_blobs": {
+        "research/governance_harness_gh4/TRANSITION_FROM_GH3.md": "f860ab6b1b2493f6308ec6769a04af97629912a6"
+      }
     }
   ]
 }
