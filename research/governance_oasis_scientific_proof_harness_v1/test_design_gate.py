@@ -134,6 +134,10 @@ def make_design(axis: AxisId) -> ExperimentDesign:
         future_leakage_guard=True,
         no_aggregate_winner_score=True,
         integrated_flow_baseline=True,
+        production_history_append_only=True,
+        production_no_permanent_memory_weight=True,
+        production_no_destructive_no=True,
+        ablation_mutations_declared=True,
         relation_context_controls=("SAME_SCOPE", "CHANGED_SCOPE", "UNRELATED_RELATION"),
         responsibility_controls=("RECORD_ONLY", "PERMUTED"),
         responsibility_non_scalar=True,
@@ -187,6 +191,22 @@ class ScientificProofDesignGateTests(unittest.TestCase):
             by_id["crosscut_scientific_evidence_level"].status,
             DesignStatus.BLOCKED,
         )
+
+    def test_production_history_semantics_cannot_be_weakened(self):
+        design = replace(
+            make_design(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS),
+            production_no_destructive_no=False,
+        )
+        report = validate_design(design)
+        self.assertIn("crosscut_history_integrity", report.unresolved_check_ids)
+
+    def test_comparator_mutations_must_be_declared(self):
+        design = replace(
+            make_design(AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY),
+            ablation_mutations_declared=False,
+        )
+        report = validate_design(design)
+        self.assertIn("crosscut_history_integrity", report.unresolved_check_ids)
 
     def test_a1_requires_effectiveness_not_only_behavior_trace(self):
         design = replace(
