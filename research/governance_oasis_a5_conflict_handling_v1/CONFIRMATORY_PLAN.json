@@ -1,0 +1,42 @@
+{
+  "schema": "governance-oasis-a5-confirmatory-plan-v1",
+  "experiment_id": "GO_A5_CONFLICT_HANDLING_V1",
+  "axis": "A5_CONFLICTING_EXPERIENCE_HANDLING",
+  "claim": "GO-A5-C1",
+  "operational_conflict_definition": "Two preserved Completed Experiences conflict when, under the same frozen current relation and possibility set, their provenance-linked records support different feasible action identities.",
+  "arms": [
+    "PROVENANCE_PRESERVING_CONTEXTUAL",
+    "ORDER_ERASED",
+    "RELATION_PROVENANCE_PERMUTED",
+    "LATEST_ONLY"
+  ],
+  "pilot": {
+    "families": [
+      "P"
+    ],
+    "cases_per_arm": 4,
+    "scientific_metrics": false
+  },
+  "confirmatory": {
+    "families": [
+      "F1",
+      "F2",
+      "F3"
+    ],
+    "cases_per_arm": 12,
+    "arms": 4,
+    "decision_realization_units": 48
+  },
+  "support_rule": "Production must preserve both CEs, produce exactly one contextual YES and one provenance-preserved NO, correctly realize the context-linked action in all cases, and the registered order/relation/latest-only controls must diverge on their prespecified relevant subsets.",
+  "invalidation_rules": [
+    "future/evaluator truth reaches worker",
+    "CE deletion or overwrite",
+    "missing NO provenance",
+    "scalar conflict score",
+    "selected != realized",
+    "more than one realization",
+    "undeclared mutation of stored order/relation provenance"
+  ],
+  "no_aggregate_winner_score": true,
+  "post_result_retuning_forbidden": true
+}
