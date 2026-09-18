@@ -367,14 +367,24 @@ class PilotScene:
     def __init__(self, client: Any, *, seed: int):
         self.client = client
         self.world = client.get_world()
-        identity = validate_runtime_identity(runtime_identity(self.world, client))
-        if str(identity.get("carla_client_version")) != EXPECTED_CARLA_VERSION:
-            raise CoreV11InvariantError("unexpected CARLA client version")
-        if str(identity.get("carla_server_version")) != EXPECTED_CARLA_VERSION:
-            raise CoreV11InvariantError("unexpected CARLA server version")
-        if identity.get("no_rendering_mode") is not True:
+
+        # Configure the frozen CARLA execution mode before validating it.
+        # This is pre-experimental host setup: no decision, actuation, Closure,
+        # evaluator result, or Pilot evidence exists yet.
+        client_version = str(client.get_client_version())
+        server_version = str(client.get_server_version())
+        if client_version != EXPECTED_CARLA_VERSION or server_version != EXPECTED_CARLA_VERSION:
             raise CoreV11InvariantError(
-                "Pilot requires no_rendering_mode=True before unit execution"
+                f"CARLA version must be {EXPECTED_CARLA_VERSION}, "
+                f"got client={client_version!r}, server={server_version!r}"
+            )
+        if client_version != server_version:
+            raise CoreV11InvariantError("CARLA client/server versions differ")
+
+        current_map = str(self.world.get_map().name).rsplit("/", 1)[-1]
+        if current_map != EXPECTED_MAP:
+            raise CoreV11InvariantError(
+                f"Pilot will not reload the CARLA world: expected {EXPECTED_MAP}, got {current_map}"
             )
 
         settings = self.world.get_settings()
@@ -382,6 +392,16 @@ class PilotScene:
         settings.fixed_delta_seconds = FIXED_DELTA_SECONDS
         settings.no_rendering_mode = True
         self.world.apply_settings(settings)
+
+        identity = validate_runtime_identity(runtime_identity(self.world, client))
+        if identity.get("synchronous_mode") is not True:
+            raise CoreV11InvariantError("Pilot failed to establish synchronous_mode=True")
+        if float(identity.get("fixed_delta_seconds")) != FIXED_DELTA_SECONDS:
+            raise CoreV11InvariantError("Pilot failed to establish fixed_delta_seconds=0.05")
+        if identity.get("no_rendering_mode") is not True:
+            raise CoreV11InvariantError(
+                "Pilot requires no_rendering_mode=True before unit execution"
+            )
 
         try:
             import carla  # type: ignore
