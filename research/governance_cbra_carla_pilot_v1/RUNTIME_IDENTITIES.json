@@ -1,5 +1,5 @@
 {
-  "status": "BLOCKED_PENDING_1_RUNTIME_IDENTITY",
+  "status": "RUNTIME_IDENTITIES_FROZEN",
   "pilot_spec": "GOVERNANCE_CBRA_CARLA_PILOT_V1_0_FINAL",
   "required": {
     "carla_host_environment_actuator": {
@@ -18,10 +18,10 @@
       "sha256": "9d10a5af565405c9d05463879fa2616330e9960e01e3320ce56b30f0b6331e6d"
     },
     "independent_evaluator": {
-      "path": null,
-      "commit_sha": null,
-      "sha256": null
+      "path": "research/g3_realtime_split_v1/worker.py",
+      "commit_sha": "eb2a85d4889db19872d7d207280f82ac429659f5",
+      "sha256": "ba1e5c2f265e187fee7723a6c55896dea1a399104a97c820af7fe857662362af"
     }
   },
-  "execution_permitted": false
+  "execution_permitted": true
 }
