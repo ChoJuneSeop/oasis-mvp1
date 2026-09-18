@@ -14,9 +14,9 @@ from .test_design_gate import make_design
 from .three_lens_gate import three_lens_review
 
 
-def execution_report(ready: bool) -> GateReport:
+def execution_report(ready: bool, profile_id: str) -> GateReport:
     return GateReport(
-        profile_id="TEST_EXEC",
+        profile_id=profile_id,
         state=GateState.FREEZE_READY if ready else GateState.DRAFT,
         checks=(),
         required_check_ids=(),
@@ -34,7 +34,7 @@ class ThreeLensReviewTests(unittest.TestCase):
         )
         review = three_lens_review(
             proof_report=proof,
-            execution_report=execution_report(True),
+            execution_report=execution_report(True, proof.execution_profile_id),
         )
         self.assertTrue(review.definition_pass)
         self.assertTrue(review.causal_pass)
@@ -47,7 +47,7 @@ class ThreeLensReviewTests(unittest.TestCase):
         )
         review = three_lens_review(
             proof_report=proof,
-            execution_report=execution_report(False),
+            execution_report=execution_report(False, proof.execution_profile_id),
         )
         self.assertFalse(review.execution_pass)
         self.assertFalse(review.all_three_pass)
@@ -60,10 +60,24 @@ class ThreeLensReviewTests(unittest.TestCase):
         proof = validate_design(design)
         review = three_lens_review(
             proof_report=proof,
-            execution_report=execution_report(True),
+            execution_report=execution_report(True, proof.execution_profile_id),
         )
         self.assertFalse(review.causal_pass)
         self.assertFalse(review.all_three_pass)
+
+    def test_execution_profile_mismatch_blocks_full_review(self):
+        proof = validate_design(
+            make_design(AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY)
+        )
+        review = three_lens_review(
+            proof_report=proof,
+            execution_report=execution_report(True, "WRONG_PROFILE"),
+        )
+        self.assertFalse(review.execution_pass)
+        self.assertFalse(review.all_three_pass)
+        self.assertTrue(
+            any("execution_profile_mismatch" in x for x in review.execution_blockers)
+        )
 
     def test_definition_failure_blocks_full_review(self):
         design = replace(
@@ -73,7 +87,7 @@ class ThreeLensReviewTests(unittest.TestCase):
         proof = validate_design(design)
         review = three_lens_review(
             proof_report=proof,
-            execution_report=execution_report(True),
+            execution_report=execution_report(True, proof.execution_profile_id),
         )
         self.assertFalse(review.definition_pass)
         self.assertFalse(review.all_three_pass)
