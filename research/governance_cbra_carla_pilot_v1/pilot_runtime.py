@@ -1,0 +1,677 @@
+from __future__ import annotations
+
+from copy import deepcopy
+from dataclasses import asdict
+from pathlib import Path
+import random
+from typing import Any, Iterable
+
+from research.carla_v22_harness_v11.canonical_harness import (
+    CanonicalHarnessV11,
+    CoreEpochView,
+    PresentObservation,
+)
+from research.carla_v22_harness_v11.carla_runtime_adapter_v1 import (
+    CARLAPresentFlowPort,
+    ControlledOracleObservationGateway,
+    runtime_identity,
+    validate_runtime_identity,
+)
+from research.governance_cbra_v1.models import (
+    DecisionProvenanceSnapshot,
+    ParticipationProvenance,
+    ResponsibilityProvenance,
+)
+from research.governance_harness_v01.harness import (
+    DynamicResponsibilityAxes,
+    ExperienceReengagement,
+    JudgmentRevalidation,
+    ResponsibilityJudgment,
+    RevalidationState,
+)
+from research.governance_harness_v01.harness_v04 import (
+    AtomicFlowSnapshot,
+    CompletedExperience,
+    CurrentFlowGapRule,
+    GovernanceFeedbackV04,
+    GovernanceHarnessV04,
+    HistoryAccessPort,
+    ParticipatingExperienceView,
+)
+from research.oasis_core_v11.carla_domain_bundle_v1 import build_domain_bundle
+from research.oasis_core_v11.current_relational_core import CoreV11InvariantError
+
+
+EXPECTED_CARLA_VERSION = "0.9.16"
+EXPECTED_MAP = "Town10HD_Opt"
+FIXED_DELTA_SECONDS = 0.05
+
+
+def scope_signature(observation: PresentObservation) -> tuple[bool, str, int]:
+    return (
+        bool(observation.front_present),
+        str(observation.front_kind),
+        int(observation.local_density),
+    )
+
+
+class PilotHistoryAccessPort(HistoryAccessPort):
+    """Governance archive that materializes real closed CARLA relation records.
+
+    GovernanceHarnessV04 intentionally stores a minimal CompletedExperience payload.
+    The Pilot enriches that payload only with relation records extracted from the
+    authoritative closed HistoryEntry via the frozen domain admission bridge. This
+    preserves real later re-participation without giving the Core archive ownership.
+    """
+
+    def __init__(self, experiences: Iterable[CompletedExperience] = ()):
+        super().__init__(experiences)
+        self._admission = build_domain_bundle().history_admission
+        self._cbra_scope: dict[str, tuple[bool, str, int]] = {}
+        self._cbra_feedback_ids: set[str] = set()
+
+    def atomic_commit(self, history, completed, feedback, sidecar, prepared_sidecar):
+        records = self._admission.admit(history)
+        enriched = CompletedExperience(
+            experience_id=completed.experience_id,
+            relation_id=completed.relation_id,
+            provenance_ref=completed.provenance_ref,
+            completed_tau=completed.completed_tau,
+            content={
+                "history_entry_id": history.entry_id,
+                "selected": history.selected_possibility_id,
+                "relation_records": records,
+            },
+            byte_size=len(repr((history, records)).encode("utf-8")),
+        )
+        return super().atomic_commit(
+            history, enriched, feedback, sidecar, prepared_sidecar
+        )
+
+    def publish_cbra_feedback(
+        self,
+        feedback: GovernanceFeedbackV04,
+        *,
+        original_scope_signature: tuple[bool, str, int],
+    ) -> None:
+        if feedback.prior_entry_id in self._cbra_feedback_ids:
+            raise CoreV11InvariantError("duplicate CBRA feedback publication")
+        self._feedback.append(deepcopy(feedback))
+        self._cbra_feedback_ids.add(feedback.prior_entry_id)
+        self._cbra_scope[feedback.prior_entry_id] = tuple(original_scope_signature)
+
+    def is_cbra_feedback(self, feedback_id: str) -> bool:
+        return feedback_id in self._cbra_feedback_ids
+
+    def cbra_scope(self, feedback_id: str):
+        return self._cbra_scope.get(feedback_id)
+
+
+class PilotParticipation:
+    """Current-context participation with optional provenance-bound CBRA feedback.
+
+    No failure-class/scenario label is accepted by this operator. Base participation
+    is derived only from the approved present observation: a prior experience may
+    participate when a front relation is present and is not currently opening away.
+    CBRA may reverse the prior judgment only for the same relation scope.
+    """
+
+    def __init__(self, history_port: PilotHistoryAccessPort):
+        self.history_port = history_port
+
+    def assess(self, evidence, _gap, candidates, feedback):
+        current = evidence.samples[-1].observation
+        current_scope = scope_signature(current)
+        latest_cbra = [
+            item
+            for item in feedback
+            if self.history_port.is_cbra_feedback(item.prior_entry_id)
+            and self.history_port.cbra_scope(item.prior_entry_id) == current_scope
+        ]
+        state_by_experience: dict[str, RevalidationState] = {}
+        for item in latest_cbra:
+            for experience_id, state in item.experience_states:
+                state_by_experience[experience_id] = state
+
+        result = []
+        for item in candidates:
+            participate = bool(
+                current.front_present and float(current.front_closing_mps) >= 0.0
+            )
+            state = state_by_experience.get(item.experience_id)
+            if state is RevalidationState.REVISED:
+                participate = not participate
+            rationale = (
+                "current front relation is present and non-opening"
+                if participate
+                else "current relation does not support participation"
+            )
+            if state is RevalidationState.REVISED:
+                rationale += "; same-scope CBRA provenance revised the prior judgment"
+            result.append(
+                ExperienceReengagement(
+                    item.experience_id,
+                    participate,
+                    rationale,
+                    evidence_refs=(f"current-epoch:{current.epoch}",),
+                    provenance_ref=item.provenance_ref,
+                )
+            )
+        return tuple(result)
+
+
+class PilotResponsibility:
+    """Dynamic U/I/V/T responsibility over the actual current candidate set."""
+
+    def __init__(self, history_port: PilotHistoryAccessPort):
+        self.history_port = history_port
+
+    def _cbra_responsibility_revised(self, context) -> bool:
+        current = context.flow.samples[-1].observation
+        sig = scope_signature(current)
+        for item in reversed(context.feedback):
+            if (
+                self.history_port.is_cbra_feedback(item.prior_entry_id)
+                and self.history_port.cbra_scope(item.prior_entry_id) == sig
+                and item.responsibility_state is RevalidationState.REVISED
+            ):
+                return True
+        return False
+
+    def assess(self, context):
+        ids = tuple(context.candidate_ids)
+        if not ids:
+            raise CoreV11InvariantError("responsibility requires current candidates")
+        current = context.flow.samples[-1].observation
+
+        if current.front_present and "yield-space" in ids:
+            selected = "yield-space"
+        elif "continue-flow" in ids:
+            selected = "continue-flow"
+        else:
+            selected = ids[0]
+
+        if self._cbra_responsibility_revised(context) and len(ids) > 1:
+            selected = next(item for item in ids if item != selected)
+
+        nonselected = tuple(item for item in ids if item != selected)
+        axes = DynamicResponsibilityAxes(
+            uncertainty=(f"front-present:{bool(current.front_present)}",),
+            impact=(f"front-kind:{current.front_kind}",),
+            vulnerability=(f"local-density:{int(current.local_density)}",),
+            temporality=(f"epoch:{int(current.epoch)}",),
+        )
+        return ResponsibilityJudgment(
+            candidate_ids=ids,
+            selected_candidate_id=selected,
+            nonselected_candidate_ids=nonselected,
+            axes=axes,
+            selected_obligations=("selected-current-evidence-bound",),
+            nonselected_obligations=(
+                ("nonselected-rationale-preserved",) if nonselected else ()
+            ),
+            rationale="dynamic current U/I/V/T responsibility binding",
+        )
+
+
+class PilotClosureRevalidation:
+    """Immediate post-Closure governance revalidation.
+
+    This is distinct from CBRA. It records that the just-closed provenance chain is
+    internally bound; later contradictory/supporting evidence remains CBRA's job.
+    """
+
+    def revalidate(self, _context, audit, _decision, _outcome):
+        return JudgmentRevalidation(
+            RevalidationState.CONFIRMED,
+            tuple(
+                (item.experience_id, RevalidationState.CONFIRMED)
+                for item in audit
+            ),
+            RevalidationState.CONFIRMED,
+            RevalidationState.CONFIRMED,
+            rationale="authoritative Closure completed; later evidence remains open",
+        )
+
+
+def build_governance_harness():
+    bundle = build_domain_bundle()
+    port = PilotHistoryAccessPort()
+    harness = GovernanceHarnessV04(
+        core=bundle.core,
+        history_port=port,
+        gap_rule=CurrentFlowGapRule(speed_drop_threshold=0.5),
+        reengagement_operator=PilotParticipation(port),
+        responsibility_operator=PilotResponsibility(port),
+        revalidation_operator=PilotClosureRevalidation(),
+    )
+    if harness.admission.state.value != "ADMITTED":
+        raise CoreV11InvariantError(
+            f"Governance Core admission blocked: {harness.admission.reasons}"
+        )
+    return harness, port
+
+
+class BaselineCoreBoundary:
+    """Explicit General Harness comparator: canonical harness + relation memory.
+
+    It has no Governance gap gate, NO provenance, U/I/V/T governance feedback, or
+    CBRA. It may receive already-completed relation records when the relation id
+    matches, which makes it a concrete comparator rather than a no-memory strawman.
+    """
+
+    def __init__(self, core, view: ParticipatingExperienceView):
+        self.core = core
+        self.view = view
+
+    def open_epoch(self, observation, tau):
+        return self.core.open_epoch(observation, tau, self.view)
+
+    def ablate_relation(self, observation, relation, tau):
+        return self.core.ablate_relation(observation, relation, tau)
+
+    def ablate_relation_group(self, observation, relations, tau):
+        return self.core.ablate_relation_group(observation, relations, tau)
+
+    def realize(self, observation, tau):
+        return self.core.realize(observation, tau)
+
+
+class PilotCARLAHost:
+    """Atomic Governance host boundary over the frozen CARLA gateway."""
+
+    def __init__(self, world: Any, ego_actor: Any, relation_id: str):
+        self.world = world
+        self.ego_actor = ego_actor
+        self.gateway = ControlledOracleObservationGateway(world, ego_actor)
+        self.flow = CARLAPresentFlowPort(world, ego_actor, self.gateway)
+        self.relation_id = relation_id
+        self.version = int(world.get_snapshot().frame) * 10
+        self.last_realization_ref: str | None = None
+
+    def set_relation_id(self, relation_id: str) -> None:
+        if not relation_id:
+            raise ValueError("relation_id is required")
+        self.relation_id = relation_id
+
+    def mark_host_mutation(self) -> None:
+        self.version += 1
+
+    def tick(self) -> int:
+        returned = int(self.world.tick())
+        self.version += 1
+        return returned
+
+    def atomic_current_snapshot(self) -> AtomicFlowSnapshot:
+        obs = PresentObservation.from_mapping(self.flow.present_observation())
+        return AtomicFlowSnapshot(
+            tau=float(self.flow.current_tau()),
+            observation=obs,
+            current_reality=dict(self.flow.current_reality()),
+            version=int(self.version),
+            fingerprint=self.flow.flow_fingerprint(),
+            relation_id=self.relation_id,
+            realization_ref=self.last_realization_ref,
+        )
+
+    def current_flow_version(self) -> int:
+        return int(self.version)
+
+    def current_tau(self) -> float:
+        return float(self.flow.current_tau())
+
+    def present_observation(self):
+        return self.flow.present_observation()
+
+    def current_reality(self):
+        return self.flow.current_reality()
+
+    def flow_fingerprint(self) -> str:
+        return self.flow.flow_fingerprint()
+
+    def apply_single_actuation(self, actuation) -> str:
+        ref = self.flow.apply_single_actuation(actuation)
+        self.last_realization_ref = str(ref)
+        self.version += 1
+        return str(ref)
+
+
+class PilotScene:
+    """One-ego/one-counterpart deterministic scene without world reload."""
+
+    def __init__(self, client: Any, *, seed: int):
+        self.client = client
+        self.world = client.get_world()
+        identity = validate_runtime_identity(runtime_identity(self.world, client))
+        if str(identity.get("carla_client_version")) != EXPECTED_CARLA_VERSION:
+            raise CoreV11InvariantError("unexpected CARLA client version")
+        if str(identity.get("carla_server_version")) != EXPECTED_CARLA_VERSION:
+            raise CoreV11InvariantError("unexpected CARLA server version")
+        if identity.get("no_rendering_mode") is not True:
+            raise CoreV11InvariantError(
+                "Pilot requires no_rendering_mode=True before unit execution"
+            )
+
+        settings = self.world.get_settings()
+        settings.synchronous_mode = True
+        settings.fixed_delta_seconds = FIXED_DELTA_SECONDS
+        settings.no_rendering_mode = True
+        self.world.apply_settings(settings)
+
+        try:
+            import carla  # type: ignore
+            self.world.set_weather(carla.WeatherParameters.ClearNoon)
+        except Exception:
+            pass
+
+        self.seed = int(seed)
+        self.ego = None
+        self.counterpart = None
+        self.base_transform = None
+        self.host: PilotCARLAHost | None = None
+        self._spawn_ego()
+
+    def _four_wheel_vehicle_ids(self):
+        ids = []
+        for bp in self.world.get_blueprint_library().filter("vehicle.*"):
+            try:
+                wheels = int(bp.get_attribute("number_of_wheels"))
+            except Exception:
+                wheels = 4
+            if wheels == 4:
+                ids.append(bp.id)
+        if not ids:
+            raise CoreV11InvariantError("no four-wheel CARLA vehicle blueprints")
+        return tuple(sorted(ids))
+
+    def _spawn_ego(self):
+        points = list(self.world.get_map().get_spawn_points())
+        if not points:
+            raise CoreV11InvariantError("CARLA map has no spawn points")
+        rng = random.Random(self.seed)
+        order = list(range(len(points)))
+        rng.shuffle(order)
+        ids = self._four_wheel_vehicle_ids()
+        preferred = (
+            "vehicle.tesla.model3"
+            if "vehicle.tesla.model3" in ids
+            else ids[0]
+        )
+        bp = self.world.get_blueprint_library().find(preferred)
+        try:
+            if bp.has_attribute("role_name"):
+                bp.set_attribute("role_name", "governance-pilot-ego")
+        except Exception:
+            pass
+        for index in order:
+            actor = self.world.try_spawn_actor(bp, points[index])
+            if actor is not None:
+                self.ego = actor
+                self.base_transform = points[index]
+                self.host = PilotCARLAHost(
+                    self.world, self.ego, relation_id="UNBOUND"
+                )
+                self.host.tick()
+                return
+        raise CoreV11InvariantError("deterministic Pilot ego spawn failed")
+
+    def _counterpart_blueprint(self, kind: str):
+        library = self.world.get_blueprint_library()
+        if kind == "vehicle":
+            ids = self._four_wheel_vehicle_ids()
+            preferred = (
+                "vehicle.lincoln.mkz_2020"
+                if "vehicle.lincoln.mkz_2020" in ids
+                else ids[-1]
+            )
+            bp = library.find(preferred)
+        elif kind == "pedestrian":
+            walkers = sorted(bp.id for bp in library.filter("walker.pedestrian.*"))
+            if not walkers:
+                raise CoreV11InvariantError("no pedestrian blueprint for changed scope")
+            bp = library.find(walkers[0])
+        else:
+            raise ValueError(f"unsupported counterpart kind: {kind}")
+        try:
+            if bp.has_attribute("role_name"):
+                bp.set_attribute("role_name", f"governance-pilot-{kind}")
+        except Exception:
+            pass
+        return bp
+
+    def remove_counterpart(self):
+        if self.counterpart is not None:
+            try:
+                self.counterpart.destroy()
+            finally:
+                self.counterpart = None
+                self.host.mark_host_mutation()
+
+    def reset_ego(self):
+        import carla  # type: ignore
+
+        self.ego.set_transform(self.base_transform)
+        self.ego.set_target_velocity(carla.Vector3D(0.0, 0.0, 0.0))
+        self.ego.set_target_angular_velocity(carla.Vector3D(0.0, 0.0, 0.0))
+        try:
+            self.ego.apply_control(carla.VehicleControl(throttle=0.0, brake=1.0))
+        except Exception:
+            pass
+        self.host.last_realization_ref = None
+        self.host.mark_host_mutation()
+        self.host.tick()
+
+    def spawn_counterpart(self, kind: str = "vehicle"):
+        self.remove_counterpart()
+        world_map = self.world.get_map()
+        wp = world_map.get_waypoint(self.ego.get_location())
+        if wp is None:
+            raise CoreV11InvariantError("ego has no waypoint for Pilot counterpart")
+        bp = self._counterpart_blueprint(kind)
+        distances = (18.0, 22.0, 26.0, 30.0, 34.0)
+        for distance in distances:
+            nxt = list(wp.next(distance))
+            if not nxt:
+                continue
+            transform = nxt[0].transform
+            transform.location.z += 0.35 if kind == "vehicle" else 0.8
+            actor = self.world.try_spawn_actor(bp, transform)
+            if actor is not None:
+                self.counterpart = actor
+                self.host.mark_host_mutation()
+                self.host.tick()
+                return actor
+        raise CoreV11InvariantError(
+            f"unable to spawn {kind} counterpart on current lane"
+        )
+
+    def set_motion(self, *, ego_speed: float, counterpart_speed: float):
+        import carla  # type: ignore
+
+        forward = self.ego.get_transform().get_forward_vector()
+        ego_v = carla.Vector3D(
+            float(forward.x) * float(ego_speed),
+            float(forward.y) * float(ego_speed),
+            float(forward.z) * float(ego_speed),
+        )
+        self.ego.set_target_velocity(ego_v)
+        if self.counterpart is not None:
+            front_v = carla.Vector3D(
+                float(forward.x) * float(counterpart_speed),
+                float(forward.y) * float(counterpart_speed),
+                float(forward.z) * float(counterpart_speed),
+            )
+            try:
+                self.counterpart.set_target_velocity(front_v)
+            except Exception:
+                pass
+        self.host.mark_host_mutation()
+        self.host.tick()
+
+    def stage_front_relation(
+        self,
+        *,
+        kind: str,
+        opening: bool,
+        relation_id: str,
+    ) -> None:
+        self.reset_ego()
+        self.host.set_relation_id(relation_id)
+        self.spawn_counterpart(kind)
+        # Establish the first actual current sample with a higher ego speed.
+        self.set_motion(ego_speed=4.0, counterpart_speed=0.5)
+        # Main current sample always has a material ego speed decrease. Omission
+        # cases are physically staged as an opening front relation, not by passing
+        # a failure label into Governance.
+        self.set_motion(
+            ego_speed=1.0,
+            counterpart_speed=(3.0 if opening else 0.2),
+        )
+
+    def close_front_relation(self) -> PresentObservation:
+        self.remove_counterpart()
+        self.host.tick()
+        return PresentObservation.from_mapping(self.host.present_observation())
+
+    def cleanup(self):
+        self.remove_counterpart()
+        if self.ego is not None:
+            try:
+                self.ego.destroy()
+            except Exception:
+                pass
+            self.ego = None
+
+
+def experience_from_history(history) -> CompletedExperience:
+    admission = build_domain_bundle().history_admission
+    records = admission.admit(history)
+    return CompletedExperience(
+        history.entry_id,
+        "",
+        f"general:{history.entry_id}",
+        history.relation_end_tau,
+        {
+            "history_entry_id": history.entry_id,
+            "selected": history.selected_possibility_id,
+            "relation_records": records,
+        },
+        len(repr((history, records)).encode("utf-8")),
+    )
+
+
+def complete_baseline_history(
+    *,
+    scene: PilotScene,
+    execution,
+    entry_id: str,
+):
+    post_observation = scene.close_front_relation()
+    post_tau = float(scene.host.current_tau())
+    closure = build_domain_bundle().closure_evaluator.evaluate(
+        realized_observation=execution.observation,
+        post_observation=post_observation,
+        selected_possibility_id=execution.realization.selected_possibility_id,
+    )
+    if not closure.closed:
+        raise CoreV11InvariantError("General Harness relation did not reach Closure")
+    return execution.recorder.complete_history_entry(
+        entry_id=entry_id,
+        realized_tau=execution.realization_tau,
+        outcome_tau=post_tau,
+        relation_end_tau=post_tau,
+        selected_possibility_id=execution.realization.selected_possibility_id,
+        realization_ref=execution.realization_ref,
+        realization_count=1,
+        outcome_description="authoritative CARLA relation-process closure",
+        closure_method=closure.method,
+        closure_evidence=closure.evidence,
+    )
+
+
+def run_general_decision(
+    *,
+    scene: PilotScene,
+    experiences: tuple[CompletedExperience, ...],
+):
+    core = build_domain_bundle().core
+    view = ParticipatingExperienceView(experiences)
+    harness = CanonicalHarnessV11(BaselineCoreBoundary(core, view))
+    return harness.execute_decision_epoch(scene.host)
+
+
+def snapshot_from_governance_execution(execution) -> DecisionProvenanceSnapshot:
+    history = execution.history_entry
+    if history is None or execution.provenance is None:
+        raise CoreV11InvariantError("CBRA requires committed Governance provenance")
+    responsibility = execution.responsibility
+    if responsibility.selected_candidate_id is None:
+        raise CoreV11InvariantError("CBRA requires an actual selected candidate")
+
+    participation = tuple(
+        ParticipationProvenance(
+            experience_id=item.experience_id,
+            participate=bool(item.participate),
+            rationale=item.rationale,
+            provenance_ref=item.provenance_ref,
+        )
+        for item in execution.reengagement
+    )
+    if not participation:
+        raise CoreV11InvariantError(
+            "Pilot CBRA failure classes require at least one participation judgment"
+        )
+
+    axis_obligations = (
+        ("U", tuple(responsibility.axes.uncertainty)),
+        ("I", tuple(responsibility.axes.impact)),
+        ("V", tuple(responsibility.axes.vulnerability)),
+        ("T", tuple(responsibility.axes.temporality)),
+    )
+    return DecisionProvenanceSnapshot(
+        entry_id=history.entry_id,
+        relation_id=execution.relation_id,
+        decision_tau=history.decision_tau,
+        closure_tau=history.relation_end_tau,
+        participation=participation,
+        responsibility=ResponsibilityProvenance(
+            selected_candidate_id=responsibility.selected_candidate_id,
+            nonselected_candidate_ids=tuple(
+                responsibility.nonselected_candidate_ids
+            ),
+            uncertainty=tuple(responsibility.axes.uncertainty),
+            impact=tuple(responsibility.axes.impact),
+            vulnerability=tuple(responsibility.axes.vulnerability),
+            temporality=tuple(responsibility.axes.temporality),
+            selected_obligations=tuple(responsibility.selected_obligations),
+            nonselected_obligations=tuple(
+                responsibility.nonselected_obligations
+            ),
+            axis_obligations=axis_obligations,
+        ),
+    )
+
+
+def cbra_feedback_from_checkpoint(checkpoint) -> GovernanceFeedbackV04:
+    obligation_states = [
+        item.state for item in checkpoint.responsibility_obligation_findings
+    ]
+    if any(state is RevalidationState.REVISED for state in obligation_states):
+        responsibility_state = RevalidationState.REVISED
+    elif any(state is RevalidationState.CONFIRMED for state in obligation_states):
+        responsibility_state = RevalidationState.CONFIRMED
+    else:
+        responsibility_state = RevalidationState.INCONCLUSIVE
+
+    return GovernanceFeedbackV04(
+        prior_entry_id=f"CBRA:{checkpoint.entry_id}:{checkpoint.ordinal}",
+        relation_id=checkpoint.relation_id,
+        provenance_refs=tuple(checkpoint.evidence_refs),
+        gap_state=RevalidationState.INCONCLUSIVE,
+        choice_state=checkpoint.selected_choice_finding.state,
+        responsibility_state=responsibility_state,
+        experience_states=tuple(
+            (item.target_id, item.state)
+            for item in checkpoint.participation_findings
+        ),
+    )
