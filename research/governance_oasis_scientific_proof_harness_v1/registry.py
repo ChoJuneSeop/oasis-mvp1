@@ -43,7 +43,8 @@ AXIS_CONTRACTS: dict[AxisId, AxisContract] = {
         mandatory_obligations=(
             "provenance_chain",
             "experience_identity_control",
-            "relation_order_ablation",
+            "relation_ablation",
+            "order_ablation",
             "participation_yes_no_provenance",
             "mechanism_removal_contrast",
         ),
