@@ -1,0 +1,136 @@
+{
+  "freeze_id": "GOVERNANCE_CBRA_CARLA_PILOT_RUN5_FREEZE_V1",
+  "status": "FROZEN_BEFORE_RUN5_EXECUTION",
+  "source_freeze_commit": "c5ce330c9abd951f9593c2bb3b9cf3200817ecb0",
+  "branch_before_run5_branch_cut": "experiment/governance-cbra-carla-pilot-v1-run4-freeze",
+  "preserved_prior_runs": {
+    "run1": {
+      "status": "PRE_EXECUTION_RUNTIME_CONFIGURATION_FAILURE",
+      "overwrite_forbidden": true
+    },
+    "run2": {
+      "status": "PRESERVED_DIAGNOSTIC_EXECUTION",
+      "overwrite_forbidden": true
+    },
+    "run3": {
+      "status": "PRE_EXECUTION_INVALID",
+      "passed_units": 15,
+      "preexecution_invalid_units": 39,
+      "overwrite_forbidden": true
+    },
+    "run4": {
+      "status": "PRE_EXECUTION_INVALID",
+      "passed_units": 15,
+      "preexecution_invalid_units": 39,
+      "invalid_cause_count": 39,
+      "invalid_cause": "vehicle counterpart did not form an approved front relation at any frozen candidate distance",
+      "diagnostic_example": {
+        "seed": 940001,
+        "ego_spawn_index": 108,
+        "ego_road_id": 466,
+        "ego_lane_id": 2,
+        "candidate_distances_m": [
+          18,
+          22,
+          26,
+          30,
+          34
+        ],
+        "candidate_road_id": 933,
+        "candidate_lane_id": 2,
+        "same_lane": true,
+        "same_road": false,
+        "longitudinal_positive": true
+      },
+      "interpretation": "the frozen counterpart positions were physically forward and lane-continuous, but crossed an OpenDRIVE road_id boundary rejected by the unchanged Gateway relation contract",
+      "overwrite_forbidden": true
+    }
+  },
+  "unchanged_scientific_design": {
+    "matrix_units": 54,
+    "matrix_git_blob": "be6f3192fe316776e7f9915f6e318f47e03e5f1b",
+    "arms": [
+      "GENERAL_HARNESS",
+      "GOVERNANCE_NO_CBRA",
+      "GOVERNANCE_PLUS_CBRA"
+    ],
+    "failure_classes": [
+      "SUCCESS_CONTROL",
+      "PARTICIPATION_COMMISSION_FAILURE",
+      "PARTICIPATION_OMISSION_FAILURE",
+      "RESPONSIBILITY_AXIS_FAILURE",
+      "EXOGENOUS_FAILURE",
+      "DELAYED_FAILURE"
+    ],
+    "reentry_contexts": [
+      "SAME_SCOPE",
+      "CHANGED_SCOPE",
+      "UNRELATED_RELATION"
+    ],
+    "seeds_unchanged": true,
+    "candidate_distances_m": [
+      18,
+      22,
+      26,
+      30,
+      34
+    ],
+    "candidate_distances_unchanged": true,
+    "gateway_relation_definition_unchanged": true,
+    "failure_labels_unchanged": true,
+    "decision_thresholds_unchanged": true,
+    "responsibility_policy_unchanged": true,
+    "cbra_policy_unchanged": true,
+    "closure_rule_unchanged": true,
+    "post_result_retuning": false,
+    "aggregate_score": null
+  },
+  "run5_addition_only": {
+    "layer": "PRE_EXECUTION_TOPOLOGY_ADMISSION",
+    "experimental_evidence": false,
+    "deterministic_seed_shuffled_spawn_order_unchanged": true,
+    "topology_rule": "ego spawn is admissible only if at least one already-frozen candidate distance using nxt[0] preserves exact Gateway road_id and lane_id",
+    "exact_gateway_scope_required": {
+      "same_road_id": true,
+      "same_lane_id": true
+    },
+    "candidate_distance_set_unchanged": true,
+    "topology_test_uses_failure_label": false,
+    "topology_test_uses_evaluator_truth": false,
+    "topology_test_uses_post_outcome": false,
+    "topology_failure_status": "PRE_EXECUTION_SCENARIO_INVALID",
+    "no_gateway_relaxation": true,
+    "no_seed_substitution": true,
+    "no_distance_substitution": true,
+    "no_threshold_substitution": true,
+    "no_policy_substitution": true,
+    "no_post_result_repair": true
+  },
+  "inherited_admission": {
+    "clean_lane_requires_no_preexisting_front_relation": true,
+    "counterpart_requires_gateway_front_present": true,
+    "counterpart_front_kind_must_match": true,
+    "counterpart_removal_requires_front_present_false": true,
+    "changed_scope_requires_vehicle_and_pedestrian_rehearsal": true
+  },
+  "runtime": {
+    "carla_version": "0.9.16",
+    "map": "Town10HD_Opt",
+    "synchronous_mode": true,
+    "fixed_delta_seconds": 0.05,
+    "no_rendering_mode": true,
+    "render_off_screen": true
+  },
+  "frozen_source_git_blobs": {
+    "research/governance_cbra_carla_pilot_v1/PILOT_MATRIX.json": "be6f3192fe316776e7f9915f6e318f47e03e5f1b",
+    "research/governance_cbra_carla_pilot_v1/pilot_runtime.py": "2880c2d0b0bf269bd74e5d3d4ba92deeb9a38830",
+    "research/governance_cbra_carla_pilot_v1/pilot_runner.py": "45c39efb4b03475fae6adf88e181a006373059a0",
+    "research/governance_cbra_carla_pilot_v1/test_pilot_preexec.py": "11e1202d34ee1ca017fd2842314bffa7ff279216"
+  },
+  "claim_boundary": {
+    "structural_pilot_only": true,
+    "confirmatory": false,
+    "superiority_claim": false,
+    "real_world_safety_claim": false
+  }
+}
