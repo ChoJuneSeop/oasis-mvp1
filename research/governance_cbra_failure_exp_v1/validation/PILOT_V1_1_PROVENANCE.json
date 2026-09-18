@@ -1,0 +1,19 @@
+{
+  "status":"PILOT_STRUCTURAL_PASS",
+  "spec_version":"CBRA_FAILURE_CE_V1_1_FINAL",
+  "frozen_experiment_snapshot_sha":"be6d3a88e60aba44f74738a8524bf0138f1613d1",
+  "workflow_run_id":35328516151,
+  "job_id":105547165021,
+  "artifact_id":10539698748,
+  "artifact_zip_sha256":"0fc868e5c75a3d7cfe3757b0083849fa3e874ee538688d7b381b886a5f25a5df",
+  "pilot_json_sha256":"debfc7b74050869e8386065ecdaff24019a38fc2c75acd665297b2ed4bbc9880",
+  "arm_count":3,
+  "case_count_per_arm":15,
+  "fresh_process":true,
+  "governance_checkpoint_contract":true,
+  "general_harness_has_no_cbra":true,
+  "as_of_gate_present":true,
+  "counterfactual_claimed":false,
+  "scientific_evaluator_used":false,
+  "pilot_used_to_tune_confirmatory":false
+}
