@@ -4,6 +4,9 @@ from dataclasses import replace
 import unittest
 
 from research.oasis_experiment_freeze_harness_v1.models import (
+    CheckCategory,
+    CheckResult,
+    CheckStatus,
     GateReport,
     GateState,
 )
@@ -28,11 +31,25 @@ def execution_report(
         "output_immutability",
     ),
 ) -> GateReport:
+    required_check_ids = tuple(required_check_ids)
+    checks = tuple(
+        CheckResult(
+            check_id=check_id,
+            category=CheckCategory.EXECUTION,
+            status=(
+                CheckStatus.PASS
+                if ready or check_id != "world_isolation"
+                else CheckStatus.FAIL
+            ),
+            summary=check_id,
+        )
+        for check_id in required_check_ids
+    )
     return GateReport(
         profile_id=profile_id,
         state=GateState.FREEZE_READY if ready else GateState.DRAFT,
-        checks=(),
-        required_check_ids=tuple(required_check_ids),
+        checks=checks,
+        required_check_ids=required_check_ids,
         unresolved_check_ids=() if ready else ("world_isolation",),
         missing_check_ids=(),
         duplicate_check_ids=(),
@@ -95,6 +112,32 @@ class ThreeLensReviewTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "execution_profile_missing_required_checks" in x
+                for x in review.execution_blockers
+            )
+        )
+
+    def test_declared_execution_ids_without_concrete_results_are_rejected(self):
+        proof = validate_design(
+            make_design(AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY)
+        )
+        fake = GateReport(
+            profile_id=proof.execution_profile_id,
+            state=GateState.FREEZE_READY,
+            checks=(),
+            required_check_ids=proof.required_execution_check_ids,
+            unresolved_check_ids=(),
+            missing_check_ids=(),
+            duplicate_check_ids=(),
+            freeze_ready=True,
+        )
+        review = three_lens_review(
+            proof_report=proof,
+            execution_report=fake,
+        )
+        self.assertFalse(review.execution_pass)
+        self.assertTrue(
+            any(
+                "execution_profile_missing_concrete_pass_results" in x
                 for x in review.execution_blockers
             )
         )
