@@ -31,6 +31,23 @@ class ProofRegistryIntegrityTests(unittest.TestCase):
                 for source in record["source_refs"]:
                     self.assertTrue((ROOT / source).exists(), source)
 
+    def test_any_axis_closing_record_must_attest_all_axis_obligations(self):
+        data = json.loads(
+            (HERE / "PROGRAM_EVIDENCE_REGISTRY.json").read_text(encoding="utf-8")
+        )
+        for record in data["records"]:
+            if not record["counts_toward_axis_proof"]:
+                continue
+            self.assertTrue(record["review_method"].strip())
+            verified = set(record["verified_obligations"])
+            for axis_name in record["axes"]:
+                axis = AxisId(axis_name)
+                required = set(AXIS_CONTRACTS[axis].mandatory_obligations)
+                self.assertTrue(
+                    required.issubset(verified),
+                    (record["evidence_id"], sorted(required - verified)),
+                )
+
     def test_nonconfirmatory_levels_cannot_be_marked_as_axis_proof(self):
         data = json.loads(
             (HERE / "PROGRAM_EVIDENCE_REGISTRY.json").read_text(encoding="utf-8")
