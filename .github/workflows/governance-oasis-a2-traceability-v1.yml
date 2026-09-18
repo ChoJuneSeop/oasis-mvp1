@@ -1,0 +1,40 @@
+name: Governance OASIS A2 Traceability v1
+
+on:
+  push:
+    branches:
+      - experiment/governance-oasis-a2-traceability-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  a2-traceability:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Compile A2 experiment and frozen harnesses
+        run: |
+          python -m compileall -q research/governance_oasis_a2_traceability_v1
+          python -m compileall -q research/governance_oasis_scientific_proof_harness_v1
+          python -m compileall -q research/oasis_experiment_freeze_harness_v1
+
+      - name: Prove frozen scientific harness did not drift
+        run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_freeze_integrity
+
+      - name: A2 design, fixture, evidence-plane and attack tests
+        run: python -m unittest -v research.governance_oasis_a2_traceability_v1.test_a2_traceability
+
+      - name: Lower execution harness regression
+        run: python -m unittest -v research.oasis_experiment_freeze_harness_v1.test_harness
+
+      - name: A2 pre-execution self-test
+        run: python -m research.governance_oasis_a2_traceability_v1
