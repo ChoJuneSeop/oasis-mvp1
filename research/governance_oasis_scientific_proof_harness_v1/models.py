@@ -106,8 +106,8 @@ class ExperimentDesign:
     attribution_controls: tuple[str, ...] = ()
     wrongness_defined_only_post_outcome: bool = False
     adverse_outcome_criterion: str = ""
-    wrong_change_realized: bool = False
-    post_outcome_contradictory_evidence: bool = False
+    adverse_change_realization_endpoint: bool = False
+    post_outcome_contradiction_endpoint: bool = False
     recovery_epochs: int = 0
     recovery_endpoint: bool = False
     post_outcome_revalidation_control: bool = False
