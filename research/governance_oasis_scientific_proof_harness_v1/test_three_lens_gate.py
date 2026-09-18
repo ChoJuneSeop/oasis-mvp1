@@ -14,12 +14,16 @@ from .test_design_gate import make_design
 from .three_lens_gate import three_lens_review
 
 
-def execution_report(ready: bool, profile_id: str) -> GateReport:
+def execution_report(
+    ready: bool,
+    profile_id: str,
+    required_check_ids=("world_isolation", "cross_arm_identity", "future_leakage", "single_realization", "source_freeze"),
+) -> GateReport:
     return GateReport(
         profile_id=profile_id,
         state=GateState.FREEZE_READY if ready else GateState.DRAFT,
         checks=(),
-        required_check_ids=(),
+        required_check_ids=tuple(required_check_ids),
         unresolved_check_ids=() if ready else ("world_isolation",),
         missing_check_ids=(),
         duplicate_check_ids=(),
@@ -64,6 +68,27 @@ class ThreeLensReviewTests(unittest.TestCase):
         )
         self.assertFalse(review.causal_pass)
         self.assertFalse(review.all_three_pass)
+
+    def test_missing_scientific_execution_check_blocks_full_review(self):
+        proof = validate_design(
+            make_design(AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY)
+        )
+        review = three_lens_review(
+            proof_report=proof,
+            execution_report=execution_report(
+                True,
+                proof.execution_profile_id,
+                required_check_ids=("world_isolation",),
+            ),
+        )
+        self.assertFalse(review.execution_pass)
+        self.assertFalse(review.all_three_pass)
+        self.assertTrue(
+            any(
+                "execution_profile_missing_required_checks" in x
+                for x in review.execution_blockers
+            )
+        )
 
     def test_execution_profile_mismatch_blocks_full_review(self):
         proof = validate_design(
