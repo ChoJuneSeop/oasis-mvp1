@@ -3,6 +3,7 @@
 from .models import (
     AxisId,
     CausalContrast,
+    ClaimOutcome,
     DesignCheck,
     DesignStatus,
     ExperimentDesign,
@@ -17,6 +18,7 @@ from .portfolio_gate import audit_portfolio
 __all__ = [
     "AxisId",
     "CausalContrast",
+    "ClaimOutcome",
     "DesignCheck",
     "DesignStatus",
     "ExperimentDesign",
