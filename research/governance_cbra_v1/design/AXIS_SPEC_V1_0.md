@@ -78,3 +78,19 @@ Symmetry does **not** mean claiming counterfactual knowledge. The unrealized sid
 ## Boundary
 
 CBRA v1.0 proves an executable provenance/revalidation contract only. It does not yet prove that this axis improves behavior. That requires the separately frozen failure-Completed-Experience comparative experiment.
+
+
+## Formal hardening after kill search and error checks
+
+The following rules are normative for v1.0:
+
+- **As-of-time gate:** a later Governance decision may inspect only checkpoints with `observed_tau < decision_tau`.
+- **Relation scope:** every evidence event names the same relation as the immutable decision provenance; cross-relation events are rejected.
+- **Event uniqueness:** every evidence event has a stable event id; duplicate ids are rejected within a checkpoint and across the full axis history.
+- **Lifecycle:** monitors are ACTIVE, DORMANT, or CLOSED. Dormant monitors may reopen without losing history. Closed monitors are terminal.
+- **Obligation traceability:** U/I/V/T remain separate targets and each preserves obligation-level target ids.
+- **NO/nonselected semantics:** a REVISED state on an unrealized path means the original rationale is contradicted by later decision-linked evidence; it never means the counterfactual action is known to have succeeded.
+- **Conflict rule:** conflicting decision-linked support/contradiction remains INCONCLUSIVE; no majority vote and no latest-state overwrite.
+- **Exogenous rule:** exogenous-only deterioration cannot revise an original decision judgment.
+
+These rules close the formal definition, causal, and execution checks recorded in `validation/FORMAL_ERROR_CHECKS.md`.
