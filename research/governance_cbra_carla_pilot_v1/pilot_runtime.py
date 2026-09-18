@@ -48,7 +48,7 @@ FIXED_DELTA_SECONDS = 0.05
 
 
 class ScenarioAdmissionError(RuntimeError):
-    """Pre-execution CARLA scene failed the frozen Run4 admission contract."""
+    """Pre-execution CARLA scene failed the frozen Run5 admission contract."""
 
 
 def scope_signature(observation: PresentObservation) -> tuple[bool, str, int]:
@@ -448,13 +448,32 @@ class PilotScene:
         # ambient actors from making front-participant Closure impossible later.
         viable = []
         world_map = self.world.get_map()
+        frozen_distances = (18.0, 22.0, 26.0, 30.0, 34.0)
         for index in order:
             wp = world_map.get_waypoint(points[index].location)
-            if wp is not None and list(wp.next(18.0)):
-                viable.append(index)
+            if wp is None:
+                continue
+
+            # Run5 adds only a topology-admission requirement. The Gateway itself
+            # is unchanged and still requires same road_id + lane_id. Therefore an
+            # ego spawn is admissible only if at least one already-frozen candidate
+            # distance, using the same nxt[0] construction path as spawn_counterpart,
+            # remains in that exact Gateway relation scope.
+            topology_matches = []
+            for distance in frozen_distances:
+                nxt = list(wp.next(distance))
+                if not nxt:
+                    continue
+                target = nxt[0]
+                if target.road_id == wp.road_id and target.lane_id == wp.lane_id:
+                    topology_matches.append(float(distance))
+            if topology_matches:
+                viable.append((index, tuple(topology_matches)))
+
         if not viable:
             raise ScenarioAdmissionError(
-                "no forward-capable ego spawn exists for the frozen Pilot scene"
+                "no ego spawn preserves Gateway same-road/same-lane topology "
+                "at any frozen counterpart distance"
             )
 
         ids = self._four_wheel_vehicle_ids()
@@ -471,7 +490,7 @@ class PilotScene:
             pass
 
         rejected = []
-        for index in viable:
+        for index, topology_matches in viable:
             actor = self.world.try_spawn_actor(bp, points[index])
             if actor is None:
                 rejected.append({"spawn_index": int(index), "reason": "spawn-failed"})
@@ -498,6 +517,7 @@ class PilotScene:
                 self.ego = actor
                 self.base_transform = points[index]
                 self.admitted_spawn_index = int(index)
+                self.admitted_topology_distances_m = tuple(topology_matches)
                 self.admission_rejected_candidates = tuple(rejected)
                 self.host = PilotCARLAHost(
                     self.world, self.ego, relation_id="UNBOUND"
@@ -512,7 +532,7 @@ class PilotScene:
                 raise
 
         raise ScenarioAdmissionError(
-            "no deterministic clean-lane ego spawn satisfied Run3 admission"
+            "no deterministic clean-lane/topology ego spawn satisfied Run5 admission"
         )
 
     def _counterpart_blueprint(self, kind: str):
