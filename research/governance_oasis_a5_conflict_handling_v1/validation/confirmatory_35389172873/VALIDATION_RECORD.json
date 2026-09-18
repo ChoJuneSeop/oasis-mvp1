@@ -1,0 +1,60 @@
+{
+  "schema": "governance-oasis-a5-confirmatory-validation-record-v1",
+  "experiment_id": "GO_A5_CONFLICT_HANDLING_V1",
+  "axis": "A5_CONFLICTING_EXPERIENCE_HANDLING",
+  "execution_sha": "0c0b8f76cf3f9219ae6b0f3faddfc62ae4d39a11",
+  "confirmatory_workflow": {
+    "run_id": 35389172873,
+    "job_id": 105743238762,
+    "conclusion": "success"
+  },
+  "artifact": {
+    "artifact_id": 10565133643,
+    "name": "governance-oasis-a5-confirmatory-35389172873-1",
+    "digest": "sha256:4378f20adf10e526110f9dcf976c94722956f4e449de6fafce14117483547095"
+  },
+  "frozen_source_blobs": {
+    "research/governance_oasis_a5_conflict_handling_v1/design_spec.py": "8f0166e308bd7da70c3ab04987a13bca87e62529",
+    "research/governance_oasis_a5_conflict_handling_v1/CONFIRMATORY_PLAN.json": "af7557a05f6904badfa3a793af06cad517c3c604",
+    "research/governance_oasis_a5_conflict_handling_v1/runner.py": "8b3245c83888cbdbd4f9a062eec83e9237b210e1",
+    "research/governance_oasis_a5_conflict_handling_v1/evaluator.py": "aedb5d99749263954cde6d9088c6c39e142a8d4d",
+    "research/governance_oasis_a5_conflict_handling_v1/preflight.py": "7ac8224095614ab93988ccbeec455de9f1f27aae"
+  },
+  "preexecution": {
+    "proof_ready": true,
+    "freeze_ready": true,
+    "unresolved_design_checks": [],
+    "unresolved_execution_checks": []
+  },
+  "matrix": {
+    "pilot_family": "P",
+    "confirmatory_families": [
+      "F1",
+      "F2",
+      "F3"
+    ],
+    "cases_per_arm": 12,
+    "arms": [
+      "PROVENANCE_PRESERVING_CONTEXTUAL",
+      "ORDER_ERASED",
+      "RELATION_PROVENANCE_PERMUTED",
+      "LATEST_ONLY"
+    ],
+    "decision_realization_units": 48
+  },
+  "results": {
+    "outcome": "SUPPORTS",
+    "failures": [],
+    "production_correct_case_count": 12,
+    "order_ablation_divergence_count": 6,
+    "relation_permutation_divergence_count": 6,
+    "latest_only_older_target_divergence_count": 6,
+    "both_ce_preserved": true,
+    "no_scalar_memory_score": true,
+    "selected_realized_single": true,
+    "no_provenance_preserved": true
+  },
+  "claim_boundary": "Finite deterministic synthetic conflict-handling mechanism only; not universal safety, optimal policy, or deployment proof.",
+  "complete_not_equal_supports": true,
+  "post_result_rule_retuning": false
+}
