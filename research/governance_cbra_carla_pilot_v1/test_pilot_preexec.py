@@ -34,11 +34,14 @@ from .pilot_runtime import (
     PilotParticipation,
     PilotResponsibility,
     PilotScene,
+    ScenarioAdmissionError,
     cbra_feedback_from_checkpoint,
     scope_signature,
 )
 from .pilot_runner import (
     ARMS,
+    RUN_BASIS,
+    run_unit,
     _failure_semantics,
     _target_for_failure,
     load_matrix,
@@ -136,6 +139,26 @@ class PilotPreExecutionAttackTests(unittest.TestCase):
         self.assertIn("settings.synchronous_mode = True", source)
         self.assertIn("settings.fixed_delta_seconds = FIXED_DELTA_SECONDS", source)
         self.assertIn("settings.no_rendering_mode = True", source)
+
+    def test_run3_admission_precedes_every_experimental_decision(self):
+        source = inspect.getsource(run_unit)
+        admission = source.index("scenario_admission =")
+        general = source.index("run_general_decision(")
+        governance = source.index("harness.execute_decision_epoch(")
+        self.assertLess(admission, general)
+        self.assertLess(admission, governance)
+        self.assertEqual(RUN_BASIS, "RUN3_CLOSURE_ADMISSION_FREEZE_V1")
+
+    def test_run3_clean_lane_and_closure_rehearsal_are_fail_closed(self):
+        spawn_source = inspect.getsource(PilotScene._spawn_ego)
+        cycle_source = inspect.getsource(PilotScene.admit_relation_cycle)
+        self.assertIn("pre-existing-front-relation", spawn_source)
+        self.assertIn("if observation.front_present", spawn_source)
+        self.assertIn("if baseline.front_present", cycle_source)
+        self.assertIn("if not staged.front_present", cycle_source)
+        self.assertIn("if closed.front_present", cycle_source)
+        self.assertIn("ScenarioAdmissionError", cycle_source)
+        self.assertNotIn("failure_class", cycle_source)
 
     def test_failure_label_cannot_enter_governance_operators(self):
         participation_src = inspect.getsource(PilotParticipation.assess)
