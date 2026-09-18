@@ -16,15 +16,19 @@ class RequiredNextExperimentsIntegrityTests(unittest.TestCase):
             (HERE / "REQUIRED_NEXT_EXPERIMENTS.json").read_text(encoding="utf-8")
         )
 
-    def test_existing_closed_axes_are_only_a1_and_a3(self):
-        closed = {x["axis"] for x in self.data["existing_closed_axes"]}
+    def test_existing_supported_evidence_axes_are_a1_and_a3_without_sequence_skip(self):
+        supported = {
+            x["axis"] for x in self.data["existing_supported_evidence_axes"]
+        }
         self.assertEqual(
-            closed,
+            supported,
             {
                 AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS.value,
                 AxisId.A3_RESPONSIBILITY_SENSITIVITY.value,
             },
         )
+        self.assertIn("A1→A2→A3→A4→A5→A6", self.data["sequencing_rule"])
+        self.assertIn("cannot skip", self.data["sequencing_rule"])
 
     def test_missing_program_obligations_are_a2_a4_a5_a6_plus_integration(self):
         axes = [x["axis"] for x in self.data["required_next_experiments"]]
