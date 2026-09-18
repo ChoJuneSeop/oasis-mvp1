@@ -1,0 +1,40 @@
+name: Governance OASIS A6 Wrong Change Recovery v1
+
+on:
+  push:
+    branches:
+      - experiment/governance-oasis-a6-wrong-change-recovery-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  a6-confirmatory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile A6 package
+        run: python -m compileall -q research/governance_oasis_a6_wrong_change_recovery_v1
+      - name: Frozen scientific harness integrity
+        run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_freeze_integrity
+      - name: A6 preregistration and structural tests
+        run: python -m unittest -v research.governance_oasis_a6_wrong_change_recovery_v1.test_a6
+      - name: A6 explicit preflight
+        run: python -m research.governance_oasis_a6_wrong_change_recovery_v1.preflight
+      - name: A6 confirmatory execution
+        run: |
+          mkdir -p a6-artifacts
+          python -m research.governance_oasis_a6_wrong_change_recovery_v1.pipeline --stage confirmatory | tee a6-artifacts/A6-CONFIRMATORY.json
+      - name: Upload sealed A6 output
+        uses: actions/upload-artifact@v4
+        with:
+          name: governance-oasis-a6-confirmatory-${{ github.run_id }}-${{ github.run_attempt }}
+          path: a6-artifacts/A6-CONFIRMATORY.json
+          if-no-files-found: error
+          retention-days: 90
