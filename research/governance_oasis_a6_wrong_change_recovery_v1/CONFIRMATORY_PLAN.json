@@ -1,0 +1,56 @@
+{
+  "schema": "governance-oasis-a6-confirmatory-plan-v1",
+  "experiment_id": "GO_A6_WRONG_CHANGE_RECOVERY_V1",
+  "axis": "A6_WRONG_BEHAVIOR_RECOVERY",
+  "claim": "GO-A6-C1",
+  "epochs": [
+    "E1 prior CE participation -> initial decision -> single realization",
+    "E2 authoritative post-outcome observation -> independent adverse evaluation -> Closure -> provenance-bound revalidation commit",
+    "E3 later relation -> later participation -> later decision -> single realization"
+  ],
+  "arms": [
+    "INITIAL_EXPERIENCE_EXPOSED",
+    "INITIAL_EXPERIENCE_HIDDEN",
+    "REVALIDATION_EXPOSED",
+    "REVALIDATION_RECORD_ONLY",
+    "EXOGENOUS_ATTRIBUTION_CONTROL"
+  ],
+  "contexts": [
+    "SAME_SCOPE",
+    "UNRELATED_RELATION"
+  ],
+  "pilot": {
+    "families": [
+      "P"
+    ],
+    "chains": 10,
+    "scientific_metrics": false
+  },
+  "confirmatory": {
+    "families": [
+      "F1",
+      "F2",
+      "F3"
+    ],
+    "cases": 6,
+    "arms": 5,
+    "chains": 30,
+    "decision_realization_units": 60
+  },
+  "adverse_outcome_rule": "Only after initial worker output is sealed, authoritative observation impact_code == 'constraint_breach' is classified ADVERSE.",
+  "support_rule": "Both causal links must hold: prior CE exposure changes the initial realized behavior and that exposed behavior is classified adverse only post-realization; then exposing the resulting decision-linked REVISED commit changes the later same-scope realized action to the preregistered recovery action relative to record-only. Exogenous evidence must not become decision-linked revision, and unrelated relations must not inherit the feedback.",
+  "invalidation_rules": [
+    "wrongness/evaluator truth reaches initial decision worker",
+    "authoritative outcome precedes realization",
+    "revalidation precedes Closure",
+    "same-epoch feedback",
+    "counterfactual rather than realized recovery",
+    "exogenous evidence relabeled decision-linked",
+    "unrelated relation inherits scoped feedback",
+    "selected != realized",
+    "more than one realization per epoch",
+    "missing participation provenance"
+  ],
+  "no_aggregate_winner_score": true,
+  "post_result_retuning_forbidden": true
+}
