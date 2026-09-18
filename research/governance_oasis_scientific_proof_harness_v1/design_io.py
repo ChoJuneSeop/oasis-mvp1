@@ -64,13 +64,24 @@ def load_design(path: Path) -> ExperimentDesign:
         selected_nonselected_obligations=bool(raw.get("selected_nonselected_obligations", False)),
         experience_identity_control=bool(raw.get("experience_identity_control", False)),
         relation_order_ablation=bool(raw.get("relation_order_ablation", False)),
+        participation_yes_no_provenance=bool(
+            raw.get("participation_yes_no_provenance", False)
+        ),
         same_current_context_across_contrast=bool(raw.get("same_current_context_across_contrast", False)),
         behavior_endpoint=bool(raw.get("behavior_endpoint", False)),
         effectiveness_endpoint=bool(raw.get("effectiveness_endpoint", False)),
         conflicting_experience_count=int(raw.get("conflicting_experience_count", 0)),
+        conflict_operational_definition=str(
+            raw.get("conflict_operational_definition", "")
+        ),
         conflict_order_preserved=bool(raw.get("conflict_order_preserved", False)),
         no_scalar_conflict_overwrite=bool(raw.get("no_scalar_conflict_overwrite", False)),
         no_global_exclusion_control=bool(raw.get("no_global_exclusion_control", False)),
+        attribution_controls=tuple(str(x) for x in raw.get("attribution_controls", ())),
+        wrongness_defined_only_post_outcome=bool(
+            raw.get("wrongness_defined_only_post_outcome", False)
+        ),
+        adverse_outcome_criterion=str(raw.get("adverse_outcome_criterion", "")),
         wrong_change_realized=bool(raw.get("wrong_change_realized", False)),
         post_outcome_contradictory_evidence=bool(raw.get("post_outcome_contradictory_evidence", False)),
         recovery_epochs=int(raw.get("recovery_epochs", 0)),
