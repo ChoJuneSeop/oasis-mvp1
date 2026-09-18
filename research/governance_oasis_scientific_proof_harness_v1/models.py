@@ -84,6 +84,10 @@ class ExperimentDesign:
     future_leakage_guard: bool
     no_aggregate_winner_score: bool
     integrated_flow_baseline: bool
+    production_history_append_only: bool
+    production_no_permanent_memory_weight: bool
+    production_no_destructive_no: bool
+    ablation_mutations_declared: bool
     relation_context_controls: tuple[str, ...] = ()
     responsibility_controls: tuple[str, ...] = ()
     responsibility_non_scalar: bool = False
