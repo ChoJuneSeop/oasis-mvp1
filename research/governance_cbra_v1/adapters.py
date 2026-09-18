@@ -7,12 +7,17 @@ from .models import (
 )
 
 
-def snapshot_from_governance_provenance(provenance) -> DecisionProvenanceSnapshot:
-    """Normalize Governance v0.4 or legacy provenance into the CBRA contract.
+def _axis_obligations(responsibility):
+    axes = responsibility.axes
+    return (
+        ("U", tuple(str(x) for x in axes.uncertainty)),
+        ("I", tuple(str(x) for x in axes.impact)),
+        ("V", tuple(str(x) for x in axes.vulnerability)),
+        ("T", tuple(str(x) for x in axes.temporality)),
+    )
 
-    This adapter copies only already-committed provenance. It does not inspect
-    future observations and does not change the source Governance record.
-    """
+
+def snapshot_from_governance_provenance(provenance) -> DecisionProvenanceSnapshot:
     reengagement = getattr(provenance, "original_reengagement", None)
     if reengagement is None:
         reengagement = getattr(provenance, "reengagement_audit", None)
@@ -29,9 +34,7 @@ def snapshot_from_governance_provenance(provenance) -> DecisionProvenanceSnapsho
     if outcome is None:
         raise ValueError("unsupported Governance provenance: missing authoritative outcome")
 
-    relation_id = getattr(provenance, "relation_id", None)
-    if not relation_id:
-        relation_id = getattr(outcome, "relation_id", None)
+    relation_id = getattr(provenance, "relation_id", None) or getattr(outcome, "relation_id", None)
     if not relation_id:
         raise ValueError("unsupported Governance provenance: missing relation id")
 
@@ -63,6 +66,7 @@ def snapshot_from_governance_provenance(provenance) -> DecisionProvenanceSnapsho
         temporality=tuple(str(x) for x in axes.temporality),
         selected_obligations=tuple(str(x) for x in responsibility.selected_obligations),
         nonselected_obligations=tuple(str(x) for x in responsibility.nonselected_obligations),
+        axis_obligations=_axis_obligations(responsibility),
     )
     return DecisionProvenanceSnapshot(
         entry_id=str(provenance.entry_id),
