@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from research.governance_oasis_scientific_proof_harness_v1.design_gate import validate_design
+from research.governance_oasis_scientific_proof_harness_v1.io import load_evidence_registry
+from research.governance_oasis_scientific_proof_harness_v1.portfolio_gate import audit_portfolio
 from research.oasis_experiment_freeze_harness_v1.harness import ExperimentFreezeHarness
 from research.oasis_experiment_freeze_harness_v1.models import CheckCategory, CheckResult, CheckStatus
 
@@ -20,6 +24,17 @@ def run_preflight():
     design=validate_design(build_design())
     pilot=build_pilot()
     confirm=build_confirmatory()
+
+    registry_path=Path(__file__).resolve().parents[1]/"governance_oasis_program_v1"/"PROGRAM_EVIDENCE_REGISTRY_AFTER_A6.json"
+    program_id,evidence=load_evidence_registry(registry_path)
+    portfolio=audit_portfolio(program_id=program_id,evidence=evidence)
+    prior_axes_supported=(
+        len(portfolio.supported_axes)==6
+        and portfolio.next_required_axis is None
+        and not portfolio.integration_supported
+        and portfolio.blockers==("missing_flow_preserving_integrated_confirmatory_evidence",)
+    )
+
     bundle=run_families(pilot)
     structural=evaluate(pilot,bundle,scientific=False)["structural"]
     full=next(r for r in bundle["runs"] if r["arm"]==Arm.FULL_FLOW.value)
@@ -61,7 +76,7 @@ def run_preflight():
         _check("single_realization",structural["one_realization_per_epoch"],"Exactly one selected==realized action exists per epoch.",required["single_realization"]),
         _check("provenance_integrity",structural["participation_provenance_complete"],"Every candidate participation YES/NO retains CE relation/order provenance.",required["provenance_integrity"]),
         _check("output_immutability",True,"Scenario definitions are frozen dataclasses and artifacts are create-only in CI.",required["output_immutability"]),
-        _check("all_six_axes_prior_supported",True,"Sequence closure entering GH4 has A1-A6 qualifying SUPPORTS evidence.",required["all_six_axes_prior_supported"]),
+        _check("all_six_axes_prior_supported",prior_axes_supported,"Actual A6 supplemental portfolio reports A1-A6 SUPPORTS with only integration remaining.",required["all_six_axes_prior_supported"]),
         _check("long_horizon_accumulation",full["final_archive_size"]==full["seed_archive_size"]+11,"Pilot archive grows by one completed experience per epoch.",required["long_horizon_accumulation"]),
         _check("current_flow_first_history_gate",not e0["history_needed"] and e0["history_access_count"]==0,"History is not accessed when current flow says it is unnecessary.",required["current_flow_first_history_gate"]),
         _check("full_temporal_chain_each_epoch",structural["strict_temporal_order"],"All required stages preserve temporal order across every epoch boundary.",required["full_temporal_chain_each_epoch"]),
