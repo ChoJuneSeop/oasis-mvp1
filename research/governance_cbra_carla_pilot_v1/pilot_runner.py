@@ -51,8 +51,8 @@ from .telemetry import HardwareProbe, directory_size, summarize
 
 
 PROTOCOL_ID = "GOVERNANCE-CBRA-CARLA-PILOT-V1"
-RUN_BASIS = "RUN3_CLOSURE_ADMISSION_FREEZE_V1"
-RUN3_MANIFEST_PATH = Path(__file__).resolve().parent / "RUN3_FREEZE_MANIFEST.json"
+RUN_BASIS = "RUN4_GATEWAY_APPROVED_COUNTERPART_FREEZE_V1"
+RUN4_MANIFEST_PATH = Path(__file__).resolve().parent / "RUN4_FREEZE_MANIFEST.json"
 HERE = Path(__file__).resolve().parent
 ROOT = Path(__file__).resolve().parents[2]
 MATRIX_PATH = HERE / "PILOT_MATRIX.json"
@@ -113,16 +113,16 @@ def _sha256_lf_normalized(path: Path) -> tuple[str, str]:
     return actual, normalized
 
 
-def validate_run3_freeze() -> dict:
-    if not RUN3_MANIFEST_PATH.is_file():
-        raise CoreV11InvariantError("Run3 freeze manifest is missing")
-    manifest = json.loads(RUN3_MANIFEST_PATH.read_text(encoding="utf-8"))
-    if manifest.get("status") != "FROZEN_BEFORE_RUN3_EXECUTION":
-        raise CoreV11InvariantError("Run3 freeze status is not executable")
+def validate_run4_freeze() -> dict:
+    if not RUN4_MANIFEST_PATH.is_file():
+        raise CoreV11InvariantError("Run4 freeze manifest is missing")
+    manifest = json.loads(RUN4_MANIFEST_PATH.read_text(encoding="utf-8"))
+    if manifest.get("status") != "FROZEN_BEFORE_RUN4_EXECUTION":
+        raise CoreV11InvariantError("Run4 freeze status is not executable")
     if manifest.get("unchanged_scientific_design", {}).get("matrix_units") != 54:
-        raise CoreV11InvariantError("Run3 matrix cardinality drifted")
+        raise CoreV11InvariantError("Run4 matrix cardinality drifted")
     if manifest.get("unchanged_scientific_design", {}).get("seeds_unchanged") is not True:
-        raise CoreV11InvariantError("Run3 seed freeze is not preserved")
+        raise CoreV11InvariantError("Run4 seed freeze is not preserved")
     expected = manifest.get("frozen_source_git_blobs", {})
     checks = {}
     for path, blob in expected.items():
@@ -131,7 +131,7 @@ def validate_run3_freeze() -> dict:
         ).strip()
         if actual != blob:
             raise CoreV11InvariantError(
-                f"Run3 frozen source drift for {path}: {actual} != {blob}"
+                f"Run4 frozen source drift for {path}: {actual} != {blob}"
             )
         dirty = subprocess.run(
             ["git", "diff", "--quiet", "--", path], cwd=ROOT
@@ -141,14 +141,14 @@ def validate_run3_freeze() -> dict:
         ).returncode
         if dirty != 0 or staged != 0:
             raise CoreV11InvariantError(
-                f"Run3 frozen source has uncommitted drift: {path}"
+                f"Run4 frozen source has uncommitted drift: {path}"
             )
         checks[path] = actual
     return checks
 
 
 def static_execution_preflight() -> dict:
-    run3_checks = validate_run3_freeze()
+    run4_checks = validate_run4_freeze()
     gate = validate_runtime_identities(ROOT)
     if not gate.passed:
         raise CoreV11InvariantError(
@@ -161,7 +161,7 @@ def static_execution_preflight() -> dict:
             f"actual={actual}, lf_normalized={normalized}"
         )
     return {
-        "run3_freeze_checks": run3_checks,
+        "run4_freeze_checks": run4_checks,
         "runtime_identity_checks": gate.checks,
         "canonical_harness_sha256": actual,
         "canonical_harness_lf_normalized_sha256": normalized,
@@ -921,8 +921,8 @@ def run_matrix(*, output_root: Path, host: str, port: int) -> Path:
     output_root.mkdir(parents=True, exist_ok=False)
     matrix = load_matrix()
     shutil.copy2(MATRIX_PATH, output_root / MATRIX_PATH.name)
-    if RUN3_MANIFEST_PATH.is_file():
-        shutil.copy2(RUN3_MANIFEST_PATH, output_root / RUN3_MANIFEST_PATH.name)
+    if RUN4_MANIFEST_PATH.is_file():
+        shutil.copy2(RUN4_MANIFEST_PATH, output_root / RUN4_MANIFEST_PATH.name)
     _atomic_json(
         output_root / "RUN_REGISTRATION.json",
         {
