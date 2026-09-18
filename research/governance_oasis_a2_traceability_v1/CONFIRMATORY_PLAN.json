@@ -1,0 +1,75 @@
+{
+  "aggregation_rule": {
+    "axis": "all A2-I/A2-R/A2-O/A2-N must be present; any INVALID -> INVALID; any INCONCLUSIVE -> INCONCLUSIVE; all SUPPORTS -> SUPPORTS; otherwise DOES_NOT_SUPPORT",
+    "contrast": "mixed SUPPORTS and DOES_NOT_SUPPORT confirmatory results are INCONCLUSIVE",
+    "run": "valid mismatch is DOES_NOT_SUPPORT; integrity failure is INVALID; valid nonnegative run with no decision consumption is INCONCLUSIVE"
+  },
+  "axis": "A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY",
+  "claims": [
+    "GO-A2-C1",
+    "GO-A2-C2"
+  ],
+  "complete_not_equal_supports": true,
+  "contrast_families": {
+    "A2-I": {
+      "arms": [
+        "I0",
+        "I1"
+      ],
+      "only_mutated_dimension": "identity_binding"
+    },
+    "A2-N": {
+      "arms": [
+        "N1",
+        "N2",
+        "N3"
+      ],
+      "stages": [
+        "candidate then revalidation NO",
+        "revalidated YES but not participating",
+        "participating but not decision-consumed"
+      ]
+    },
+    "A2-O": {
+      "arms": [
+        "O0",
+        "O1"
+      ],
+      "only_mutated_dimension": "order_digest"
+    },
+    "A2-R": {
+      "arms": [
+        "R0",
+        "R1"
+      ],
+      "only_mutated_dimension": "relation_digest"
+    }
+  },
+  "design_freeze": "A2 Experience Contribution Traceability Design Freeze v1.0",
+  "experiment_id": "GO_A2_RELATION_ORDER_TRACEABILITY_V1",
+  "post_result_retuning_forbidden": true,
+  "required_execution_checks": [
+    "source_freeze",
+    "world_isolation",
+    "cross_arm_identity",
+    "future_leakage",
+    "evaluator_postjoin",
+    "single_realization",
+    "provenance_integrity",
+    "output_immutability",
+    "dual_evidence_independence",
+    "pre_realization_seal",
+    "decision_invocation_binding",
+    "fixture_isolation",
+    "negative_control_coverage",
+    "hash_chain_integrity"
+  ],
+  "result_states": [
+    "SUPPORTS",
+    "DOES_NOT_SUPPORT",
+    "INCONCLUSIVE",
+    "INVALID"
+  ],
+  "schema": "governance-oasis-a2-confirmatory-plan-v1",
+  "scientific_rule": "decision-linked contribution exists only when CE-derived input is independently observed crossing the exact decision invocation input boundary before single realization"
+}
