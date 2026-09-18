@@ -24,13 +24,19 @@ def audit_portfolio(
     for axis in AxisId:
         axis_records = by_axis.get(axis, [])
         axis_coverage[axis.value] = tuple(item.evidence_id for item in axis_records)
-        if not axis_records:
+        empirical_records = [
+            item
+            for item in axis_records
+            if item.level is not EvidenceLevel.DESIGN_ONLY
+            and item.result_status not in {"NOT_STARTED", "NOT_EXECUTED"}
+        ]
+        if not empirical_records:
             missing.append(axis.value)
             continue
 
         qualifying = [
             item
-            for item in axis_records
+            for item in empirical_records
             if item.counts_toward_axis_proof
             and item.design_report_passed
             and item.result_status == "COMPLETE"
