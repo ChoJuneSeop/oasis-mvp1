@@ -39,6 +39,10 @@ def load_design(path: Path) -> ExperimentDesign:
         contrasts=contrasts,
         independent_evaluator=bool(raw["independent_evaluator"]),
         evaluator_blinded_to=tuple(str(x) for x in raw.get("evaluator_blinded_to", ())),
+        authoritative_outcome_observation=bool(raw["authoritative_outcome_observation"]),
+        decision_worker_forbidden_inputs=tuple(
+            str(x) for x in raw.get("decision_worker_forbidden_inputs", ())
+        ),
         provenance_chain=tuple(str(x) for x in raw.get("provenance_chain", ())),
         replication_plan=str(raw["replication_plan"]),
         claim_boundary=tuple(str(x) for x in raw.get("claim_boundary", ())),
