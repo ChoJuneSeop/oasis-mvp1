@@ -57,6 +57,36 @@ def three_lens_review(
             "execution_profile_missing_required_checks:"
             + ",".join(missing_scientific_execution_checks)
         )
+
+    check_counts: dict[str, int] = {}
+    check_status: dict[str, CheckStatus] = {}
+    for item in execution_report.checks:
+        check_counts[item.check_id] = check_counts.get(item.check_id, 0) + 1
+        if check_counts[item.check_id] == 1:
+            check_status[item.check_id] = item.status
+
+    missing_concrete_results = sorted(
+        check_id
+        for check_id in proof_report.required_execution_check_ids
+        if check_counts.get(check_id, 0) != 1
+    )
+    if missing_concrete_results:
+        execution_blockers.append(
+            "execution_profile_missing_concrete_pass_results:"
+            + ",".join(missing_concrete_results)
+        )
+
+    nonpassing_concrete_results = sorted(
+        check_id
+        for check_id in proof_report.required_execution_check_ids
+        if check_counts.get(check_id, 0) == 1
+        and check_status.get(check_id) is not CheckStatus.PASS
+    )
+    if nonpassing_concrete_results:
+        execution_blockers.append(
+            "execution_profile_nonpassing_required_results:"
+            + ",".join(nonpassing_concrete_results)
+        )
     if proof_report.execution_profile_id != execution_report.profile_id:
         execution_blockers.append(
             "execution_profile_mismatch:"
