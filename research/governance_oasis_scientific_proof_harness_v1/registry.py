@@ -194,3 +194,24 @@ CLAIM_DESCRIPTIONS: dict[str, str] = {
     "GO-A6-C1": "A behavior change induced by prior experience can be classified as adverse only after authoritative outcome observation, provenance-bound revalidated, and later related behavior can recover.",
     "GO-INTEGRATED-C1": "The six governance functions coexist in one flow-preserving integrated experiment without violating temporal causality or single realization.",
 }
+
+
+REQUIRED_CLAIMS_BY_AXIS: dict[AxisId, tuple[str, ...]] = {
+    AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS: ("GO-A1-C1", "GO-A1-C2"),
+    AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY: ("GO-A2-C1", "GO-A2-C2"),
+    AxisId.A3_RESPONSIBILITY_SENSITIVITY: ("GO-A3-C1",),
+    AxisId.A4_OVERGENERALIZATION_PREVENTION: ("GO-A4-C1",),
+    AxisId.A5_CONFLICTING_EXPERIENCE_HANDLING: ("GO-A5-C1",),
+    AxisId.A6_WRONG_BEHAVIOR_RECOVERY: ("GO-A6-C1",),
+}
+
+MANDATORY_EXECUTION_CHECK_IDS = (
+    "source_freeze",
+    "world_isolation",
+    "cross_arm_identity",
+    "future_leakage",
+    "evaluator_postjoin",
+    "single_realization",
+    "provenance_integrity",
+    "output_immutability",
+)
