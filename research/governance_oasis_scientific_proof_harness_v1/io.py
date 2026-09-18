@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from .models import AxisId, EvidenceLevel, EvidenceRecord
+from .models import AxisId, ClaimOutcome, EvidenceLevel, EvidenceRecord
 
 
 def load_evidence_registry(path: Path) -> tuple[str, tuple[EvidenceRecord, ...]]:
@@ -21,10 +21,12 @@ def load_evidence_registry(path: Path) -> tuple[str, tuple[EvidenceRecord, ...]]
                 source_refs=tuple(str(x) for x in raw.get("source_refs", ())),
                 claim_boundary=tuple(str(x) for x in raw.get("claim_boundary", ())),
                 counts_toward_axis_proof=bool(raw["counts_toward_axis_proof"]),
+                claim_outcome=ClaimOutcome(raw["claim_outcome"]),
                 verified_obligations=tuple(
                     str(x) for x in raw.get("verified_obligations", ())
                 ),
                 review_method=str(raw.get("review_method", "")),
+                result_rule_ref=str(raw.get("result_rule_ref", "")),
                 notes=tuple(str(x) for x in raw.get("notes", ())),
             )
         )
