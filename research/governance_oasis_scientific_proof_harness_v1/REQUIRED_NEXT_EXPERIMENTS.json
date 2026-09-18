@@ -107,6 +107,8 @@
       "axis": "A6_WRONG_BEHAVIOR_RECOVERY",
       "scientific_question": "After a prior Completed Experience induces a realized behavior change, and only the authoritative post-realization outcome subsequently satisfies a preregistered adverse-outcome criterion, can provenance-bound revalidation alter a later related decision and produce prespecified behavioral recovery?",
       "minimum_arms": [
+        "INITIAL_EXPERIENCE_EXPOSED",
+        "INITIAL_EXPERIENCE_HIDDEN",
         "REVALIDATION_EXPOSED",
         "REVALIDATION_RECORD_ONLY",
         "EXOGENOUS_ATTRIBUTION_CONTROL"
@@ -129,11 +131,12 @@
         "later behavior recovery observation"
       ],
       "primary_observables": [
-        "wrong-change realization",
+        "initial experience-induced behavior difference",
+        "authoritative adverse-outcome classification after realization",
         "revalidation target and attribution",
         "later participation revision",
         "later selected/realized action",
-        "recovery endpoint"
+        "prespecified recovery endpoint"
       ],
       "mandatory_invariants": [
         "same-epoch feedback forbidden",
@@ -155,7 +158,8 @@
         "DECISION_LINKED",
         "EXOGENOUS"
       ],
-      "adverse_outcome_rule": "Wrongness/adversity is undefined at decision time and is assigned only from authoritative post-realization observation under a preregistered evaluator rule."
+      "adverse_outcome_rule": "Wrongness/adversity is undefined at decision time and is assigned only from authoritative post-realization observation under a preregistered evaluator rule.",
+      "support_condition": "Support requires both causal links under the frozen rule: prior CE exposure must causally alter the initial realized behavior that is later classified adverse, and exposing the resulting provenance-bound revalidation must causally improve the preregistered later recovery endpoint relative to record-only. Failure of either link is a valid DOES_NOT_SUPPORT result."
     },
     {
       "experiment_id": "GH4_FLOW_PRESERVING_INTEGRATED_CONFIRMATORY",
@@ -172,14 +176,24 @@
       "required_flow": [
         "CURRENT_FLOW",
         "RELATION_PROCESS",
+        "HISTORY_NEED_GATE",
         "SELECTIVE_PARTICIPATION",
-        "POSSIBILITY_SET",
+        "POSSIBILITY_DISTRIBUTION",
         "U_I_V_T_RESPONSIBILITY",
+        "DECISION",
         "SINGLE_REALIZATION",
         "POST_OUTCOME_OBSERVATION",
         "CLOSURE",
         "REVALIDATION",
-        "LATER_SELECTIVE_REUSE"
+        "COMMIT",
+        "LATER_CURRENT_FLOW",
+        "LATER_RELATION_PROCESS",
+        "LATER_HISTORY_NEED_GATE",
+        "LATER_SELECTIVE_PARTICIPATION",
+        "LATER_POSSIBILITY_DISTRIBUTION",
+        "LATER_U_I_V_T_RESPONSIBILITY",
+        "LATER_DECISION",
+        "LATER_SINGLE_REALIZATION"
       ],
       "mandatory_scenario_features": [
         "long-horizon accumulation",
