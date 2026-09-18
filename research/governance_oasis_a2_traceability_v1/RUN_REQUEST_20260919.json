@@ -1,0 +1,14 @@
+{
+  "schema": "governance-oasis-a2-confirmatory-run-request-v1",
+  "experiment_id": "GO_A2_RELATION_ORDER_TRACEABILITY_V1",
+  "requested_sequence": [
+    "A2-I",
+    "A2-R",
+    "A2-O",
+    "A2-N"
+  ],
+  "execution_profile_id": "GO_A2_TRACEABILITY_EXECUTION_V1",
+  "preexecution_verified_sha": "fcea202f79005551d3d6cdd1c98d11c774e3bb48",
+  "interpretation_rule": "COMPLETE != SUPPORTS",
+  "confirmatory": true
+}
