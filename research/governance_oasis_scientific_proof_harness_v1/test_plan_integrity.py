@@ -47,6 +47,17 @@ class RequiredNextExperimentsIntegrityTests(unittest.TestCase):
                 self.assertTrue(item["primary_observables"])
                 self.assertIn("zero difference remains a valid result", item["mandatory_invariants"])
 
+    def test_a2_ablation_does_not_claim_same_full_ce_content(self):
+        a2 = next(
+            x for x in self.data["required_next_experiments"]
+            if x["axis"] == AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY.value
+        )
+        held = " ".join(a2["held_constant"]).lower()
+        self.assertIn("same completed experience identities", held)
+        self.assertIn("non-relational payload", held)
+        self.assertIn("only declared relation/process/order metadata", held)
+        self.assertNotIn("same completed experience multiset/content", held)
+
     def test_a4_requires_all_relation_contexts(self):
         a4 = next(
             x for x in self.data["required_next_experiments"]
@@ -63,20 +74,38 @@ class RequiredNextExperimentsIntegrityTests(unittest.TestCase):
             if x["axis"] == AxisId.A5_CONFLICTING_EXPERIENCE_HANDLING.value
         )
         self.assertGreaterEqual(a5["minimum_conflicting_completed_experiences"], 2)
+        self.assertTrue(a5["conflict_operational_definition"].strip())
         text = " ".join(a5["mandatory_invariants"]).lower()
         self.assertIn("no scalar", text)
         self.assertIn("no destructive overwrite", text)
 
-    def test_a6_requires_real_wrong_change_before_recovery(self):
+    def test_a6_requires_post_outcome_wrongness_then_recovery(self):
         a6 = next(
             x for x in self.data["required_next_experiments"]
             if x["axis"] == AxisId.A6_WRONG_BEHAVIOR_RECOVERY.value
         )
         self.assertGreaterEqual(a6["minimum_temporal_epochs"], 3)
+        self.assertEqual(
+            set(a6["attribution_controls"]),
+            {"DECISION_LINKED", "EXOGENOUS"},
+        )
+        self.assertIn("undefined at decision time", a6["adverse_outcome_rule"])
         chain = a6["required_temporal_chain"]
-        self.assertLess(chain.index("wrong later behavior is actually realized"), chain.index("Closure"))
-        self.assertLess(chain.index("Closure"), chain.index("provenance-bound revalidation commit"))
-        self.assertLess(chain.index("provenance-bound revalidation commit"), chain.index("later behavior recovery observation"))
+        realized = chain.index(
+            "later behavior change is actually realized without a pre-supplied wrongness label"
+        )
+        observed = chain.index("authoritative post-outcome observation is produced")
+        evaluated = chain.index(
+            "independent evaluator applies the preregistered adverse-outcome criterion after worker output is sealed"
+        )
+        closure = chain.index("Closure")
+        revalidation = chain.index("provenance-bound revalidation commit")
+        recovery = chain.index("later behavior recovery observation")
+        self.assertLess(realized, observed)
+        self.assertLess(observed, evaluated)
+        self.assertLess(evaluated, closure)
+        self.assertLess(closure, revalidation)
+        self.assertLess(revalidation, recovery)
 
     def test_integration_requires_all_six_axes(self):
         integrated = self.data["required_next_experiments"][-1]
