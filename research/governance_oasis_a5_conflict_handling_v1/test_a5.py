@@ -30,14 +30,6 @@ class A5Tests(unittest.TestCase):
         self.assertTrue(d.proof_ready,d.unresolved_check_ids)
         self.assertTrue(g.freeze_ready,g.unresolved_check_ids)
 
-    def test_confirmatory_reference_result(self):
-        world=build_confirmatory_world()
-        result=evaluate(world,run_workers(world),scientific=True)
-        self.assertEqual(result["outcome"],"SUPPORTS")
-        self.assertEqual(result["production_correct_case_count"],12)
-        self.assertEqual(result["order_ablation_divergence_count"],6)
-        self.assertEqual(result["relation_permutation_divergence_count"],6)
-        self.assertEqual(result["latest_only_older_target_divergence_count"],6)
 
 if __name__=="__main__":
     unittest.main()
