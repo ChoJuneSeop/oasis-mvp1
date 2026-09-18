@@ -66,7 +66,27 @@ def evaluate_run(
         revalidations = [e for e in events if e.event_type is EventType.REVALIDATION_OBSERVED]
         participations = [e for e in events if e.event_type is EventType.PARTICIPATION_OBSERVED]
         consumptions = [e for e in events if e.event_type is EventType.DECISION_INPUT_CONSUMED]
-        anchor = candidates[-1] if candidates else (events[0] if events else None)
+        provenance_events = candidates + revalidations + participations + consumptions
+        digest_states = {
+            (e.payload_digest, e.relation_digest, e.order_digest)
+            for e in provenance_events
+        }
+        if len(digest_states) > 1:
+            return RunEvaluation(
+                run_id=reference_ledger.run_id,
+                contrast_id=reference_ledger.contrast_id,
+                arm_id=reference_ledger.arm_id,
+                outcome=ClaimOutcome.INVALID,
+                reasons=(f"{ce_id}: reference provenance digest changed across pre-realization states",),
+                matched_entries=0,
+                reference_consumed_ids=(),
+                system_consumed_ids=(),
+            )
+        anchor = (
+            consumptions[-1]
+            if consumptions
+            else (candidates[-1] if candidates else (events[0] if events else None))
+        )
         reference_state[ce_id] = {
             "candidate": bool(candidates),
             "revalidated": _last_bool(revalidations, "accepted"),
