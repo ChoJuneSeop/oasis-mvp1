@@ -1,0 +1,27 @@
+{
+  "status":"PILOT_FREEZE_READY",
+  "spec_version":"GOVERNANCE_CBRA_CARLA_PILOT_V1_0_FINAL",
+  "frozen_design_snapshot_sha":"88209b37b63b4b4a2c638801b4d62886add74204",
+  "freeze_validation_run_id":35332552245,
+  "freeze_validation_job_id":105559944434,
+  "validation":{
+    "compile":true,
+    "pilot_freeze_tests":true,
+    "mapping_regression":true,
+    "efficiency_contract_regression":true,
+    "canonical_carla_regression":true,
+    "cbra_regression":true,
+    "governance_regression":true,
+    "real_execution_block_asserted":true
+  },
+  "pilot_matrix":{
+    "arms":3,
+    "failure_classes":6,
+    "reentry_contexts":3,
+    "minimum_case_arm_units":54
+  },
+  "runtime_identity_status":"BLOCKED_PENDING_4_SOURCE_IDENTITIES",
+  "real_carla_execution_permitted":false,
+  "real_carla_executed":false,
+  "aggregate_score":null
+}
