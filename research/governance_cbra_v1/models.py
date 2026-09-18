@@ -14,6 +14,7 @@ class TargetKind(str, Enum):
     RESPONSIBILITY_I = "responsibility_i"
     RESPONSIBILITY_V = "responsibility_v"
     RESPONSIBILITY_T = "responsibility_t"
+    RESPONSIBILITY_OBLIGATION = "responsibility_obligation"
 
 
 class AssessmentBasis(str, Enum):
@@ -32,6 +33,12 @@ class EvidenceDirection(str, Enum):
     SUPPORTS = "supports"
     CONTRADICTS = "contradicts"
     INDETERMINATE = "indeterminate"
+
+
+class MonitorState(str, Enum):
+    ACTIVE = "active"
+    DORMANT = "dormant"
+    CLOSED = "closed"
 
 
 @dataclass(frozen=True)
@@ -56,6 +63,7 @@ class ResponsibilityProvenance:
     temporality: tuple[str, ...]
     selected_obligations: tuple[str, ...]
     nonselected_obligations: tuple[str, ...]
+    axis_obligations: tuple[tuple[str, tuple[str, ...]], ...]
 
     def __post_init__(self):
         if not self.selected_candidate_id:
@@ -69,6 +77,11 @@ class ResponsibilityProvenance:
             raise ValueError("CBRA requires selected obligations")
         if self.nonselected_candidate_ids and not self.nonselected_obligations:
             raise ValueError("CBRA requires nonselected obligations")
+        labels = tuple(axis for axis, _ in self.axis_obligations)
+        if labels != ("U", "I", "V", "T"):
+            raise ValueError("CBRA axis obligations must be ordered U/I/V/T")
+        if any(not obligations for _, obligations in self.axis_obligations):
+            raise ValueError("CBRA requires obligation-level traceability for every U/I/V/T axis")
 
 
 @dataclass(frozen=True)
@@ -92,6 +105,8 @@ class DecisionProvenanceSnapshot:
 
 @dataclass(frozen=True)
 class TargetEvidence:
+    relation_id: str
+    event_id: str
     target_kind: TargetKind
     target_id: str
     direction: EvidenceDirection
@@ -100,6 +115,8 @@ class TargetEvidence:
     note: str = ""
 
     def __post_init__(self):
+        if not self.relation_id or not self.event_id:
+            raise ValueError("CBRA evidence requires relation and event identity")
         if not self.target_id:
             raise ValueError("CBRA evidence requires a target id")
         if not self.evidence_refs:
@@ -127,5 +144,6 @@ class RevalidationCheckpoint:
     selected_choice_finding: RevalidationFinding
     nonselected_choice_findings: tuple[RevalidationFinding, ...]
     responsibility_findings: tuple[RevalidationFinding, ...]
+    responsibility_obligation_findings: tuple[RevalidationFinding, ...]
     overall_attribution: AttributionKind
     evidence_refs: tuple[str, ...]
