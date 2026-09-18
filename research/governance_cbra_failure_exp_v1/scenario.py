@@ -53,13 +53,14 @@ class ScenarioCase:
     truth:TruthCase
 
 
-FAMILIES=("F1","F2","F3","F4")
+FAMILY_SCOPES={"F1":1,"F2":2,"F3":3,"F4":4}
 
 
 def _case(fc:FailureClass, ctx:ReentryContext, family:str, idx:int)->ScenarioCase:
+    initial_scope=FAMILY_SCOPES.get(family,2)
     relation="REL-A"
     re_rel="REL-B" if ctx is ReentryContext.UNRELATED else relation
-    re_scope=2 if ctx is ReentryContext.SAME_SCOPE else (3 if ctx is ReentryContext.CHANGED_SCOPE else 2)
+    re_scope=initial_scope if ctx is ReentryContext.SAME_SCOPE else (initial_scope+1 if ctx is ReentryContext.CHANGED_SCOPE else initial_scope)
 
     if fc is FailureClass.PARTICIPATION_COMMISSION:
         initial=True; kind=TargetKind.PARTICIPATION; target="CE-FAIL"
@@ -77,7 +78,7 @@ def _case(fc:FailureClass, ctx:ReentryContext, family:str, idx:int)->ScenarioCas
         initial=True; kind=TargetKind.PARTICIPATION; target="CE-FAIL"
         direction=EvidenceDirection.CONTRADICTS; attribution=AttributionKind.DECISION_LINKED
 
-    cid=f"{idx:03d}:{fc.value}:{ctx.value}:{family}"
+    cid=f"{idx:03d}:{fc.value}:{ctx.value}:{family}:s{initial_scope}"
     truth=TruthCase(
         cid,
         should_change_same_scope=fc in {FailureClass.PARTICIPATION_COMMISSION,FailureClass.PARTICIPATION_OMISSION,FailureClass.RESPONSIBILITY_AXIS,FailureClass.DELAYED},
@@ -86,7 +87,7 @@ def _case(fc:FailureClass, ctx:ReentryContext, family:str, idx:int)->ScenarioCas
         no_provenance_should_be_revisable=fc is FailureClass.PARTICIPATION_OMISSION,
         responsibility_axis_should_be_revisable=fc is FailureClass.RESPONSIBILITY_AXIS,
     )
-    runtime=RuntimeCase(cid,fc,ctx,family,relation,re_rel,2,re_scope,initial,kind,target,direction,attribution,fc is FailureClass.DELAYED)
+    runtime=RuntimeCase(cid,fc,ctx,family,relation,re_rel,initial_scope,re_scope,initial,kind,target,direction,attribution,fc is FailureClass.DELAYED)
     return ScenarioCase(runtime,truth)
 
 
@@ -100,7 +101,7 @@ def build_pilot_world()->tuple[ScenarioCase,...]:
 
 def build_confirmatory_world()->tuple[ScenarioCase,...]:
     out=[]; i=0
-    for family in FAMILIES:
+    for family in FAMILY_SCOPES:
         for fc in FailureClass:
             for ctx in ReentryContext:
                 i+=1; out.append(_case(fc,ctx,family,i))
