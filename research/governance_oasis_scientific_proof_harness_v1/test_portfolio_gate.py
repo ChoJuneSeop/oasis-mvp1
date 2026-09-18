@@ -4,7 +4,7 @@ from pathlib import Path
 import unittest
 
 from .io import load_evidence_registry
-from .models import AxisId, EvidenceLevel, EvidenceRecord
+from .models import AxisId, ClaimOutcome, EvidenceLevel, EvidenceRecord
 from .portfolio_gate import audit_portfolio
 from .registry import AXIS_CONTRACTS
 
@@ -54,6 +54,7 @@ class PortfolioGateTests(unittest.TestCase):
             source_refs=("integrated-spec", "integrated-result"),
             claim_boundary=("finite integrated scope",),
             counts_toward_axis_proof=True,
+            claim_outcome=ClaimOutcome.SUPPORTS,
             verified_obligations=tuple(
                 sorted(
                     {
@@ -64,11 +65,57 @@ class PortfolioGateTests(unittest.TestCase):
                 )
             ),
             review_method="test integrated review",
+            result_rule_ref="frozen-result-rule",
         )
         report = audit_portfolio(program_id="TEST", evidence=(integrated,))
         self.assertFalse(report.proof_complete)
         self.assertEqual(set(report.weak_axes), {axis.value for axis in AxisId})
         self.assertEqual(report.integration_evidence_ids, ("E-INTEGRATED-ONLY",))
+
+    def test_completed_null_result_does_not_count_as_proof_support(self):
+        axis = AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS
+        record = EvidenceRecord(
+            evidence_id="E-NULL",
+            experiment_id="X-NULL",
+            axes=(axis,),
+            level=EvidenceLevel.CONFIRMATORY,
+            design_report_passed=True,
+            result_status="COMPLETE",
+            source_refs=("spec", "result"),
+            claim_boundary=("finite scope",),
+            counts_toward_axis_proof=True,
+            claim_outcome=ClaimOutcome.DOES_NOT_SUPPORT,
+            verified_obligations=AXIS_CONTRACTS[axis].mandatory_obligations,
+            review_method="test review",
+            result_rule_ref="frozen-result-rule",
+        )
+        report = audit_portfolio(program_id="TEST", evidence=(record,))
+        self.assertFalse(report.proof_complete)
+        self.assertIn(axis.value, report.unsupported_axes)
+        self.assertNotIn(axis.value, report.supported_axes)
+
+    def test_conflicting_confirmatory_outcomes_are_inconclusive_not_proof(self):
+        axis = AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS
+        base = dict(
+            experiment_id="X",
+            axes=(axis,),
+            level=EvidenceLevel.CONFIRMATORY,
+            design_report_passed=True,
+            result_status="COMPLETE",
+            source_refs=("spec", "result"),
+            claim_boundary=("finite scope",),
+            counts_toward_axis_proof=True,
+            verified_obligations=AXIS_CONTRACTS[axis].mandatory_obligations,
+            review_method="test review",
+            result_rule_ref="frozen-result-rule",
+        )
+        records = (
+            EvidenceRecord(evidence_id="E-S", claim_outcome=ClaimOutcome.SUPPORTS, **base),
+            EvidenceRecord(evidence_id="E-N", claim_outcome=ClaimOutcome.DOES_NOT_SUPPORT, **base),
+        )
+        report = audit_portfolio(program_id="TEST", evidence=records)
+        self.assertIn(axis.value, report.inconclusive_axes)
+        self.assertNotIn(axis.value, report.supported_axes)
 
     def test_program_can_close_only_with_all_axis_confirmatory_and_integration(self):
         records = []
@@ -86,6 +133,7 @@ class PortfolioGateTests(unittest.TestCase):
                     counts_toward_axis_proof=True,
                     verified_obligations=AXIS_CONTRACTS[axis].mandatory_obligations,
                     review_method="test axis review",
+                    result_rule_ref="frozen-result-rule",
                 )
             )
         records.append(
@@ -109,6 +157,7 @@ class PortfolioGateTests(unittest.TestCase):
                     )
                 ),
                 review_method="test integrated review",
+            result_rule_ref="frozen-result-rule",
             )
         )
         report = audit_portfolio(program_id="TEST", evidence=records)
