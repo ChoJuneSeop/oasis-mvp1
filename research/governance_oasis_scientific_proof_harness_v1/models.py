@@ -142,6 +142,8 @@ class EvidenceRecord:
     source_refs: tuple[str, ...]
     claim_boundary: tuple[str, ...]
     counts_toward_axis_proof: bool
+    verified_obligations: tuple[str, ...]
+    review_method: str
     notes: tuple[str, ...] = ()
 
 
