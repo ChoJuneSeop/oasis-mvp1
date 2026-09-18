@@ -1,0 +1,360 @@
+{
+  "program_id": "GOVERNANCE_OASIS_SIX_AXIS_PROOF_PROGRAM_V1",
+  "status": "SUPPLEMENTAL_AFTER_A4_CONFIRMATORY",
+  "interpretation_rule": "Only confirmatory evidence that satisfies the axis-specific proof contract counts toward axis proof. Structural pilots and partial mechanism evidence remain provenance but do not close an axis.",
+  "records": [
+    {
+      "evidence_id": "E-GH1L-A1",
+      "experiment_id": "GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT",
+      "axes": [
+        "A1_BEHAVIOR_CHANGE_EFFECTIVENESS"
+      ],
+      "level": "CONFIRMATORY",
+      "design_report_passed": true,
+      "result_status": "COMPLETE",
+      "source_refs": [
+        "research/governance_harness_gh1l/design/FINAL_SPEC.md",
+        "research/governance_harness_gh1l/results/GH1L_CONFIRMATORY_RESULT_2026-09-16.md"
+      ],
+      "claim_boundary": [
+        "finite frozen synthetic world",
+        "selective re-participation mechanism only",
+        "not real-world safety or general model superiority"
+      ],
+      "counts_toward_axis_proof": true,
+      "notes": [
+        "G1-vs-G3 behavior-path effect",
+        "G1-vs-G4 selective participation contrast",
+        "G1-vs-G5 experience identity specificity"
+      ],
+      "verified_obligations": [
+        "behavior_endpoint",
+        "effectiveness_endpoint",
+        "mechanism_removal_contrast",
+        "same_current_context_across_contrast"
+      ],
+      "review_method": "retrospective source-bounded review against Governance OASIS Scientific Proof Harness v1 axis obligations",
+      "claim_outcome": "SUPPORTS",
+      "result_rule_ref": "research/governance_harness_gh1l/design/FINAL_SPEC.md#Frozen execution contract",
+      "source_git_blobs": {
+        "research/governance_harness_gh1l/design/FINAL_SPEC.md": "766c76706ddaa3dfcea822dbef467699d383aeb9",
+        "research/governance_harness_gh1l/results/GH1L_CONFIRMATORY_RESULT_2026-09-16.md": "754087e5ece0c56acad299c68b7ee5ea579e451b"
+      }
+    },
+    {
+      "evidence_id": "E-GH1L-A2-PARTIAL",
+      "experiment_id": "GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT",
+      "axes": [
+        "A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY"
+      ],
+      "level": "CONFIRMATORY",
+      "design_report_passed": false,
+      "result_status": "COMPLETE",
+      "source_refs": [
+        "research/governance_harness_gh1l/design/FINAL_SPEC.md",
+        "research/governance_harness_gh1l/results/GH1L_CONFIRMATORY_RESULT_2026-09-16.md"
+      ],
+      "claim_boundary": [
+        "identity specificity is tested",
+        "relation/order-history ablation is not closed by this experiment"
+      ],
+      "counts_toward_axis_proof": false,
+      "notes": [
+        "Identity specificity and provenance are supported.",
+        "Separate relation-history and order-history ablations are absent, so A2 remains open."
+      ],
+      "verified_obligations": [
+        "provenance_chain",
+        "experience_identity_control",
+        "mechanism_removal_contrast"
+      ],
+      "review_method": "claim-boundary review; not eligible for axis closure",
+      "claim_outcome": "SUPPORTS",
+      "result_rule_ref": "research/governance_harness_gh1l/design/FINAL_SPEC.md#Frozen invariants",
+      "source_git_blobs": {
+        "research/governance_harness_gh1l/design/FINAL_SPEC.md": "766c76706ddaa3dfcea822dbef467699d383aeb9",
+        "research/governance_harness_gh1l/results/GH1L_CONFIRMATORY_RESULT_2026-09-16.md": "754087e5ece0c56acad299c68b7ee5ea579e451b"
+      }
+    },
+    {
+      "evidence_id": "E-GH2-A3",
+      "experiment_id": "GH2_V1_1",
+      "axes": [
+        "A3_RESPONSIBILITY_SENSITIVITY"
+      ],
+      "level": "CONFIRMATORY",
+      "design_report_passed": true,
+      "result_status": "COMPLETE",
+      "source_refs": [
+        "research/governance_harness_gh2/README.md",
+        "research/governance_harness_gh2/results/GH2_V1_1_CONFIRMATORY_INTERPRETATION.md"
+      ],
+      "claim_boundary": [
+        "finite deterministic synthetic responsibility contract",
+        "not deployment safety or general task superiority"
+      ],
+      "counts_toward_axis_proof": true,
+      "notes": [
+        "CURRENT_BOUND vs RECORD_ONLY",
+        "PERMUTED and STALE responsibility controls",
+        "non-scalar U/I/V/T and selected==realized invariants"
+      ],
+      "verified_obligations": [
+        "responsibility_record_only_control",
+        "responsibility_content_control",
+        "responsibility_non_scalar",
+        "selected_nonselected_obligations"
+      ],
+      "review_method": "retrospective source-bounded review against Governance OASIS Scientific Proof Harness v1 axis obligations",
+      "claim_outcome": "SUPPORTS",
+      "result_rule_ref": "research/governance_harness_gh2/README.md#v1.1 confirmatory",
+      "source_git_blobs": {
+        "research/governance_harness_gh2/README.md": "b031326a56daa4c00b5260e6ee68217e828d8b6f",
+        "research/governance_harness_gh2/results/GH2_V1_1_CONFIRMATORY_INTERPRETATION.md": "a7e54c3c72545dbe7ac6600d2c57295e41e77580"
+      }
+    },
+    {
+      "evidence_id": "E-GH3-A4-PARTIAL",
+      "experiment_id": "GH3_V1_0",
+      "axes": [
+        "A4_OVERGENERALIZATION_PREVENTION"
+      ],
+      "level": "CONFIRMATORY",
+      "design_report_passed": false,
+      "result_status": "COMPLETE",
+      "source_refs": [
+        "research/governance_harness_gh3/design/FINAL_SPEC.md",
+        "research/governance_harness_gh3/results/GH3_CONFIRMATORY_RESULT_2026-09-16.md"
+      ],
+      "claim_boundary": [
+        "same-scope vs shifted-scope non-stickiness is demonstrated",
+        "unrelated-relation control is absent from the primary confirmatory matrix"
+      ],
+      "counts_toward_axis_proof": false,
+      "notes": [
+        "Supporting scope-locality evidence, not full A4 closure"
+      ],
+      "verified_obligations": [
+        "same_scope_control",
+        "changed_scope_control",
+        "no_global_exclusion"
+      ],
+      "review_method": "claim-boundary review; not eligible for axis closure",
+      "claim_outcome": "SUPPORTS",
+      "result_rule_ref": "research/governance_harness_gh3/design/FINAL_SPEC.md#Stability controls",
+      "source_git_blobs": {
+        "research/governance_harness_gh3/design/FINAL_SPEC.md": "9b0a653fb8149c5e5831b0f80cd3718629233992",
+        "research/governance_harness_gh3/results/GH3_CONFIRMATORY_RESULT_2026-09-16.md": "38dc3f2bc4ca964d99cae68aa9a80d0064623fdf"
+      }
+    },
+    {
+      "evidence_id": "E-GH3-A6-PARTIAL",
+      "experiment_id": "GH3_V1_0",
+      "axes": [
+        "A6_WRONG_BEHAVIOR_RECOVERY"
+      ],
+      "level": "CONFIRMATORY",
+      "design_report_passed": false,
+      "result_status": "COMPLETE",
+      "source_refs": [
+        "research/governance_harness_gh3/design/FINAL_SPEC.md",
+        "research/governance_harness_gh3/results/GH3_CONFIRMATORY_RESULT_2026-09-16.md"
+      ],
+      "claim_boundary": [
+        "post-Closure revalidation changes a later related decision",
+        "the experiment does not first require and observe a realized wrong behavior change followed by recovery"
+      ],
+      "counts_toward_axis_proof": false,
+      "notes": [
+        "GH-3 supports post-Closure outcome-based revalidation and later decision change.",
+        "It does not establish that prior CE causally induced an adverse behavior under a post-outcome wrongness criterion, so it cannot close A6."
+      ],
+      "verified_obligations": [
+        "authoritative_outcome_observation",
+        "post_outcome_contradiction_endpoint",
+        "later_recurrence",
+        "revalidation_ablation"
+      ],
+      "review_method": "claim-boundary review; not eligible for axis closure",
+      "claim_outcome": "SUPPORTS",
+      "result_rule_ref": "research/governance_harness_gh3/design/FINAL_SPEC.md#Link B primary",
+      "source_git_blobs": {
+        "research/governance_harness_gh3/design/FINAL_SPEC.md": "9b0a653fb8149c5e5831b0f80cd3718629233992",
+        "research/governance_harness_gh3/results/GH3_CONFIRMATORY_RESULT_2026-09-16.md": "38dc3f2bc4ca964d99cae68aa9a80d0064623fdf"
+      }
+    },
+    {
+      "evidence_id": "E-CBRA-FAILURE-A4-A6-DESIGN",
+      "experiment_id": "CBRA_FAILURE_COMPLETED_EXPERIENCE_V1_1",
+      "axes": [
+        "A4_OVERGENERALIZATION_PREVENTION",
+        "A6_WRONG_BEHAVIOR_RECOVERY"
+      ],
+      "level": "DESIGN_ONLY",
+      "design_report_passed": false,
+      "result_status": "NOT_EXECUTED",
+      "source_refs": [
+        "research/governance_cbra_failure_exp_v1/FINAL_SPEC.md"
+      ],
+      "claim_boundary": [
+        "synthetic mechanism design",
+        "pre-execution pending"
+      ],
+      "counts_toward_axis_proof": false,
+      "notes": [
+        "Contains same/changed/unrelated contexts and delayed checkpoints but cannot count before execution and recovery-specific redesign"
+      ],
+      "verified_obligations": [],
+      "review_method": "claim-boundary review; not eligible for axis closure",
+      "claim_outcome": "UNTESTED",
+      "result_rule_ref": "research/governance_cbra_failure_exp_v1/FINAL_SPEC.md",
+      "source_git_blobs": {
+        "research/governance_cbra_failure_exp_v1/FINAL_SPEC.md": "b0a942e762404b318f672e9fbca9e7bf79de1a28"
+      }
+    },
+    {
+      "evidence_id": "E-RUN5-CARLA-STRUCTURAL",
+      "experiment_id": "GOVERNANCE_CBRA_CARLA_PILOT_RUN5",
+      "axes": [],
+      "level": "STRUCTURAL_ONLY",
+      "design_report_passed": false,
+      "result_status": "NOT_EXECUTED",
+      "source_refs": [
+        "research/governance_cbra_carla_pilot_v1/RUN5_FREEZE_SPEC.md"
+      ],
+      "claim_boundary": [
+        "CARLA structural pilot only",
+        "not confirmatory effectiveness evidence"
+      ],
+      "counts_toward_axis_proof": false,
+      "notes": [
+        "Useful execution-validity work but intentionally excluded from Governance proof coverage"
+      ],
+      "verified_obligations": [],
+      "review_method": "claim-boundary review; not eligible for axis closure",
+      "claim_outcome": "UNTESTED",
+      "result_rule_ref": "research/governance_cbra_carla_pilot_v1/RUN5_FREEZE_SPEC.md",
+      "source_git_blobs": {
+        "research/governance_cbra_carla_pilot_v1/RUN5_FREEZE_SPEC.md": "ab7563e3cd4e05fd770c3d64cb0fc7ae93d09187"
+      }
+    },
+    {
+      "evidence_id": "E-GH4-INTEGRATION-DESIGN",
+      "experiment_id": "GH4",
+      "axes": [
+        "A1_BEHAVIOR_CHANGE_EFFECTIVENESS",
+        "A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY",
+        "A3_RESPONSIBILITY_SENSITIVITY",
+        "A4_OVERGENERALIZATION_PREVENTION",
+        "A5_CONFLICTING_EXPERIENCE_HANDLING",
+        "A6_WRONG_BEHAVIOR_RECOVERY"
+      ],
+      "level": "DESIGN_ONLY",
+      "design_report_passed": false,
+      "result_status": "NOT_STARTED",
+      "source_refs": [
+        "research/governance_harness_gh4/TRANSITION_FROM_GH3.md"
+      ],
+      "claim_boundary": [
+        "integrated long-horizon validation reserved but not designed"
+      ],
+      "counts_toward_axis_proof": false,
+      "notes": [
+        "Required final integration evidence remains open"
+      ],
+      "verified_obligations": [],
+      "review_method": "claim-boundary review; not eligible for axis closure",
+      "claim_outcome": "UNTESTED",
+      "result_rule_ref": "research/governance_harness_gh4/TRANSITION_FROM_GH3.md",
+      "source_git_blobs": {
+        "research/governance_harness_gh4/TRANSITION_FROM_GH3.md": "f860ab6b1b2493f6308ec6769a04af97629912a6"
+      }
+    },
+    {
+      "evidence_id": "E-A2-TRACEABILITY-V1",
+      "experiment_id": "GO_A2_RELATION_ORDER_TRACEABILITY_V1",
+      "axes": [
+        "A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY"
+      ],
+      "level": "CONFIRMATORY",
+      "design_report_passed": true,
+      "result_status": "COMPLETE",
+      "source_refs": [
+        "research/governance_oasis_a2_traceability_v1/design_spec.py",
+        "research/governance_oasis_a2_traceability_v1/CONFIRMATORY_PLAN.json",
+        "research/governance_oasis_a2_traceability_v1/validation/confirmatory_35385728934/VALIDATION_RECORD.json"
+      ],
+      "claim_boundary": [
+        "controlled synthetic confirmatory execution through the frozen production CurrentContextChoice preference boundary",
+        "experience contribution traceability only; not action-quality, deployment-safety, or universal-performance proof"
+      ],
+      "counts_toward_axis_proof": true,
+      "notes": [
+        "A2-I identity trace SUPPORTS",
+        "A2-R relation/process trace SUPPORTS",
+        "A2-O order-history trace SUPPORTS",
+        "A2-N false-attribution controls SUPPORTS",
+        "sealed artifact digest sha256:36d0d3adf50b4f57f2550e3ead1ebcf889183d78cd104947e22e5abb96682255"
+      ],
+      "verified_obligations": [
+        "provenance_chain",
+        "experience_identity_control",
+        "relation_ablation",
+        "order_ablation",
+        "participation_yes_no_provenance",
+        "mechanism_removal_contrast"
+      ],
+      "review_method": "prospective A2 confirmatory execution reviewed against the frozen Governance OASIS Scientific Proof Harness v1 axis obligations",
+      "claim_outcome": "SUPPORTS",
+      "result_rule_ref": "research/governance_oasis_a2_traceability_v1/CONFIRMATORY_PLAN.json",
+      "source_git_blobs": {
+        "research/governance_oasis_a2_traceability_v1/design_spec.py": "416e3e56aae2611501d15adb44ae36569d838a50",
+        "research/governance_oasis_a2_traceability_v1/CONFIRMATORY_PLAN.json": "37fef7614caad2dfb34a55266d828d348b647c4d",
+        "research/governance_oasis_a2_traceability_v1/validation/confirmatory_35385728934/VALIDATION_RECORD.json": "ffd4e35d0ec75893afca84dc672bd3e6b425a27d"
+      }
+    },
+    {
+      "evidence_id": "E-A4-SCOPE-LOCALITY-V1",
+      "experiment_id": "GO_A4_SCOPE_LOCALITY_V1",
+      "axes": [
+        "A4_OVERGENERALIZATION_PREVENTION"
+      ],
+      "level": "CONFIRMATORY",
+      "design_report_passed": true,
+      "result_status": "COMPLETE",
+      "source_refs": [
+        "research/governance_oasis_a4_scope_locality_v1/design_spec.py",
+        "research/governance_oasis_a4_scope_locality_v1/CONFIRMATORY_PLAN.json",
+        "research/governance_oasis_a4_scope_locality_v1/validation/confirmatory_35388101677/VALIDATION_RECORD.json"
+      ],
+      "claim_boundary": [
+        "finite deterministic synthetic scope-locality mechanism",
+        "tests relation/context locality only; not universal safety or performance superiority"
+      ],
+      "counts_toward_axis_proof": true,
+      "notes": [
+        "SAME_SCOPE production preserves legitimate scoped REVISED influence in all 3 frozen families",
+        "CHANGED_SCOPE and UNRELATED_RELATION remain base-eligible and are not globally suppressed by production",
+        "scope-guard ablation produces 6 inappropriate global exclusions while production produces 0",
+        "sealed artifact digest sha256:2f79406a37cffc93119907cf5d1a740e38c30d46eae99bcd788b9638e43d9bbe"
+      ],
+      "verified_obligations": [
+        "same_scope_control",
+        "changed_scope_control",
+        "unrelated_relation_control",
+        "no_global_exclusion",
+        "participation_yes_no_provenance"
+      ],
+      "review_method": "prospective A4 confirmatory execution reviewed against the frozen Governance OASIS Scientific Proof Harness v1 axis obligations",
+      "claim_outcome": "SUPPORTS",
+      "result_rule_ref": "research/governance_oasis_a4_scope_locality_v1/CONFIRMATORY_PLAN.json",
+      "source_git_blobs": {
+        "research/governance_oasis_a4_scope_locality_v1/design_spec.py": "41c4de92df59b6cc3c2dee7e67c483f752b501cb",
+        "research/governance_oasis_a4_scope_locality_v1/CONFIRMATORY_PLAN.json": "8f3771422dfed68033f0d3c13028c5b07ee36ab9",
+        "research/governance_oasis_a4_scope_locality_v1/validation/confirmatory_35388101677/VALIDATION_RECORD.json": "91a2e1a5d5097658011ad6fa9a7de5f7ecbfa414"
+      }
+    }
+  ],
+  "base_frozen_registry_blob": "189b9b1e578f8a9da6a642b17cc1d011c0d3b084",
+  "base_after_a2_registry_blob": "3947d2fbc7146ae9f5eba7fcbf1022ecdce0a74b"
+}
