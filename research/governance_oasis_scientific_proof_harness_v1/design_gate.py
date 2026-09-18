@@ -61,6 +61,11 @@ def _contrast_integrity(design: ExperimentDesign) -> DesignCheck:
             bad.append(f"{item.contrast_id}: held_constant empty")
         if not item.observable_ids:
             bad.append(f"{item.contrast_id}: observable_ids empty")
+        unknown_observables = sorted(set(item.observable_ids) - set(design.observables))
+        if unknown_observables:
+            bad.append(
+                f"{item.contrast_id}: observable_ids not declared by design={unknown_observables}"
+            )
         if not item.falsification_condition.strip():
             bad.append(f"{item.contrast_id}: falsification_condition missing")
     duplicates = sorted(k for k, n in Counter(ids).items() if n > 1)
@@ -76,6 +81,30 @@ def _contrast_integrity(design: ExperimentDesign) -> DesignCheck:
             "crosscut_causal_contrast_integrity",
             "Causal contrasts are incomplete or not uniquely specified.",
             evidence=tuple(bad) if bad else ("no causal contrast",),
+        )
+    )
+
+
+def _falsifiability(design: ExperimentDesign) -> DesignCheck:
+    missing = []
+    if not design.purpose.strip():
+        missing.append("purpose")
+    if not design.hypothesis.strip():
+        missing.append("hypothesis")
+    if not design.null_or_falsification.strip():
+        missing.append("null_or_falsification")
+    if not design.observables:
+        missing.append("observables")
+    return (
+        _pass(
+            "crosscut_falsifiability",
+            "Purpose, hypothesis, falsification condition, and observables are prespecified.",
+        )
+        if not missing
+        else _fail(
+            "crosscut_falsifiability",
+            "The design cannot produce a scientific test because core falsifiability fields are missing.",
+            evidence=(f"missing={missing}",),
         )
     )
 
@@ -210,10 +239,15 @@ def _provenance_chain(design: ExperimentDesign) -> DesignCheck:
 
 def _axis_a1(design: ExperimentDesign) -> DesignCheck:
     axis = AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS
+    held_current = any(
+        any("current" in item.lower() or "observation" in item.lower() for item in contrast.held_constant)
+        for contrast in design.contrasts
+    )
     ok = (
         design.behavior_endpoint
         and design.effectiveness_endpoint
         and design.same_current_context_across_contrast
+        and held_current
         and _mechanism_contrast(design)
     )
     return (
@@ -231,6 +265,7 @@ def _axis_a1(design: ExperimentDesign) -> DesignCheck:
                 f"behavior_endpoint={design.behavior_endpoint}",
                 f"effectiveness_endpoint={design.effectiveness_endpoint}",
                 f"same_current_context_across_contrast={design.same_current_context_across_contrast}",
+                f"held_current_context={held_current}",
                 f"mechanism_contrast={_mechanism_contrast(design)}",
             ),
         )
@@ -239,10 +274,16 @@ def _axis_a1(design: ExperimentDesign) -> DesignCheck:
 
 def _axis_a2(design: ExperimentDesign) -> DesignCheck:
     axis = AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY
+    identity_contrast = _mechanism_contrast(design, "identity")
+    relation_order_contrast = (
+        _mechanism_contrast(design, "order")
+        or _mechanism_contrast(design, "relation")
+    )
     ok = (
         design.experience_identity_control
         and design.relation_order_ablation
-        and _mechanism_contrast(design)
+        and identity_contrast
+        and relation_order_contrast
         and len(design.provenance_chain) >= 5
     )
     return (
@@ -259,6 +300,8 @@ def _axis_a2(design: ExperimentDesign) -> DesignCheck:
             evidence=(
                 f"experience_identity_control={design.experience_identity_control}",
                 f"relation_order_ablation={design.relation_order_ablation}",
+                f"identity_contrast={identity_contrast}",
+                f"relation_order_contrast={relation_order_contrast}",
                 f"provenance_length={len(design.provenance_chain)}",
             ),
         )
@@ -301,7 +344,16 @@ def _axis_a4(design: ExperimentDesign) -> DesignCheck:
     axis = AxisId.A4_OVERGENERALIZATION_PREVENTION
     contexts = {x.upper() for x in design.relation_context_controls}
     required = {"SAME_SCOPE", "CHANGED_SCOPE", "UNRELATED_RELATION"}
-    ok = required.issubset(contexts) and design.no_global_exclusion_control
+    scope_contrast = (
+        _mechanism_contrast(design, "scope")
+        or _mechanism_contrast(design, "relation")
+        or _mechanism_contrast(design, "participation")
+    )
+    ok = (
+        required.issubset(contexts)
+        and design.no_global_exclusion_control
+        and scope_contrast
+    )
     return (
         _pass(
             "axis_a4_overgeneralization",
@@ -316,6 +368,7 @@ def _axis_a4(design: ExperimentDesign) -> DesignCheck:
             evidence=(
                 f"contexts={sorted(contexts)}",
                 f"no_global_exclusion_control={design.no_global_exclusion_control}",
+                f"scope_contrast={scope_contrast}",
             ),
         )
     )
@@ -396,6 +449,7 @@ AXIS_CHECKS = {
 def validate_design(design: ExperimentDesign) -> ProofDesignReport:
     checks: list[DesignCheck] = [
         _claim_alignment(design),
+        _falsifiability(design),
         _contrast_integrity(design),
         _temporal_causality(design),
         _evaluator_independence(design),
