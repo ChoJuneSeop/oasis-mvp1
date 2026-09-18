@@ -60,6 +60,7 @@ class CausalContrast:
 class ExperimentDesign:
     experiment_id: str
     execution_profile_id: str
+    required_execution_check_ids: tuple[str, ...]
     purpose: str
     targeted_axes: tuple[AxisId, ...]
     claim_ids: tuple[str, ...]
@@ -139,6 +140,7 @@ class DesignCheck:
 class ProofDesignReport:
     experiment_id: str
     execution_profile_id: str
+    required_execution_check_ids: tuple[str, ...]
     checks: tuple[DesignCheck, ...]
     targeted_axes: tuple[AxisId, ...]
     proof_ready: bool
@@ -148,6 +150,7 @@ class ProofDesignReport:
         return {
             "experiment_id": self.experiment_id,
             "execution_profile_id": self.execution_profile_id,
+            "required_execution_check_ids": list(self.required_execution_check_ids),
             "checks": [item.as_dict() for item in self.checks],
             "targeted_axes": [axis.value for axis in self.targeted_axes],
             "proof_ready": self.proof_ready,
