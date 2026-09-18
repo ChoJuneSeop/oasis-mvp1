@@ -1,0 +1,55 @@
+{
+  "schema": "governance-oasis-a4-confirmatory-validation-record-v1",
+  "experiment_id": "GO_A4_SCOPE_LOCALITY_V1",
+  "axis": "A4_OVERGENERALIZATION_PREVENTION",
+  "execution_sha": "82f7132e2d9f07d8984008dcb9704d67f1b2f2b9",
+  "confirmatory_workflow": {
+    "run_id": 35388101677,
+    "job_id": 105739694358,
+    "conclusion": "success"
+  },
+  "artifact": {
+    "artifact_id": 10564942304,
+    "name": "governance-oasis-a4-confirmatory-35388101677-1",
+    "digest": "sha256:2f79406a37cffc93119907cf5d1a740e38c30d46eae99bcd788b9638e43d9bbe"
+  },
+  "frozen_source_blobs": {
+    "research/governance_oasis_a4_scope_locality_v1/design_spec.py": "41c4de92df59b6cc3c2dee7e67c483f752b501cb",
+    "research/governance_oasis_a4_scope_locality_v1/CONFIRMATORY_PLAN.json": "8f3771422dfed68033f0d3c13028c5b07ee36ab9",
+    "research/governance_oasis_a4_scope_locality_v1/experiment.py": "0192da31fe7afbe9a34ef7086b623da64b6ecb1d"
+  },
+  "preexecution": {
+    "proof_ready": true,
+    "freeze_ready": true,
+    "unresolved_design_checks": [],
+    "unresolved_execution_checks": []
+  },
+  "matrix": {
+    "families": [
+      "F1",
+      "F2",
+      "F3"
+    ],
+    "contexts": [
+      "SAME_SCOPE",
+      "CHANGED_SCOPE",
+      "UNRELATED_RELATION"
+    ],
+    "arms": [
+      "SCOPE_LOCAL_PRODUCTION",
+      "SCOPE_GUARD_ABLATED",
+      "RECORD_ONLY"
+    ],
+    "decision_realization_units": 27
+  },
+  "results": {
+    "outcome": "SUPPORTS",
+    "failures": [],
+    "same_scope_effect_count": 3,
+    "production_inappropriate_global_exclusion_count": 0,
+    "guard_ablated_global_exclusion_count": 6
+  },
+  "claim_boundary": "Finite deterministic synthetic scope-locality mechanism only; not universal safety or performance proof.",
+  "complete_not_equal_supports": true,
+  "post_result_rule_retuning": false
+}
