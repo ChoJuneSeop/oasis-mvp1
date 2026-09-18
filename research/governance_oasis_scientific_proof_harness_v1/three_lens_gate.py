@@ -9,6 +9,7 @@ DEFINITION_CHECKS = {
     "crosscut_claim_alignment",
     "crosscut_falsifiability",
     "crosscut_preregistration_boundary",
+    "crosscut_history_integrity",
     "crosscut_provenance_continuity",
     "crosscut_scientific_evidence_level",
 }
