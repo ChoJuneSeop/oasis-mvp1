@@ -29,6 +29,9 @@ def load_design(path: Path) -> ExperimentDesign:
     return ExperimentDesign(
         experiment_id=str(raw["experiment_id"]),
         execution_profile_id=str(raw["execution_profile_id"]),
+        required_execution_check_ids=tuple(
+            str(x) for x in raw.get("required_execution_check_ids", ())
+        ),
         purpose=str(raw["purpose"]),
         targeted_axes=tuple(AxisId(x) for x in raw.get("targeted_axes", ())),
         claim_ids=tuple(str(x) for x in raw.get("claim_ids", ())),
