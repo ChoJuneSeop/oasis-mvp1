@@ -19,6 +19,12 @@ def load_evidence_registry(path: Path) -> tuple[str, tuple[EvidenceRecord, ...]]
                 design_report_passed=bool(raw["design_report_passed"]),
                 result_status=str(raw["result_status"]),
                 source_refs=tuple(str(x) for x in raw.get("source_refs", ())),
+                source_git_blobs=tuple(
+                    (str(path), str(blob))
+                    for path, blob in sorted(
+                        dict(raw.get("source_git_blobs", {})).items()
+                    )
+                ),
                 claim_boundary=tuple(str(x) for x in raw.get("claim_boundary", ())),
                 counts_toward_axis_proof=bool(raw["counts_toward_axis_proof"]),
                 claim_outcome=ClaimOutcome(raw["claim_outcome"]),
