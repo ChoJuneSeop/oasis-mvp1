@@ -48,6 +48,22 @@ class ProofRegistryIntegrityTests(unittest.TestCase):
                     (record["evidence_id"], sorted(required - verified)),
                 )
 
+    def test_every_record_declares_claim_outcome_and_result_rule(self):
+        data = json.loads(
+            (HERE / "PROGRAM_EVIDENCE_REGISTRY.json").read_text(encoding="utf-8")
+        )
+        allowed = {
+            "UNTESTED",
+            "SUPPORTS",
+            "DOES_NOT_SUPPORT",
+            "INCONCLUSIVE",
+            "INVALID",
+        }
+        for record in data["records"]:
+            with self.subTest(evidence_id=record["evidence_id"]):
+                self.assertIn(record["claim_outcome"], allowed)
+                self.assertTrue(record["result_rule_ref"].strip())
+
     def test_nonconfirmatory_levels_cannot_be_marked_as_axis_proof(self):
         data = json.loads(
             (HERE / "PROGRAM_EVIDENCE_REGISTRY.json").read_text(encoding="utf-8")
