@@ -1,0 +1,87 @@
+{
+  "freeze_id": "GOVERNANCE_CBRA_CARLA_PILOT_RUN3_FREEZE_V1",
+  "status": "FROZEN_BEFORE_RUN3_EXECUTION",
+  "source_freeze_commit": "b1203f7d3d1e6cac4895a09444defbc9bf31fee2",
+  "branch_before_run3_branch_cut": "experiment/governance-cbra-carla-pilot-v1-freeze",
+  "preserved_prior_runs": {
+    "run1": {
+      "status": "PRE_EXECUTION_RUNTIME_CONFIGURATION_FAILURE",
+      "overwrite_forbidden": true
+    },
+    "run2": {
+      "status": "PRESERVED_DIAGNOSTIC_EXECUTION",
+      "interpretation": "revealed scenario/Closure admission defect before valid arm-level comparison in many units",
+      "overwrite_forbidden": true
+    }
+  },
+  "unchanged_scientific_design": {
+    "matrix_units": 54,
+    "arms": [
+      "GENERAL_HARNESS",
+      "GOVERNANCE_NO_CBRA",
+      "GOVERNANCE_PLUS_CBRA"
+    ],
+    "failure_classes": [
+      "SUCCESS_CONTROL",
+      "PARTICIPATION_COMMISSION_FAILURE",
+      "PARTICIPATION_OMISSION_FAILURE",
+      "RESPONSIBILITY_AXIS_FAILURE",
+      "EXOGENOUS_FAILURE",
+      "DELAYED_FAILURE"
+    ],
+    "reentry_contexts": [
+      "SAME_SCOPE",
+      "CHANGED_SCOPE",
+      "UNRELATED_RELATION"
+    ],
+    "seeds_unchanged": true,
+    "failure_labels_unchanged": true,
+    "decision_thresholds_unchanged": true,
+    "responsibility_policy_unchanged": true,
+    "cbra_policy_unchanged": true,
+    "closure_rule_unchanged": true,
+    "post_result_retuning": false,
+    "aggregate_score": null
+  },
+  "run3_addition_only": {
+    "layer": "PRE_EXECUTION_SCENARIO_ADMISSION",
+    "experimental_evidence": false,
+    "deterministic_seed_shuffled_spawn_search": true,
+    "admissible_spawn_requires_forward_relation_space": true,
+    "admissible_spawn_requires_no_preexisting_front_relation": true,
+    "required_relation_rehearsal": {
+      "baseline_requires_front_present": false,
+      "staged_counterpart_requires_front_present": true,
+      "staged_counterpart_kind_must_match": true,
+      "counterpart_removal_requires_front_present": false
+    },
+    "changed_scope_requires_vehicle_and_pedestrian_rehearsal": true,
+    "same_scope_and_unrelated_require_vehicle_rehearsal": true,
+    "admission_failure_status": "PRE_EXECUTION_SCENARIO_INVALID",
+    "admission_failure_starts_no_decision_epoch": true,
+    "no_seed_substitution_after_admission_failure": true,
+    "no_threshold_substitution_after_admission_failure": true,
+    "no_distance_substitution_after_admission_failure": true,
+    "no_post_result_repair": true
+  },
+  "runtime": {
+    "carla_version": "0.9.16",
+    "map": "Town10HD_Opt",
+    "synchronous_mode": true,
+    "fixed_delta_seconds": 0.05,
+    "no_rendering_mode": true,
+    "render_off_screen": true
+  },
+  "frozen_source_git_blobs": {
+    "research/governance_cbra_carla_pilot_v1/PILOT_MATRIX.json": "be6f3192fe316776e7f9915f6e318f47e03e5f1b",
+    "research/governance_cbra_carla_pilot_v1/pilot_runtime.py": "6bf6d20d42ea44465017c65a789efa7bcc96a189",
+    "research/governance_cbra_carla_pilot_v1/pilot_runner.py": "7f311e0b1a933ec8f75ee1320bf760b97fb3e17e",
+    "research/governance_cbra_carla_pilot_v1/test_pilot_preexec.py": "d16abe83802e459357c9776be1a931c8493957bc"
+  },
+  "claim_boundary": {
+    "structural_pilot_only": true,
+    "confirmatory": false,
+    "superiority_claim": false,
+    "real_world_safety_claim": false
+  }
+}
