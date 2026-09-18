@@ -6,8 +6,10 @@ from pathlib import Path
 
 from .design_gate import validate_design
 from .design_io import load_design
+from .execution_report_io import load_execution_report
 from .io import load_evidence_registry
 from .portfolio_gate import audit_portfolio
+from .readiness_gate import evaluate_experiment_readiness
 
 
 HERE = Path(__file__).resolve().parent
@@ -21,6 +23,13 @@ def main(argv: list[str] | None = None) -> int:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--portfolio", action="store_true")
     group.add_argument("--design", type=Path)
+    group.add_argument(
+        "--ready-check",
+        type=Path,
+        metavar="DESIGN_JSON",
+        help="run the canonical scientific+sequence+three-lens readiness gate",
+    )
+    parser.add_argument("--execution-report", type=Path)
     parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
     parser.add_argument("--report", type=Path)
     parser.add_argument("--audit-only", action="store_true")
@@ -31,6 +40,21 @@ def main(argv: list[str] | None = None) -> int:
         report = audit_portfolio(program_id=program_id, evidence=records)
         payload = report.as_dict()
         ready = report.proof_complete
+    elif args.ready_check is not None:
+        if args.execution_report is None:
+            parser.error("--ready-check requires --execution-report")
+        program_id, records = load_evidence_registry(args.registry)
+        portfolio = audit_portfolio(program_id=program_id, evidence=records)
+        design = load_design(args.ready_check)
+        execution = load_execution_report(args.execution_report)
+        report = evaluate_experiment_readiness(
+            program_id=program_id,
+            design=design,
+            portfolio=portfolio,
+            execution_report=execution,
+        )
+        payload = report.as_dict()
+        ready = report.experiment_ready
     else:
         design = load_design(args.design)
         report = validate_design(design)
