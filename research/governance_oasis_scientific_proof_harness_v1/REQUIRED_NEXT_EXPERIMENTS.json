@@ -25,14 +25,15 @@
       ],
       "held_constant": [
         "same current-flow observations",
-        "same Completed Experience multiset/content",
+        "same Completed Experience identities and same non-relational payload",
+        "only declared relation/process/order metadata or identity binding may differ by ablation arm",
         "same Core and possibility set",
         "same responsibility rule",
         "same evaluator"
       ],
       "primary_observables": [
         "experience participation identities",
-        "YES/NO provenance",
+        "participation YES/NO provenance for every eligible candidate",
         "selected and realized possibility",
         "prespecified effectiveness endpoint"
       ],
@@ -96,10 +97,11 @@
         "same evaluator"
       ],
       "primary_observables": [
-        "which CE participates",
-        "which CE is NO with preserved provenance",
+        "which conflicting CE participates",
+        "which conflicting CE is NO with preserved provenance",
         "selected and realized possibility",
-        "conflict-resolution provenance chain"
+        "conflict-resolution provenance chain",
+        "whether both original CE records remain unchanged and inspectable"
       ],
       "mandatory_invariants": [
         "no scalar memory weight",
@@ -107,12 +109,13 @@
         "both conflicting CEs remain inspectable",
         "order/provenance mutation occurs only in declared ablation arms",
         "zero difference remains a valid result"
-      ]
+      ],
+      "conflict_operational_definition": "Two or more preserved Completed Experiences are conflicting only when, under the same frozen current relation and possibility set, their provenance-linked relation records support different feasible action identities or mutually incompatible participation consequences."
     },
     {
       "experiment_id": "GO_A6_WRONG_CHANGE_RECOVERY_V1",
       "axis": "A6_WRONG_BEHAVIOR_RECOVERY",
-      "scientific_question": "After a prior Completed Experience actually induces a wrong realized behavior, can later post-outcome evidence revise the bound judgment and produce later related behavioral recovery?",
+      "scientific_question": "After a prior Completed Experience induces a realized behavior change, and only the authoritative post-realization outcome subsequently satisfies a preregistered adverse-outcome criterion, can provenance-bound revalidation alter a later related decision and produce prespecified behavioral recovery?",
       "minimum_arms": [
         "REVALIDATION_EXPOSED",
         "REVALIDATION_RECORD_ONLY",
@@ -126,9 +129,11 @@
       "required_temporal_chain": [
         "prior CE exists",
         "CE participates",
-        "wrong later behavior is actually realized",
-        "authoritative post-outcome observation contradicts the bound judgment",
+        "later behavior change is actually realized without a pre-supplied wrongness label",
+        "authoritative post-outcome observation is produced",
+        "independent evaluator applies the preregistered adverse-outcome criterion after worker output is sealed",
         "Closure",
+        "decision-linked or exogenous attribution is preserved",
         "provenance-bound revalidation commit",
         "later current relation",
         "later behavior recovery observation"
@@ -143,6 +148,8 @@
       "mandatory_invariants": [
         "same-epoch feedback forbidden",
         "counterfactual recovery cannot count",
+        "wrongness label cannot be supplied to the decision worker",
+        "evaluator truth joins only after worker output is sealed",
         "exogenous evidence cannot be relabeled as decision-linked",
         "unrelated relation cannot inherit recovery feedback",
         "zero difference remains a valid result"
@@ -153,7 +160,12 @@
         "same Core, possibility set, participation rule, and responsibility rule",
         "same outcome observation stream",
         "same independent evaluator"
-      ]
+      ],
+      "attribution_controls": [
+        "DECISION_LINKED",
+        "EXOGENOUS"
+      ],
+      "adverse_outcome_rule": "Wrongness/adversity is undefined at decision time and is assigned only from authoritative post-realization observation under a preregistered evaluator rule."
     },
     {
       "experiment_id": "GH4_FLOW_PRESERVING_INTEGRATED_CONFIRMATORY",
