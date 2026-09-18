@@ -1,5 +1,5 @@
 {
-  "status": "BLOCKED_PENDING_3_RUNTIME_IDENTITIES",
+  "status": "BLOCKED_PENDING_2_RUNTIME_IDENTITIES",
   "pilot_spec": "GOVERNANCE_CBRA_CARLA_PILOT_V1_0_FINAL",
   "required": {
     "carla_host_environment_actuator": {
@@ -8,9 +8,9 @@
       "sha256": "9d10a5af565405c9d05463879fa2616330e9960e01e3320ce56b30f0b6331e6d"
     },
     "oasis_core_adapter": {
-      "path": null,
-      "commit_sha": null,
-      "sha256": null
+      "path": "research/integration_checkpoint/harness_adapter.py",
+      "commit_sha": "6d9b97c92cdc72262deee76ec1b0288f5ce96579",
+      "sha256": "9eb6171f9a9a7c1f290d00ed5e0e43c4b1f58e2fe1571bb0bbbc98b4375aab87"
     },
     "observation_gateway": {
       "path": null,
