@@ -39,6 +39,7 @@ from research.oasis_core_v11.current_relational_core import CoreV11InvariantErro
 
 from .pilot_runtime import (
     PilotScene,
+    ScenarioAdmissionError,
     build_governance_harness,
     cbra_feedback_from_checkpoint,
     complete_baseline_history,
@@ -50,6 +51,8 @@ from .telemetry import HardwareProbe, directory_size, summarize
 
 
 PROTOCOL_ID = "GOVERNANCE-CBRA-CARLA-PILOT-V1"
+RUN_BASIS = "RUN3_CLOSURE_ADMISSION_FREEZE_V1"
+RUN3_MANIFEST_PATH = Path(__file__).resolve().parent / "RUN3_FREEZE_MANIFEST.json"
 HERE = Path(__file__).resolve().parent
 ROOT = Path(__file__).resolve().parents[2]
 MATRIX_PATH = HERE / "PILOT_MATRIX.json"
@@ -351,6 +354,21 @@ def run_unit(unit: dict, *, output_root: Path, host: str, port: int) -> Path:
 
     try:
         scene = PilotScene(client, seed=int(unit["seed"]))
+        required_kinds = ["vehicle"]
+        if unit["reentry_context"] == "CHANGED_SCOPE":
+            required_kinds.append("pedestrian")
+        scenario_admission = [scene.admit_relation_cycle(kind) for kind in required_kinds]
+        _atomic_json(
+            unit_dir / "SCENARIO_ADMISSION.json",
+            {
+                "run_basis": RUN_BASIS,
+                "status": "PASS",
+                "experimental_evidence": False,
+                "required_kinds": required_kinds,
+                "checks": scenario_admission,
+                "post_result_substitution": False,
+            },
+        )
         start_frame = int(scene.world.get_snapshot().frame)
         runtime = {
             **scene.host.atomic_current_snapshot().__dict__,
@@ -789,6 +807,7 @@ def run_unit(unit: dict, *, output_root: Path, host: str, port: int) -> Path:
 
         result = {
             "protocol_id": PROTOCOL_ID,
+            "run_basis": RUN_BASIS,
             "unit_id": unit["unit_id"],
             "status": "PASS",
             "structural_only": True,
@@ -812,9 +831,25 @@ def run_unit(unit: dict, *, output_root: Path, host: str, port: int) -> Path:
         }
         _atomic_json(unit_dir / "UNIT_RESULT.json", result)
         return unit_dir
+    except ScenarioAdmissionError as exc:
+        invalid = {
+            "protocol_id": PROTOCOL_ID,
+            "run_basis": RUN_BASIS,
+            "unit_id": unit["unit_id"],
+            "status": "PRE_EXECUTION_SCENARIO_INVALID",
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+            "structural_only": True,
+            "experimental_decision_started": False,
+            "partial_results_preserved": True,
+            "post_result_tuning": False,
+        }
+        _atomic_json(unit_dir / "UNIT_RESULT.json", invalid)
+        raise
     except Exception as exc:
         failure = {
             "protocol_id": PROTOCOL_ID,
+            "run_basis": RUN_BASIS,
             "unit_id": unit["unit_id"],
             "status": "FAIL",
             "error_type": type(exc).__name__,
@@ -850,10 +885,13 @@ def run_matrix(*, output_root: Path, host: str, port: int) -> Path:
     output_root.mkdir(parents=True, exist_ok=False)
     matrix = load_matrix()
     shutil.copy2(MATRIX_PATH, output_root / MATRIX_PATH.name)
+    if RUN3_MANIFEST_PATH.is_file():
+        shutil.copy2(RUN3_MANIFEST_PATH, output_root / RUN3_MANIFEST_PATH.name)
     _atomic_json(
         output_root / "RUN_REGISTRATION.json",
         {
             "protocol_id": PROTOCOL_ID,
+            "run_basis": RUN_BASIS,
             "matrix_status": matrix["status"],
             "unit_count": matrix["unit_count"],
             "first_pilot_execution_registered_before_unit_1": True,
@@ -883,12 +921,20 @@ def run_matrix(*, output_root: Path, host: str, port: int) -> Path:
         ]
         started = time.perf_counter()
         proc = subprocess.run(cmd, text=True, capture_output=True)
+        result_path = output_root / "units" / unit["unit_id"] / "UNIT_RESULT.json"
+        unit_status = "PROCESS_ERROR"
+        if result_path.is_file():
+            try:
+                unit_status = json.loads(result_path.read_text(encoding="utf-8")).get("status", "PROCESS_ERROR")
+            except Exception:
+                unit_status = "PROCESS_ERROR"
         row = {
             "ordinal": index,
             "unit_id": unit["unit_id"],
             "arm": unit["arm"],
             "failure_class": unit["failure_class"],
             "reentry_context": unit["reentry_context"],
+            "unit_status": unit_status,
             "returncode": proc.returncode,
             "wall_seconds": time.perf_counter() - started,
             "stdout_tail": proc.stdout[-4000:],
@@ -906,20 +952,35 @@ def run_matrix(*, output_root: Path, host: str, port: int) -> Path:
             break
 
     completed = len(rows)
-    passed = sum(1 for row in rows if row["returncode"] == 0)
-    failed = completed - passed
+    passed = sum(1 for row in rows if row["unit_status"] == "PASS")
+    preexecution_invalid = sum(
+        1 for row in rows if row["unit_status"] == "PRE_EXECUTION_SCENARIO_INVALID"
+    )
+    failed = sum(1 for row in rows if row["unit_status"] == "FAIL")
+    process_errors = completed - passed - preexecution_invalid - failed
     status = (
         "PASS"
-        if completed == 54 and failed == 0
-        else ("RUNTIME_LOST" if runtime_lost else "INCOMPLETE_OR_FAILED")
+        if completed == 54 and passed == 54
+        else (
+            "RUNTIME_LOST"
+            if runtime_lost
+            else (
+                "PRE_EXECUTION_INVALID"
+                if preexecution_invalid > 0 and failed == 0 and process_errors == 0
+                else "INCOMPLETE_OR_FAILED"
+            )
+        )
     )
     summary = {
         "protocol_id": PROTOCOL_ID,
+        "run_basis": RUN_BASIS,
         "status": status,
         "registered_units": 54,
         "completed_units": completed,
         "passed_units": passed,
+        "preexecution_invalid_units": preexecution_invalid,
         "failed_units": failed,
+        "process_error_units": process_errors,
         "runtime_lost": runtime_lost,
         "structural_only": True,
         "confirmatory": False,
