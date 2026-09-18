@@ -1,0 +1,187 @@
+{
+  "schema": "governance-oasis-a2-arm-evidence-summary-v1",
+  "experiment_id": "GO_A2_RELATION_ORDER_TRACEABILITY_V1",
+  "batch_id": "35385728934-1",
+  "execution_sha": "81a483b6196cb2280d5b649b58ef9b13da624f9c",
+  "contrasts": {
+    "A2-I": {
+      "outcome": "SUPPORTS",
+      "arms": [
+        {
+          "arm_id": "I0",
+          "outcome": "SUPPORTS",
+          "matched_entries": 1,
+          "reference_consumed_ids": [
+            "CE-A"
+          ],
+          "system_consumed_ids": [
+            "CE-A"
+          ],
+          "system_trace_digest": "3604c90718dc8723b703f997fb2975b089d104c30fb644db1a72db7ec4fa18ee",
+          "reference_event_count": 7,
+          "reference_chain_final_hash": "bcb2d7b8064082021d6a3f9ebdb31487bb7be0449e67e448bee9d726b6bf16cb"
+        },
+        {
+          "arm_id": "I1",
+          "outcome": "SUPPORTS",
+          "matched_entries": 1,
+          "reference_consumed_ids": [
+            "CE-B"
+          ],
+          "system_consumed_ids": [
+            "CE-B"
+          ],
+          "system_trace_digest": "d2605ef1e71917fe34cad7978149d56b6f9cfaf26398d282d5cc2dab8f9b5f28",
+          "reference_event_count": 7,
+          "reference_chain_final_hash": "f06497111a408ef4b3a85f420f6793f8eff7ff76168693d5a93218e03e66ee92"
+        }
+      ]
+    },
+    "A2-R": {
+      "outcome": "SUPPORTS",
+      "arms": [
+        {
+          "arm_id": "R0",
+          "outcome": "SUPPORTS",
+          "matched_entries": 1,
+          "reference_consumed_ids": [
+            "CE-R"
+          ],
+          "system_consumed_ids": [
+            "CE-R"
+          ],
+          "system_trace_digest": "a97a22779753a64d7166a9173c5779f95380b45d9d197baa285174bdcf49b066",
+          "reference_event_count": 7,
+          "reference_chain_final_hash": "ab68470ee279a92e7b658671bbcc7259b4c365890503ce73df4fb065a82e9aac"
+        },
+        {
+          "arm_id": "R1",
+          "outcome": "SUPPORTS",
+          "matched_entries": 1,
+          "reference_consumed_ids": [
+            "CE-R"
+          ],
+          "system_consumed_ids": [
+            "CE-R"
+          ],
+          "system_trace_digest": "8525625359385455758f46fdd04c9b4206d7021793e89c59590ffd6daaad0fff",
+          "reference_event_count": 7,
+          "reference_chain_final_hash": "bb68c0ef00dd53673fd7e2aa4f65278d50002d2401275c063672f713528032fa"
+        }
+      ]
+    },
+    "A2-O": {
+      "outcome": "SUPPORTS",
+      "arms": [
+        {
+          "arm_id": "O0",
+          "outcome": "SUPPORTS",
+          "matched_entries": 3,
+          "reference_consumed_ids": [
+            "CE-1",
+            "CE-2",
+            "CE-3"
+          ],
+          "system_consumed_ids": [
+            "CE-1",
+            "CE-2",
+            "CE-3"
+          ],
+          "system_trace_digest": "c05a2421c0952b3fcfd3dfbca9dc11d875b6cb90b0a8972b50e1edbc3144cf3c",
+          "reference_event_count": 15,
+          "reference_chain_final_hash": "aab46e19b7b38d9cdedb3cb191490dc651c99c100a29036c05670ad09793244e"
+        },
+        {
+          "arm_id": "O1",
+          "outcome": "SUPPORTS",
+          "matched_entries": 3,
+          "reference_consumed_ids": [
+            "CE-1",
+            "CE-2",
+            "CE-3"
+          ],
+          "system_consumed_ids": [
+            "CE-1",
+            "CE-2",
+            "CE-3"
+          ],
+          "system_trace_digest": "5ea092442ef9103a82ad45baeead9757502d9194a950cae6df7b5568703e8c95",
+          "reference_event_count": 15,
+          "reference_chain_final_hash": "1d076004b5daec5997c7c4055303718f2464bcbcd70d127d91a67622d397fe2e"
+        }
+      ]
+    },
+    "A2-N": {
+      "outcome": "SUPPORTS",
+      "arms": [
+        {
+          "arm_id": "N1",
+          "state": [
+            true,
+            false,
+            false,
+            false
+          ],
+          "outcome": "SUPPORTS",
+          "matched_entries": 1,
+          "reference_consumed_ids": [],
+          "system_consumed_ids": [],
+          "system_trace_digest": "a9df05d92c0451f22112d62aa38d2dd1f611597c40f9922017058c421d24829c",
+          "reference_event_count": 6,
+          "reference_chain_final_hash": "3d252e18657670711afdc29989f5543fb209e2c0a85044c7f6390eaf14201a5e"
+        },
+        {
+          "arm_id": "N2",
+          "state": [
+            true,
+            true,
+            false,
+            false
+          ],
+          "outcome": "SUPPORTS",
+          "matched_entries": 1,
+          "reference_consumed_ids": [],
+          "system_consumed_ids": [],
+          "system_trace_digest": "9e918d6743b509e36614995e5ce87239c248d24a1cf4f79ae3f23d44373bc228",
+          "reference_event_count": 6,
+          "reference_chain_final_hash": "efca5c0d1b716f8267641dad148140bca035fa937d17e04b494a145cd4e8734a"
+        },
+        {
+          "arm_id": "N3",
+          "state": [
+            true,
+            true,
+            true,
+            false
+          ],
+          "outcome": "SUPPORTS",
+          "matched_entries": 1,
+          "reference_consumed_ids": [],
+          "system_consumed_ids": [],
+          "system_trace_digest": "fa5cc1ff96758aa00decf2fd205832f75c40cb7b19fad3c7eb7cc7fb72d2eede",
+          "reference_event_count": 6,
+          "reference_chain_final_hash": "f4ea6ff06e25f3e3d8569cbab63745162ebf161d01786f532e265eac8c96ef6c"
+        }
+      ]
+    }
+  },
+  "production_dimension_checks": {
+    "identity": {
+      "identity_changed": true,
+      "payload_same": true,
+      "relation_same": true,
+      "order_same": true
+    },
+    "relation": {
+      "identity_same": true,
+      "payload_same": true,
+      "relation_changed": true,
+      "order_same": true
+    },
+    "order": {
+      "identity_set_same": true,
+      "payload_relation_same_per_ce": true,
+      "order_changed": true
+    }
+  }
+}
