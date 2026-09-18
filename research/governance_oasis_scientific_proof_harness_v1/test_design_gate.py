@@ -99,6 +99,7 @@ def make_design(axis: AxisId) -> ExperimentDesign:
         ]
     return ExperimentDesign(
         experiment_id=f"TEST_{axis.value}",
+        execution_profile_id=f"EXEC_{axis.value}",
         purpose="Falsifiable Governance OASIS mechanism test",
         targeted_axes=(axis,),
         claim_ids=(CLAIM_BY_AXIS[axis],),
