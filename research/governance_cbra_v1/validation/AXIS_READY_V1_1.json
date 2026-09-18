@@ -1,0 +1,25 @@
+{
+  "status": "CBRA_V1_1_FORMALLY_READY",
+  "formal_name": "Continuous Bidirectional Revalidation Axis",
+  "korean_name": "지속 양방향 재검증축",
+  "role": "GOVERNANCE_AUXILIARY_OPERATOR_AXIS",
+  "fixed_oasis_six_axes_changed": false,
+  "kill_search_status": "COMPLETE_BROAD_CLAIMS_NARROWED",
+  "formal_error_checks": {
+    "definition": "PASS",
+    "causal": "PASS",
+    "execution": "PASS"
+  },
+  "closed_design_errors": ["E-01","E-02","E-03","E-04","E-05","E-06","E-07","E-08"],
+  "validated_head": "8fa58bd5e9db7bc616155f277cfd11632473d08b",
+  "validation_run_id": 35325339219,
+  "validation_job_id": 105536959865,
+  "tests": {
+    "axis_invariants_passed": 15,
+    "review_projection_passed": 5,
+    "governance_v04_attack_regression_passed": 16
+  },
+  "behavioral_experiment_executed": false,
+  "behavioral_superiority_claimed": false,
+  "aggregate_score": null
+}
