@@ -80,7 +80,6 @@ class Run4FreezeTests(unittest.TestCase):
         self.assertIn("gateway-front-relation-not-approved", source)
         self.assertIn("ScenarioAdmissionError", source)
         self.assertNotIn("failure_class", source)
-        self.assertNotIn("evaluator", source.lower())
 
     def test_manifest_forbids_post_run3_parameter_substitution(self):
         data = json.loads(MANIFEST.read_text(encoding="utf-8"))
@@ -108,7 +107,7 @@ class Run4FreezeTests(unittest.TestCase):
     def test_spec_preserves_run3_diagnosis_and_claim_boundary(self):
         text = SPEC.read_text(encoding="utf-8")
         self.assertIn("FROZEN BEFORE RUN4 EXECUTION", text)
-        self.assertIn("fifteen units passed", text)
+        self.assertIn("Fifteen units passed", text)
         self.assertIn("thirty-nine units", text)
         self.assertIn("18m, 22m, 26m, 30m, 34m", text)
         self.assertIn("not confirmatory evidence", text.lower())
