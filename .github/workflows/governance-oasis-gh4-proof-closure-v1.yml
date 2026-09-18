@@ -1,0 +1,25 @@
+name: Governance OASIS GH4 Proof Closure v1
+
+on:
+  push:
+    branches:
+      - program/governance-oasis-gh4-proof-closure-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gh4-proof-closure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Frozen scientific harness integrity
+        run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_freeze_integrity
+      - name: GH4 final portfolio proof closure audit
+        run: python -m research.governance_oasis_program_v1.audit_after_gh4
