@@ -1,0 +1,49 @@
+{
+  "completed_experiences": [
+    {
+      "ce_instance_id": "CE-A",
+      "role": "identity-control-A",
+      "semantic_payload": "matched-ce-payload"
+    },
+    {
+      "ce_instance_id": "CE-B",
+      "role": "identity-control-B",
+      "semantic_payload": "matched-ce-payload"
+    },
+    {
+      "ce_instance_id": "CE-R",
+      "role": "relation-ablation-anchor",
+      "semantic_payload": "matched-ce-payload"
+    },
+    {
+      "ce_instance_id": "CE-1",
+      "role": "order-member-1",
+      "semantic_payload": "matched-ce-payload"
+    },
+    {
+      "ce_instance_id": "CE-2",
+      "role": "order-member-2",
+      "semantic_payload": "matched-ce-payload"
+    },
+    {
+      "ce_instance_id": "CE-3",
+      "role": "order-member-3",
+      "semantic_payload": "matched-ce-payload"
+    },
+    {
+      "ce_instance_id": "CE-DECOY",
+      "role": "false-attribution-negative-control",
+      "semantic_payload": "matched-ce-payload"
+    }
+  ],
+  "experiment_id": "GO_A2_RELATION_ORDER_TRACEABILITY_V1",
+  "prohibitions": [
+    "no CE deletion",
+    "no post-result identity reassignment",
+    "no permanent scalar memory weight",
+    "candidate does not imply participation",
+    "participation does not imply decision consumption"
+  ],
+  "schema": "governance-oasis-a2-ce-registry-v1",
+  "semantic_payload_rule": "CE-A/CE-B/CE-R/CE-1/CE-2/CE-3/CE-DECOY use the same frozen semantic payload descriptor; identity, relation, and order are tested as independent provenance dimensions."
+}
