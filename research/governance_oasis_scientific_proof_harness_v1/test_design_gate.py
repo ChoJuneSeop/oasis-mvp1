@@ -37,6 +37,20 @@ def make_design(axis: AxisId) -> ExperimentDesign:
         falsification_condition="The prespecified treatment-control causal contrast is zero or contradicts the claimed mechanism under the frozen matrix.",
         mechanism_removed_or_permuted=True,
     )
+    contrasts = [contrast]
+    if axis is AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY:
+        contrasts.append(
+            CausalContrast(
+                contrast_id="C2",
+                treatment="IDENTITY_INTACT",
+                control="IDENTITY_PERMUTED",
+                targeted_mechanism="experience identity",
+                held_constant=("current_observation", "core", "possibility_set", "participation_count"),
+                observable_ids=("realized_choice", "outcome"),
+                falsification_condition="Identity permutation produces no distinguishable contribution under the frozen relation context.",
+                mechanism_removed_or_permuted=True,
+            )
+        )
     return ExperimentDesign(
         experiment_id=f"TEST_{axis.value}",
         purpose="Falsifiable Governance OASIS mechanism test",
@@ -47,7 +61,7 @@ def make_design(axis: AxisId) -> ExperimentDesign:
         null_or_falsification="No causal treatment-control difference under the frozen contrast.",
         temporal_order=MANDATORY_TEMPORAL_ORDER,
         observables=("realized_choice", "outcome"),
-        contrasts=(contrast,),
+        contrasts=tuple(contrasts),
         independent_evaluator=True,
         evaluator_blinded_to=("future_state", "expected_label"),
         provenance_chain=(
