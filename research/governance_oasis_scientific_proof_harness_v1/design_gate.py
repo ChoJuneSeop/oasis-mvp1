@@ -37,13 +37,28 @@ def _subsequence(required: tuple[str, ...], actual: tuple[str, ...]) -> bool:
     return True
 
 
-def _mechanism_contrast(design: ExperimentDesign, keyword: str | None = None) -> bool:
+def _matching_contrast_ids(
+    design: ExperimentDesign,
+    *keywords: str,
+) -> tuple[str, ...]:
+    wanted = tuple(item.lower() for item in keywords if item)
+    matched = []
     for contrast in design.contrasts:
-        if not contrast.mechanism_removed_or_permuted:
-            continue
-        if keyword is None or keyword.lower() in contrast.targeted_mechanism.lower():
-            return True
-    return False
+        haystack = " ".join(
+            (
+                contrast.targeted_mechanism,
+                contrast.treatment,
+                contrast.control,
+            )
+        ).lower()
+        if not wanted or any(keyword in haystack for keyword in wanted):
+            if contrast.mechanism_removed_or_permuted:
+                matched.append(contrast.contrast_id)
+    return tuple(matched)
+
+
+def _mechanism_contrast(design: ExperimentDesign, keyword: str | None = None) -> bool:
+    return bool(_matching_contrast_ids(design, *(()) if keyword is None else (keyword,)))
 
 
 def _contrast_integrity(design: ExperimentDesign) -> DesignCheck:
@@ -203,24 +218,44 @@ def _evaluator_independence(design: ExperimentDesign) -> DesignCheck:
 def _outcome_evidence_boundary(design: ExperimentDesign) -> DesignCheck:
     forbidden = {x.lower() for x in design.decision_worker_forbidden_inputs}
     future_hidden = any("future" in x for x in forbidden)
-    expected_hidden = any("expected" in x or "label" in x or "truth" in x for x in forbidden)
-    evaluator_hidden = any("evaluator" in x or "outcome" in x for x in forbidden)
+    expected_hidden = any(
+        "expected" in x or "label" in x or "truth" in x for x in forbidden
+    )
+    evaluator_hidden = any(
+        "evaluator" in x or "outcome" in x for x in forbidden
+    )
+
+    outcome_dependent = (
+        AxisId.A6_WRONG_BEHAVIOR_RECOVERY in design.targeted_axes
+        or bool(design.metadata.get("requires_authoritative_post_outcome"))
+    )
+    authoritative_ok = (
+        design.authoritative_outcome_observation if outcome_dependent else True
+    )
     ok = (
-        design.authoritative_outcome_observation
-        and future_hidden
+        future_hidden
         and expected_hidden
         and evaluator_hidden
+        and authoritative_ok
     )
     return (
         _pass(
             "crosscut_outcome_evidence_boundary",
-            "Scientific outcomes come from authoritative post-realization observation and evaluator/future truth is forbidden from decision workers.",
+            (
+                "Decision workers are blind to future/evaluator truth; "
+                "authoritative post-realization observation is required whenever "
+                "the targeted claim depends on outcome evidence."
+            ),
         )
         if ok
         else _fail(
             "crosscut_outcome_evidence_boundary",
-            "The design could mistake a supplied label for a realized outcome or leak post-outcome truth into the decision path.",
+            (
+                "The design could leak future/evaluator truth or use a supplied "
+                "label where authoritative post-realization evidence is required."
+            ),
             evidence=(
+                f"outcome_dependent={outcome_dependent}",
                 f"authoritative_outcome_observation={design.authoritative_outcome_observation}",
                 f"decision_worker_forbidden_inputs={list(design.decision_worker_forbidden_inputs)}",
             ),
@@ -328,17 +363,20 @@ def _axis_a1(design: ExperimentDesign) -> DesignCheck:
 
 def _axis_a2(design: ExperimentDesign) -> DesignCheck:
     axis = AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY
-    identity_contrast = _mechanism_contrast(design, "identity")
-    relation_order_contrast = (
-        _mechanism_contrast(design, "order")
-        or _mechanism_contrast(design, "relation")
+    identity_ids = set(_matching_contrast_ids(design, "identity"))
+    relation_order_ids = set(
+        _matching_contrast_ids(design, "order", "relation")
+    )
+    distinct_contrasts = bool(
+        identity_ids
+        and relation_order_ids
+        and any(a != b for a in identity_ids for b in relation_order_ids)
     )
     ok = (
         design.experience_identity_control
         and design.relation_order_ablation
         and design.participation_yes_no_provenance
-        and identity_contrast
-        and relation_order_contrast
+        and distinct_contrasts
         and len(design.provenance_chain) >= 5
     )
     return (
@@ -356,8 +394,9 @@ def _axis_a2(design: ExperimentDesign) -> DesignCheck:
                 f"experience_identity_control={design.experience_identity_control}",
                 f"relation_order_ablation={design.relation_order_ablation}",
                 f"participation_yes_no_provenance={design.participation_yes_no_provenance}",
-                f"identity_contrast={identity_contrast}",
-                f"relation_order_contrast={relation_order_contrast}",
+                f"identity_contrast_ids={sorted(identity_ids)}",
+                f"relation_order_contrast_ids={sorted(relation_order_ids)}",
+                f"distinct_contrasts={distinct_contrasts}",
                 f"provenance_length={len(design.provenance_chain)}",
             ),
         )
@@ -367,13 +406,29 @@ def _axis_a2(design: ExperimentDesign) -> DesignCheck:
 def _axis_a3(design: ExperimentDesign) -> DesignCheck:
     axis = AxisId.A3_RESPONSIBILITY_SENSITIVITY
     controls = {x.upper() for x in design.responsibility_controls}
-    content_control = bool(controls.intersection({"PERMUTED", "STALE", "AXIS_ABLATION"}))
+    content_control_names = {"PERMUTED", "STALE", "AXIS_ABLATION"}
+    content_control = bool(controls.intersection(content_control_names))
+    binding_ids = set(_matching_contrast_ids(design, "record_only", "binding"))
+    content_ids = set(
+        _matching_contrast_ids(
+            design,
+            "permuted",
+            "stale",
+            "axis_ablation",
+            "candidate identity",
+        )
+    )
+    distinct_responsibility_contrasts = bool(
+        binding_ids
+        and content_ids
+        and any(a != b for a in binding_ids for b in content_ids)
+    )
     ok = (
         "RECORD_ONLY" in controls
         and content_control
+        and distinct_responsibility_contrasts
         and design.responsibility_non_scalar
         and design.selected_nonselected_obligations
-        and _mechanism_contrast(design, "responsibility")
     )
     return (
         _pass(
@@ -390,7 +445,9 @@ def _axis_a3(design: ExperimentDesign) -> DesignCheck:
                 f"responsibility_controls={sorted(controls)}",
                 f"responsibility_non_scalar={design.responsibility_non_scalar}",
                 f"selected_nonselected_obligations={design.selected_nonselected_obligations}",
-                f"responsibility_contrast={_mechanism_contrast(design, 'responsibility')}",
+                f"binding_contrast_ids={sorted(binding_ids)}",
+                f"content_contrast_ids={sorted(content_ids)}",
+                f"distinct_responsibility_contrasts={distinct_responsibility_contrasts}",
             ),
         )
     )
@@ -408,6 +465,7 @@ def _axis_a4(design: ExperimentDesign) -> DesignCheck:
     ok = (
         required.issubset(contexts)
         and design.no_global_exclusion_control
+        and design.participation_yes_no_provenance
         and scope_contrast
     )
     return (
@@ -424,6 +482,7 @@ def _axis_a4(design: ExperimentDesign) -> DesignCheck:
             evidence=(
                 f"contexts={sorted(contexts)}",
                 f"no_global_exclusion_control={design.no_global_exclusion_control}",
+                f"participation_yes_no_provenance={design.participation_yes_no_provenance}",
                 f"scope_contrast={scope_contrast}",
             ),
         )
@@ -433,12 +492,14 @@ def _axis_a4(design: ExperimentDesign) -> DesignCheck:
 def _axis_a5(design: ExperimentDesign) -> DesignCheck:
     axis = AxisId.A5_CONFLICTING_EXPERIENCE_HANDLING
     conflict_defined = bool(design.conflict_operational_definition.strip())
+    context_variation = len(set(design.relation_context_controls)) >= 2
     ok = (
         design.conflicting_experience_count >= 2
         and conflict_defined
         and design.conflict_order_preserved
         and design.no_scalar_conflict_overwrite
         and design.participation_yes_no_provenance
+        and context_variation
         and _mechanism_contrast(design, "conflict")
     )
     return (
@@ -457,6 +518,7 @@ def _axis_a5(design: ExperimentDesign) -> DesignCheck:
                 f"conflict_operational_definition_present={conflict_defined}",
                 f"conflict_order_preserved={design.conflict_order_preserved}",
                 f"participation_yes_no_provenance={design.participation_yes_no_provenance}",
+                f"conflict_context_variation={context_variation}",
                 f"no_scalar_conflict_overwrite={design.no_scalar_conflict_overwrite}",
                 f"conflict_contrast={_mechanism_contrast(design, 'conflict')}",
             ),
@@ -474,6 +536,20 @@ def _axis_a6(design: ExperimentDesign) -> DesignCheck:
         and bool(design.adverse_outcome_criterion.strip())
         and design.authoritative_outcome_observation
     )
+    initial_effect_ids = set(
+        _matching_contrast_ids(
+            design,
+            "experience",
+            "participation",
+            "history",
+        )
+    )
+    recovery_ids = set(_matching_contrast_ids(design, "revalidation"))
+    distinct_causal_links = bool(
+        initial_effect_ids
+        and recovery_ids
+        and any(a != b for a in initial_effect_ids for b in recovery_ids)
+    )
     ok = (
         design.wrong_change_realized
         and outcome_defined_after_realization
@@ -481,10 +557,11 @@ def _axis_a6(design: ExperimentDesign) -> DesignCheck:
         and design.recovery_epochs >= 3
         and design.recovery_endpoint
         and design.post_outcome_revalidation_control
+        and design.participation_yes_no_provenance
         and "EXOGENOUS" in attributions
         and "DECISION_LINKED" in attributions
         and required_contexts.issubset(contexts)
-        and _mechanism_contrast(design, "revalidation")
+        and distinct_causal_links
     )
     return (
         _pass(
@@ -508,7 +585,10 @@ def _axis_a6(design: ExperimentDesign) -> DesignCheck:
                 f"recovery_epochs={design.recovery_epochs}",
                 f"recovery_endpoint={design.recovery_endpoint}",
                 f"post_outcome_revalidation_control={design.post_outcome_revalidation_control}",
-                f"revalidation_contrast={_mechanism_contrast(design, 'revalidation')}",
+                f"participation_yes_no_provenance={design.participation_yes_no_provenance}",
+                f"initial_effect_contrast_ids={sorted(initial_effect_ids)}",
+                f"revalidation_contrast_ids={sorted(recovery_ids)}",
+                f"distinct_causal_links={distinct_causal_links}",
             ),
         )
     )
