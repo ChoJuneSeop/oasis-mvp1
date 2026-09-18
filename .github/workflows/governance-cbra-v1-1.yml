@@ -1,0 +1,24 @@
+name: Governance CBRA v1.1 formal validation
+
+on:
+  push:
+    branches: [feature/governance-cbra-v1-1]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile CBRA
+        run: python -m compileall -q research/governance_cbra_v1
+      - name: Run corrected CBRA invariants
+        run: python -m unittest -v research.governance_cbra_v1.validation.test_axis
+      - name: Run existing Governance v0.4 attack regression
+        run: python -m unittest -v research.governance_harness_v01.test_governance_attack_v04
