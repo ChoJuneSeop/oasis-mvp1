@@ -583,9 +583,9 @@ def _axis_a6(design: ExperimentDesign) -> DesignCheck:
         and any(a != b for a in initial_effect_ids for b in recovery_ids)
     )
     ok = (
-        design.wrong_change_realized
+        design.adverse_change_realization_endpoint
         and outcome_defined_after_realization
-        and design.post_outcome_contradictory_evidence
+        and design.post_outcome_contradiction_endpoint
         and design.recovery_epochs >= 3
         and design.recovery_endpoint
         and design.post_outcome_revalidation_control
@@ -598,22 +598,22 @@ def _axis_a6(design: ExperimentDesign) -> DesignCheck:
     return (
         _pass(
             "axis_a6_wrong_behavior_recovery",
-            "A realized wrong change is followed by contradictory real outcome evidence and a later recovery contrast.",
+            "A6 defines observable adverse-change, post-outcome contradiction, and later recovery endpoints without assuming their results.",
             axis=axis,
         )
         if ok
         else _fail(
             "axis_a6_wrong_behavior_recovery",
-            "A6 is not merely revalidation visibility; it requires wrong behavior, later contradiction, and observed later recovery.",
+            "A6 must be able to observe an experience-induced adverse change, post-outcome contradiction, and later recovery without presupposing them.",
             axis=axis,
             evidence=(
-                f"wrong_change_realized={design.wrong_change_realized}",
+                f"adverse_change_realization_endpoint={design.adverse_change_realization_endpoint}",
                 f"wrongness_defined_only_post_outcome={design.wrongness_defined_only_post_outcome}",
                 f"adverse_outcome_criterion_present={bool(design.adverse_outcome_criterion.strip())}",
                 f"authoritative_outcome_observation={design.authoritative_outcome_observation}",
                 f"attribution_controls={sorted(attributions)}",
                 f"relation_context_controls={sorted(contexts)}",
-                f"post_outcome_contradictory_evidence={design.post_outcome_contradictory_evidence}",
+                f"post_outcome_contradiction_endpoint={design.post_outcome_contradiction_endpoint}",
                 f"recovery_epochs={design.recovery_epochs}",
                 f"recovery_endpoint={design.recovery_endpoint}",
                 f"post_outcome_revalidation_control={design.post_outcome_revalidation_control}",
