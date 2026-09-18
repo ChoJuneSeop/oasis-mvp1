@@ -93,13 +93,25 @@ def make_design(axis: AxisId) -> ExperimentDesign:
         selected_nonselected_obligations=True,
         experience_identity_control=True,
         relation_order_ablation=True,
+        participation_yes_no_provenance=True,
         same_current_context_across_contrast=True,
         behavior_endpoint=True,
         effectiveness_endpoint=True,
         conflicting_experience_count=2,
+        conflict_operational_definition=(
+            "Two preserved Completed Experiences are conflict cases only when, "
+            "under the same current relation and feasible possibility set, their "
+            "provenance-linked records support incompatible feasible actions."
+        ),
         conflict_order_preserved=True,
         no_scalar_conflict_overwrite=True,
         no_global_exclusion_control=True,
+        attribution_controls=("DECISION_LINKED", "EXOGENOUS"),
+        wrongness_defined_only_post_outcome=True,
+        adverse_outcome_criterion=(
+            "Independent post-realization evaluator marks the authoritative outcome "
+            "adverse under the frozen directional criterion."
+        ),
         wrong_change_realized=True,
         post_outcome_contradictory_evidence=True,
         recovery_epochs=3,
@@ -161,6 +173,14 @@ class ScientificProofDesignGateTests(unittest.TestCase):
         report = validate_design(design)
         self.assertIn("axis_a4_overgeneralization", report.unresolved_check_ids)
 
+    def test_a2_requires_yes_no_participation_provenance(self):
+        design = replace(
+            make_design(AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY),
+            participation_yes_no_provenance=False,
+        )
+        report = validate_design(design)
+        self.assertIn("axis_a2_experience_traceability", report.unresolved_check_ids)
+
     def test_a5_requires_real_conflict_and_preserved_order(self):
         design = replace(
             make_design(AxisId.A5_CONFLICTING_EXPERIENCE_HANDLING),
@@ -169,6 +189,38 @@ class ScientificProofDesignGateTests(unittest.TestCase):
         )
         report = validate_design(design)
         self.assertIn("axis_a5_conflicting_experience", report.unresolved_check_ids)
+
+    def test_a5_requires_operational_conflict_definition(self):
+        design = replace(
+            make_design(AxisId.A5_CONFLICTING_EXPERIENCE_HANDLING),
+            conflict_operational_definition="",
+        )
+        report = validate_design(design)
+        self.assertIn("axis_a5_conflicting_experience", report.unresolved_check_ids)
+
+    def test_a6_wrongness_cannot_be_known_before_outcome(self):
+        design = replace(
+            make_design(AxisId.A6_WRONG_BEHAVIOR_RECOVERY),
+            wrongness_defined_only_post_outcome=False,
+        )
+        report = validate_design(design)
+        self.assertIn("axis_a6_wrong_behavior_recovery", report.unresolved_check_ids)
+
+    def test_a6_requires_exogenous_and_decision_linked_attribution_controls(self):
+        design = replace(
+            make_design(AxisId.A6_WRONG_BEHAVIOR_RECOVERY),
+            attribution_controls=("DECISION_LINKED",),
+        )
+        report = validate_design(design)
+        self.assertIn("axis_a6_wrong_behavior_recovery", report.unresolved_check_ids)
+
+    def test_a6_requires_unrelated_relation_control(self):
+        design = replace(
+            make_design(AxisId.A6_WRONG_BEHAVIOR_RECOVERY),
+            relation_context_controls=("SAME_SCOPE",),
+        )
+        report = validate_design(design)
+        self.assertIn("axis_a6_wrong_behavior_recovery", report.unresolved_check_ids)
 
     def test_a6_requires_realized_wrong_change_then_later_recovery(self):
         design = replace(
