@@ -51,6 +51,52 @@ def make_design(axis: AxisId) -> ExperimentDesign:
                 mechanism_removed_or_permuted=True,
             )
         )
+    elif axis is AxisId.A3_RESPONSIBILITY_SENSITIVITY:
+        contrasts = [
+            CausalContrast(
+                contrast_id="C1",
+                treatment="CURRENT_BOUND",
+                control="RECORD_ONLY",
+                targeted_mechanism="responsibility binding",
+                held_constant=("current_observation", "core", "possibility_set", "responsibility_computation"),
+                observable_ids=("realized_choice", "outcome"),
+                falsification_condition="Binding responsibility does not alter any prespecified responsibility-sensitive realized choice relative to record-only.",
+                mechanism_removed_or_permuted=True,
+            ),
+            CausalContrast(
+                contrast_id="C2",
+                treatment="CURRENT_BOUND",
+                control="PERMUTED",
+                targeted_mechanism="responsibility candidate identity permuted",
+                held_constant=("current_observation", "core", "possibility_set", "responsibility_profile_multiset"),
+                observable_ids=("realized_choice", "outcome"),
+                falsification_condition="Permuting candidate-bound responsibility content produces no prespecified contrast relative to correctly bound responsibility.",
+                mechanism_removed_or_permuted=True,
+            ),
+        ]
+    elif axis is AxisId.A6_WRONG_BEHAVIOR_RECOVERY:
+        contrasts = [
+            CausalContrast(
+                contrast_id="C1",
+                treatment="EXPERIENCE_PARTICIPATES",
+                control="EXPERIENCE_HIDDEN",
+                targeted_mechanism="experience participation initial behavior effect",
+                held_constant=("current_observation", "core", "possibility_set", "responsibility_rule"),
+                observable_ids=("realized_choice", "outcome"),
+                falsification_condition="The prior experience does not causally alter the realized behavior that is later evaluated.",
+                mechanism_removed_or_permuted=True,
+            ),
+            CausalContrast(
+                contrast_id="C2",
+                treatment="REVALIDATION_EXPOSED",
+                control="REVALIDATION_RECORD_ONLY",
+                targeted_mechanism="post outcome revalidation recovery",
+                held_constant=("current_observation", "core", "possibility_set", "prior_experience_provenance"),
+                observable_ids=("realized_choice", "outcome"),
+                falsification_condition="Exposing provenance-bound revalidation does not alter the prespecified later recovery endpoint.",
+                mechanism_removed_or_permuted=True,
+            ),
+        ]
     return ExperimentDesign(
         experiment_id=f"TEST_{axis.value}",
         purpose="Falsifiable Governance OASIS mechanism test",
