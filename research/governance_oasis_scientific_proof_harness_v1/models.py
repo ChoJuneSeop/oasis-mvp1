@@ -167,6 +167,7 @@ class EvidenceRecord:
     design_report_passed: bool
     result_status: str
     source_refs: tuple[str, ...]
+    source_git_blobs: tuple[tuple[str, str], ...]
     claim_boundary: tuple[str, ...]
     counts_toward_axis_proof: bool
     claim_outcome: ClaimOutcome
