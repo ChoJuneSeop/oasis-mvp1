@@ -1,0 +1,76 @@
+{
+  "schema": "governance-oasis-a6-confirmatory-validation-record-v1",
+  "experiment_id": "GO_A6_WRONG_CHANGE_RECOVERY_V1",
+  "axis": "A6_WRONG_BEHAVIOR_RECOVERY",
+  "execution_sha": "e74a772aab3c49806b79ce1c67c59316e7806ff6",
+  "confirmatory_workflow": {
+    "run_id": 35390180217,
+    "job_id": 105746456751,
+    "conclusion": "success"
+  },
+  "artifact": {
+    "artifact_id": 10565336568,
+    "name": "governance-oasis-a6-confirmatory-35390180217-1",
+    "digest": "sha256:587a8d87e73a26dd1d23d32b976986e74207d3c70273ed19e0fb13daba285822"
+  },
+  "frozen_source_blobs": {
+    "research/governance_oasis_a6_wrong_change_recovery_v1/design_spec.py": "6c61f5c5afe139baafdf7aa2ddc1069fea315cfe",
+    "research/governance_oasis_a6_wrong_change_recovery_v1/CONFIRMATORY_PLAN.json": "956d82184ab1056d63d6794866af9a88ad969bb0",
+    "research/governance_oasis_a6_wrong_change_recovery_v1/scenario.py": "11de97ace818bbe0c6b6e369d829ce6833b1711b",
+    "research/governance_oasis_a6_wrong_change_recovery_v1/pipeline.py": "20a8082558f9e0e386e9cc08268147e63d8a6355",
+    "research/governance_oasis_a6_wrong_change_recovery_v1/evaluator.py": "c5c10946f559c00f17651096fdc98e3dcb19addb",
+    "research/governance_oasis_a6_wrong_change_recovery_v1/preflight.py": "b916484ad1f776349350ef838f78dc935caa9798"
+  },
+  "preexecution": {
+    "proof_ready": true,
+    "freeze_ready": true,
+    "unresolved_design_checks": [],
+    "unresolved_execution_checks": []
+  },
+  "matrix": {
+    "pilot_family": "P",
+    "confirmatory_families": [
+      "F1",
+      "F2",
+      "F3"
+    ],
+    "contexts": [
+      "SAME_SCOPE",
+      "UNRELATED_RELATION"
+    ],
+    "arms": [
+      "INITIAL_EXPERIENCE_EXPOSED",
+      "INITIAL_EXPERIENCE_HIDDEN",
+      "REVALIDATION_EXPOSED",
+      "REVALIDATION_RECORD_ONLY",
+      "EXOGENOUS_ATTRIBUTION_CONTROL"
+    ],
+    "chains": 30,
+    "decision_realization_units": 60
+  },
+  "temporal_chain": [
+    "prior CE exists",
+    "initial CE exposed/hidden decision and realization",
+    "authoritative post-realization observation",
+    "independent post-seal adverse evaluation",
+    "Closure",
+    "provenance-bound revalidation commit",
+    "later relation participation",
+    "later decision and realization"
+  ],
+  "results": {
+    "outcome": "SUPPORTS",
+    "failures": [],
+    "initial_experience_behavior_change_count": 3,
+    "exposed_post_outcome_adverse_count": 3,
+    "hidden_post_outcome_benign_count": 3,
+    "same_scope_recovery_count": 3,
+    "record_only_nonrecovery_count": 3,
+    "exogenous_not_revised_count": 3,
+    "exogenous_no_recovery_count": 3,
+    "unrelated_feedback_noninheritance_count": 3
+  },
+  "claim_boundary": "Finite deterministic synthetic wrong-change/recovery mechanism only; adversity is operational and post-realization, not a universal moral/legal judgment or real-world safety proof.",
+  "complete_not_equal_supports": true,
+  "post_result_rule_retuning": false
+}
