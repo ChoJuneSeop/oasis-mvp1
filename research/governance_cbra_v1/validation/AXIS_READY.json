@@ -1,0 +1,36 @@
+{
+  "status": "CBRA_AXIS_READY",
+  "version": "CBRA_V1_0",
+  "formal_name": "Continuous Bidirectional Revalidation Axis",
+  "korean_name": "지속 양방향 재검증축",
+  "governance_role": "AUXILIARY_OPERATOR_AXIS",
+  "replaces_fixed_six_axes": false,
+  "source_branch": "feature/governance-cbra-v1",
+  "source_head_before_evidence": "9413cb06a890557f19e3d3c77192f24f34d761c2",
+  "validation_run_id": 35324081956,
+  "validation_job_id": 105532983897,
+  "compile_pass": true,
+  "cbra_invariant_tests": {
+    "passed": 8,
+    "failed": 0
+  },
+  "governance_v04_attack_regression": {
+    "passed": 16,
+    "failed": 0
+  },
+  "validated_contracts": [
+    "participation YES and NO are both revalidation targets",
+    "selected and nonselected provenance are both retained",
+    "nonselected and nonparticipating paths do not receive invented counterfactual outcomes",
+    "U/I/V/T are revalidated separately",
+    "exogenous-only failure does not automatically revise a prior decision",
+    "monitoring begins only after Closure",
+    "monitoring time is strictly monotonic",
+    "checkpoint history is append-only",
+    "unknown provenance targets are rejected",
+    "no scalar score, weight, or latest-state collapse API"
+  ],
+  "comparative_failure_experiment_executed": false,
+  "behavioral_superiority_claimed": false,
+  "aggregate_score": null
+}
