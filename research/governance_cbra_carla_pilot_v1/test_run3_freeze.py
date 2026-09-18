@@ -13,9 +13,9 @@ SPEC = HERE / "RUN3_FREEZE_SPEC.md"
 
 
 class Run3FreezeTests(unittest.TestCase):
-    def _blob(self, path: str) -> str:
+    def _blob_at(self, commit: str, path: str) -> str:
         return subprocess.check_output(
-            ["git", "rev-parse", f"HEAD:{path}"], cwd=ROOT, text=True
+            ["git", "rev-parse", f"{commit}:{path}"], cwd=ROOT, text=True
         ).strip()
 
     def test_run3_manifest_is_frozen_before_execution(self):
@@ -40,12 +40,18 @@ class Run3FreezeTests(unittest.TestCase):
             data["frozen_source_git_blobs"][path],
             "be6f3192fe316776e7f9915f6e318f47e03e5f1b",
         )
-        self.assertEqual(self._blob(path), data["frozen_source_git_blobs"][path])
+        self.assertEqual(
+            self._blob_at(data["source_freeze_commit"], path),
+            data["frozen_source_git_blobs"][path],
+        )
 
     def test_frozen_runtime_sources_match_manifest(self):
         data = json.loads(MANIFEST.read_text(encoding="utf-8"))
         for path, expected in data["frozen_source_git_blobs"].items():
-            self.assertEqual(self._blob(path), expected)
+            self.assertEqual(
+                self._blob_at(data["source_freeze_commit"], path),
+                expected,
+            )
 
     def test_source_freeze_commit_is_ancestor_of_head(self):
         data = json.loads(MANIFEST.read_text(encoding="utf-8"))
