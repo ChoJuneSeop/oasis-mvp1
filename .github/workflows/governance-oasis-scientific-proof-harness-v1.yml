@@ -41,6 +41,12 @@ jobs:
       - name: Scientific plus execution combined gate
         run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_combined_gate
 
+      - name: Official six-axis sequence gate
+        run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_program_sequence
+
+      - name: Definition causal execution three-lens gate
+        run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_three_lens_gate
+
       - name: Lower execution-harness regression
         run: python -m unittest -v research.oasis_experiment_freeze_harness_v1.test_harness
 
@@ -65,4 +71,10 @@ jobs:
           assert "A4_OVERGENERALIZATION_PREVENTION" in p["weak_axes"]
           assert "A6_WRONG_BEHAVIOR_RECOVERY" in p["weak_axes"]
           assert p["integration_evidence_ids"] == []
+          assert p["supported_axes"] == [
+              "A1_BEHAVIOR_CHANGE_EFFECTIVENESS",
+              "A3_RESPONSIBILITY_SENSITIVITY",
+          ]
+          assert p["next_required_axis"] == "A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY"
+          assert p["integration_supported"] is False
           PY
