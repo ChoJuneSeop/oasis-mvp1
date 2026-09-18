@@ -647,6 +647,7 @@ def validate_design(design: ExperimentDesign) -> ProofDesignReport:
     )
     return ProofDesignReport(
         experiment_id=design.experiment_id,
+        execution_profile_id=design.execution_profile_id,
         checks=tuple(checks),
         targeted_axes=design.targeted_axes,
         proof_ready=not unresolved,
