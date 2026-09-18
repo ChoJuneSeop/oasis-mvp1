@@ -50,6 +50,9 @@ jobs:
       - name: Canonical all-gates experiment readiness
         run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_readiness_gate
 
+      - name: Serialized execution-report anti-forgery checks
+        run: python -m unittest -v research.governance_oasis_scientific_proof_harness_v1.test_execution_report_io
+
       - name: Lower execution-harness regression
         run: python -m unittest -v research.oasis_experiment_freeze_harness_v1.test_harness
 
