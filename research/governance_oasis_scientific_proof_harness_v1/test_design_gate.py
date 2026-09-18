@@ -203,11 +203,33 @@ class ScientificProofDesignGateTests(unittest.TestCase):
         report = validate_design(design)
         self.assertIn("axis_a2_experience_traceability", report.unresolved_check_ids)
 
+    def test_a2_identity_and_relation_order_need_distinct_contrasts(self):
+        design = make_design(AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY)
+        merged = CausalContrast(
+            contrast_id="MERGED",
+            treatment="IDENTITY_AND_RELATION_INTACT",
+            control="IDENTITY_AND_RELATION_ABLATED",
+            targeted_mechanism="experience identity relation order",
+            held_constant=("current_observation", "core", "possibility_set"),
+            observable_ids=("realized_choice", "outcome"),
+            falsification_condition="Merged contrast produces no effect.",
+            mechanism_removed_or_permuted=True,
+        )
+        design = replace(design, contrasts=(merged,))
+        report = validate_design(design)
+        self.assertIn("axis_a2_experience_traceability", report.unresolved_check_ids)
+
     def test_a3_requires_record_only_and_content_control(self):
         design = replace(
             make_design(AxisId.A3_RESPONSIBILITY_SENSITIVITY),
             responsibility_controls=("RECORD_ONLY",),
         )
+        report = validate_design(design)
+        self.assertIn("axis_a3_responsibility_sensitivity", report.unresolved_check_ids)
+
+    def test_a3_requires_distinct_binding_and_content_contrasts(self):
+        design = make_design(AxisId.A3_RESPONSIBILITY_SENSITIVITY)
+        design = replace(design, contrasts=(design.contrasts[0],))
         report = validate_design(design)
         self.assertIn("axis_a3_responsibility_sensitivity", report.unresolved_check_ids)
 
@@ -227,6 +249,14 @@ class ScientificProofDesignGateTests(unittest.TestCase):
         report = validate_design(design)
         self.assertIn("axis_a2_experience_traceability", report.unresolved_check_ids)
 
+    def test_a4_requires_yes_no_provenance_not_only_scope_labels(self):
+        design = replace(
+            make_design(AxisId.A4_OVERGENERALIZATION_PREVENTION),
+            participation_yes_no_provenance=False,
+        )
+        report = validate_design(design)
+        self.assertIn("axis_a4_overgeneralization", report.unresolved_check_ids)
+
     def test_a5_requires_real_conflict_and_preserved_order(self):
         design = replace(
             make_design(AxisId.A5_CONFLICTING_EXPERIENCE_HANDLING),
@@ -240,6 +270,14 @@ class ScientificProofDesignGateTests(unittest.TestCase):
         design = replace(
             make_design(AxisId.A5_CONFLICTING_EXPERIENCE_HANDLING),
             conflict_operational_definition="",
+        )
+        report = validate_design(design)
+        self.assertIn("axis_a5_conflicting_experience", report.unresolved_check_ids)
+
+    def test_a5_requires_context_variation_for_conflict_resolution(self):
+        design = replace(
+            make_design(AxisId.A5_CONFLICTING_EXPERIENCE_HANDLING),
+            relation_context_controls=("SAME_SCOPE",),
         )
         report = validate_design(design)
         self.assertIn("axis_a5_conflicting_experience", report.unresolved_check_ids)
@@ -265,6 +303,12 @@ class ScientificProofDesignGateTests(unittest.TestCase):
             make_design(AxisId.A6_WRONG_BEHAVIOR_RECOVERY),
             relation_context_controls=("SAME_SCOPE",),
         )
+        report = validate_design(design)
+        self.assertIn("axis_a6_wrong_behavior_recovery", report.unresolved_check_ids)
+
+    def test_a6_requires_distinct_initial_experience_effect_and_recovery_links(self):
+        design = make_design(AxisId.A6_WRONG_BEHAVIOR_RECOVERY)
+        design = replace(design, contrasts=(design.contrasts[1],))
         report = validate_design(design)
         self.assertIn("axis_a6_wrong_behavior_recovery", report.unresolved_check_ids)
 
@@ -309,9 +353,9 @@ class ScientificProofDesignGateTests(unittest.TestCase):
         report = validate_design(design)
         self.assertIn("crosscut_evaluator_independence", report.unresolved_check_ids)
 
-    def test_supplied_label_cannot_substitute_for_authoritative_outcome(self):
+    def test_outcome_dependent_recovery_requires_authoritative_outcome(self):
         design = replace(
-            make_design(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS),
+            make_design(AxisId.A6_WRONG_BEHAVIOR_RECOVERY),
             authoritative_outcome_observation=False,
         )
         report = validate_design(design)
