@@ -47,6 +47,10 @@ EXPECTED_MAP = "Town10HD_Opt"
 FIXED_DELTA_SECONDS = 0.05
 
 
+class ScenarioAdmissionError(RuntimeError):
+    """Pre-execution CARLA scene failed the frozen Run3 admission contract."""
+
+
 def scope_signature(observation: PresentObservation) -> tuple[bool, str, int]:
     return (
         bool(observation.front_present),
@@ -432,12 +436,16 @@ class PilotScene:
     def _spawn_ego(self):
         points = list(self.world.get_map().get_spawn_points())
         if not points:
-            raise CoreV11InvariantError("CARLA map has no spawn points")
+            raise ScenarioAdmissionError("CARLA map has no spawn points")
         rng = random.Random(self.seed)
         order = list(range(len(points)))
         rng.shuffle(order)
-        # Exclude dead-end spawn points up front so the frozen one-counterpart
-        # scenario can always be staged without post-result spawn substitution.
+
+        # Run3 freezes a deterministic clean-lane admission rule. We may examine
+        # candidates only before any Pilot decision epoch exists. A candidate is
+        # admissible only when it has forward relation space and the approved
+        # gateway reports no pre-existing front relation. This prevents unrelated
+        # ambient actors from making front-participant Closure impossible later.
         viable = []
         world_map = self.world.get_map()
         for index in order:
@@ -445,10 +453,10 @@ class PilotScene:
             if wp is not None and list(wp.next(18.0)):
                 viable.append(index)
         if not viable:
-            raise CoreV11InvariantError(
-                "CARLA map has no viable Pilot ego spawn with forward relation space"
+            raise ScenarioAdmissionError(
+                "no forward-capable ego spawn exists for the frozen Pilot scene"
             )
-        order = viable
+
         ids = self._four_wheel_vehicle_ids()
         preferred = (
             "vehicle.tesla.model3"
@@ -461,17 +469,51 @@ class PilotScene:
                 bp.set_attribute("role_name", "governance-pilot-ego")
         except Exception:
             pass
-        for index in order:
+
+        rejected = []
+        for index in viable:
             actor = self.world.try_spawn_actor(bp, points[index])
-            if actor is not None:
+            if actor is None:
+                rejected.append({"spawn_index": int(index), "reason": "spawn-failed"})
+                continue
+            try:
+                self.world.tick()
+                gateway = ControlledOracleObservationGateway(self.world, actor)
+                observation = PresentObservation.from_mapping(
+                    gateway.observe().as_mapping()
+                )
+                if observation.front_present:
+                    rejected.append(
+                        {
+                            "spawn_index": int(index),
+                            "reason": "pre-existing-front-relation",
+                            "front_kind": observation.front_kind,
+                            "local_density": observation.local_density,
+                        }
+                    )
+                    actor.destroy()
+                    self.world.tick()
+                    continue
+
                 self.ego = actor
                 self.base_transform = points[index]
+                self.admitted_spawn_index = int(index)
+                self.admission_rejected_candidates = tuple(rejected)
                 self.host = PilotCARLAHost(
                     self.world, self.ego, relation_id="UNBOUND"
                 )
-                self.host.tick()
                 return
-        raise CoreV11InvariantError("deterministic Pilot ego spawn failed")
+            except Exception:
+                if self.ego is None:
+                    try:
+                        actor.destroy()
+                    except Exception:
+                        pass
+                raise
+
+        raise ScenarioAdmissionError(
+            "no deterministic clean-lane ego spawn satisfied Run3 admission"
+        )
 
     def _counterpart_blueprint(self, kind: str):
         library = self.world.get_blueprint_library()
@@ -542,6 +584,54 @@ class PilotScene:
         raise CoreV11InvariantError(
             f"unable to spawn {kind} counterpart on current lane"
         )
+
+    def admit_relation_cycle(self, kind: str) -> dict[str, object]:
+        """Rehearse relation presence and Closure before any experimental decision.
+
+        This admission cycle is diagnostic only. It creates no HistoryEntry, no
+        Completed Experience, no CBRA checkpoint, and no Pilot evidence. Failure
+        is classified PRE_EXECUTION_SCENARIO_INVALID and never repaired by seed,
+        threshold, distance, or post-result substitution.
+        """
+        self.reset_ego()
+        self.host.set_relation_id(f"ADMISSION:{kind}")
+        baseline = PresentObservation.from_mapping(self.host.present_observation())
+        if baseline.front_present:
+            raise ScenarioAdmissionError(
+                f"{kind} admission baseline is contaminated by an ambient front relation"
+            )
+
+        self.spawn_counterpart(kind)
+        staged = PresentObservation.from_mapping(self.host.present_observation())
+        if not staged.front_present:
+            raise ScenarioAdmissionError(
+                f"{kind} counterpart did not form an approved front relation"
+            )
+        if staged.front_kind != kind:
+            raise ScenarioAdmissionError(
+                f"{kind} admission observed front_kind={staged.front_kind!r}"
+            )
+
+        self.remove_counterpart()
+        self.host.tick()
+        closed = PresentObservation.from_mapping(self.host.present_observation())
+        if closed.front_present:
+            raise ScenarioAdmissionError(
+                f"{kind} counterpart removal did not produce front_present=False"
+            )
+
+        result = {
+            "kind": kind,
+            "spawn_index": int(self.admitted_spawn_index),
+            "baseline_front_present": bool(baseline.front_present),
+            "staged_front_present": bool(staged.front_present),
+            "staged_front_kind": staged.front_kind,
+            "closure_front_present": bool(closed.front_present),
+            "passed": True,
+        }
+        self.reset_ego()
+        self.host.set_relation_id("UNBOUND")
+        return result
 
     def set_motion(self, *, ego_speed: float, counterpart_speed: float):
         import carla  # type: ignore
