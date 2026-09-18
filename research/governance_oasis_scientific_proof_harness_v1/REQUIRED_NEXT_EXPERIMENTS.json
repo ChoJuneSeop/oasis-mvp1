@@ -1,17 +1,7 @@
 {
   "program_id": "GOVERNANCE_OASIS_SIX_AXIS_PROOF_PROGRAM_V1",
   "status": "PROSPECTIVE_REQUIREMENTS_NOT_FROZEN",
-  "sequencing_rule": "Use existing valid evidence where claim coverage is complete; design only the unresolved causal obligations, then run one integrated flow-preserving confirmatory experiment.",
-  "existing_closed_axes": [
-    {
-      "axis": "A1_BEHAVIOR_CHANGE_EFFECTIVENESS",
-      "evidence": "GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT"
-    },
-    {
-      "axis": "A3_RESPONSIBILITY_SENSITIVITY",
-      "evidence": "GH2_V1_1"
-    }
-  ],
+  "sequencing_rule": "Official progression follows A1→A2→A3→A4→A5→A6. Existing valid later-axis evidence is preserved but cannot skip the first unsupported axis. After all six axes have qualifying SUPPORTS evidence, run one integrated flow-preserving confirmatory experiment.",
   "required_next_experiments": [
     {
       "experiment_id": "GO_A2_RELATION_ORDER_TRACEABILITY_V1",
@@ -206,6 +196,16 @@
         "NO provenance preserved",
         "post-result retuning forbidden"
       ]
+    }
+  ],
+  "existing_supported_evidence_axes": [
+    {
+      "axis": "A1_BEHAVIOR_CHANGE_EFFECTIVENESS",
+      "evidence": "GH1L_EXPERIMENT_V1_0_2_ACTION_CONTRACT"
+    },
+    {
+      "axis": "A3_RESPONSIBILITY_SENSITIVITY",
+      "evidence": "GH2_V1_1"
     }
   ]
 }
