@@ -1,0 +1,20 @@
+{
+  "protocol": "OASIS-CARLA Paper Validation Protocol v2.2",
+  "harness": "OASIS-CARLA Paper Validation Harness v1.1",
+  "harness_path": "research/carla_v22_canonical/harness_v1_1.py",
+  "harness_source_commit": "d4bbef7570a010aeb80241ebed1f4573c0e65016",
+  "verified_bundle_commit": "57cf3edba8e1a0e557b7890ded98dca4cd5906ff",
+  "harness_sha256": "fe57064e10fd870ba9c3cf1ba0f5b95dc5a2bdd1337ae1b905a2f79bc450ce18",
+  "g32_sidecar_origin_branch": "experiment/g32-participation-reconstruction-provenance",
+  "g32_sidecar_origin_head": "c6982b728dc391aa160ea0bcb46652634690a709",
+  "g32_sidecar_tree_sha": "7595131af0fd8a4a6b3d47a242be720edd5265c3",
+  "verification_workflow": "CARLA v2.2 canonical Harness v1.1",
+  "verification_run_id": 34678545938,
+  "verification_conclusion": "success",
+  "canonical_validation_tests": 3,
+  "g32_regression_tests": 8,
+  "experiment_executed": false,
+  "result_artifact": null,
+  "result_source_hash_linked": false,
+  "boundary": "The lost Harness v1.0 decision formula is not reconstructed or claimed. Harness v1.1 defines a reproducible adapter boundary and G3.2 observation flow only."
+}
