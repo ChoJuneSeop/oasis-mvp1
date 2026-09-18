@@ -1,0 +1,28 @@
+{
+  "status":"CBRA_FAILURE_CE_V1_1_COMPLETE",
+  "axis":"CBRA_V1_0",
+  "experiment":"CBRA_FAILURE_CE_V1_1_FINAL",
+  "frozen_scientific_snapshot_sha":"be6d3a88e60aba44f74738a8524bf0138f1613d1",
+  "pilot_run_id":35328516151,
+  "confirmatory_run_id":35328613899,
+  "postrun_structural_audit":"PASS",
+  "v1_0_confirmatory_status":"DIAGNOSTIC_ONLY_NOT_SCIENTIFICALLY_ADMISSIBLE",
+  "v1_1_evidence_status":"ESTABLISHED_WITHIN_FROZEN_SYNTHETIC_MECHANISM_SCOPE",
+  "validated":[
+    "CBRA history exposure changes later governance behavior relative to record-only CBRA provenance under the frozen failure matrix",
+    "NO participation provenance is revalidation-visible without counterfactual outcome invention",
+    "U/I/V/T obligation provenance can be revalidated separately",
+    "changed-scope re-entry is not globally suppressed by prior revision under the frozen contextual rule",
+    "exogenous-only failure is not automatically attributed as a decision error by CBRA",
+    "delayed failure monitoring preserves ordered post-Closure checkpoints and as-of gating"
+  ],
+  "not_validated":[
+    "universal superiority over general harnesses",
+    "real-world safety",
+    "CARLA deployment validity",
+    "population-general statistical claims",
+    "normative correctness of U/I/V/T"
+  ],
+  "aggregate_score":null,
+  "post_result_rule_repair":false
+}
