@@ -66,6 +66,21 @@ class ProgramSequenceTests(unittest.TestCase):
             AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY.value,
         )
 
+    def test_replication_flag_cannot_be_used_to_skip_into_an_unsupported_later_axis(self):
+        design = replace(
+            make_design(AxisId.A5_CONFLICTING_EXPERIENCE_HANDLING),
+            metadata={"replication_of_closed_axis": True},
+        )
+        report = validate_program_sequence(
+            program_id=self.program_id,
+            design=design,
+            portfolio=self.portfolio,
+        )
+        self.assertFalse(report.sequence_ready)
+        self.assertTrue(
+            any("official_axis_sequence_requires" in x for x in report.blockers)
+        )
+
     def test_integration_is_blocked_until_all_six_axes_are_supported(self):
         design = replace(
             make_design(AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY),
