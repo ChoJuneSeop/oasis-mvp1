@@ -8,13 +8,13 @@ from .models import AxisId, CausalContrast, DesignStatus, EvidenceLevel, Experim
 from .registry import MANDATORY_TEMPORAL_ORDER
 
 
-CLAIM_BY_AXIS = {
-    AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS: "GO-A1-C1",
-    AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY: "GO-A2-C1",
-    AxisId.A3_RESPONSIBILITY_SENSITIVITY: "GO-A3-C1",
-    AxisId.A4_OVERGENERALIZATION_PREVENTION: "GO-A4-C1",
-    AxisId.A5_CONFLICTING_EXPERIENCE_HANDLING: "GO-A5-C1",
-    AxisId.A6_WRONG_BEHAVIOR_RECOVERY: "GO-A6-C1",
+CLAIMS_BY_AXIS = {
+    AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS: ("GO-A1-C1", "GO-A1-C2"),
+    AxisId.A2_EXPERIENCE_CONTRIBUTION_TRACEABILITY: ("GO-A2-C1", "GO-A2-C2"),
+    AxisId.A3_RESPONSIBILITY_SENSITIVITY: ("GO-A3-C1",),
+    AxisId.A4_OVERGENERALIZATION_PREVENTION: ("GO-A4-C1",),
+    AxisId.A5_CONFLICTING_EXPERIENCE_HANDLING: ("GO-A5-C1",),
+    AxisId.A6_WRONG_BEHAVIOR_RECOVERY: ("GO-A6-C1",),
 }
 
 
@@ -121,15 +121,18 @@ def make_design(axis: AxisId) -> ExperimentDesign:
         experiment_id=f"TEST_{axis.value}",
         execution_profile_id=f"EXEC_{axis.value}",
         required_execution_check_ids=(
+            "source_freeze",
             "world_isolation",
             "cross_arm_identity",
             "future_leakage",
+            "evaluator_postjoin",
             "single_realization",
-            "source_freeze",
+            "provenance_integrity",
+            "output_immutability",
         ),
         purpose="Falsifiable Governance OASIS mechanism test",
         targeted_axes=(axis,),
-        claim_ids=(CLAIM_BY_AXIS[axis],),
+        claim_ids=CLAIMS_BY_AXIS[axis],
         evidence_level=EvidenceLevel.CONFIRMATORY,
         hypothesis="The targeted Governance OASIS mechanism causally affects the prespecified later governance endpoint.",
         null_or_falsification="No causal treatment-control difference under the frozen contrast.",
@@ -205,6 +208,18 @@ class ScientificProofDesignGateTests(unittest.TestCase):
                 report = validate_design(make_design(axis))
                 self.assertTrue(report.proof_ready, report.as_dict())
 
+    def test_design_only_profile_cannot_be_miscounted_as_proof_ready(self):
+        design = replace(
+            make_design(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS),
+            evidence_level=EvidenceLevel.DESIGN_ONLY,
+        )
+        report = validate_design(design)
+        self.assertFalse(report.proof_ready)
+        self.assertIn(
+            "crosscut_scientific_evidence_level",
+            report.unresolved_check_ids,
+        )
+
     def test_structural_pilot_cannot_be_miscounted_as_proof(self):
         design = replace(
             make_design(AxisId.A4_OVERGENERALIZATION_PREVENTION),
@@ -217,6 +232,25 @@ class ScientificProofDesignGateTests(unittest.TestCase):
         self.assertEqual(
             by_id["crosscut_scientific_evidence_level"].status,
             DesignStatus.BLOCKED,
+        )
+
+    def test_axis_design_must_register_every_required_claim(self):
+        design = replace(
+            make_design(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS),
+            claim_ids=("GO-A1-C1",),
+        )
+        report = validate_design(design)
+        self.assertIn("crosscut_claim_alignment", report.unresolved_check_ids)
+
+    def test_scientific_design_cannot_use_a_weak_execution_profile_contract(self):
+        design = replace(
+            make_design(AxisId.A1_BEHAVIOR_CHANGE_EFFECTIVENESS),
+            required_execution_check_ids=("source_freeze", "single_realization"),
+        )
+        report = validate_design(design)
+        self.assertIn(
+            "crosscut_execution_contract_declared",
+            report.unresolved_check_ids,
         )
 
     def test_scientific_design_must_declare_execution_checks(self):
