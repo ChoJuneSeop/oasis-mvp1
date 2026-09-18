@@ -11,7 +11,12 @@ from .models import (
     ExperimentDesign,
     ProofDesignReport,
 )
-from .registry import CLAIM_AXIS_MAP, MANDATORY_TEMPORAL_ORDER
+from .registry import (
+    CLAIM_AXIS_MAP,
+    MANDATORY_EXECUTION_CHECK_IDS,
+    MANDATORY_TEMPORAL_ORDER,
+    REQUIRED_CLAIMS_BY_AXIS,
+)
 
 
 def _pass(check_id: str, summary: str, *, axis: AxisId | None = None, evidence=()):
@@ -110,7 +115,13 @@ def _contrast_integrity(design: ExperimentDesign) -> DesignCheck:
 def _execution_contract_declared(design: ExperimentDesign) -> DesignCheck:
     ids = tuple(x for x in design.required_execution_check_ids if x.strip())
     duplicates = sorted(k for k, n in Counter(ids).items() if n > 1)
-    ok = bool(design.execution_profile_id.strip()) and bool(ids) and not duplicates
+    missing_mandatory = sorted(set(MANDATORY_EXECUTION_CHECK_IDS) - set(ids))
+    ok = (
+        bool(design.execution_profile_id.strip())
+        and bool(ids)
+        and not duplicates
+        and not missing_mandatory
+    )
     return (
         _pass(
             "crosscut_execution_contract_declared",
@@ -124,6 +135,7 @@ def _execution_contract_declared(design: ExperimentDesign) -> DesignCheck:
                 f"execution_profile_id={design.execution_profile_id!r}",
                 f"required_execution_check_ids={list(ids)}",
                 f"duplicates={duplicates}",
+                f"missing_mandatory={missing_mandatory}",
             ),
         )
     )
@@ -167,6 +179,17 @@ def _claim_alignment(design: ExperimentDesign) -> DesignCheck:
             errors.append(f"{claim_id} maps to {axis.value} but axis is not targeted")
     if not targeted and not design.structural_only:
         errors.append("non-structural design targets no governance axis")
+
+    required_claims = set()
+    for axis in targeted:
+        required_claims.update(REQUIRED_CLAIMS_BY_AXIS[axis])
+    if design.evidence_level is EvidenceLevel.INTEGRATED_CONFIRMATORY:
+        required_claims.add("GO-INTEGRATED-C1")
+    missing_required_claims = sorted(required_claims - set(design.claim_ids))
+    if missing_required_claims:
+        errors.append(
+            "missing required claim ids=" + ",".join(missing_required_claims)
+        )
     return (
         _pass(
             "crosscut_claim_alignment",
@@ -674,6 +697,7 @@ def validate_design(design: ExperimentDesign) -> ProofDesignReport:
     ]
 
     if design.structural_only or design.evidence_level in {
+        EvidenceLevel.DESIGN_ONLY,
         EvidenceLevel.STRUCTURAL_ONLY,
         EvidenceLevel.PILOT_ONLY,
     }:
