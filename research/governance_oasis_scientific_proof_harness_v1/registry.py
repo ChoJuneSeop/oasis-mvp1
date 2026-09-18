@@ -117,12 +117,12 @@ AXIS_CONTRACTS: dict[AxisId, AxisContract] = {
             "재검증하고, 이후 관련 관계에서 행동 구조가 복구되는가?"
         ),
         mandatory_obligations=(
-            "wrong_change_realized",
+            "adverse_change_realization_endpoint",
             "wrongness_defined_post_outcome",
             "authoritative_outcome_observation",
             "decision_linked_and_exogenous_attribution_controls",
             "same_scope_and_unrelated_relation_controls",
-            "post_outcome_contradictory_evidence",
+            "post_outcome_contradiction_endpoint",
             "later_recurrence",
             "recovery_endpoint",
             "revalidation_ablation",
