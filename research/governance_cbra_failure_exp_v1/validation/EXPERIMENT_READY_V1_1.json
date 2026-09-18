@@ -1,0 +1,19 @@
+{
+  "status":"EXPERIMENT_READY",
+  "spec_version":"CBRA_FAILURE_CE_V1_1_FINAL",
+  "frozen_experiment_snapshot_sha":"be6d3a88e60aba44f74738a8524bf0138f1613d1",
+  "preexecution_run_id":35328349140,
+  "preexecution_job_id":105546620961,
+  "compile_pass":true,
+  "cbra_invariants_pass":true,
+  "failure_experiment_preexecution_pass":true,
+  "governance_v04_regression_pass":true,
+  "v1_0_results_used_for_tuning":false,
+  "pilot_cases_per_arm":15,
+  "confirmatory_cases_per_arm":60,
+  "arms":["GOV_CBRA","GOV_RECORD_ONLY","GENERAL_HARNESS"],
+  "pilot_structural_only":true,
+  "pilot_may_tune_confirmatory":false,
+  "aggregate_score":null,
+  "post_result_rule_repair":false
+}
