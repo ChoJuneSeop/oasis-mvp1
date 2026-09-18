@@ -336,6 +336,7 @@ def _axis_a2(design: ExperimentDesign) -> DesignCheck:
     ok = (
         design.experience_identity_control
         and design.relation_order_ablation
+        and design.participation_yes_no_provenance
         and identity_contrast
         and relation_order_contrast
         and len(design.provenance_chain) >= 5
@@ -354,6 +355,7 @@ def _axis_a2(design: ExperimentDesign) -> DesignCheck:
             evidence=(
                 f"experience_identity_control={design.experience_identity_control}",
                 f"relation_order_ablation={design.relation_order_ablation}",
+                f"participation_yes_no_provenance={design.participation_yes_no_provenance}",
                 f"identity_contrast={identity_contrast}",
                 f"relation_order_contrast={relation_order_contrast}",
                 f"provenance_length={len(design.provenance_chain)}",
@@ -430,10 +432,13 @@ def _axis_a4(design: ExperimentDesign) -> DesignCheck:
 
 def _axis_a5(design: ExperimentDesign) -> DesignCheck:
     axis = AxisId.A5_CONFLICTING_EXPERIENCE_HANDLING
+    conflict_defined = bool(design.conflict_operational_definition.strip())
     ok = (
         design.conflicting_experience_count >= 2
+        and conflict_defined
         and design.conflict_order_preserved
         and design.no_scalar_conflict_overwrite
+        and design.participation_yes_no_provenance
         and _mechanism_contrast(design, "conflict")
     )
     return (
@@ -449,7 +454,9 @@ def _axis_a5(design: ExperimentDesign) -> DesignCheck:
             axis=axis,
             evidence=(
                 f"conflicting_experience_count={design.conflicting_experience_count}",
+                f"conflict_operational_definition_present={conflict_defined}",
                 f"conflict_order_preserved={design.conflict_order_preserved}",
+                f"participation_yes_no_provenance={design.participation_yes_no_provenance}",
                 f"no_scalar_conflict_overwrite={design.no_scalar_conflict_overwrite}",
                 f"conflict_contrast={_mechanism_contrast(design, 'conflict')}",
             ),
@@ -459,12 +466,24 @@ def _axis_a5(design: ExperimentDesign) -> DesignCheck:
 
 def _axis_a6(design: ExperimentDesign) -> DesignCheck:
     axis = AxisId.A6_WRONG_BEHAVIOR_RECOVERY
+    contexts = {x.upper() for x in design.relation_context_controls}
+    attributions = {x.upper() for x in design.attribution_controls}
+    required_contexts = {"SAME_SCOPE", "UNRELATED_RELATION"}
+    outcome_defined_after_realization = (
+        design.wrongness_defined_only_post_outcome
+        and bool(design.adverse_outcome_criterion.strip())
+        and design.authoritative_outcome_observation
+    )
     ok = (
         design.wrong_change_realized
+        and outcome_defined_after_realization
         and design.post_outcome_contradictory_evidence
         and design.recovery_epochs >= 3
         and design.recovery_endpoint
         and design.post_outcome_revalidation_control
+        and "EXOGENOUS" in attributions
+        and "DECISION_LINKED" in attributions
+        and required_contexts.issubset(contexts)
         and _mechanism_contrast(design, "revalidation")
     )
     return (
@@ -480,6 +499,11 @@ def _axis_a6(design: ExperimentDesign) -> DesignCheck:
             axis=axis,
             evidence=(
                 f"wrong_change_realized={design.wrong_change_realized}",
+                f"wrongness_defined_only_post_outcome={design.wrongness_defined_only_post_outcome}",
+                f"adverse_outcome_criterion_present={bool(design.adverse_outcome_criterion.strip())}",
+                f"authoritative_outcome_observation={design.authoritative_outcome_observation}",
+                f"attribution_controls={sorted(attributions)}",
+                f"relation_context_controls={sorted(contexts)}",
                 f"post_outcome_contradictory_evidence={design.post_outcome_contradictory_evidence}",
                 f"recovery_epochs={design.recovery_epochs}",
                 f"recovery_endpoint={design.recovery_endpoint}",
