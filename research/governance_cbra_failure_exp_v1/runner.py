@@ -4,7 +4,7 @@ from dataclasses import asdict
 
 from research.governance_cbra_v1.axis import ContinuousBidirectionalRevalidationAxis
 from research.governance_cbra_v1.models import (
-    AttributionKind, DecisionProvenanceSnapshot, ParticipationProvenance,
+    AttributionKind, EvidenceDirection, DecisionProvenanceSnapshot, ParticipationProvenance,
     ResponsibilityProvenance, TargetEvidence, TargetKind,
 )
 from research.governance_harness_v01.harness import RevalidationState
